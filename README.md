@@ -58,7 +58,7 @@ Asegúrese de tener instalado Python 3.10+ y un servidor MySQL ejecutándose loc
 **1. Clonar el repositorio**
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
+git clone <https://github.com/bautistaribotta/southern_honey_group.git>
 cd southern_honey_group
 
 ```
@@ -122,7 +122,7 @@ El portal estará disponible de forma local ingresando a `http://127.0.0.1:8000/
 
 ---
 
-## Autor
+## Datos personales
 
 **Bautista Ribotta**
 Desarrollador Full Stack a cargo del ciclo de vida completo del software: analisis de requerimientos, diseño UI/UX, modelado de la base de datos y programación integral del backend y frontend.
