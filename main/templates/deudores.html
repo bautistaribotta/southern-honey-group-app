@@ -8,7 +8,7 @@
     <title> Deudores </title>
     <link rel="stylesheet" href="{% static 'inicio.css' %}">
     <link rel="stylesheet" href="{% static 'deudores.css' %}">
-    <link rel="icon" type="image/svg+xml" href="../static/hive.svg">
+    <link rel="icon" type="image/svg+xml" href="{% static 'hive.svg' %}">
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -110,16 +110,22 @@
               </tr>
             </thead>
             <tbody>
+              {% for deudor in deudores %}
               <tr>
-                <td><div class="deudor-id"></div></td>
-                <td><div class="deudor-nombre"></div></td>
-                <td></td>
-                <td class="valor-pesos"></td>
-                <td class="valor-usd"></td>
-                <td class="valor-usd"></td>
-                <td class="valor-miel"></td>
-                <td class="valor-miel"></td>
+                <td><div class="deudor-id"> {{ deudor.id }} </div></td>
+                <td><div class="deudor-nombre"> {{ deudor.cliente }} </div></td>
+                <td> {{ deudor.fecha|date:"d/m/Y" }} </td>
+                <td class="valor-pesos"> $ {{ deudor.monto_total }} </td>
+                <td class="valor-usd"> {{ deudor.valor_dolar }} </td>
+                <td class="valor-usd"> - </td>
+                <td class="valor-miel"> {{ deudor.valor_kilo_miel }} </td>
+                <td class="valor-miel"> - </td>
               </tr>
+              {% empty %}
+              <tr>
+                <td colspan="8" style="text-align: center;"> No hay deudores registrados. </td>
+              </tr>
+              {% endfor %}
             </tbody>
           </table>
           

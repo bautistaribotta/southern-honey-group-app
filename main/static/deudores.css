@@ -59,17 +59,18 @@
   border: 1px solid var(--stone-200);
   border-radius: 0.75rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  flex: 1;
+  overflow: hidden; /* Esto asegura que el contenido no tape las esquinas redondeadas */
+  /* Mantiene el alto visual equivalente a unas 5 filas incluso vacía */
+  min-height: 400px;
 }
 
-/* --- TABLA DE DEUDORES --- */
 .tabla-deudores {
   width: 100%;
   text-align: left;
   border-collapse: collapse;
+  flex: 1;
 }
 
 .tabla-deudores th {
