@@ -6,11 +6,11 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 
     <title> Productos </title>
-    <!-- Importo el CSS base para la estructura y menú lateral -->
+
     <link rel="stylesheet" href="{% static 'inicio.css' %}">
-    
-    <!-- Importamos el CSS específico de las tablas y botones de productos -->
     <link rel="stylesheet" href="{% static 'productos.css' %}">
+    <link rel="stylesheet" href="{% static 'js/paneles.js' %}">
+
     <link rel="icon" type="image/svg+xml" href="{% static 'hive.svg' %}">
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
@@ -220,7 +220,9 @@
             </div>
 
             <div class="campo-formulario">
+
               <label for="categoria">Categoría</label>
+
               <select id="categoria" name="categoria" class="select-estandar" required>
                 <option value="" disabled selected>Seleccione una categoría</option>
                 <option value="Miel">Miel</option>
@@ -232,6 +234,7 @@
                 <option value="Medicamentos">Medicamentos</option>
                 <option value="Otros">Otros</option>
               </select>
+
             </div>
 
             <div class="campo-formulario">
@@ -256,18 +259,5 @@
         </div>
       </div>
     </div>
-
-    <!-- JS para realizar la accion -->
-    <script>
-      function abrirPanel() {
-        document.getElementById('slide-over-contenedor').classList.add('abierto');
-        document.body.style.overflow = 'hidden';
-      }
-
-      function cerrarPanel() {
-        document.getElementById('slide-over-contenedor').classList.remove('abierto');
-        document.body.style.overflow = 'auto';
-      }
-    </script>
   </body>
 </html>

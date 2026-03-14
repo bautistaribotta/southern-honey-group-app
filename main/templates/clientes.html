@@ -6,8 +6,11 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 
     <title> Clientes </title>
+
     <link rel="stylesheet" href="{% static 'inicio.css' %}">
     <link rel="stylesheet" href="{% static 'clientes.css' %}">
+    <link rel="stylesheet" href="{% static 'js/paneles.js' %}">
+    
     <link rel="icon" type="image/svg+xml" href="{% static 'hive.svg' %}">
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
@@ -174,145 +177,113 @@
     
     <!-- PANEL LATERAL NUEVO CLIENTE (SLIDE-OVER) -->
     <div id="slide-over-contenedor">
-    <div id="slide-over-fondo" onclick="cerrarPanel()"></div>
+      <div id="slide-over-fondo" onclick="cerrarPanel()"></div>
 
-    <div id="slide-over-panel">
-      <form id="form-cliente" method="POST" autocomplete="off">
-      {% csrf_token %}
-      <!-- 1. Cabecera -->
-      <header class="panel-cabecera">
-        <div class="panel-titulo-fila">
-          <div class="icono-contenedor">
-            <span class="material-symbols-outlined">person_add</span>
+      <div id="slide-over-panel">
+        <form id="form-cliente" method="POST">
+        {% csrf_token %}
+        <!-- 1. Cabecera -->
+        <header class="panel-cabecera">
+          <div class="panel-titulo-fila">
+            <div class="icono-contenedor">
+              <span class="material-symbols-outlined">person_add</span>
+            </div>
+            <div class="texto-cabecera">
+              <h3>Nuevo Cliente</h3>
+              <p>Ingrese los datos para el registro</p>
+            </div>
           </div>
-          <div class="texto-cabecera">
-            <h3>Nuevo Cliente</h3>
-            <p>Ingrese los datos para el registro</p>
-          </div>
-        </div>
-        <button type="button" class="boton-cerrar" onclick="cerrarPanel()">
-          <span class="material-symbols-outlined">close</span>
-        </button>
-      </header>
+          <button type="button" class="boton-cerrar" onclick="cerrarPanel()">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </header>
 
-      <!-- 2. Cuerpo con Scroll -->
-      <main class="panel-cuerpo">
-
-        <!-- Sección 1: Información Personal -->
-        <section class="seccion-bloque">
-          <div class="subtitulo-formulario">
-            <span class="material-symbols-outlined">badge</span>
-            <h4>Información Personal</h4>
-          </div>
-
-          <div class="sub-panel-datos">
-            <div class="grupo-input">
-              <label for="nombre">Nombre</label>
-              <input type="text" id="nombre" name="nombre" placeholder="Ej: Juan Antonio">
+        <!-- 2. Cuerpo con Scroll -->
+        <main class="panel-cuerpo">
+          <input type="hiden" id="id_cliente" name="id_cliente" value="">
+          <!-- Sección 1: Información Personal -->
+          <section class="seccion-bloque">
+            <div class="subtitulo-formulario">
+              <span class="material-symbols-outlined">badge</span>
+              <h4>Información Personal</h4>
             </div>
 
-            <div class="grupo-input">
-              <label for="apellido">Apellido</label>
-              <input type="text" id="apellido" name="apellido" placeholder="Ej: Pérez Garcia">
-            </div>
+            <div class="sub-panel-datos">
+              <div class="grupo-input">
+                <label for="nombre">Nombre</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Ej: Juan Antonio">
+              </div>
 
-            <div class="grupo-input">
-              <label for="telefono">Teléfono</label>
-              <div class="input-con-icono">
-                <span class="material-symbols-outlined">call</span>
-                <input type="text" id="telefono" name="telefono" placeholder="Ej: +54 9 02302...">
+              <div class="grupo-input">
+                <label for="apellido">Apellido</label>
+                <input type="text" id="apellido" name="apellido" placeholder="Ej: Pérez Garcia">
+              </div>
+
+              <div class="grupo-input">
+                <label for="telefono">Teléfono</label>
+                <div class="input-con-icono">
+                  <span class="material-symbols-outlined">call</span>
+                  <input type="text" id="telefono" name="telefono" placeholder="Ej: +54 9 02302...">
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        <!-- Sección 2: Ubicación -->
-        <section class="seccion-bloque">
-          <div class="subtitulo-formulario">
-            <span class="material-symbols-outlined">location_on</span>
-            <h4>Ubicación</h4>
-          </div>
-
-          <div class="sub-panel-datos">
-            <div class="grupo-input">
-              <label for="localidad">Localidad</label>
-              <input type="text" id="localidad" name="localidad" placeholder="Ej: Córdoba Capital">
+          <!-- Sección 2: Ubicación -->
+          <section class="seccion-bloque">
+            <div class="subtitulo-formulario">
+              <span class="material-symbols-outlined">location_on</span>
+              <h4>Ubicación</h4>
             </div>
 
-            <div class="grupo-input">
-              <label for="direccion">Dirección</label>
-              <input type="text" id="direccion" name="direccion" placeholder="Calle y número">
-            </div>
-          </div>
-        </section>
-
-        <!-- Sección 3: Facturación -->
-        <section class="seccion-bloque">
-          <div class="subtitulo-formulario">
-            <span class="material-symbols-outlined">receipt_long</span>
-            <h4>Facturación</h4>
-          </div>
-
-          <div class="sub-panel-datos">
-            <div class="fila-toggle">
-              <div class="texto-toggle">
-                <span class="titulo-toggle">Factura la producción</span>
-                <span class="subtitulo-toggle">Activa para ingresar el cuit</span>
+            <div class="sub-panel-datos">
+              <div class="grupo-input">
+                <label for="localidad">Localidad</label>
+                <input type="text" id="localidad" name="localidad" placeholder="Ej: Córdoba Capital">
               </div>
-              <label class="switch">
-                <input type="checkbox" id="factura" name="factura">
-                <span class="slider"></span>
-              </label>
+
+              <div class="grupo-input">
+                <label for="direccion">Dirección</label>
+                <input type="text" id="direccion" name="direccion" placeholder="Calle y número">
+              </div>
+            </div>
+          </section>
+
+          <!-- Sección 3: Facturación -->
+          <section class="seccion-bloque">
+            <div class="subtitulo-formulario">
+              <span class="material-symbols-outlined">receipt_long</span>
+              <h4>Facturación</h4>
             </div>
 
-            <div class="grupo-input" id="campo-cuit">
-              <label for="cuit">CUIT</label>
-              <input type="text" id="cuit" name="cuit" placeholder="00-00000000-0">
+            <div class="sub-panel-datos">
+              <div class="fila-toggle">
+                <div class="texto-toggle">
+                  <span class="titulo-toggle">Factura la producción</span>
+                  <span class="subtitulo-toggle">Activa para ingresar el cuit</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="factura" name="factura">
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="grupo-input" id="campo-cuit">
+                <label for="cuit">CUIT</label>
+                <input type="text" id="cuit" name="cuit" placeholder="00-00000000-0">
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-      </main>
+        </main>
 
-      <!-- 3. Pie fijo -->
-      <footer class="panel-pie">
-        <button type="button" class="boton-secundario" onclick="cerrarPanel()">Cancelar</button>
-        <button type="submit" class="boton-primario">Guardar Cliente</button>
-      </footer>
-      </form>
+        <!-- 3. Pie fijo -->
+        <footer class="panel-pie">
+          <button type="button" class="boton-secundario" onclick="cerrarPanel()">Cancelar</button>
+          <button type="submit" class="boton-primario">Guardar Cliente</button>
+        </footer>
+        </form>
+      </div>
     </div>
-  </div>
-
-    <!-- JS para realizar la accion -->
-    <script>
-      function abrirPanel() {
-        document.getElementById('slide-over-contenedor').classList.add('abierto');
-        document.body.style.overflow = 'hidden';
-      }
-
-      function cerrarPanel() {
-        document.getElementById('slide-over-contenedor').classList.remove('abierto');
-        document.body.style.overflow = 'auto';
-      }
-
-      // Lógica para mostrar/ocultar CUIT
-      const checkboxFactura = document.getElementById('factura');
-      const campoCuit = document.getElementById('campo-cuit');
-
-      // Función que actualiza la visibilidad
-      function actualizarCuit() {
-        if (checkboxFactura.checked) {
-          campoCuit.style.display = 'flex';
-        } else {
-          campoCuit.style.display = 'none';
-        }
-      }
-
-      // Escuchar cambios en el switch
-      checkboxFactura.addEventListener('change', actualizarCuit);
-
-      // Ejecutar al cargar para asegurar el estado inicial
-      actualizarCuit();
-    </script>
   </body>
 </html>
