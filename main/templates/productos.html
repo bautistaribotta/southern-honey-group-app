@@ -212,7 +212,7 @@
 
         <!-- Cuerpo del Panel (Formulario) -->
         <div class="panel-cuerpo">
-          <form class="formulario-producto" id="form-nuevo-producto" method="POST">
+          <form class="formulario-producto" id="form-nuevo-producto" method="POST" autocomplete="off">
             {% csrf_token %}
             <div class="campo-formulario">
               <label for="nombre">Nombre del Producto</label>

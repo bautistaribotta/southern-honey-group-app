@@ -1,6 +1,6 @@
 from .services import (get_cotizacion_oficial, get_cotizacion_blue,
                        get_cotizacion_miel_clara, get_cotizacion_miel_oscura,
-                       nuevo_producto, nuevo_cliente)
+                       nuevo_producto, nuevo_cliente, editar_producto, editar_cliente)
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
@@ -14,18 +14,17 @@ def login(request):
         usuario = request.POST.get("user")
         password = request.POST.get("password")
 
-        # Autenticacion
         usuario_valido = authenticate(request, username=usuario, password=password)
 
         # Si es válido los redirijo, si no, envío el error por mensaje
         if usuario_valido is not None:
             auth_login(request, usuario_valido)
             return redirect("inicio")
+
         else:
             messages.error(request, "Usuario y/o contraseña incorrectos")
             return redirect("login")
 
-    # Si no se realizo un POST, simplemente cargo la pagina
     return render(request, "login.html")
 
 
@@ -49,29 +48,36 @@ def inicio(request):
 
 @login_required
 def productos(request):
-    # Recibo el metodo POST, guardo los datos del formulario, creo
-    # el producto en la base de datos, queda realizar validaciones
+    """
+    Recibo el metodo POST, guardo los datos del formulario y creo
+    el producto en la base de datos, queda realizar validaciones
+    """
     if request.method == "POST":
+        id_producto = request.POST.get("id_producto")
         nombre_producto = request.POST.get("nombre")
         categoria = request.POST.get("categoria")
         precio = request.POST.get("precio")
         cantidad = request.POST.get("stock")
 
-        nuevo_producto(nombre_producto, categoria, precio, cantidad)
-        messages.success(request, "Producto agregado correctamente.")
+        if id_producto:
+            editar_producto(id_producto, nombre_producto, categoria, precio, cantidad, activo)
+
+        else:
+            nuevo_producto(nombre_producto, categoria, precio, cantidad)
+            messages.success(request, "Producto agregado correctamente.")
 
         return redirect("productos")
 
-    # Trae solo los productos activos de la base de datos ordenados por nombre.
+    """
+    1-Trae solo los productos activos de la base de datos ordenados por nombre
+    2-Divide esa lista total en bloques de 5 productos
+    3-Se fija en la URL en qué página está el usuario
+    4-Extraigo únicamente los 5 productos que corresponden a esa página específica
+      para no ralentizar la busqueda si tengo muchos elementos en la base de datos
+    """
     productos = Producto.objects.filter(activo=True).order_by("nombre")
-
-    # Divide esa lista total en bloques de 5 productos
     paginator_productos = Paginator(productos, 5)
-
-    # Se fija en la URL en qué página está el usuario
     pagina_numero = request.GET.get("page")
-
-    # Extraigo únicamente los 5 productos que corresponden a esa página específica
     pagina_obj = paginator_productos.get_page(pagina_numero)
 
     return render(request, "productos.html", {"productos":pagina_obj})
@@ -80,6 +86,7 @@ def productos(request):
 @login_required
 def clientes(request):
     if request.method == "POST":
+        id_cliente = request.POST.get("id_cliente")
         nombre_cliente = request.POST.get("nombre")
         apellido = request.POST.get("apellido")
         telefono = request.POST.get("telefono")
@@ -88,16 +95,22 @@ def clientes(request):
         factura = request.POST.get("factura")
         cuit = request.POST.get("cuit")
 
-        nuevo_cliente(nombre_cliente, apellido, telefono, localidad, direccion, factura, cuit)
-        messages.success(request, "Cliente creado correctamente")
+        if id_cliente:
+            editar_cliente(id_cliente)
+
+        else:
+            nuevo_cliente(nombre_cliente, apellido, telefono, localidad, direccion, factura, cuit)
+            messages.success(request, "Cliente creado correctamente")
 
         return redirect("clientes")
 
     """
-    Repito el proceso aplicado en productos
-    Query + Cant. pag. a mostrar + URL + Los 5 que corresponden + Enviar el listado al HTML
+    1-Trae solo los clientes activos de la base de datos ordenados por nombre
+    2-Divide esa lista total en bloques de 5 clientes
+    3-Se fija en la URL en qué página está el usuario
+    4-Extraigo únicamente los 5 clientes que corresponden a esa página específica
+      para no ralentizar la busqueda si tengo muchos elementos en la base de datos
     """
-    # Trae solo los clientes activos de la base de datos ordenados por nombre.
     clientes = Cliente.objects.filter(activo=True).order_by("nombre")
     paginator_clientes = Paginator(clientes, 5)
     pagina_numero = request.GET.get("page")
