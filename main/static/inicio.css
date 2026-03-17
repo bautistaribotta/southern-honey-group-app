@@ -243,3 +243,87 @@ body {
   align-items: center;
   padding: 30px;
 }
+
+/* --- SISTEMA DE NOTIFICACIONES TOAST --- */
+.contenedor-toast {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  min-width: 320px;
+  max-width: 450px;
+  background-color: white;
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  border-left: 4px solid var(--slate-400);
+  animation: slideInToast 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  position: relative;
+  overflow: hidden;
+}
+
+.toast.success { border-left-color: var(--brand-olive); }
+.toast.error { border-left-color: #ef4444; }
+.toast.info { border-left-color: var(--slate-400); }
+
+.toast span.material-symbols-outlined {
+  font-size: 24px;
+}
+
+.toast.success span.material-symbols-outlined { color: var(--brand-olive); }
+.toast.error span.material-symbols-outlined { color: #ef4444; }
+.toast.info span.material-symbols-outlined { color: var(--slate-400); }
+
+.toast-contenido {
+  flex: 1;
+}
+
+.toast-contenido p {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--slate-800);
+}
+
+.btn-cerrar-toast {
+  background: none;
+  border: none;
+  color: var(--slate-400);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-cerrar-toast:hover {
+  background-color: #f1f5f9;
+  color: var(--slate-600);
+}
+
+@keyframes slideInToast {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.toast.desvanecer {
+  animation: slideOutToast 0.3s ease-in forwards;
+}
+
+@keyframes slideOutToast {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(120%); opacity: 0; }
+}
