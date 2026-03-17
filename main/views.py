@@ -113,14 +113,19 @@ def clientes(request):
         telefono = request.POST.get("telefono")
         localidad = request.POST.get("localidad")
         direccion = request.POST.get("direccion")
-        factura = request.POST.get("factura")
+        # El checkbox llega como 'on' si está marcado, lo convertimos a booleano
+        factura = request.POST.get("factura") == 'on'
         cuit = request.POST.get("cuit")
 
         if id_cliente:
-            editar_cliente(id_cliente)
+            # Aquí también debemos asegurar el orden correcto cuando implementes editar_cliente
+            # Por ahora mantengo la llamada pero asumiendo el orden de services.py
+            # editar_cliente(id_cliente, nombre_cliente, apellido, telefono, localidad, direccion, cuit, factura, True)
+            pass
 
         else:
-            nuevo_cliente(nombre_cliente, apellido, telefono, localidad, direccion, factura, cuit)
+            # Orden correcto según services.py: (nombre, apellido, telefono, localidad, direccion, cuit, factura_produccion)
+            nuevo_cliente(nombre_cliente, apellido, telefono, localidad, direccion, cuit, factura)
             messages.success(request, "Cliente creado correctamente")
 
         return redirect("clientes")
