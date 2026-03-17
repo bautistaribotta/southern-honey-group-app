@@ -125,19 +125,38 @@ def clientes(request):
 
         return redirect("clientes")
 
-    """
-    1-Trae solo los clientes activos de la base de datos ordenados por nombre
-    2-Divide esa lista total en bloques de 5 clientes
-    3-Se fija en la URL en qué página está el usuario
-    4-Extraigo únicamente los 5 clientes que corresponden a esa página específica
-      para no ralentizar la busqueda si tengo muchos elementos en la base de datos
-    """
-    clientes = Cliente.objects.filter(activo=True).order_by("nombre")
-    paginator_clientes = Paginator(clientes, 5)
+    # Parámetros de búsqueda
+    q = request.GET.get("q", "")
+    
+    clientes_list = Cliente.objects.filter(activo=True)
+    
+    if q:
+        if q[0].isdigit():
+            # Buscar por ID si empieza con número
+            clientes_list = clientes_list.filter(id__icontains=q)
+        else:
+            # Buscar por nombre o apellido
+            from django.db.models import Q
+            clientes_list = clientes_list.filter(
+                Q(nombre__icontains=q) | Q(apellido__icontains=q)
+            )
+            
+    clientes_list = clientes_list.order_by("nombre")
+
+    paginator_clientes = Paginator(clientes_list, 5)
     pagina_numero = request.GET.get("page")
     pagina_obj = paginator_clientes.get_page(pagina_numero)
 
-    return render(request, "clientes.html", {"clientes": pagina_obj})
+    contexto = {
+        "clientes": pagina_obj,
+        "q": q
+    }
+
+    # Si es AJAX, devolvemos el parcial
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return render(request, "tabla_clientes.html", contexto)
+
+    return render(request, "clientes.html", contexto)
 
 
 @login_required

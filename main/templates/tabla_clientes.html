@@ -1,0 +1,63 @@
+<table class="tabla-clientes">
+  <thead>
+    <tr id="encabezado-tabla-clientes">
+      <th> Cliente </th>
+      <th> Localidad </th>
+      <th> Dirección </th>
+      <th class="texto-centrado"> Telefono </th>
+      <th class="texto-derecha"> Acciones </th> <!-- Editar/Eliminar -->
+    </tr>
+  </thead>
+  <tbody>
+    {% for cliente in clientes %}
+    <tr>
+      <td>
+        <div class="cliente-nombre"> {{ cliente.nombre }} {{ cliente.apellido|default:"" }} </div>
+        <div class="cliente-id"> ID: {{ cliente.id }} </div>
+      </td>
+      <td> {{ cliente.localidad }} </td>
+      <td> {{ cliente.direccion|default:"-" }} </td>
+      <td class="texto-centrado"> {{ cliente.telefono }} </td>
+      <td>
+        <div class="acciones-tabla">
+          <button class="boton-icono editar" title="Editar">
+            <span class="material-symbols-outlined">edit</span>
+          </button>
+          <button class="boton-icono eliminar" title="Eliminar">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+        </div>
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="5" style="text-align: center;"> No hay clientes registrados. </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Paginación -->
+<div class="paginacion">
+  <div class="paginacion-info">
+    Mostrando <span>{{ clientes.start_index }}-{{ clientes.end_index }}</span>
+    de <span>{{ clientes.paginator.count }}</span> clientes
+  </div>
+  <div class="paginacion-botones">
+    {% if clientes.has_previous %}
+      <a href="?page={{ clientes.previous_page_number }}{% if q %}&q={{ q }}{% endif %}">
+        <button class="boton-paginacion">Anterior</button>
+      </a>
+    {% else %}
+      <button class="boton-paginacion" disabled>Anterior</button>
+    {% endif %}
+
+    {% if clientes.has_next %}
+      <a href="?page={{ clientes.next_page_number }}{% if q %}&q={{ q }}{% endif %}">
+        <button class="boton-paginacion">Siguiente</button>
+      </a>
+    {% else %}
+      <button class="boton-paginacion" disabled>Siguiente</button>
+    {% endif %}
+  </div>
+</div>

@@ -93,7 +93,7 @@
           <div class="grupo-busqueda">
             <div class="contenedor-input-busqueda">
               <span class="material-symbols-outlined icono-busqueda">search</span>
-              <input type="text" class="input-busqueda" placeholder="Buscar clientes por nombre o ID">
+              <input type="text" id="buscar-cliente" class="input-busqueda" placeholder="Buscar clientes por nombre o ID" value="{{ q|default:'' }}">
             </div>
           </div>
           
@@ -104,72 +104,8 @@
         </div>
 
         <!-- Tabla de Clientes -->
-        <div class="contenedor-tabla"> 
-
-          <table class="tabla-clientes">
-            <thead>
-              <tr id="encabezado-tabla-clientes">
-                <th> Cliente </th>
-                <th> Localidad </th>
-                <th> Dirección </th>
-                <th class="texto-centrado"> Telefono </th>
-                <th class="texto-derecha"> Acciones </th> <!-- Editar/Eliminar -->
-              </tr>
-            </thead>
-            <tbody>
-              {% for cliente in clientes %}
-              <tr>
-                <td>
-                  <div class="cliente-nombre"> {{ cliente.nombre }} {{ cliente.apellido|default:"" }} </div>
-                  <div class="cliente-id"> ID: {{ cliente.id }} </div>
-                </td>
-                <td> {{ cliente.localidad }} </td>
-                <td> {{ cliente.direccion|default:"-" }} </td>
-                <td class="texto-centrado"> {{ cliente.telefono }} </td>
-                <td>
-                  <div class="acciones-tabla">
-                    <button class="boton-icono editar" title="Editar">
-                      <span class="material-symbols-outlined">edit</span>
-                    </button>
-                    <button class="boton-icono eliminar" title="Eliminar">
-                      <span class="material-symbols-outlined">delete</span>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="5" style="text-align: center;"> No hay clientes registrados. </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          
-          <!-- Paginación -->
-          <div class="paginacion">
-            <!-- Uso 3 variables nativas de Python para el index de la tabla -->
-            <div class="paginacion-info">
-              Mostrando <span>{{ clientes.start_index }}-{{ clientes.end_index }}</span>
-              de <span>{{ clientes.paginator.count }}</span> clientes
-            </div>
-            <div class="paginacion-botones">
-              {% if clientes.has_previous %}
-                <a href="?page={{ clientes.previous_page_number }}">
-                  <button class="boton-paginacion">Anterior</button>
-                </a>
-              {% else %}
-                <button class="boton-paginacion" disabled>Anterior</button>
-              {% endif %}
-
-              {% if clientes.has_next %}
-                <a href="?page={{ clientes.next_page_number }}">
-                  <button class="boton-paginacion">Siguiente</button>
-                </a>
-              {% else %}
-                <button class="boton-paginacion" disabled>Siguiente</button>
-              {% endif %}
-            </div>
-          </div>
+        <div class="contenedor-tabla" id="tabla-clientes-container"> 
+          {% include 'tabla_clientes.html' %}
         </div>
 
       </section>
@@ -287,5 +223,48 @@
     </div>
   <script src="{% static 'js/paneles.js' %}"></script>
   <script src="{% static 'js/clientes.js' %}"></script>
+  <script>
+    const inputBusqueda = document.getElementById('buscar-cliente');
+    const contenedorTabla = document.getElementById('tabla-clientes-container');
+
+    function buscar(url_string = null) {
+        const q = inputBusqueda.value;
+        let url;
+        
+        if (url_string) {
+            url = new URL(url_string, window.location.origin);
+        } else {
+            url = new URL(window.location.href);
+            url.searchParams.set('q', q);
+            url.searchParams.delete('page');
+        }
+
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            contenedorTabla.innerHTML = html;
+            window.history.pushState({}, '', url);
+            vincularPaginacion();
+        })
+        .catch(error => console.error('Error en la búsqueda:', error));
+    }
+
+    function vincularPaginacion() {
+        const linksPaginacion = contenedorTabla.querySelectorAll('.paginacion-botones a');
+        linksPaginacion.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                buscar(this.href);
+            });
+        });
+    }
+
+    inputBusqueda.addEventListener('input', () => buscar());
+    vincularPaginacion();
+  </script>
   </body>
   </html>
