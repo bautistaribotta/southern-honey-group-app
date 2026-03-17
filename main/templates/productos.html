@@ -93,20 +93,20 @@
           <div class="grupo-busqueda">
             <div class="contenedor-input-busqueda">
               <span class="material-symbols-outlined icono-busqueda">search</span>
-              <input type="text" class="input-busqueda" placeholder="Buscar productos por nombre o ID">
+              <input type="text" id="buscar-producto" class="input-busqueda" placeholder="Buscar productos por nombre o ID" value="{{ q|default:'' }}">
             </div>
             
             <div class="contenedor-filtro">
-              <select class="select-filtro">
-                <option value="">Todas las Categorías</option>
-                <option value="Miel">Miel</option>
-                <option value="Alimento">Alimento</option>
-                <option value="Cera">Cera</option>
-                <option value="Madera">Madera</option>
-                <option value="Estampa">Estampa</option>
-                <option value="Insumos">Insumos</option>
-                <option value="Medicamentos">Medicamentos</option>
-                <option value="Otros">Otros</option>
+              <select id="filtro-categoria" class="select-filtro">
+                <option value="" {% if not categoria %}selected{% endif %}>Todas las Categorías</option>
+                <option value="Miel" {% if categoria == "Miel" %}selected{% endif %}>Miel</option>
+                <option value="Alimento" {% if categoria == "Alimento" %}selected{% endif %}>Alimento</option>
+                <option value="Cera" {% if categoria == "Cera" %}selected{% endif %}>Cera</option>
+                <option value="Madera" {% if categoria == "Madera" %}selected{% endif %}>Madera</option>
+                <option value="Estampa" {% if categoria == "Estampa" %}selected{% endif %}>Estampa</option>
+                <option value="Insumos" {% if categoria == "Insumos" %}selected{% endif %}>Insumos</option>
+                <option value="Medicamentos" {% if categoria == "Medicamentos" %}selected{% endif %}>Medicamentos</option>
+                <option value="Otros" {% if categoria == "Otros" %}selected{% endif %}>Otros</option>
               </select>
               <span class="material-symbols-outlined icono-filtro">filter_list</span>
             </div>
@@ -119,72 +119,8 @@
         </div>
 
         <!-- Tabla de Productos -->
-        <div class="contenedor-tabla">
-
-          <table class="tabla-productos">
-            <thead>
-              <tr id="encabezado-tabla-productos">
-                <th>Producto</th>
-                <th class="texto-centrado">Categoría</th>
-                <th class="texto-centrado">Stock</th>
-                <th class="texto-centrado">Precio Unitario</th>
-                <th class="texto-derecha">Acciones</th> <!-- Editar/Eliminar -->
-              </tr>
-            </thead>
-            <tbody>
-              {% for producto in productos %}
-              <tr>
-                <td>
-                  <div class="producto-info"> {{ producto.nombre }} </div>
-                  <div class="producto-id"> ID: {{ producto.id }} </div>
-                </td>
-                <td class="texto-centrado"> {{ producto.categoria }} </td>
-                <td class="stock-valor"> {{ producto.cantidad|floatformat:0 }} </td>
-                <td class="precio-valor"> $ {{ producto.precio }} </td>
-                <td>
-                  <div class="acciones-tabla">
-                    <button class="boton-icono editar" title="Editar">
-                      <span class="material-symbols-outlined">edit</span>
-                    </button>
-                    <button class="boton-icono eliminar" title="Eliminar">
-                      <span class="material-symbols-outlined">delete</span>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="5" style="text-align: center;"> No hay productos registrados. </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          
-          <!-- Paginación -->
-          <div class="paginacion">
-            <!-- Uso 3 variables nativas de Python para el index de la tabla -->
-            <div class="paginacion-info">
-              Mostrando <span>{{ productos.start_index }}-{{ productos.end_index }}</span>
-              de <span>{{ productos.paginator.count }}</span> productos
-            </div>
-            <div class="paginacion-botones">
-              {% if productos.has_previous %}
-                <a href="?page={{ productos.previous_page_number }}">
-                  <button class="boton-paginacion">Anterior</button>
-                </a>
-              {% else %}
-                <button class="boton-paginacion" disabled>Anterior</button>
-              {% endif %}
-
-              {% if productos.has_next %}
-                <a href="?page={{ productos.next_page_number }}">
-                  <button class="boton-paginacion">Siguiente</button>
-                </a>
-              {% else %}
-                <button class="boton-paginacion" disabled>Siguiente</button>
-              {% endif %}
-            </div>
-          </div>
+        <div class="contenedor-tabla" id="tabla-productos-container">
+          {% include 'tabla_productos.html' %}
         </div>
       </section>
     </main>
@@ -260,5 +196,57 @@
       </div>
     </div>
   <script src="{% static 'js/paneles.js' %}"></script>
+  <script>
+    const inputBusqueda = document.getElementById('buscar-producto');
+    const filtroCategoria = document.getElementById('filtro-categoria');
+    const contenedorTabla = document.getElementById('tabla-productos-container');
+
+    function buscar(url_string = null) {
+        const q = inputBusqueda.value;
+        const categoria = filtroCategoria.value;
+        let url;
+        
+        if (url_string) {
+            url = new URL(url_string, window.location.origin);
+        } else {
+            url = new URL(window.location.href);
+            url.searchParams.set('q', q);
+            url.searchParams.set('categoria', categoria);
+            url.searchParams.delete('page'); // Reiniciar a la primera página en cada búsqueda
+        }
+
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            contenedorTabla.innerHTML = html;
+            // Actualizar la URL en la barra de direcciones sin recargar
+            window.history.pushState({}, '', url);
+            // Re-vincular eventos de paginación
+            vincularPaginacion();
+        })
+        .catch(error => console.error('Error en la búsqueda:', error));
+    }
+
+    function vincularPaginacion() {
+        const linksPaginacion = contenedorTabla.querySelectorAll('.paginacion-botones a');
+        linksPaginacion.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                buscar(this.href);
+            });
+        });
+    }
+
+    // Eventos para búsqueda en tiempo real
+    inputBusqueda.addEventListener('input', () => buscar());
+    filtroCategoria.addEventListener('change', () => buscar());
+    
+    // Vincular paginación inicial
+    vincularPaginacion();
+  </script>
   </body>
   </html>

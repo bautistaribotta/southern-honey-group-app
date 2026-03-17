@@ -68,19 +68,40 @@ def productos(request):
 
         return redirect("productos")
 
-    """
-    1-Trae solo los productos activos de la base de datos ordenados por nombre
-    2-Divide esa lista total en bloques de 5 productos
-    3-Se fija en la URL en qué página está el usuario
-    4-Extraigo únicamente los 5 productos que corresponden a esa página específica
-      para no ralentizar la busqueda si tengo muchos elementos en la base de datos
-    """
-    productos = Producto.objects.filter(activo=True).order_by("nombre")
+    # Parámetros de búsqueda y filtrado
+    q = request.GET.get("q", "")
+    categoria_filtrada = request.GET.get("categoria", "")
+    
+    productos = Producto.objects.filter(activo=True)
+    
+    if q:
+        if q[0].isdigit():
+            # Si inicia con números, buscamos por ID (exacto o que contenga)
+            productos = productos.filter(id__icontains=q)
+        else:
+            # Si no, buscamos por nombre
+            productos = productos.filter(nombre__icontains=q)
+            
+    if categoria_filtrada:
+        productos = productos.filter(categoria=categoria_filtrada)
+        
+    productos = productos.order_by("nombre")
+
     paginator_productos = Paginator(productos, 5)
     pagina_numero = request.GET.get("page")
     pagina_obj = paginator_productos.get_page(pagina_numero)
 
-    return render(request, "productos.html", {"productos":pagina_obj})
+    contexto = {
+        "productos": pagina_obj,
+        "q": q,
+        "categoria": categoria_filtrada
+    }
+
+    # Si es una petición AJAX, devolvemos solo la tabla
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return render(request, "tabla_productos.html", contexto)
+
+    return render(request, "productos.html", contexto)
 
 
 @login_required
