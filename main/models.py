@@ -2,8 +2,18 @@ from django.db import models
 
 
 class Producto(models.Model):
+    CATEGORIAS = [
+        ('Miel', 'Miel'),
+        ('Alimento', 'Alimento'),
+        ('Cera', 'Cera'),
+        ('Madera', 'Madera'),
+        ('Estampa', 'Estampa'),
+        ('Insumos', 'Insumos'),
+        ('Medicamentos', 'Medicamentos'),
+        ('Otros', 'Otros'),
+    ]
     nombre = models.CharField(max_length=50)
-    categoria = models.CharField(max_length=50, null=True, blank=True)
+    categoria = models.CharField(max_length=50, choices=CATEGORIAS, null=True, blank=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     cantidad = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     cantidad_vendida = models.PositiveIntegerField(default=0)
