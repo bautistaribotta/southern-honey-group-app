@@ -60,7 +60,8 @@ def productos(request):
         cantidad = request.POST.get("stock")
 
         if id_producto:
-            editar_producto(id_producto, nombre_producto, categoria, precio, cantidad, activo)
+            editar_producto(id_producto, nombre_producto, categoria, precio, cantidad, True)
+            messages.success(request, "Producto editado correctamente.")
 
         else:
             nuevo_producto(nombre_producto, categoria, precio, cantidad)
@@ -113,20 +114,17 @@ def clientes(request):
         telefono = request.POST.get("telefono")
         localidad = request.POST.get("localidad")
         direccion = request.POST.get("direccion")
-        # El checkbox llega como 'on' si está marcado, lo convertimos a booleano
+        # El checkbox llega como 'on' si está marcado, lo convierto en un booleano
         factura = request.POST.get("factura") == 'on'
         cuit = request.POST.get("cuit")
 
         if id_cliente:
-            # Aquí también debemos asegurar el orden correcto cuando implementes editar_cliente
-            # Por ahora mantengo la llamada pero asumiendo el orden de services.py
-            # editar_cliente(id_cliente, nombre_cliente, apellido, telefono, localidad, direccion, cuit, factura, True)
-            pass
+            editar_cliente(id_cliente, nombre_cliente, apellido, telefono, localidad, direccion, cuit, factura, True)
+            messages.success(request, "Cliente editado correctamente")
 
         else:
-            # Orden correcto según services.py: (nombre, apellido, telefono, localidad, direccion, cuit, factura_produccion)
             nuevo_cliente(nombre_cliente, apellido, telefono, localidad, direccion, cuit, factura)
-            messages.success(request, "Cliente creado correctamente")
+            messages.success(request, "Cliente agregado correctamente")
 
         return redirect("clientes")
 

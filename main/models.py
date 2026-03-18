@@ -74,3 +74,11 @@ class DetalleOperacion(models.Model):
 
     def __str__(self):
         return f"{self.cantidad} de {self.producto} (Op: {self.operacion.id})"
+
+
+class Remito(models.Model):
+    pass
+
+
+class Pagos(models.Model):
+    pass
