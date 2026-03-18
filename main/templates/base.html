@@ -1,0 +1,103 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+
+    {% block nombre-pestaña %}
+    <title> Titulo pestaña </title>
+    {% endblock %}
+
+    {% block links %}
+    <!-- Esta parte va a ser reemplazada por los links al hacer la solicitud -->
+    {% endblock %}
+
+    <link rel="stylesheet" href="{% static 'inicio.css' %}">
+    <script src="{% static 'js/notifications.js' %}"></script>
+    <script src="{% static 'js/paneles.js' %}"></script>
+    
+    <link rel="icon" type="image/svg+xml" href="{% static 'hive.svg' %}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  </head>
+
+  <body>
+    <!-- BARRA LATERAL -->
+    <nav id="barra-lateral">
+      <div id="encabezado-sidebar">
+        <span class="material-symbols-outlined" id="icono-panal-sidebar">hive</span>
+        <h3> Southern <br> Honey Group </h3>
+      </div>
+
+      <ul id="menu-navegacion">
+        <li>
+          <a href="{% url 'inicio' %}" class="item-menu {% if request.resolver_match.url_name == 'inicio' %} activo {% endif %}">
+            <span class="material-symbols-outlined">home</span>
+            Inicio
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'productos' %}" class="item-menu {% if request.resolver_match.url_name == 'productos' %} activo {% endif %}">
+            <span class="material-symbols-outlined">inventory_2</span>
+            Productos
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'clientes'%}" class="item-menu {% if request.resolver_match.url_name == 'clientes' %} activo {% endif %}">
+            <span class="material-symbols-outlined">groups</span>
+            Clientes
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'deudores' %}" class="item-menu {% if request.resolver_match.url_name == 'deudores' %} activo {% endif %}">
+            <span class="material-symbols-outlined">account_balance_wallet</span>
+            Deudores
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'remitos' %}" class="item-menu {% if request.resolver_match.url_name == 'remitos' %} activo {% endif %}">
+            <span class="material-symbols-outlined">receipt_long</span>
+            Remitos
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main id="contenido-principal">
+      
+      <!-- CABECERA PRINCIPAL -->
+      <header id="cabecera-principal">
+        {% block cabecera %}
+        
+        {% endblock %}
+
+        <details id="perfil-usuario-container">
+          <summary id="perfil-usuario">
+            <span class="material-symbols-outlined">account_circle</span>
+            <p id="nombre-usuario"> {{ user.username }} </p>
+            <span class="material-symbols-outlined" id="flecha-perfil">expand_more</span>
+          </summary>
+          
+          <div id="menu-desplegable-usuario">
+            <a href="{% url 'cerrar_sesion' %}" id="opcion-logout">
+              <span class="material-symbols-outlined">logout</span>
+              Cerrar Sesión
+            </a>
+          </div>
+        </details>
+      </header>
+
+      <!-- ÁREA DE TRABAJO -->
+      {% block area-trabajo %}
+      
+      {% endblock %}
+    </main>
+
+    {% block codigo-javascript %}
+
+    {% endblock %}
+  </body>
+</html>

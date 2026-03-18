@@ -1,24 +1,22 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 
-    <title> Productos </title>
+{% block nombre-pestaña %}
+<title> Productos </title>
+{% endblock %}
 
-    <link rel="stylesheet" href="{% static 'inicio.css' %}">
-    <link rel="stylesheet" href="{% static 'productos.css' %}">
-    <script src="{% static 'js/notifications.js' %}"></script>
-    <script src="{% static 'js/paneles.js' %}"></script>
+{% block links %}
+<link rel="stylesheet" href="{% static 'productos.css' %}">
+{% endblock %}
 
-    <link rel="icon" type="image/svg+xml" href="{% static 'hive.svg' %}">
+{% block cabecera %}
+<div id="titulos-cabecera">
+  <h2> Inventario de Productos </h2>
+  <p> Gestione el stock aquí, agregue, edite o elimine productos </p>
+</div>
+{% endblock %}
 
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-  </head>
-
-  <body>
+{% block area-trabajo %}
     <!-- Contenedor de Notificaciones Toast -->
     <div id="contenedor-toast" class="contenedor-toast">
       {% if messages %}
@@ -39,73 +37,6 @@
         {% endfor %}
       {% endif %}
     </div>
-
-    <!-- BARRA LATERAL -->
-    <nav id="barra-lateral">
-      <div id="encabezado-sidebar">
-        <span class="material-symbols-outlined" id="icono-panal-sidebar">hive</span>
-        <h3> Southern <br> Honey Group </h3>
-      </div>
-
-      <ul id="menu-navegacion">
-        <li>
-          <a href="{% url 'inicio' %}" class="item-menu">
-            <span class="material-symbols-outlined">home</span>
-            Inicio
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'productos' %}" class="item-menu activo">
-            <span class="material-symbols-outlined">inventory_2</span>
-            Productos
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'clientes'%}" class="item-menu">
-            <span class="material-symbols-outlined">groups</span>
-            Clientes
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'deudores' %}" class="item-menu">
-            <span class="material-symbols-outlined">account_balance_wallet</span>
-            Deudores
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'remitos' %}" class="item-menu">
-            <span class="material-symbols-outlined">receipt_long</span>
-            Remitos
-          </a>
-        </li>
-      </ul>
-    </nav>
-
-    <!-- CONTENIDO PRINCIPAL -->
-    <main id="contenido-principal">
-      
-      <!-- CABECERA PRINCIPAL -->
-      <header id="cabecera-principal">
-        <div id="titulos-cabecera">
-          <h2> Inventario de Productos </h2>
-          <p> Gestione el stock aquí, agregue, edite o elimine productos </p>
-        </div>
-        
-        <details id="perfil-usuario-container">
-          <summary id="perfil-usuario">
-            <span class="material-symbols-outlined">account_circle</span>
-            <p id="nombre-usuario"> {{ user.username }} </p>
-            <span class="material-symbols-outlined" id="flecha-perfil">expand_more</span>
-          </summary>
-          
-          <div id="menu-desplegable-usuario">
-            <a href="{% url 'cerrar_sesion' %}" id="opcion-logout">
-              <span class="material-symbols-outlined">logout</span>
-              Cerrar Sesión
-            </a>
-          </div>
-        </details>
-      </header>
 
       <!-- ÁREA DE TRABAJO DE PRODUCTOS -->
       <section id="area-trabajo">
@@ -217,6 +148,9 @@
         </div>
       </div>
     </div>
+
+{% endblock %}
+
   <script src="{% static 'js/paneles.js' %}"></script>
   <script>
     const inputBusqueda = document.getElementById('buscar-producto');
@@ -270,5 +204,3 @@
     // Vincular paginación inicial
     vincularPaginacion();
   </script>
-  </body>
-  </html>
