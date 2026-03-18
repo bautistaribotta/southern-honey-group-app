@@ -2,155 +2,150 @@
 {% load static %}
 
 {% block nombre-pestaña %}
-<title> Productos </title>
+  <title> Productos </title>
 {% endblock %}
 
 {% block links %}
-<link rel="stylesheet" href="{% static 'productos.css' %}">
+  <link rel="stylesheet" href="{% static 'productos.css' %}">
 {% endblock %}
 
 {% block cabecera %}
-<div id="titulos-cabecera">
-  <h2> Inventario de Productos </h2>
-  <p> Gestione el stock aquí, agregue, edite o elimine productos </p>
-</div>
+  <div id="titulos-cabecera">
+    <h2> Inventario de Productos </h2>
+    <p> Gestione el stock aquí, agregue, edite o elimine productos </p>
+  </div>
 {% endblock %}
 
 {% block area-trabajo %}
-    <!-- Contenedor de Notificaciones Toast -->
-    <div id="contenedor-toast" class="contenedor-toast">
-      {% if messages %}
-        {% for message in messages %}
-          <div class="toast {{ message.tags }}">
-            <span class="material-symbols-outlined">
-              {% if message.tags == 'success' %}check_circle
-              {% elif message.tags == 'error' %}error
-              {% else %}info{% endif %}
-            </span>
-            <div class="toast-contenido">
-              <p>{{ message }}</p>
-            </div>
-            <button class="btn-cerrar-toast" onclick="cerrarToast(this.parentElement)">
-              <span class="material-symbols-outlined">close</span>
-            </button>
+  <!-- Contenedor de Notificaciones Toast -->
+  <div id="contenedor-toast" class="contenedor-toast">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="toast {{ message.tags }}">
+          <span class="material-symbols-outlined">
+            {% if message.tags == 'success' %}check_circle
+            {% elif message.tags == 'error' %}error
+            {% else %}info{% endif %}
+          </span>
+          <div class="toast-contenido">
+            <p>{{ message }}</p>
           </div>
-        {% endfor %}
-      {% endif %}
-    </div>
-
-      <!-- ÁREA DE TRABAJO DE PRODUCTOS -->
-      <section id="area-trabajo">
-        
-        <!-- Controles Superiores: Buscador y Filtros -->
-        <div class="barra-herramientas">
-          <div class="grupo-busqueda">
-            <div class="contenedor-input-busqueda">
-              <span class="material-symbols-outlined icono-busqueda">search</span>
-              <input type="text" id="buscar-producto" class="input-busqueda" placeholder="Buscar productos por nombre o ID" value="{{ q|default:'' }}">
-            </div>
-            
-            <div class="contenedor-filtro">
-              <select id="filtro-categoria" class="select-filtro">
-                <option value="" {% if not categoria %}selected{% endif %}>Todas las Categorías</option>
-                <option value="Miel" {% if categoria == "Miel" %}selected{% endif %}>Miel</option>
-                <option value="Alimento" {% if categoria == "Alimento" %}selected{% endif %}>Alimento</option>
-                <option value="Cera" {% if categoria == "Cera" %}selected{% endif %}>Cera</option>
-                <option value="Madera" {% if categoria == "Madera" %}selected{% endif %}>Madera</option>
-                <option value="Estampa" {% if categoria == "Estampa" %}selected{% endif %}>Estampa</option>
-                <option value="Insumos" {% if categoria == "Insumos" %}selected{% endif %}>Insumos</option>
-                <option value="Medicamentos" {% if categoria == "Medicamentos" %}selected{% endif %}>Medicamentos</option>
-                <option value="Otros" {% if categoria == "Otros" %}selected{% endif %}>Otros</option>
-              </select>
-              <span class="material-symbols-outlined icono-filtro">filter_list</span>
-            </div>
-          </div>
-          
-          <button class="boton-nuevo" onclick="abrirPanel()">
-            <span class="material-symbols-outlined">add</span>
-            Nuevo Producto
-          </button>
-        </div>
-
-        <!-- Tabla de Productos -->
-        <div class="contenedor-tabla" id="tabla-productos-container">
-          {% include 'tabla_productos.html' %}
-        </div>
-      </section>
-    </main>
-
-    <!-- PANEL LATERAL NUEVO PRODUCTO (SLIDE-OVER) -->
-    <div id="slide-over-contenedor">
-      <div id="slide-over-fondo" onclick="cerrarPanel()"> </div>
-      
-      <div id="slide-over-panel">
-        <!-- Cabecera del Panel -->
-        <header class="panel-cabecera">
-          <div class="panel-titulo-fila">
-            <div class="icono-contenedor">
-              <span class="material-symbols-outlined">inventory_2</span>
-            </div>
-            <div class="texto-cabecera">
-              <h3>Nuevo Producto</h3>
-              <p>Complete los detalles para el inventario</p>
-            </div>
-          </div>
-          <button class="boton-cerrar-panel" onclick="cerrarPanel()">
+          <button class="btn-cerrar-toast" onclick="cerrarToast(this.parentElement)">
             <span class="material-symbols-outlined">close</span>
           </button>
-        </header>
-
-        <!-- Cuerpo del Panel (Formulario) -->
-        <div class="panel-cuerpo">
-          <form class="formulario-producto" id="form-nuevo-producto" method="POST" autocomplete="off">
-            {% csrf_token %}
-            <div class="campo-formulario">
-              <label for="nombre">Nombre del Producto</label>
-              <input type="text" id="nombre" name="nombre" class="input-estandar" placeholder="Ej: Miel Orgánica 500g" required>
-            </div>
-
-            <div class="campo-formulario">
-
-              <label for="categoria">Categoría</label>
-
-              <select id="categoria" name="categoria" class="select-estandar" required>
-                <option value="" disabled selected>Seleccione una categoría</option>
-                <option value="Miel">Miel</option>
-                <option value="Alimento">Alimento</option>
-                <option value="Cera">Cera</option>
-                <option value="Madera">Madera</option>
-                <option value="Estampa">Estampa</option>
-                <option value="Insumos">Insumos</option>
-                <option value="Medicamentos">Medicamentos</option>
-                <option value="Otros">Otros</option>
-              </select>
-
-            </div>
-
-            <div class="campo-formulario">
-              <label for="precio">Precio Unitario</label>
-              <div class="contenedor-input-prefijo">
-                <span class="prefijo-input">$</span>
-                <input type="number" step="0.01" id="precio" name="precio" class="input-estandar input-con-prefijo" placeholder="0.00" required>
-              </div>
-            </div>
-
-            <div class="campo-formulario">
-              <label for="stock">Stock Inicial (Opcional)</label>
-              <input type="number" step="0.01" id="stock" name="stock" class="input-estandar" placeholder="0">
-            </div>
-          </form>
         </div>
+      {% endfor %}
+    {% endif %}
+  </div>
 
-        <!-- Pie del Panel -->
-        <div class="panel-pie">
-          <button type="button" class="boton-cancelar" onclick="cerrarPanel()">Cancelar</button>
-          <button type="submit" form="form-nuevo-producto" class="boton-guardar">Guardar Producto</button>
+  <!-- ÁREA DE TRABAJO DE PRODUCTOS -->
+  <section id="area-trabajo">
+    <!-- Controles Superiores: Buscador y Filtros -->
+    <div class="barra-herramientas">
+      <div class="grupo-busqueda">
+        <div class="contenedor-input-busqueda">
+          <span class="material-symbols-outlined icono-busqueda">search</span>
+          <input type="text" id="buscar-producto" class="input-busqueda" placeholder="Buscar productos por nombre o ID" value="{{ q|default:'' }}">
+        </div>
+        
+        <div class="contenedor-filtro">
+          <select id="filtro-categoria" class="select-filtro">
+            <option value="" {% if not categoria %}selected{% endif %}>Todas las Categorías</option>
+            <option value="Miel" {% if categoria == "Miel" %}selected{% endif %}>Miel</option>
+            <option value="Alimento" {% if categoria == "Alimento" %}selected{% endif %}>Alimento</option>
+            <option value="Cera" {% if categoria == "Cera" %}selected{% endif %}>Cera</option>
+            <option value="Madera" {% if categoria == "Madera" %}selected{% endif %}>Madera</option>
+            <option value="Estampa" {% if categoria == "Estampa" %}selected{% endif %}>Estampa</option>
+            <option value="Insumos" {% if categoria == "Insumos" %}selected{% endif %}>Insumos</option>
+            <option value="Medicamentos" {% if categoria == "Medicamentos" %}selected{% endif %}>Medicamentos</option>
+            <option value="Otros" {% if categoria == "Otros" %}selected{% endif %}>Otros</option>
+          </select>
+          <span class="material-symbols-outlined icono-filtro">filter_list</span>
         </div>
       </div>
+      
+      <button class="boton-nuevo" onclick="abrirPanel()">
+        <span class="material-symbols-outlined">add</span>
+        Nuevo Producto
+      </button>
     </div>
 
+    <!-- Tabla de Productos -->
+    <div class="contenedor-tabla" id="tabla-productos-container">
+      {% include 'tabla_productos.html' %}
+    </div>
+  </section>
+
+  <!-- PANEL LATERAL NUEVO PRODUCTO (SLIDE-OVER) -->
+  <div id="slide-over-contenedor">
+    <div id="slide-over-fondo" onclick="cerrarPanel()"> </div>
+    
+    <div id="slide-over-panel">
+      <!-- Cabecera del Panel -->
+      <header class="panel-cabecera">
+        <div class="panel-titulo-fila">
+          <div class="icono-contenedor">
+            <span class="material-symbols-outlined">inventory_2</span>
+          </div>
+          <div class="texto-cabecera">
+            <h3>Nuevo Producto</h3>
+            <p>Complete los detalles para el inventario</p>
+          </div>
+        </div>
+        <button class="boton-cerrar-panel" onclick="cerrarPanel()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </header>
+
+      <!-- Cuerpo del Panel (Formulario) -->
+      <div class="panel-cuerpo">
+        <form class="formulario-producto" id="form-nuevo-producto" method="POST" autocomplete="off">
+          {% csrf_token %}
+          <div class="campo-formulario">
+            <label for="nombre">Nombre del Producto</label>
+            <input type="text" id="nombre" name="nombre" class="input-estandar" placeholder="Ej: Miel Orgánica 500g" required>
+          </div>
+
+          <div class="campo-formulario">
+            <label for="categoria">Categoría</label>
+            <select id="categoria" name="categoria" class="select-estandar" required>
+              <option value="" disabled selected>Seleccione una categoría</option>
+              <option value="Miel">Miel</option>
+              <option value="Alimento">Alimento</option>
+              <option value="Cera">Cera</option>
+              <option value="Madera">Madera</option>
+              <option value="Estampa">Estampa</option>
+              <option value="Insumos">Insumos</option>
+              <option value="Medicamentos">Medicamentos</option>
+              <option value="Otros">Otros</option>
+            </select>
+          </div>
+
+          <div class="campo-formulario">
+            <label for="precio">Precio Unitario</label>
+            <div class="contenedor-input-prefijo">
+              <span class="prefijo-input">$</span>
+              <input type="number" step="0.01" id="precio" name="precio" class="input-estandar input-con-prefijo" placeholder="0.00" required>
+            </div>
+          </div>
+
+          <div class="campo-formulario">
+            <label for="stock">Stock Inicial (Opcional)</label>
+            <input type="number" step="0.01" id="stock" name="stock" class="input-estandar" placeholder="0">
+          </div>
+        </form>
+      </div>
+
+      <!-- Pie del Panel -->
+      <div class="panel-pie">
+        <button type="button" class="boton-cancelar" onclick="cerrarPanel()">Cancelar</button>
+        <button type="submit" form="form-nuevo-producto" class="boton-guardar">Guardar Producto</button>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
+{% block codigo-javascript %}
   <script src="{% static 'js/paneles.js' %}"></script>
   <script>
     const inputBusqueda = document.getElementById('buscar-producto');
@@ -158,43 +153,43 @@
     const contenedorTabla = document.getElementById('tabla-productos-container');
 
     function buscar(url_string = null) {
-        const q = inputBusqueda.value;
-        const categoria = filtroCategoria.value;
-        let url;
-        
-        if (url_string) {
-            url = new URL(url_string, window.location.origin);
-        } else {
-            url = new URL(window.location.href);
-            url.searchParams.set('q', q);
-            url.searchParams.set('categoria', categoria);
-            url.searchParams.delete('page'); // Reiniciar a la primera página en cada búsqueda
-        }
+      const q = inputBusqueda.value;
+      const categoria = filtroCategoria.value;
+      let url;
+      
+      if (url_string) {
+        url = new URL(url_string, window.location.origin);
+      } else {
+        url = new URL(window.location.href);
+        url.searchParams.set('q', q);
+        url.searchParams.set('categoria', categoria);
+        url.searchParams.delete('page'); // Reiniciar a la primera página en cada búsqueda
+      }
 
-        fetch(url, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.text())
-        .then(html => {
-            contenedorTabla.innerHTML = html;
-            // Actualizar la URL en la barra de direcciones sin recargar
-            window.history.pushState({}, '', url);
-            // Re-vincular eventos de paginación
-            vincularPaginacion();
-        })
-        .catch(error => console.error('Error en la búsqueda:', error));
+      fetch(url, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => response.text())
+      .then(html => {
+        contenedorTabla.innerHTML = html;
+        // Actualizar la URL en la barra de direcciones sin recargar
+        window.history.pushState({}, '', url);
+        // Re-vincular eventos de paginación
+        vincularPaginacion();
+      })
+      .catch(error => console.error('Error en la búsqueda:', error));
     }
 
     function vincularPaginacion() {
-        const linksPaginacion = contenedorTabla.querySelectorAll('.paginacion-botones a');
-        linksPaginacion.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                buscar(this.href);
-            });
+      const linksPaginacion = contenedorTabla.querySelectorAll('.paginacion-botones a');
+      linksPaginacion.forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          buscar(this.href);
         });
+      });
     }
 
     // Eventos para búsqueda en tiempo real
@@ -204,3 +199,4 @@
     // Vincular paginación inicial
     vincularPaginacion();
   </script>
+{% endblock %}

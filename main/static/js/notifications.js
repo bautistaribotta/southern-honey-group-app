@@ -1,6 +1,4 @@
-/**
- * Lógica para Notificaciones Toast (Southern Honey Group)
- */
+// Lógica para las notificaciones Toast
 
 /**
  * Cierra un toast con una animación de desvanecimiento
@@ -16,9 +14,8 @@ function cerrarToast(toast) {
     }, 300);
 }
 
-/**
- * Inicializa los toasts existentes en la página y configura el auto-cerrado
- */
+
+//Inicializa los toasts existentes en la página y configura el auto-cerrado
 function inicializarToasts() {
     const toasts = document.querySelectorAll('.toast');
     toasts.forEach(toast => {

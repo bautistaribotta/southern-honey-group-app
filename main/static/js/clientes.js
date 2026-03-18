@@ -1,3 +1,4 @@
+// Codigo para la logica del CUIT
 const checkboxFactura = document.getElementById('factura');
 const campoCuit = document.getElementById('campo-cuit');
 
