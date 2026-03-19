@@ -3,6 +3,7 @@ from .services import (get_cotizacion_oficial, get_cotizacion_blue,
                        nuevo_producto, nuevo_cliente, editar_producto, editar_cliente)
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.contrib import messages
@@ -162,7 +163,8 @@ def clientes(request):
     return render(request, "clientes.html", contexto)
 
 
-@login_required
+# Verifico que solo un administrador pueda ver la vista, tambien verifica que el usuario este logueado
+@staff_member_required(login_url="inicio")
 def deudores(request):
     return render(request, "deudores.html")
 

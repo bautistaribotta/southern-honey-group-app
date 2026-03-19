@@ -50,12 +50,14 @@
             Clientes
           </a>
         </li>
+        {% if user.is_staff %}
         <li>
           <a href="{% url 'deudores' %}" class="item-menu {% if request.resolver_match.url_name == 'deudores' %} activo {% endif %}">
             <span class="material-symbols-outlined">account_balance_wallet</span>
             Deudores
           </a>
         </li>
+        {% endif %}
         <li>
           <a href="{% url 'remitos' %}" class="item-menu {% if request.resolver_match.url_name == 'remitos' %} activo {% endif %}">
             <span class="material-symbols-outlined">receipt_long</span>
