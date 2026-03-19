@@ -37,7 +37,6 @@ El proyecto es desarrollado, diseñado y mantenido de manera independiente, abar
 **Frontend**
 
 * **HTML5 & CSS3:** Diseño estructurado y modular empleando variables nativas de CSS.
-* **HTMX:** Para interacciones dinámicas con el DOM sin necesidad de recargar la página completa ni escribir JavaScript complejo.
 * **JavaScript Vanilla:** Manejo de componentes interactivos de la UI, como los modales de tipo Slide-Over y lógica de formularios.
 
 ---
