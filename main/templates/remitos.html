@@ -1,91 +1,23 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 
-    <title> Remitos </title>
-    <link rel="stylesheet" href="{% static 'inicio.css' %}">
-    <link rel="stylesheet" href="{% static 'remitos.css' %}">
-    <link rel="icon" type="image/svg+xml" href="../static/hive.svg">
+{% block nombre-pestaña %}
+<title> Remitos </title>
+{% endblock %}
 
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-  </head>
+{% block links %}
+<link rel="stylesheet" href="{% static 'remitos.css' %}">
+{% endblock %}
 
-  <body>
-    <!-- BARRA LATERAL -->
-    <nav id="barra-lateral">
-      <div id="encabezado-sidebar">
-        <span class="material-symbols-outlined" id="icono-panal-sidebar">hive</span>
-        <h3> Southern <br> Honey Group </h3>
-      </div>
+{% block cabecera %}
+<div id="titulos-cabecera">
+  <h2> Remitos </h2>
+  <p> Gestione el historial de remitos, entregas y facturación </p>
+</div>
+{% endblock %}
 
-      <ul id="menu-navegacion">
-        <li>
-          <a href="{% url 'inicio' %}" class="item-menu">
-            <span class="material-symbols-outlined">home</span>
-            Inicio
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'productos' %}" class="item-menu">
-            <span class="material-symbols-outlined">inventory_2</span>
-            Productos
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'clientes'%}" class="item-menu">
-            <span class="material-symbols-outlined">groups</span>
-            Clientes
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'deudores' %}" class="item-menu">
-            <span class="material-symbols-outlined">account_balance_wallet</span>
-            Deudores
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'remitos' %}" class="item-menu activo">
-            <span class="material-symbols-outlined">receipt_long</span>
-            Remitos
-          </a>
-        </li>
-      </ul>
-    </nav>
-
-    <!-- CONTENIDO PRINCIPAL -->
-    <main id="contenido-principal">
-      
-      <!-- CABECERA PRINCIPAL -->
-      <header id="cabecera-principal">
-        <div id="titulos-cabecera">
-          <h2> Remitos </h2>
-          <p> Gestione el historial de remitos, entregas y facturación </p>
-        </div>
-        
-        <details id="perfil-usuario-container">
-          <summary id="perfil-usuario">
-            <span class="material-symbols-outlined">account_circle</span>
-            <p id="nombre-usuario"> {{ user.username }} </p>
-            <span class="material-symbols-outlined" id="flecha-perfil">expand_more</span>
-          </summary>
-          
-          <div id="menu-desplegable-usuario">
-            <a href="{% url 'cerrar_sesion' %}" id="opcion-logout">
-              <span class="material-symbols-outlined">logout</span>
-              Cerrar Sesión
-            </a>
-          </div>
-        </details>
-      </header>
-
-      <!-- ÁREA DE TRABAJO -->
-      <section id="area-trabajo">
-        
-      </section>
-    </main>
-  </body>
-</html>
+{% block area-trabajo %}
+<!-- ÁREA DE TRABAJO -->
+<section id="area-trabajo">  
+</section>
+{% endblock %}

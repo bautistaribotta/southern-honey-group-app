@@ -10,29 +10,29 @@
   </thead>
   <tbody>
     {% for producto in productos %}
-    <tr>
-      <td>
-        <div class="producto-info"> {{ producto.nombre }} </div>
-        <div class="producto-id"> ID: {{ producto.id }} </div>
-      </td>
-      <td class="texto-centrado"> {{ producto.categoria }} </td>
-      <td class="stock-valor"> {{ producto.cantidad|floatformat:0 }} </td>
-      <td class="precio-valor"> $ {{ producto.precio }} </td>
-      <td>
-        <div class="acciones-tabla">
-          <button class="boton-icono editar" title="Editar">
-            <span class="material-symbols-outlined">edit</span>
-          </button>
-          <button class="boton-icono eliminar" title="Eliminar">
-            <span class="material-symbols-outlined">delete</span>
-          </button>
-        </div>
-      </td>
-    </tr>
+      <tr>
+        <td>
+          <div class="producto-info"> {{ producto.nombre }} </div>
+          <div class="producto-id"> ID: {{ producto.id }} </div>
+        </td>
+        <td class="texto-centrado categoria-valor"> {{ producto.categoria }} </td>
+        <td class="stock-valor"> {{ producto.cantidad|floatformat:0 }} </td>
+        <td class="precio-valor"> $ {{ producto.precio }} </td>
+        <td>
+          <div class="acciones-tabla">
+            <button class="boton-icono editar" title="Editar">
+              <span class="material-symbols-outlined">edit</span>
+            </button>
+            <button class="boton-icono eliminar" title="Eliminar">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </div>
+        </td>
+      </tr>
     {% empty %}
-    <tr>
-      <td colspan="5" style="text-align: center;"> No hay productos registrados. </td>
-    </tr>
+      <tr>
+        <td colspan="5" style="text-align: center;"> No hay productos registrados. </td>
+      </tr>
     {% endfor %}
   </tbody>
 </table>

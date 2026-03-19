@@ -2,74 +2,73 @@
 {% load static %}
 
 {% block nombre-pestaña %}
-<title> Clientes </title>
+  <title> Clientes </title>
 {% endblock %}
 
 {% block links %}
-<link rel="stylesheet" href="{% static 'clientes.css' %}">
+  <link rel="stylesheet" href="{% static 'clientes.css' %}">
 {% endblock %}
 
 {% block cabecera %}
-<div id="titulos-cabecera">
-  <h2> Clientes </h2>
-  <p> Gestione su cartera de clientes, agregue, edite o elimine perfiles </p>
-</div>
+  <div id="titulos-cabecera">
+    <h2> Clientes </h2>
+    <p> Gestione su cartera de clientes, agregue, edite o elimine perfiles </p>
+  </div>
 {% endblock %}
 
 {% block area-trabajo %}
-<!-- Contenedor de Notificaciones Toast -->
-<div id="contenedor-toast" class="contenedor-toast">
-  {% if messages %}
-  {% for message in messages %}
-  <div class="toast {{ message.tags }}">
-    <span class="material-symbols-outlined">
-      {% if message.tags == 'success' %}check_circle
-      {% elif message.tags == 'error' %}error
-      {% else %}info{% endif %}
-    </span>
-    <div class="toast-contenido">
-      <p>{{ message }}</p>
-    </div>
-    <button class="btn-cerrar-toast" onclick="cerrarToast(this.parentElement)">
-      <span class="material-symbols-outlined">close</span>
-    </button>
-  </div>
-  {% endfor %}
-  {% endif %}
-</div>
-
-      <!-- ÁREA DE TRABAJO -->
-      <section id="area-trabajo">
-        
-        <!-- Controles Superiores: Buscador -->
-        <div class="barra-herramientas">
-          <div class="grupo-busqueda">
-            <div class="contenedor-input-busqueda">
-              <span class="material-symbols-outlined icono-busqueda">search</span>
-              <input type="text" id="buscar-cliente" class="input-busqueda" placeholder="Buscar clientes por nombre o ID" value="{{ q|default:'' }}">
-            </div>
+  <!-- Contenedor de Notificaciones Toast -->
+  <div id="contenedor-toast" class="contenedor-toast">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="toast {{ message.tags }}">
+          <span class="material-symbols-outlined">
+            {% if message.tags == 'success' %}check_circle
+            {% elif message.tags == 'error' %}error
+            {% else %}info{% endif %}
+          </span>
+          <div class="toast-contenido">
+            <p>{{ message }}</p>
           </div>
-          
-          <button class="boton-nuevo" onclick="abrirPanel()">
-            <span class="material-symbols-outlined">add</span>
-            Nuevo Cliente
+          <button class="btn-cerrar-toast" onclick="cerrarToast(this.parentElement)">
+            <span class="material-symbols-outlined">close</span>
           </button>
         </div>
+      {% endfor %}
+    {% endif %}
+  </div>
 
-        <!-- Tabla de Clientes -->
-        <div class="contenedor-tabla" id="tabla-clientes-container"> 
-          {% include 'tabla_clientes.html' %}
-        </div>
-
-      </section>
-    </main>
+  <!-- ÁREA DE TRABAJO -->
+  <section id="area-trabajo">
     
-    <!-- PANEL LATERAL NUEVO CLIENTE (SLIDE-OVER) -->
-    <div id="slide-over-contenedor">
-      <div id="slide-over-fondo" onclick="cerrarPanel()"></div>
+    <!-- Controles Superiores: Buscador -->
+    <div class="barra-herramientas">
+      <div class="grupo-busqueda">
+        <div class="contenedor-input-busqueda">
+          <span class="material-symbols-outlined icono-busqueda">search</span>
+          <input type="text" id="buscar-cliente" class="input-busqueda" placeholder="Buscar clientes por nombre o ID" value="{{ q|default:'' }}">
+        </div>
+      </div>
+      
+      <button class="boton-nuevo" onclick="abrirPanel()">
+        <span class="material-symbols-outlined">add</span>
+        Nuevo Cliente
+      </button>
+    </div>
 
-      <div id="slide-over-panel">
-        <form id="form-cliente" method="POST">
+    <!-- Tabla de Clientes -->
+    <div class="contenedor-tabla" id="tabla-clientes-container"> 
+      {% include 'tabla_clientes.html' %}
+    </div>
+
+  </section>
+
+  <!-- PANEL LATERAL NUEVO CLIENTE (SLIDE-OVER) -->
+  <div id="slide-over-contenedor">
+    <div id="slide-over-fondo" onclick="cerrarPanel()"></div>
+
+    <div id="slide-over-panel">
+      <form id="form-cliente" method="POST">
         {% csrf_token %}
         <!-- 1. Cabecera -->
         <header class="panel-cabecera">
@@ -171,9 +170,9 @@
           <button type="button" class="boton-secundario" onclick="cerrarPanel()">Cancelar</button>
           <button type="submit" class="boton-primario">Guardar Cliente</button>
         </footer>
-        </form>
-      </div>
+      </form>
     </div>
+  </div>
 {% endblock %}
 
 {% block codigo-javascript %}
@@ -184,39 +183,39 @@
     const contenedorTabla = document.getElementById('tabla-clientes-container');
 
     function buscar(url_string = null) {
-        const q = inputBusqueda.value;
-        let url;
-        
-        if (url_string) {
-            url = new URL(url_string, window.location.origin);
-        } else {
-            url = new URL(window.location.href);
-            url.searchParams.set('q', q);
-            url.searchParams.delete('page');
-        }
+      const q = inputBusqueda.value;
+      let url;
+      
+      if (url_string) {
+        url = new URL(url_string, window.location.origin);
+      } else {
+        url = new URL(window.location.href);
+        url.searchParams.set('q', q);
+        url.searchParams.delete('page');
+      }
 
-        fetch(url, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.text())
-        .then(html => {
-            contenedorTabla.innerHTML = html;
-            window.history.pushState({}, '', url);
-            vincularPaginacion();
-        })
-        .catch(error => console.error('Error en la búsqueda:', error));
+      fetch(url, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => response.text())
+      .then(html => {
+        contenedorTabla.innerHTML = html;
+        window.history.pushState({}, '', url);
+        vincularPaginacion();
+      })
+      .catch(error => console.error('Error en la búsqueda:', error));
     }
 
     function vincularPaginacion() {
-        const linksPaginacion = contenedorTabla.querySelectorAll('.paginacion-botones a');
-        linksPaginacion.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                buscar(this.href);
-            });
+      const linksPaginacion = contenedorTabla.querySelectorAll('.paginacion-botones a');
+      linksPaginacion.forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          buscar(this.href);
         });
+      });
     }
 
     inputBusqueda.addEventListener('input', () => buscar());
