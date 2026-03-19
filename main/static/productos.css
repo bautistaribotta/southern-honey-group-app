@@ -166,17 +166,10 @@
 
 .tabla-productos tbody tr {
   transition: all 0.2s ease;
-  cursor: pointer;
 }
 
 .tabla-productos tbody tr:last-child td {
   border-bottom: none;
-}
-
-.tabla-productos tbody tr:hover {
-  background-color: #f1f5f9;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .producto-info {
