@@ -163,6 +163,11 @@ def clientes(request):
     return render(request, "clientes.html", contexto)
 
 
+@login_required()
+def informacion_clientes(request):
+    return render(request, "informacion_clientes.html")
+
+
 # Verifico que solo un administrador pueda ver la vista, tambien verifica que el usuario este logueado
 @staff_member_required(login_url="inicio")
 def deudores(request):

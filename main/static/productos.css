@@ -242,7 +242,7 @@
 
 .boton-icono.editar:hover {
   color: var(--brand-olive);
-  background-color: #fdfcf8;
+  background-color: #556b2f34;
 }
 
 .boton-icono.eliminar:hover {

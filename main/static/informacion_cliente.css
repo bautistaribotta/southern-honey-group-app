@@ -1,0 +1,268 @@
+/* --- INFORMACIÓN CLIENTE --- */
+
+.boton-volver {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: var(--slate-500);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color 0.2s;
+    margin-bottom: 1.5rem;
+}
+
+.boton-volver:hover {
+    color: var(--brand-olive);
+}
+
+.cabecera-detalle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.info-principal {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.avatar-cliente {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: #556b2f1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--brand-olive);
+    font-size: 1.5rem;
+    font-weight: 700;
+    border: 1px solid #556b2f33;
+}
+
+.nombre-cliente-titulo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--slate-900);
+    margin: 0;
+}
+
+.id-cliente-subtitulo {
+    color: var(--slate-500);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.acciones-cliente {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.boton-accion {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid var(--stone-200);
+    background: white;
+    color: var(--slate-700);
+}
+
+.boton-accion:hover {
+    background-color: #f9fafb;
+}
+
+.boton-accion.eliminar {
+    color: #dc2626;
+    border-color: #fecaca;
+}
+
+.boton-accion.eliminar:hover {
+    background-color: #fef2f2;
+}
+
+/* --- TARJETA ÚNICA DE INFORMACIÓN --- */
+
+.tarjeta-info-unica {
+    background: white;
+    border: 1px solid var(--stone-200);
+    border-radius: 0.75rem;
+    padding: 2rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2.5rem;
+}
+
+.seccion-info-header {
+    margin-bottom: 1.5rem;
+}
+
+.seccion-info-header h4 {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--slate-500);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+.grid-datos-cliente {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+}
+
+.subseccion-datos {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.campo-info label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--slate-500);
+    margin-bottom: 0.35rem;
+}
+
+.campo-info p {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--slate-900);
+    margin: 0;
+}
+
+.valor-con-icono {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--slate-900);
+}
+
+.valor-con-icono .material-symbols-outlined {
+    font-size: 1.1rem;
+    color: var(--brand-olive);
+}
+
+/* --- OPERACIONES --- */
+
+.contenedor-operaciones {
+    margin-top: 2.5rem;
+}
+
+.encabezado-operaciones {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+
+.encabezado-operaciones h4 {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--slate-500);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.boton-nueva-op {
+    background: none;
+    border: none;
+    color: var(--brand-olive);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: color 0.2s;
+}
+
+.boton-nueva-op:hover {
+    color: #3f5022;
+}
+
+.tabla-operaciones-container {
+    background: white;
+    border: 1px solid var(--stone-200);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.tabla-operaciones {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.tabla-operaciones th {
+    background-color: #f9fafb;
+    padding: 1rem 2rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--slate-500);
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--stone-200);
+}
+
+.tabla-operaciones td {
+    padding: 1.25rem 2rem;
+    border-bottom: 1px solid var(--stone-200);
+    font-size: 0.875rem;
+}
+
+.tabla-operaciones tr:last-child td {
+    border-bottom: none;
+}
+
+.tabla-operaciones tr:hover {
+    background-color: #f9fafb;
+}
+
+.fecha-operacion {
+    color: var(--slate-500);
+    font-weight: 500;
+}
+
+.detalle-principal {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--slate-900);
+}
+
+.detalle-secundario {
+    font-size: 0.875rem;
+    color: var(--slate-500);
+    margin-top: 0.125rem;
+}
+
+.monto-total {
+    text-align: right;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--brand-olive);
+}
+
+@media (max-width: 1024px) {
+    .grid-datos-cliente {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}

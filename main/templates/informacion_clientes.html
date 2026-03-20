@@ -2,20 +2,138 @@
 {% load static %}
 
 {% block nombre-pestaña %}
-<title> Informacion cliente </title>
+<title> Información Cliente - Southern Honey Group </title>
 {% endblock %}
 
 {% block links %}
-
+<link rel="stylesheet" href="{% static 'informacion_cliente.css' %}">
 {% endblock %}
 
 {% block cabecera %}
 <div id="titulos-cabecera">
-  <h2> Informacion del cliente </h2>
-  <p> Gestione los datos del cliente y visualice sus operaciones </p>
+  <h2> Clientes </h2>
+  <p> Información detallada del cliente seleccionado </p>
 </div>
 {% endblock %}
 
 {% block area-trabajo %}
+<div id="espacio-trabajo-cliente">
+    <a href="{% url 'clientes' %}" class="boton-volver">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Volver a Clientes
+    </a>
 
+    <div class="cabecera-detalle">
+        <div class="info-principal">
+            <div class="avatar-cliente">
+                {{ cliente.nombre|slice:":1" }}{{ cliente.apellido|slice:":1" }}
+            </div>
+            <div>
+                <h3 class="nombre-cliente-titulo">{{ cliente.nombre }} {{ cliente.apellido }}</h3>
+                <p class="id-cliente-subtitulo">ID: {{ cliente.id }}</p>
+            </div>
+        </div>
+        <div class="acciones-cliente">
+            <button class="boton-accion">
+                <span class="material-symbols-outlined">edit</span>
+                Editar
+            </button>
+            <button class="boton-accion eliminar">
+                <span class="material-symbols-outlined">delete</span>
+                Eliminar
+            </button>
+        </div>
+    </div>
+
+    <!-- TÍTULO DE SECCIÓN FUERA DEL RECTÁNGULO -->
+    <div class="seccion-info-header" style="margin-bottom: 0.75rem;">
+        <h4><span class="material-symbols-outlined">badge</span> Información Personal</h4>
+    </div>
+
+    <!-- TARJETA ÚNICA DE INFORMACIÓN -->
+    <div class="tarjeta-info-unica">
+        <div class="grid-datos-cliente">
+            <!-- Columna 1: Datos Personales -->
+            <div class="subseccion-datos">
+                <div class="campo-info">
+                    <label>Nombre</label>
+                    <p>{{ cliente.nombre }}</p>
+                </div>
+                <div class="campo-info">
+                    <label>Apellido</label>
+                    <p>{{ cliente.apellido }}</p>
+                </div>
+                <div class="campo-info">
+                    <label>Teléfono</label>
+                    <div class="valor-con-icono">
+                        {{ cliente.telefono|default:"No registrado" }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna 2: Ubicación -->
+            <div class="subseccion-datos">
+                <div class="campo-info">
+                    <label>Localidad</label>
+                    <p>{{ cliente.localidad|default:"No registrada" }}</p>
+                </div>
+                <div class="campo-info">
+                    <label>Dirección</label>
+                    <p>{{ cliente.direccion|default:"No registrada" }}</p>
+                </div>
+            </div>
+
+            <!-- Columna 3: Facturación -->
+            <div class="subseccion-datos">
+                <div class="campo-info">
+                    <label>Factura la producción</label>
+                    <p>{% if cliente.factura_produccion %}Sí{% else %}No{% endif %}</p>
+                </div>
+                <div class="campo-info">
+                    <label>CUIT</label>
+                    <p>{{ cliente.cuit|default:"No registrado" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="contenedor-operaciones">
+        <div class="encabezado-operaciones">
+            <h4><span class="material-symbols-outlined">history</span> Operaciones Realizadas</h4>
+            <button class="boton-nueva-op">
+                <span class="material-symbols-outlined">add</span>
+                Nueva Operación
+            </button>
+        </div>
+        <div class="tabla-operaciones-container">
+            <table class="tabla-operaciones">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Detalle de Operación</th>
+                        <th style="text-align: right;">Monto Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for operacion in operaciones %}
+                    <tr>
+                        <td class="fecha-operacion">{{ operacion.fecha|date:"d/m/Y" }}</td>
+                        <td>
+                            <div class="detalle-principal">Operación #{{ operacion.id }}</div>
+                            <div class="detalle-secundario">{{ operacion.observaciones|default:"Sin observaciones" }}</div>
+                        </td>
+                        <td class="monto-total">${{ operacion.monto_total }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="text-align: center; padding: 2rem; color: var(--slate-500);">
+                            Este cliente no posee operaciones registradas.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
 {% endblock %}
