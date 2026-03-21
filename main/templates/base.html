@@ -10,7 +10,7 @@
     {% endblock %}
 
     {% block links %}
-      <!-- Esta parte va a ser reemplazada por los links al hacer la solicitud -->
+
     {% endblock %}
 
     <link rel="stylesheet" href="{% static 'inicio.css' %}">
@@ -45,7 +45,7 @@
           </a>
         </li>
         <li>
-          <a href="{% url 'clientes'%}" class="item-menu {% if request.resolver_match.url_name == 'clientes' %} activo {% endif %}">
+          <a href="{% url 'clientes'%}" class="item-menu {% if request.resolver_match.url_name == 'clientes' or request.resolver_match.url_name == 'informacion_clientes' %} activo {% endif %}">
             <span class="material-symbols-outlined">groups</span>
             Clientes
           </a>
