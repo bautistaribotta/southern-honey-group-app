@@ -20,7 +20,7 @@
         <td class="precio-valor"> $ {{ producto.precio }} </td>
         <td>
           <div class="acciones-tabla">
-            <button class="boton-icono editar" title="Editar" data-id="{{ producto.id }}">
+            <button class="boton-icono editar" title="Editar" data-id="{{ producto.id }}" onclick="abrirPanel()">
               <span class="material-symbols-outlined">edit</span>
             </button>
             <button class="boton-icono eliminar" title="Eliminar" data-id="{{ producto.id }}">

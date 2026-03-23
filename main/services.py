@@ -2,6 +2,11 @@ import requests
 from bs4 import BeautifulSoup
 
 
+def buscar_producto(id_producto):
+    producto = Cliente.objects.get(id=id_producto)
+    return producto
+
+
 def nuevo_producto(nombre, categoria=None, precio=None, cantidad=None):
     from .models import Producto
     nuevo_producto = Producto.objects.create(
@@ -36,6 +41,11 @@ def eliminar_producto(id_producto):
     producto.activo = False
     producto.save()
     return producto
+
+
+def buscar_cliente(id_cliente):
+    cliente = Cliente.objects.get(id=id_cliente)
+    return cliente
 
 
 def nuevo_cliente(nombre, apellido=None, telefono=None, localidad=None, direccion=None, cuit=None, factura_produccion=False):
