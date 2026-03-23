@@ -1,6 +1,4 @@
-from .services import (get_cotizacion_oficial, get_cotizacion_blue,
-                       get_cotizacion_miel_clara, get_cotizacion_miel_oscura,
-                       nuevo_producto, nuevo_cliente, editar_producto, editar_cliente)
+from .services import *
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.admin.views.decorators import staff_member_required
@@ -89,6 +87,7 @@ def productos(request):
         
     productos = productos.order_by("nombre")
 
+    # Cargo de a 5 productos
     paginator_productos = Paginator(productos, 5)
     pagina_numero = request.GET.get("page")
     pagina_obj = paginator_productos.get_page(pagina_numero)
@@ -147,6 +146,7 @@ def clientes(request):
             
     clientes_list = clientes_list.order_by("nombre")
 
+    # Cargo de a 5 clientes
     paginator_clientes = Paginator(clientes_list, 5)
     pagina_numero = request.GET.get("page")
     pagina_obj = paginator_clientes.get_page(pagina_numero)

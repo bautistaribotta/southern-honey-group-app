@@ -10,7 +10,7 @@
   </thead>
   <tbody>
     {% for cliente in clientes %}
-      <tr>
+      <tr class="fila-cliente" data-id="{{ cliente.id }}" ondblclick="irAInformacionCliente('{{ cliente.id }}')">
         <td>
           <div class="cliente-nombre"> {{ cliente.nombre }} {{ cliente.apellido|default:"" }} </div>
           <div class="cliente-id"> ID: {{ cliente.id }} </div>
@@ -20,10 +20,10 @@
         <td class="texto-centrado"> {{ cliente.telefono }} </td>
         <td>
           <div class="acciones-tabla">
-            <button class="boton-icono editar" title="Editar">
+            <button class="boton-icono editar" title="Editar" data-id="{{ cliente.id }}">
               <span class="material-symbols-outlined">edit</span>
             </button>
-            <button class="boton-icono eliminar" title="Eliminar">
+            <button class="boton-icono eliminar" title="Eliminar" data-id="{{ cliente.id }}">
               <span class="material-symbols-outlined">delete</span>
             </button>
           </div>
