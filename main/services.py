@@ -43,6 +43,8 @@ def eliminar_producto(id_producto):
     return producto
 
 
+
+
 def buscar_cliente(id_cliente):
     cliente = Cliente.objects.get(id=id_cliente)
     return cliente
@@ -88,7 +90,6 @@ def eliminar_cliente(id_cliente):
     cliente.activo = False
     cliente.save()
     return cliente
-
 
 
 

@@ -164,7 +164,8 @@ def clientes(request):
 
 
 @login_required()
-def informacion_clientes(request):
+def informacion_clientes(request, id_cliente):
+    contexto = buscar_cliente(id_cliente)
     return render(request, "informacion_clientes.html")
 
 
@@ -177,6 +178,27 @@ def deudores(request):
 @login_required
 def remitos(request):
     return render(request, "remitos.html")
+
+
+@login_required
+def obtener_cliente_json(request, id_cliente):
+    from django.http import JsonResponse
+    # Busco al cliente usando su ID y devuelvo sus datos en formato JSON
+    try:
+        cliente = Cliente.objects.get(id=id_cliente, activo=True)
+        datos = {
+            "id": cliente.id,
+            "nombre": cliente.nombre,
+            "apellido": cliente.apellido,
+            "telefono": cliente.telefono,
+            "localidad": cliente.localidad,
+            "direccion": cliente.direccion,
+            "factura": cliente.factura_produccion,
+            "cuit": cliente.cuit
+        }
+        return JsonResponse(datos)
+    except Cliente.DoesNotExist:
+        return JsonResponse({"Error": "Cliente no encontrado"}, status=404)
 
 
 def cerrar_sesion(request):
