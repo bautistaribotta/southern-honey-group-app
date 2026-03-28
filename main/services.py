@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 
 
 def buscar_producto(id_producto):
-    producto = Cliente.objects.get(id=id_producto)
+    producto = Producto.objects.get(id=id_producto)
     return producto
 
 

@@ -21,7 +21,7 @@ function irAInformacionCliente(id) {
 }
 
 // Configuro el panel para registrar un cliente nuevo
-function prepararPanelNuevo() {
+function prepararPanelNuevoCliente() {
     // Cambio los textos del panel a su estado original
     document.querySelector('#slide-over-panel h3').innerText = 'Nuevo Cliente';
     document.querySelector('#slide-over-panel .texto-cabecera p').innerText = 'Ingrese los datos para el registro';
@@ -38,7 +38,7 @@ function prepararPanelNuevo() {
 }
 
 // Configuro el panel con los datos del cliente para editarlo
-function prepararPanelEdicion(id) {
+function prepararPanelEditarCliente(id) {
     // Pido los datos del cliente al servidor usando su ID
     fetch(`/api/clientes/${id}/`)
         .then(response => response.json())
@@ -76,7 +76,7 @@ document.addEventListener('click', function(e) {
 
     if (botonEditar) {
         const id = botonEditar.dataset.id;
-        prepararPanelEdicion(id);
+        prepararPanelEditarCliente(id);
     }
 
     if (botonEliminar) {
