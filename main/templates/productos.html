@@ -101,6 +101,7 @@
       <div class="panel-cuerpo">
         <form class="formulario-producto" id="form-nuevo-producto" method="POST" autocomplete="off">
           {% csrf_token %}
+          <input type="hidden" id="id_producto" name="id_producto">
           <div class="campo-formulario">
             <label for="nombre">Nombre del Producto</label>
             <input type="text" id="nombre" name="nombre" class="input-estandar" placeholder="Ej: Miel Orgánica 500g" required>
