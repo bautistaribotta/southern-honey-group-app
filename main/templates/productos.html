@@ -64,7 +64,7 @@
         </div>
       </div>
       
-      <button class="boton-nuevo" onclick="abrirPanel()">
+      <button class="boton-nuevo" onclick="prepararPanelNuevoProducto()">
         <span class="material-symbols-outlined">add</span>
         Nuevo Producto
       </button>
@@ -99,7 +99,7 @@
 
       <!-- Cuerpo del Panel (Formulario) -->
       <div class="panel-cuerpo">
-        <form class="formulario-producto" id="form-nuevo-producto" method="POST" autocomplete="off">
+        <form class="formulario-producto" id="form-producto" method="POST" autocomplete="off">
           {% csrf_token %}
           <input type="hidden" id="id_producto" name="id_producto">
           <div class="campo-formulario">
@@ -139,8 +139,8 @@
 
       <!-- Pie del Panel -->
       <div class="panel-pie">
-        <button type="button" class="boton-cancelar" onclick="cerrarPanel()">Cancelar</button>
-        <button type="submit" form="form-nuevo-producto" class="boton-guardar">Guardar Producto</button>
+        <button type="submit" form="form-producto" class="boton-primario">Guardar Producto</button>
+        <button type="button" class="boton-secundario" onclick="cerrarPanel()">Cancelar</button>
       </div>
     </div>
   </div>
@@ -148,6 +148,7 @@
 
 {% block codigo-javascript %}
   <script src="{% static 'js/paneles.js' %}"></script>
+  <script src="{% static 'js/productos.js' %}"></script>
   <script>
     const inputBusqueda = document.getElementById('buscar-producto');
     const filtroCategoria = document.getElementById('filtro-categoria');

@@ -183,22 +183,34 @@ def remitos(request):
 @login_required
 def obtener_cliente_json(request, id_cliente):
     from django.http import JsonResponse
-    # Busco al cliente usando su ID y devuelvo sus datos en formato JSON
-    try:
-        cliente = Cliente.objects.get(id=id_cliente, activo=True)
-        datos = {
-            "id": cliente.id,
-            "nombre": cliente.nombre,
-            "apellido": cliente.apellido,
-            "telefono": cliente.telefono,
-            "localidad": cliente.localidad,
-            "direccion": cliente.direccion,
-            "factura": cliente.factura_produccion,
-            "cuit": cliente.cuit
-        }
+    # Importo el servicio que acabo de crear para separar la lógica de negocio de la respuesta HTTP
+    from .services import obtener_datos_cliente
+    
+    # Obtengo los datos ya procesados y filtrados desde la capa de servicios
+    datos = obtener_datos_cliente(id_cliente)
+    
+    if datos:
+        # Si el cliente existe y está activo, devuelvo sus datos en formato JSON
         return JsonResponse(datos)
-    except Cliente.DoesNotExist:
-        return JsonResponse({"Error": "Cliente no encontrado"}, status=404)
+    
+    # Si el servicio me devuelve None (cliente no encontrado o inactivo), respondo con un error 404
+    return JsonResponse({"Error": "Cliente no encontrado"}, status=404)
+
+
+@login_required
+def obtener_producto_json(request, id_producto):
+    from django.http import JsonResponse
+    # Llamo al servicio que se encarga de buscar y formatear los datos del producto
+    from .services import obtener_datos_producto
+    
+    datos = obtener_datos_producto(id_producto)
+    
+    if datos:
+        # Si el producto existe, devuelvo la respuesta exitosa en JSON
+        return JsonResponse(datos)
+    
+    # Si no lo encuentro o está inactivo, devuelvo un error 404
+    return JsonResponse({"Error": "Producto no encontrado"}, status=404)
 
 
 def cerrar_sesion(request):

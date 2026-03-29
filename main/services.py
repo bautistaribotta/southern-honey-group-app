@@ -1,8 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
 
+# Todos los imports son colocados dentro de la funciones para asi evitar import circulares
+
 
 def buscar_producto(id_producto):
+    from .models import Producto
     producto = Producto.objects.get(id=id_producto)
     return producto
 
@@ -36,7 +39,7 @@ def eliminar_producto(id_producto):
     from .models import Producto
     producto = Producto.objects.get(id=id_producto)
     
-    # En lugar de borrarlo de la base de datos, lo marcamos como inactivo
+    # En lugar de borrarlo de la base de datos, lo marco como inactivo
     # para no perder el historial de ventas en las otras tablas
     producto.activo = False
     producto.save()
@@ -46,6 +49,8 @@ def eliminar_producto(id_producto):
 
 
 def buscar_cliente(id_cliente):
+    # Me aseguro de importar el modelo Cliente antes de consultarlo
+    from .models import Cliente
     cliente = Cliente.objects.get(id=id_cliente)
     return cliente
 
@@ -84,12 +89,35 @@ def editar_cliente(id_cliente, nombre, apellido, telefono, localidad, direccion,
 def eliminar_cliente(id_cliente):
     from .models import Cliente
     cliente = Cliente.objects.get(id=id_cliente)
-    
-    # Marcamos el cliente como inactivo en lugar de borrarlo
-    # Esto es clave para no perder el historial de sus compras pasadas
+    """
+    Marco el cliente como inactivo en lugar de borrarlo
+    Esto es clave para no perder el historial de sus compras pasadas
+    """
     cliente.activo = False
     cliente.save()
     return cliente
+
+
+def obtener_datos_cliente(id_cliente):
+    from .models import Cliente
+    try:
+        # Busco al cliente asegurándome de que esté activo para no exponer datos de registros "eliminados"
+        cliente = Cliente.objects.get(id=id_cliente, activo=True)
+        
+        # Estructuro la información en un diccionario para que sea fácil de consumir,
+        # ya sea para una respuesta JSON o para cualquier otra lógica interna del sistema
+        return {
+            "id": cliente.id,
+            "nombre": cliente.nombre,
+            "apellido": cliente.apellido,
+            "telefono": cliente.telefono,
+            "localidad": cliente.localidad,
+            "direccion": cliente.direccion,
+            "factura": cliente.factura_produccion,
+            "cuit": cliente.cuit
+        }
+    except Cliente.DoesNotExist:
+        return None
 
 
 
@@ -146,20 +174,21 @@ def get_cotizacion_miel_clara():
         return None
 
 
-def get_cotizacion_miel_oscura():
-    url = r"https://infomiel.com/"
+def obtener_datos_producto(id_producto):
+    # Importo el modelo Producto localmente para evitar dependencias circulares
+    from .models import Producto
     try:
-        respuesta = requests.get(url)
-        html_resp = respuesta.text
-        soup = BeautifulSoup(html_resp, "html.parser")
-
-        # Busco la celda que contiene el texto de referencia
-        etiqueta_oscura = soup.find("td", string=lambda t: t and "Miel Oscura" in t)
-        # El precio está en la siguiente celda (el hermano de la etiqueta encontrada)
-        precio_miel_oscura = etiqueta_oscura.find_next_sibling("td").text
-
-        miel_oscura_limpia = "".join(filter(str.isdigit, precio_miel_oscura))
-        return miel_oscura_limpia
-    except Exception as e:
-        print(f"Error al obtener cotización miel oscura: {e}")  # Quitar a futuro
+        # Busco el producto asegurándome de que esté activo en el inventario
+        producto = Producto.objects.get(id=id_producto, activo=True)
+        
+        # Estructuro la información en un diccionario limpio para que la API JSON lo consuma fácilmente
+        return {
+            "id": producto.id,
+            "nombre": producto.nombre,
+            "categoria": producto.categoria,
+            "precio": str(producto.precio), # Convierto el Decimal a string para evitar errores de serialización JSON
+            "cantidad": str(producto.cantidad)
+        }
+    except Producto.DoesNotExist:
+        # Si el producto no existe o está inactivo, devuelvo None
         return None
