@@ -183,10 +183,9 @@ def remitos(request):
 @login_required
 def obtener_cliente_json(request, id_cliente):
     from django.http import JsonResponse
-    # Importo el servicio que acabo de crear para separar la lógica de negocio de la respuesta HTTP
     from .services import obtener_datos_cliente
     
-    # Obtengo los datos ya procesados y filtrados desde la capa de servicios
+    # Obtengo los datos ya procesados y filtrados
     datos = obtener_datos_cliente(id_cliente)
     
     if datos:

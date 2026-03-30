@@ -86,9 +86,5 @@ class DetalleOperacion(models.Model):
         return f"{self.cantidad} de {self.producto} (Op: {self.operacion.id})"
 
 
-class Remito(models.Model):
-    pass
-
-
 class Pagos(models.Model):
     pass
