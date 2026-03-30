@@ -10,7 +10,7 @@
   </thead>
   <tbody>
     {% for cliente in clientes %}
-      <tr class="fila-cliente" data-id="{{ cliente.id }}">
+      <tr class="fila-cliente" data-id="{{ cliente.id }}" ondblclick="irAInformacionCliente('{{cliente.id}}')">
         <td>
           <div class="cliente-nombre"> {{ cliente.nombre }} {{ cliente.apellido|default:"" }} </div>
           <div class="cliente-id"> ID: {{ cliente.id }} </div>
