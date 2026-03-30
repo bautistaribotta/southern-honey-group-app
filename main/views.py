@@ -165,8 +165,8 @@ def clientes(request):
 
 @login_required()
 def informacion_clientes(request, id_cliente):
-    contexto = buscar_cliente(id_cliente)
-    return render(request, "informacion_clientes.html")
+    cliente = buscar_cliente(id_cliente)
+    return render(request, "informacion_clientes.html", {"cliente": cliente})
 
 
 # Verifico que solo un administrador pueda ver la vista, tambien verifica que el usuario este logueado
