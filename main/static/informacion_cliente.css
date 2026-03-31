@@ -18,7 +18,7 @@
     font-size: 0.875rem;
     font-weight: 500;
     transition: color 0.2s;
-    margin-bottom: 1rem; /* Reduzco el margen inferior de 1.5rem a 1rem */
+    margin-bottom: 2rem; /* Aumentamos el margen para dar más aire */
 }
 
 .boton-volver:hover {
