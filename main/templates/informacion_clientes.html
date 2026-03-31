@@ -9,13 +9,6 @@
 <link rel="stylesheet" href="{% static 'informacion_cliente.css' %}">
 {% endblock %}
 
-{% block cabecera %}
-<div id="titulos-cabecera">
-  <h2> Clientes </h2>
-  <p> Información detallada del cliente seleccionado </p>
-</div>
-{% endblock %}
-
 {% block area-trabajo %}
 <div id="espacio-trabajo-cliente">
     <a href="{% url 'clientes' %}" class="boton-volver">
