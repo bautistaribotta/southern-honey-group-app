@@ -34,7 +34,7 @@ function prepararPanelNuevoCliente() {
     
     // Verifico el estado del campo CUIT y abro el panel
     actualizarCuit();
-    abrirPanel();
+    abrirPanelSlideOver();
 }
 
 // Configuro el panel con los datos del cliente para editarlo
@@ -61,7 +61,7 @@ function prepararPanelEditarCliente(id) {
 
             // Ajusto la visibilidad del CUIT y abro el panel
             actualizarCuit();
-            abrirPanel();
+            abrirPanelSlideOver();
         })
         .catch(error => {
             console.error('Error al obtener datos del cliente:', error);
