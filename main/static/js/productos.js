@@ -9,7 +9,7 @@ function prepararPanelNuevoProducto() {
     document.getElementById('form-producto').reset();
     document.getElementById('id_producto').value = '';
     
-    abrirPanel();
+    abrirSlideOver();
 }
 
 function prepararPanelEditarProducto(id) {
@@ -33,7 +33,7 @@ function prepararPanelEditarProducto(id) {
             document.getElementById('stock').value = producto.cantidad;
 
             // Abro el panel una vez que los datos están cargados
-            abrirPanel();
+            abrirSlideOver();
         })
         .catch(error => {
             console.error('Error al obtener datos del producto:', error);

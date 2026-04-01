@@ -77,8 +77,8 @@
   </section>
 
   <!-- PANEL LATERAL NUEVO PRODUCTO (SLIDE-OVER) -->
-  <div id="slide-over-contenedor">
-    <div id="slide-over-fondo" onclick="cerrarPanel()"> </div>
+  <div id="contenedor-slide-over">
+    <div id="slide-over-fondo" onclick="cerrarSlideOver()"> </div>
     
     <div id="slide-over-panel">
       <!-- Cabecera del Panel -->
@@ -92,7 +92,7 @@
             <p>Complete los detalles para el inventario</p>
           </div>
         </div>
-        <button class="boton-cerrar-panel" onclick="cerrarPanel()">
+        <button class="boton-cerrar-panel" onclick="cerrarSlideOver()">
           <span class="material-symbols-outlined">close</span>
         </button>
       </header>
@@ -140,7 +140,7 @@
       <!-- Pie del Panel -->
       <div class="panel-pie">
         <button type="submit" form="form-producto" class="boton-primario">Guardar Producto</button>
-        <button type="button" class="boton-secundario" onclick="cerrarPanel()">Cancelar</button>
+        <button type="button" class="boton-secundario" onclick="cerrarSlideOver()">Cancelar</button>
       </div>
     </div>
   </div>

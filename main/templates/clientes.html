@@ -64,8 +64,8 @@
   </section>
 
   <!-- PANEL LATERAL NUEVO CLIENTE (SLIDE-OVER) -->
-  <div id="slide-over-contenedor">
-    <div id="slide-over-fondo" onclick="cerrarPanel()"></div>
+  <div id="contenedor-slide-over">
+    <div id="slide-over-fondo" onclick="cerrarSlideOver()"></div>
 
     <div id="slide-over-panel">
       <form id="form-cliente" method="POST">
@@ -81,7 +81,7 @@
               <p>Ingrese los datos para el registro</p>
             </div>
           </div>
-          <button type="button" class="boton-cerrar" onclick="cerrarPanel()">
+          <button type="button" class="boton-cerrar" onclick="cerrarSlideOver()">
             <span class="material-symbols-outlined">close</span>
           </button>
         </header>
@@ -168,7 +168,7 @@
         <!-- 3. Pie fijo -->
         <footer class="panel-pie">
           <button type="submit" class="boton-primario">Guardar Cliente</button>
-          <button type="button" class="boton-secundario" onclick="cerrarPanel()">Cancelar</button>
+          <button type="button" class="boton-secundario" onclick="cerrarSlideOver()">Cancelar</button>
         </footer>
       </form>
     </div>

@@ -297,7 +297,7 @@
 }
 
 /* --- PANEL LATERAL (SLIDE-OVER) --- */
-#slide-over-contenedor {
+#contenedor-slide-over {
   position: fixed;
   inset: 0;
   z-index: 100;
@@ -309,7 +309,7 @@
   transition: visibility 0.3s;
 }
 
-#slide-over-contenedor.abierto {
+#contenedor-slide-over.slide-over-abierto {
   visibility: visible;
   transition: none; /* Al abrir no necesitamos delay */
 }
@@ -323,7 +323,7 @@
   transition: opacity 0.3s ease-in-out;
 }
 
-#slide-over-contenedor.abierto #slide-over-fondo {
+#contenedor-slide-over.slide-over-abierto #slide-over-fondo {
   opacity: 1;
 }
 
@@ -344,7 +344,7 @@
   -webkit-font-smoothing: antialiased;
 }
 
-#slide-over-contenedor.abierto #slide-over-panel {
+#contenedor-slide-over.slide-over-abierto #slide-over-panel {
   transform: translateX(0);
 }
 
