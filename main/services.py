@@ -1,17 +1,14 @@
 import requests
 from bs4 import BeautifulSoup
-
-# Todos los imports son colocados dentro de la funciones para asi evitar import circulares
+from models import Producto, Cliente, Operacion
 
 
 def buscar_producto(id_producto):
-    from .models import Producto
     producto = Producto.objects.get(id=id_producto)
     return producto
 
 
 def nuevo_producto(nombre, categoria=None, precio=None, cantidad=None):
-    from .models import Producto
     nuevo_producto = Producto.objects.create(
                     nombre=nombre,
                     categoria=categoria,
@@ -22,7 +19,6 @@ def nuevo_producto(nombre, categoria=None, precio=None, cantidad=None):
 
 
 def editar_producto(id_producto, nombre, categoria, precio, cantidad, activo):
-    from .models import Producto
     producto = Producto.objects.get(id=id_producto)
     
     producto.nombre = nombre
@@ -36,7 +32,6 @@ def editar_producto(id_producto, nombre, categoria, precio, cantidad, activo):
 
 
 def eliminar_producto(id_producto):
-    from .models import Producto
     producto = Producto.objects.get(id=id_producto)
     
     # En lugar de borrarlo de la base de datos, lo marco como inactivo
@@ -49,28 +44,24 @@ def eliminar_producto(id_producto):
 
 
 def buscar_cliente(id_cliente):
-    # Me aseguro de importar el modelo Cliente antes de consultarlo
-    from .models import Cliente
     cliente = Cliente.objects.get(id=id_cliente)
     return cliente
 
 
-def nuevo_cliente(nombre, apellido=None, telefono=None, localidad=None, direccion=None, cuit=None, factura_produccion=False):
-    from .models import Cliente
+def nuevo_cliente(nombre, apellido=None, telefono=None, localidad=None, direccion=None, factura_produccion=False, cuit=None):
     nuevo_cliente = Cliente.objects.create(
                     nombre=nombre,
                     apellido=apellido,
                     telefono=telefono,
                     localidad=localidad,
                     direccion=direccion,
-                    cuit=cuit,
-                    factura_produccion=factura_produccion
+                    factura_produccion=factura_produccion,
+                    cuit=cuit
     )
     return nuevo_cliente
 
 
-def editar_cliente(id_cliente, nombre, apellido, telefono, localidad, direccion, cuit, factura_produccion, activo):
-    from .models import Cliente
+def editar_cliente(id_cliente, nombre, apellido, telefono, localidad, direccion, factura_produccion, cuit, activo):
     cliente = Cliente.objects.get(id=id_cliente)
     
     cliente.nombre = nombre
@@ -78,8 +69,8 @@ def editar_cliente(id_cliente, nombre, apellido, telefono, localidad, direccion,
     cliente.telefono = telefono
     cliente.localidad = localidad
     cliente.direccion = direccion
-    cliente.cuit = cuit
     cliente.factura_produccion = factura_produccion
+    cliente.cuit = cuit
     cliente.activo = activo
     
     cliente.save()
@@ -87,7 +78,6 @@ def editar_cliente(id_cliente, nombre, apellido, telefono, localidad, direccion,
 
 
 def eliminar_cliente(id_cliente):
-    from .models import Cliente
     cliente = Cliente.objects.get(id=id_cliente)
     """
     Marco el cliente como inactivo en lugar de borrarlo
@@ -99,7 +89,6 @@ def eliminar_cliente(id_cliente):
 
 
 def obtener_datos_cliente(id_cliente):
-    from .models import Cliente
     try:
         # Busco al cliente asegurándome de que esté activo para no exponer datos de registros "eliminados"
         cliente = Cliente.objects.get(id=id_cliente, activo=True)
@@ -155,7 +144,7 @@ def get_cotizacion_blue():
         }
 
 
-def get_cotizacion_miel_clara():
+def get_cotizacion_miel():
     url = r"https://infomiel.com/"
     try:
         respuesta = requests.get(url)

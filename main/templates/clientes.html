@@ -7,6 +7,7 @@
 
 {% block links %}
   <link rel="stylesheet" href="{% static 'clientes.css' %}">
+  <script src="{% static 'js/paneles.js' %}"></script>
 {% endblock %}
 
 {% block cabecera %}
@@ -173,11 +174,30 @@
       </form>
     </div>
   </div>
+
+  <!-- Panel de eliminacion y Fondo -->
+  <div id="contenedor-panel-eliminar" class="">
+
+    <div id="contenedor-panel-fondo" onclick="cerrarPanelEliminar()"></div>
+
+    <!-- Panel -->
+    <div id="panel-eliminar">
+      <button type="button" class="boton-cerrar" onclick="cerrarPanelEliminar()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+
+      <h3>Confirmar eliminacion</h3>
+      <p>¿Esta seguro que quiere eliminar el cliente {{cliente.nombre}} {{cliente.apellido}}?</p>
+
+      <button class="boton-primario-eliminar">Si, eliminar</button>
+      <button class="boton-secundario">Cancelar</button>
+    </div>
+  </div>
 {% endblock %}
 
 {% block codigo-javascript %}
-  <script src="{% static 'js/paneles.js' %}"></script>
   <script src="{% static 'js/clientes.js' %}"></script>
+  <script src="{% static 'js/paneles.js' %}"></script>
   <script>
     const inputBusqueda = document.getElementById('buscar-cliente');
     const contenedorTabla = document.getElementById('tabla-clientes-container');

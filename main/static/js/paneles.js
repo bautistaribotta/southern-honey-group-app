@@ -11,11 +11,11 @@ function cerrarSlideOver() {
 }
 
 function abrirPanelEliminar() {
-    document.getElementById('panel-eliminar-contenedor').classList.add('panel-abierto');
+    document.getElementById('contenedor-panel-eliminar').classList.add('panel-abierto');
     document.body.style.overflow = 'hidden';
 }
 
 function cerrarPanelEliminar() {
-    document.getElementById('panel-eliminar-contenedor').classList.remove('panel-abierto');
+    document.getElementById('contenedor-panel-eliminar').classList.remove('panel-abierto');
     document.body.style.overflow = 'auto';
 }

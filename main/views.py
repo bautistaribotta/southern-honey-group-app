@@ -117,13 +117,15 @@ def clientes(request):
         # El checkbox llega como 'on' si está marcado, lo convierto en un booleano
         factura = request.POST.get("factura") == 'on'
         cuit = request.POST.get("cuit")
+        if not factura:
+            cuit = None
 
         if id_cliente:
-            editar_cliente(id_cliente, nombre_cliente, apellido, telefono, localidad, direccion, cuit, factura, True)
+            editar_cliente(id_cliente, nombre_cliente, apellido, telefono, localidad, direccion, factura, cuit, True)
             messages.success(request, "Cliente editado correctamente")
 
         else:
-            nuevo_cliente(nombre_cliente, apellido, telefono, localidad, direccion, cuit, factura)
+            nuevo_cliente(nombre_cliente, apellido, telefono, localidad, direccion, factura, cuit)
             messages.success(request, "Cliente agregado correctamente")
 
         return redirect("clientes")

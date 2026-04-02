@@ -1,4 +1,8 @@
 /* --- BARRA DE HERRAMIENTAS (Buscador y Botón) --- */
+:root {
+  --color-rojo-eliminacion: #dc2626;
+}
+
 .barra-herramientas {
   display: flex;
   justify-content: space-between;
@@ -192,7 +196,7 @@
 }
 
 .boton-icono.eliminar:hover {
-  color: #dc2626;
+  color: var(--color-rojo-eliminacion);
   background-color: #fef2f2;
 }
 
@@ -515,8 +519,13 @@ input:checked + .slider:before { transform: translateX(20px); }
   transition: all 0.2s;
 }
 
-.boton-primario:hover { filter: brightness(1.1); }
-.boton-primario:active { transform: scale(0.98); }
+.boton-primario:hover { 
+  filter: brightness(1.1); 
+}
+
+.boton-primario:active { 
+  transform: scale(0.98); 
+}
 
 .boton-secundario {
   background-color: white;
@@ -529,4 +538,57 @@ input:checked + .slider:before { transform: translateX(20px); }
   cursor: pointer;
   transition: background 0.2s;
 }
-.boton-secundario:hover { background-color: #f8fafc; }
+
+.boton-secundario:hover { 
+  background-color: #f8fafc; 
+}
+
+/* Panel de eliminacion */
+#contenedor-panel-eliminar {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  visibility: hidden;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+#contenedor-panel-eliminar.abierto {
+  visibility: visible;
+  opacity: 1;
+}
+
+#contenedor-panel-fondo {
+  position: absolute;
+  inset: 0;
+  background-color: #00000066;
+  backdrop-filter: blur(4px); 
+}
+
+#panel-eliminar {
+  position: relative;
+  background-color: white;
+  border-radius: 12px;
+  border: 1px solid #4b632d1a;
+  padding: 2rem;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 20px 25px -5px #0000001a;
+  display: flex;
+}
+
+#panel-eliminar h3 {
+
+}
+
+#panel-eliminar p {
+
+}
+
+.boton-primario-eliminar {
+  background-color: var(--color-rojo-eliminacion);
+}

@@ -81,6 +81,6 @@ document.addEventListener('click', function(e) {
 
     if (botonEliminar) {
         const id = botonEliminar.dataset.id;
-        // Aquí implementaré la confirmación de borrado más adelante
+        abrirPanelEliminar(id)
     }
 });
