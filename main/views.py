@@ -1,11 +1,15 @@
-from .services import *
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.contrib import messages
-from .models import Producto, Cliente
+from .services import (
+    nuevo_producto, editar_producto, eliminar_producto,
+    nuevo_cliente, editar_cliente, buscar_cliente,
+    get_cotizacion_oficial, get_cotizacion_blue,
+    obtener_datos_cliente, obtener_datos_producto
+)
 
 
 def login(request):

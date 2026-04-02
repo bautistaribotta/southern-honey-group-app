@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from models import Producto, Cliente, Operacion
+from .models import Producto, Cliente, Operacion
 
 
 def buscar_producto(id_producto):
@@ -164,8 +164,6 @@ def get_cotizacion_miel():
 
 
 def obtener_datos_producto(id_producto):
-    # Importo el modelo Producto localmente para evitar dependencias circulares
-    from .models import Producto
     try:
         # Busco el producto asegurándome de que esté activo en el inventario
         producto = Producto.objects.get(id=id_producto, activo=True)
