@@ -1,12 +1,14 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.contrib import messages
+
+from .models import Cliente
 from .services import (
     nuevo_producto, editar_producto, eliminar_producto,
-    nuevo_cliente, editar_cliente, buscar_cliente,
+    nuevo_cliente, editar_cliente,
     get_cotizacion_oficial, get_cotizacion_blue,
     obtener_datos_cliente, obtener_datos_producto
 )
@@ -171,7 +173,7 @@ def clientes(request):
 
 @login_required()
 def informacion_clientes(request, id_cliente):
-    cliente = buscar_cliente(id_cliente)
+    cliente = get_object_or_404(Cliente, id=id_cliente, activo=True)
     return render(request, "informacion_clientes.html", {"cliente": cliente})
 
 
@@ -205,7 +207,6 @@ def obtener_cliente_json(request, id_cliente):
 @login_required
 def obtener_producto_json(request, id_producto):
     from django.http import JsonResponse
-    # Llamo al servicio que se encarga de buscar y formatear los datos del producto
     from .services import obtener_datos_producto
     
     datos = obtener_datos_producto(id_producto)
