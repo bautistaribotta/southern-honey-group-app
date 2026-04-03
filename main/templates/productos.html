@@ -144,6 +144,31 @@
       </div>
     </div>
   </div>
+
+  <!-- Panel de eliminacion y Fondo -->
+  <div id="contenedor-panel-eliminar">
+    <div id="contenedor-panel-fondo" onclick="cerrarPanelEliminar()"></div>
+
+    <!-- Panel -->
+    <div id="panel-eliminar">
+      <button type="button" class="boton-cerrar-panel" id="icono-cerrar-panel-eliminar" onclick="cerrarPanelEliminar()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+
+      <div id="icono-advertencia">
+        <span class="material-symbols-outlined">warning</span>
+      </div>
+
+      <h3>Confirmar eliminación</h3>
+      <input type="hidden" id="id-eliminar" value="">
+      <p id="texto-confirmacion-eliminar">¿Está seguro que quiere eliminar este producto?</p>
+
+      <div class="acciones-modal">
+        <button type="button" class="boton-secundario" onclick="cerrarPanelEliminar()">No, mantener</button>
+        <button type="button" class="boton-primario-eliminar" id="boton-confirmar-eliminar">Sí, eliminar</button>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
 {% block codigo-javascript %}
@@ -165,7 +190,7 @@
         url = new URL(window.location.href);
         url.searchParams.set('q', q);
         url.searchParams.set('categoria', categoria);
-        url.searchParams.delete('page'); // Reiniciar a la primera página en cada búsqueda
+        url.searchParams.delete('page');
       }
 
       fetch(url, {
@@ -176,9 +201,7 @@
       .then(response => response.text())
       .then(html => {
         contenedorTabla.innerHTML = html;
-        // Actualizar la URL en la barra de direcciones sin recargar
         window.history.pushState({}, '', url);
-        // Re-vincular eventos de paginación
         vincularPaginacion();
       })
       .catch(error => console.error('Error en la búsqueda:', error));
@@ -194,11 +217,8 @@
       });
     }
 
-    // Eventos para búsqueda en tiempo real
     inputBusqueda.addEventListener('input', () => buscar());
     filtroCategoria.addEventListener('change', () => buscar());
-    
-    // Vincular paginación inicial
     vincularPaginacion();
   </script>
 {% endblock %}

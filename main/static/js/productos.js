@@ -48,10 +48,23 @@ function prepararPanelEditarProducto(id) {
 document.addEventListener('click', function(e) {
     // Busco el botón de editar más cercano al elemento clickeado
     const botonEditar = e.target.closest('.boton-icono.editar');
+    const botonEliminar = e.target.closest('.boton-icono.eliminar');
 
     if (botonEditar) {
         // Extraigo el ID del atributo data-id que definimos en el HTML
         const id = botonEditar.dataset.id;
         prepararPanelEditarProducto(id);
+    }
+
+    if (botonEliminar) {
+        const id = botonEliminar.dataset.id;
+        const nombre = botonEliminar.dataset.nombre;
+
+        // Relleno los datos en el modal de confirmación
+        document.getElementById('id-eliminar').value = id;
+        document.getElementById('texto-confirmacion-eliminar').innerText = `¿Confirma que quiere eliminar el producto "${nombre}"?`;
+
+        // Abro el modal
+        abrirPanelEliminar();
     }
 });
