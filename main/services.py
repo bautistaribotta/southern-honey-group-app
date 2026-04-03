@@ -108,7 +108,7 @@ def get_cotizacion_oficial():
             "venta": datos.get("venta")
         }
     except Exception as e:
-        print(f"Error al obtener cotización oficial: {e}")  # Quitar a futuro
+        print(f"Error al obtener cotización oficial: {e}")  # TODO: Quitar a futuro
         return {
             "compra": None,
             "venta": None
@@ -125,7 +125,7 @@ def get_cotizacion_blue():
             "venta": datos.get("venta")
         }
     except Exception as e:
-        print(f"Error al obtener cotización oficial: {e}")  # Quitar a futuro
+        print(f"Error al obtener cotización del dolar blue: {e}")  # TODO: Quitar a futuro
         return {
             "compra": None,
             "venta": None
@@ -147,7 +147,7 @@ def get_cotizacion_miel():
         miel_clara_limpia = "".join(filter(str.isdigit, precio_miel_clara))
         return miel_clara_limpia
     except Exception as e:
-        print(f"Error al obtener cotización miel clara: {e}")  # Quitar a futuro
+        print(f"Error al obtener cotización miel: {e}")  # TODO: Quitar a futuro
         return None
 
 

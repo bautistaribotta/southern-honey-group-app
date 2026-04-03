@@ -5,14 +5,13 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.contrib import messages
 
-from .models import Cliente
+from .models import Cliente, Producto, Operacion, DetalleOperacion
 from .services import (
     nuevo_producto, editar_producto, eliminar_producto,
     nuevo_cliente, editar_cliente,
     get_cotizacion_oficial, get_cotizacion_blue,
     obtener_datos_cliente, obtener_datos_producto
 )
-
 
 def login(request):
     if request.method == "POST":
