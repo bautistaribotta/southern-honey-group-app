@@ -85,7 +85,7 @@ document.addEventListener('click', function(e) {
 
         // Relleno los datos en el modal de confirmación
         document.getElementById('id-eliminar').value = id;
-        document.getElementById('texto-confirmacion-eliminar').innerText = `¿Está seguro que quiere eliminar al cliente ${nombre}?`;
+        document.getElementById('texto-confirmacion-eliminar').innerText = `¿Confirma que quiere eliminar al cliente ${nombre}?`;
 
         // Abro el modal
         abrirPanelEliminar();
