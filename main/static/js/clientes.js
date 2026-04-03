@@ -84,7 +84,7 @@ document.addEventListener('click', function(e) {
         const nombre = botonEliminar.dataset.nombre;
 
         // Relleno los datos en el modal de confirmación
-        document.getElementById('id-eliminar').value = id;
+        document.getElementById('id_eliminar').value = id;
         document.getElementById('texto-confirmacion-eliminar').innerText = `¿Confirma que quiere eliminar al cliente ${nombre}?`;
 
         // Abro el modal

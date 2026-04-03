@@ -10,7 +10,7 @@ from .services import (
     nuevo_producto, editar_producto, eliminar_producto,
     nuevo_cliente, editar_cliente,
     get_cotizacion_oficial, get_cotizacion_blue,
-    obtener_datos_cliente, obtener_datos_producto
+    obtener_datos_cliente, obtener_datos_producto, eliminar_cliente
 )
 
 def login(request):
@@ -63,13 +63,23 @@ def productos(request):
         precio = request.POST.get("precio")
         cantidad = request.POST.get("stock")
 
-        if id_producto:
-            editar_producto(id_producto, nombre_producto, categoria, precio, cantidad, True)
-            messages.success(request, "Producto editado correctamente.")
+        # Si es una ELIMINACION, aqui traigo el id a borrar
+        id_eliminar = request.POST.get("id_eliminar")
+        if id_eliminar:
+            eliminar_producto(id_eliminar)
+            messages.success(request, "Producto eliminado correctamente")
+            return redirect("productos")
 
         else:
-            nuevo_producto(nombre_producto, categoria, precio, cantidad)
-            messages.success(request, "Producto agregado correctamente.")
+            # Si es una EDICION
+            if id_producto:
+                editar_producto(id_producto, nombre_producto, categoria, precio, cantidad, True)
+                messages.success(request, "Producto editado correctamente")
+
+            # Si es un NUEVO producto
+            else:
+                nuevo_producto(nombre_producto, categoria, precio, cantidad)
+                messages.success(request, "Producto agregado correctamente")
 
         return redirect("productos")
 
@@ -103,7 +113,7 @@ def productos(request):
         "categoria": categoria_filtrada
     }
 
-    # Si es una petición AJAX, devolvemos solo la tabla
+    # Si es una petición AJAX, devuelvo solo la tabla
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return render(request, "tabla_productos.html", contexto)
 
@@ -125,13 +135,23 @@ def clientes(request):
         if not factura:
             cuit = None
 
-        if id_cliente:
-            editar_cliente(id_cliente, nombre_cliente, apellido, telefono, localidad, direccion, factura, cuit, True)
-            messages.success(request, "Cliente editado correctamente")
+        # Si es una ELIMINACION, aqui traigo el id a borrar
+        id_eliminar = request.POST.get("id_eliminar")
+        if id_eliminar:
+            eliminar_cliente(id_eliminar)
+            messages.success(request, "Cliente eliminado correctamente")
+            return redirect("clientes")
 
         else:
-            nuevo_cliente(nombre_cliente, apellido, telefono, localidad, direccion, factura, cuit)
-            messages.success(request, "Cliente agregado correctamente")
+            # Si es una EDICION
+            if id_cliente:
+                editar_cliente(id_cliente, nombre_cliente, apellido, telefono, localidad, direccion, factura, cuit, True)
+                messages.success(request, "Cliente editado correctamente")
+
+            # Si es un NUEVO cliente
+            else:
+                nuevo_cliente(nombre_cliente, apellido, telefono, localidad, direccion, factura, cuit)
+                messages.success(request, "Cliente agregado correctamente")
 
         return redirect("clientes")
 
