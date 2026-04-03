@@ -81,6 +81,13 @@ document.addEventListener('click', function(e) {
 
     if (botonEliminar) {
         const id = botonEliminar.dataset.id;
-        abrirPanelEliminar(id)
+        const nombre = botonEliminar.dataset.nombre;
+
+        // Relleno los datos en el modal de confirmación
+        document.getElementById('id-eliminar').value = id;
+        document.getElementById('texto-confirmacion-eliminar').innerText = `¿Está seguro que quiere eliminar al cliente ${nombre}?`;
+
+        // Abro el modal
+        abrirPanelEliminar();
     }
 });
