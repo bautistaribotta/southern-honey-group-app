@@ -560,9 +560,9 @@
   background-color: white;
   border-radius: 12px;
   border: 1px solid #4b632d1a;
-  padding: 2.5rem 2rem;
+  padding: 2rem 2rem;
   width: 90%;
-  max-width: 400px;
+  max-width: 450px;
   box-shadow: 0 20px 25px -5px #0000001a;
   display: flex;
   flex-direction: column;
