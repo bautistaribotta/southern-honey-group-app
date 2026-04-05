@@ -104,12 +104,25 @@
           <input type="hidden" id="id_producto" name="id_producto">
           <div class="campo-formulario">
             <label for="nombre">Nombre del Producto</label>
-            <input type="text" id="nombre" name="nombre" class="input-estandar" placeholder="Ej: Miel Orgánica 500g" required>
+            <input 
+              type="text" 
+              id="nombre" 
+              name="nombre" 
+              class="input-estandar" 
+              placeholder="Ej: Miel Orgánica 500g" 
+              required
+              pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}"
+              title="Mínimo 3 caracteres. No se permiten simbolos">
           </div>
 
           <div class="campo-formulario">
             <label for="categoria">Categoría</label>
-            <select id="categoria" name="categoria" class="select-estandar" required>
+            <select 
+              id="categoria" 
+              name="categoria" 
+              class="select-estandar" 
+              required
+              title="Seleccione una de las opciones disponibles">
               <option value="" disabled selected>Seleccione una categoría</option>
               <option value="Miel">Miel</option>
               <option value="Alimento">Alimento</option>
@@ -126,7 +139,17 @@
             <label for="precio">Precio Unitario</label>
             <div class="contenedor-input-prefijo">
               <span class="prefijo-input">$</span>
-              <input type="number" step="1" id="precio" name="precio" class="input-estandar input-con-prefijo" placeholder="0.00" required>
+              <input 
+                type="number" 
+                step="1" 
+                id="precio" 
+                name="precio" 
+                class="input-estandar 
+                input-con-prefijo" 
+                placeholder="0.00" 
+                required
+                pattern="[\d]"
+                title="Solo se permiten numeros">
             </div>
           </div>
 
