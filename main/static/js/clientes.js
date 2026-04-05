@@ -64,7 +64,6 @@ function prepararPanelEditarCliente(id) {
             abrirSlideOver();
         })
         .catch(error => {
-            console.error('Error al obtener datos del cliente:', error);
             crearToast('Error al cargar los datos del cliente', 'error');
         });
 }
@@ -85,7 +84,7 @@ document.addEventListener('click', function(e) {
 
         // Relleno los datos en el modal de confirmación
         document.getElementById('id_eliminar').value = id;
-        document.getElementById('texto-confirmacion-eliminar').innerText = `¿Confirma que quiere eliminar al cliente ${nombre}?`;
+        document.getElementById('texto-confirmacion-eliminar').innerHTML = `¿Confirma que quiere eliminar al cliente <b>${nombre}</b>?`;
 
         // Abro el modal
         abrirPanelEliminar();

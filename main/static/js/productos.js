@@ -36,8 +36,6 @@ function prepararPanelEditarProducto(id) {
             abrirSlideOver();
         })
         .catch(error => {
-            console.error('Error al obtener datos del producto:', error);
-            // Si existe la función de notificaciones, aviso del error
             if (typeof crearToast === 'function') {
                 crearToast('Error al cargar los datos del producto', 'error');
             }
@@ -62,7 +60,7 @@ document.addEventListener('click', function(e) {
 
         // Relleno los datos en el modal de confirmación
         document.getElementById('id_eliminar').value = id;
-        document.getElementById('texto-confirmacion-eliminar').innerText = `¿Confirma que quiere eliminar el producto "${nombre}"?`;
+        document.getElementById('texto-confirmacion-eliminar').innerHTML = `¿Confirma que quiere eliminar el producto <b>${nombre}</b>?`;
 
         // Abro el modal
         abrirPanelEliminar();
