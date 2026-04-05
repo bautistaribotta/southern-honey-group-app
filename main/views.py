@@ -134,6 +134,9 @@ def clientes(request):
         cuit = request.POST.get("cuit")
         if not factura:
             cuit = None
+        elif cuit:
+            # Elimina todos los guiones antes de guardarlo en la base de datos
+            cuit = cuit.replace("-", "")
 
         # Si es una ELIMINACION, aqui traigo el id a borrar
         id_eliminar = request.POST.get("id_eliminar")

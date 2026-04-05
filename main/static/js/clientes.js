@@ -1,6 +1,7 @@
 // Lógica para el manejo de CUIT y facturación
 const checkboxFactura = document.getElementById('factura');
 const campoCuit = document.getElementById('campo-cuit');
+const inputCuit = document.getElementById('cuit');
 
 if (checkboxFactura && campoCuit) {
     function actualizarCuit() {
@@ -13,6 +14,23 @@ if (checkboxFactura && campoCuit) {
     
     checkboxFactura.addEventListener('change', actualizarCuit);
     actualizarCuit(); 
+}
+
+// Formateo dinámico del CUIT (XX-XXXXXXXX-X)
+if (inputCuit) {
+    inputCuit.addEventListener('input', function (e) {
+        // Elimino todo lo que no sea número
+        let valor = e.target.value.replace(/\D/g, '');
+        
+        // Aplico el formato de guiones automáticamente
+        if (valor.length > 2 && valor.length <= 10) {
+            valor = valor.slice(0, 2) + '-' + valor.slice(2);
+        } else if (valor.length > 10) {
+            valor = valor.slice(0, 2) + '-' + valor.slice(2, 10) + '-' + valor.slice(10, 11);
+        }
+        
+        e.target.value = valor;
+    });
 }
 
 // Redirecciono a la vista de detalles del cliente al hacer doble click
@@ -56,7 +74,14 @@ function prepararPanelEditarCliente(id) {
             document.getElementById('telefono').value = cliente.telefono;
             document.getElementById('localidad').value = cliente.localidad;
             document.getElementById('direccion').value = cliente.direccion;
-            document.getElementById('cuit').value = cliente.cuit || '';
+            
+            // Si el cliente ya tiene un CUIT guardado en DB (solo números), le agrego los guiones para mostrarlo bonito
+            let cuitGuardado = cliente.cuit || '';
+            if (cuitGuardado.length === 11) {
+                cuitGuardado = cuitGuardado.slice(0, 2) + '-' + cuitGuardado.slice(2, 10) + '-' + cuitGuardado.slice(10, 11);
+            }
+            document.getElementById('cuit').value = cuitGuardado;
+            
             document.getElementById('factura').checked = cliente.factura;
 
             // Ajusto la visibilidad del CUIT y abro el panel

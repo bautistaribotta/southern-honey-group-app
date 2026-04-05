@@ -87,4 +87,4 @@ class DetalleOperacion(models.Model):
 
 
 class Pagos(models.Model):
-    pass
+    operacion = models.ForeignKey(Cliente, on_delete=models.PROTECT, db_column='id_operacion')

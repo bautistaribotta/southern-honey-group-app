@@ -99,19 +99,39 @@
             <div class="sub-panel-datos">
               <div class="grupo-input">
                 <label for="nombre">Nombre</label>
-                <input type="text" id="nombre" name="nombre" placeholder="Ej: Juan Antonio">
+                <input 
+                  type="text" 
+                  id="nombre" 
+                  name="nombre" 
+                  placeholder="Ej: Antonio" 
+                  required
+                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{3,}"
+                  title="Mínimo 3 letras, sin números ni símbolos">
               </div>
 
               <div class="grupo-input">
                 <label for="apellido">Apellido</label>
-                <input type="text" id="apellido" name="apellido" placeholder="Ej: Pérez Garcia">
+                <input 
+                  type="text" 
+                  id="apellido" 
+                  name="apellido" 
+                  placeholder="Ej: Garcia"
+                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{2,}"
+                  title="Mínimo 2 letras, sin números ni símbolos">
               </div>
 
               <div class="grupo-input">
                 <label for="telefono">Teléfono</label>
                 <div class="input-con-icono">
                   <span class="material-symbols-outlined">call</span>
-                  <input type="text" id="telefono" name="telefono" placeholder="Ej: +54 9 02302...">
+                  <input 
+                    type="text" 
+                    id="telefono" 
+                    name="telefono" 
+                    placeholder="Ej: 02302..." 
+                    required
+                    pattern="[\d]{6,}"
+                    title="Mínimo 6 números, sin letras ni simbolos">
                 </div>
               </div>
             </div>
@@ -127,12 +147,24 @@
             <div class="sub-panel-datos">
               <div class="grupo-input">
                 <label for="localidad">Localidad</label>
-                <input type="text" id="localidad" name="localidad" placeholder="Ej: Córdoba Capital">
+                <input 
+                  type="text" 
+                  id="localidad" 
+                  name="localidad" 
+                  placeholder="Ej: Córdoba Capital"
+                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{4,}"
+                  title="Mínimo 4 letras. No se permiten simbolos">
               </div>
 
               <div class="grupo-input">
                 <label for="direccion">Dirección</label>
-                <input type="text" id="direccion" name="direccion" placeholder="Calle y número">
+                <input 
+                  type="text" 
+                  id="direccion" 
+                  name="direccion" 
+                  placeholder="Calle y número"
+                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}"
+                  title="Mínimo 3 caracteres. No se permiten simbolos">
               </div>
             </div>
           </section>
@@ -158,7 +190,13 @@
 
               <div class="grupo-input" id="campo-cuit">
                 <label for="cuit">CUIT</label>
-                <input type="text" id="cuit" name="cuit" placeholder="00-00000000-0">
+                <input 
+                  type="text" 
+                  id="cuit" 
+                  name="cuit" 
+                  placeholder="00-00000000-0"
+                  pattern="[\d]{10,}"
+                  title="Mínimo 10 caracteres. Solo se permiten números">
               </div>
             </div>
           </section>
