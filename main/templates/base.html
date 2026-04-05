@@ -53,7 +53,7 @@
         {% if user.is_staff %}
         <li>
           <a href="{% url 'deudores' %}" class="item-menu {% if request.resolver_match.url_name == 'deudores' %} activo {% endif %}">
-            <span class="material-symbols-outlined">account_balance_wallet</span>
+            <span class="material-symbols-outlined">payments</span>
             Deudores
           </a>
         </li>

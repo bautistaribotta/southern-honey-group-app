@@ -17,6 +17,10 @@
   width: 24rem;
 }
 
+.input-mitad {
+  width: 12rem;
+}
+
 .icono-busqueda {
   position: absolute;
   left: 0.75rem;
