@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from django.shortcuts import get_object_or_404
 from .models import Producto, Cliente, Operacion
 
 
@@ -14,7 +15,7 @@ def nuevo_producto(nombre, categoria=None, precio=None, cantidad=None):
 
 
 def editar_producto(id_producto, nombre, categoria, precio, cantidad, activo):
-    producto = Producto.objects.get(id=id_producto)
+    producto = get_object_or_404(Producto, id=id_producto)
     
     producto.nombre = nombre
     producto.categoria = categoria
@@ -27,7 +28,7 @@ def editar_producto(id_producto, nombre, categoria, precio, cantidad, activo):
 
 
 def eliminar_producto(id_producto):
-    producto = Producto.objects.get(id=id_producto)
+    producto = get_object_or_404(Producto, id=id_producto)
     
     # En lugar de borrarlo de la base de datos, lo marco como inactivo
     # para no perder el historial de ventas en las otras tablas
@@ -50,7 +51,7 @@ def nuevo_cliente(nombre, apellido=None, telefono=None, localidad=None, direccio
 
 
 def editar_cliente(id_cliente, nombre, apellido, telefono, localidad, direccion, factura_produccion, cuit, activo):
-    cliente = Cliente.objects.get(id=id_cliente)
+    cliente = get_object_or_404(Cliente, id=id_cliente)
     
     cliente.nombre = nombre
     cliente.apellido = apellido
@@ -66,7 +67,7 @@ def editar_cliente(id_cliente, nombre, apellido, telefono, localidad, direccion,
 
 
 def eliminar_cliente(id_cliente):
-    cliente = Cliente.objects.get(id=id_cliente)
+    cliente = get_object_or_404(Cliente, id=id_cliente)
     """
     Marco el cliente como inactivo en lugar de borrarlo
     Esto es clave para no perder el historial de sus compras pasadas

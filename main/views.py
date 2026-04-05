@@ -90,8 +90,8 @@ def productos(request):
     productos = Producto.objects.filter(activo=True)
     
     if q:
-        if q[0].isdigit():
-            # Si inicia con números, buscamos por ID (exacto o que contenga)
+        if q.isdigit():
+            # Si es solo números, busco por ID (exacto o que contenga)
             productos = productos.filter(id__icontains=q)
         else:
             # Si no, buscamos por nombre
@@ -161,8 +161,8 @@ def clientes(request):
     clientes_list = Cliente.objects.filter(activo=True)
     
     if q:
-        if q[0].isdigit():
-            # Buscar por ID si empieza con número
+        if q.isdigit():
+            # # Si es solo números, busco por ID (exacto o que contenga)
             clientes_list = clientes_list.filter(id__icontains=q)
         else:
             # Buscar por nombre o apellido
