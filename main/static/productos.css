@@ -648,3 +648,33 @@
 .boton-primario-eliminar:hover {
   filter: brightness(0.9);
 }
+
+#boton-confirmar-eliminar {
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#boton-confirmar-eliminar span {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+
+#boton-confirmar-eliminar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background-color: rgba(0, 0, 0, 0.3);
+  transition: width 0.2s ease-out;
+  z-index: 1;
+}
+
+#boton-confirmar-eliminar.manteniendo::before {
+  width: 100%;
+  transition: width 2s linear;
+}
