@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block nombre-pestaña %}
+  <title> Nueva Operación </title>
+{% endblock %}
+
+{% block links %}
+  <link rel="stylesheet" href="{% static 'operaciones.css' %}">
+{% endblock %}
+
+{% block cabecera %}
+  <div id="titulos-cabecera" style="display: none;">
+    <!-- Oculto el cabezal por defecto de base.html porque operaciones tiene el suyo propio -->
+  </div>
+{% endblock %}
+
+{% block area-trabajo %}
+  <section id="area-trabajo" class="area-operacion">
+    
+    <!-- Encabezado de la vista -->
+    <div class="cabecera-operacion">
+      <a href="{% url 'clientes' %}" class="boton-volver">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Volver al perfil
+      </a>
+      <h2 class="titulo-operacion">Nueva Operación</h2>
+      <div class="info-cliente-actual">
+        <span class="texto-gris">Cliente actual:</span>
+        <div class="badge-cliente">
+          <span class="material-symbols-outlined">person</span>
+          Juan Pérez
+        </div>
+        <span class="texto-gris" style="opacity: 0.6; font-size: 0.75rem;">ID: 15</span>
+      </div>
+    </div>
+
+    <!-- Contenedor Principal a 2 Columnas -->
+    <div class="grid-operacion">
+      
+      <!-- COLUMNA IZQUIERDA (PRODUCTOS) -->
+      <div class="columna-productos">
+        
+        <!-- Buscador -->
+        <div class="panel-buscador">
+          <div class="contenedor-input-busqueda">
+            <span class="material-symbols-outlined icono-busqueda">search</span>
+            <input type="text" class="input-busqueda" placeholder="Buscar productos por nombre o categoría...">
+          </div>
+        </div>
+
+        <!-- Tabla de Productos Disponibles -->
+        <div class="contenedor-tabla shadow-sm">
+          <table class="tabla-productos">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th class="texto-centrado">Categoría</th>
+                <th class="texto-centrado">Stock</th>
+                <th class="texto-derecha">Precio</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              
+              <!-- Ejemplo Producto 1 -->
+              <tr class="fila-hover">
+                <td>
+                  <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div>
+                      <div class="producto-info">Miel Multifloral 500g</div>
+                      <div class="producto-id">ID: 1</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="texto-centrado"><span class="etiqueta etiqueta-miel">Miel</span></td>
+                <td class="stock-valor">124 u.</td>
+                <td class="precio-valor font-bold">$1.250,00</td>
+                <td class="texto-derecha">
+                  <button class="boton-agregar-producto" title="Añadir a la operación">
+                    <span class="material-symbols-outlined">add</span>
+                  </button>
+                </td>
+              </tr>
+
+              <!-- Ejemplo Producto 2 -->
+              <tr class="fila-hover">
+                <td>
+                  <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div>
+                      <div class="producto-info">Panal de Miel 250g</div>
+                      <div class="producto-id">ID: 2</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="texto-centrado"><span class="etiqueta etiqueta-alimento">Natural</span></td>
+                <td class="stock-valor">42 u.</td>
+                <td class="precio-valor font-bold">$2.100,00</td>
+                <td class="texto-derecha">
+                  <button class="boton-agregar-producto" title="Añadir a la operación">
+                    <span class="material-symbols-outlined">add</span>
+                  </button>
+                </td>
+              </tr>
+
+              <!-- Ejemplo Producto 3 -->
+              <tr class="fila-hover">
+                <td>
+                  <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div>
+                      <div class="producto-info">Miel Cremosa 300g</div>
+                      <div class="producto-id">ID: 5</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="texto-centrado"><span class="etiqueta etiqueta-estampa">Especial</span></td>
+                <td class="stock-valor">8 u.</td>
+                <td class="precio-valor font-bold">$1.850,00</td>
+                <td class="texto-derecha">
+                  <button class="boton-agregar-producto" title="Añadir a la operación">
+                    <span class="material-symbols-outlined">add</span>
+                  </button>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+          
+          <!-- Paginación Pequeña -->
+          <div class="paginacion-compacta">
+            <span class="texto-gris" style="font-size: 0.75rem; font-weight: 500;">Mostrando 3 de 48 productos</span>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="boton-pag-compacto">Anterior</button>
+              <button class="boton-pag-compacto">Siguiente</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLUMNA DERECHA (RESUMEN/CARRITO) -->
+      <div class="columna-resumen">
+        <div class="panel-resumen sticky">
+          <div class="cabecera-resumen">
+            <h3>
+              <span class="material-symbols-outlined">shopping_cart</span>
+              Resumen de Venta
+            </h3>
+          </div>
+
+          <!-- Items Seleccionados (CARRITO COMO TABLA) -->
+          <div class="contenedor-tabla-carrito">
+            <table class="tabla-carrito">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th class="texto-centrado">Cant.</th>
+                  <th class="texto-derecha"></th>
+                </tr>
+              </thead>
+              <tbody>
+                
+                <!-- Item 1 -->
+                <tr>
+                  <td>
+                    <div class="item-nombre">Miel Multifloral 500g</div>
+                    <div class="item-precio">$1.250,00 c/u</div>
+                  </td>
+                  <td class="texto-centrado">
+                    <input type="number" class="input-cantidad" value="2" min="1">
+                  </td>
+                  <td class="texto-derecha">
+                    <button class="boton-eliminar-item"><span class="material-symbols-outlined">delete</span></button>
+                  </td>
+                </tr>
+
+                <!-- Item 2 -->
+                <tr>
+                  <td>
+                    <div class="item-nombre">Panal de Miel 250g</div>
+                    <div class="item-precio">$2.100,00 c/u</div>
+                  </td>
+                  <td class="texto-centrado">
+                    <input type="number" class="input-cantidad" value="1" min="1">
+                  </td>
+                  <td class="texto-derecha">
+                    <button class="boton-eliminar-item"><span class="material-symbols-outlined">delete</span></button>
+                  </td>
+                </tr>
+                
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Métodos de Pago -->
+          <div class="seccion-pago">
+            <p class="titulo-seccion-pago">Método de Pago</p>
+            <div class="grid-metodos-pago">
+              
+              <label class="metodo-pago seleccionado">
+                <input type="radio" name="metodo_pago" value="cta_corriente" checked class="hidden-radio">
+                <span class="material-symbols-outlined icono-pago">auto_stories</span>
+                <span class="metodo-texto">Cta. Corriente</span>
+              </label>
+
+              <label class="metodo-pago">
+                <input type="radio" name="metodo_pago" value="contado" class="hidden-radio">
+                <span class="material-symbols-outlined icono-pago">payments</span>
+                <span class="metodo-texto">Débito / Contado</span>
+              </label>
+
+            </div>
+          </div>
+
+          <!-- Totales -->
+          <div class="seccion-totales">
+            <div class="fila-subtotal">
+              <span class="texto-gris" style="font-weight: 500;">Subtotal</span>
+              <span class="font-bold text-slate-900">$4.600,00</span>
+            </div>
+            
+            <div class="fila-total">
+              <span>Total</span>
+              <span class="total-destacado">$4.600,00</span>
+            </div>
+          </div>
+
+          <!-- Confirmar -->
+          <div class="seccion-confirmar">
+            <button class="boton-confirmar-operacion">
+              <span class="material-symbols-outlined">check_circle</span>
+              Confirmar Operación
+            </button>
+            <p class="texto-ayuda-confirmar">Al confirmar, se generará el remito y se actualizará el stock.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Script temporal para simular interacción de radio buttons -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const metodosPago = document.querySelectorAll('.metodo-pago');
+      metodosPago.forEach(label => {
+        label.addEventListener('click', function() {
+          metodosPago.forEach(l => l.classList.remove('seleccionado'));
+          this.classList.add('seleccionado');
+        });
+      });
+    });
+  </script>
+{% endblock %}

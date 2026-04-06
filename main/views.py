@@ -203,6 +203,12 @@ def informacion_clientes(request, id_cliente):
     return render(request, "informacion_clientes.html", {"cliente": cliente})
 
 
+@login_required()
+def operaciones(request, id_cliente):
+    cliente = get_object_or_404(Cliente, id=id_cliente)
+    return render(request, "operaciones.html", context={"cliente": cliente})
+
+
 # Verifico que solo un administrador pueda ver la vista, tambien verifica que el usuario este logueado
 @staff_member_required(login_url="inicio")
 def deudores(request):
