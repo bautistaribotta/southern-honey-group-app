@@ -452,6 +452,40 @@
 }
 .input-con-icono input { width: 100%; padding-left: 2.5rem; }
 
+/* VALIDACIONES PERSONALIZADAS */
+.mensaje-error {
+  display: none;
+  color: #dc2626; /* Rojo de error */
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  font-weight: 500;
+  animation: aparecer 0.3s ease;
+}
+
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Cuando el input es inválido y no está vacío (para no mostrar errores apenas se abre el form) */
+.grupo-input input:invalid:not(:placeholder-shown) {
+  border-color: #dc2626;
+}
+
+.grupo-input input:invalid:not(:placeholder-shown) ~ .mensaje-error,
+.grupo-input input:invalid:not(:placeholder-shown) + .mensaje-error {
+  display: block;
+}
+
+/* Si tiene icono, el input es hijo de un div, así que apuntamos al padre */
+.input-con-icono input:invalid:not(:placeholder-shown) {
+  border-color: #dc2626;
+}
+
+.grupo-input:has(.input-con-icono input:invalid:not(:placeholder-shown)) .mensaje-error {
+  display: block;
+}
+
 /* TOGGLE SWITCH */
 .fila-toggle {
   display: flex;

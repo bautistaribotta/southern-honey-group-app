@@ -474,6 +474,40 @@
   padding-left: 1.75rem;
 }
 
+/* VALIDACIONES PERSONALIZADAS */
+.mensaje-error {
+  display: none;
+  color: #dc2626;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  font-weight: 500;
+  animation: aparecer 0.3s ease;
+}
+
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Cuando el input es inválido y no está vacío */
+.campo-formulario input:invalid:not(:placeholder-shown) {
+  border-color: #dc2626;
+}
+
+.campo-formulario input:invalid:not(:placeholder-shown) ~ .mensaje-error,
+.campo-formulario input:invalid:not(:placeholder-shown) + .mensaje-error {
+  display: block;
+}
+
+/* Si tiene prefijo (como el símbolo $ en el precio) */
+.contenedor-input-prefijo input:invalid:not(:placeholder-shown) {
+  border-color: #dc2626;
+}
+
+.campo-formulario:has(.contenedor-input-prefijo input:invalid:not(:placeholder-shown)) .mensaje-error {
+  display: block;
+}
+
 /* Pie del Panel (Botones) */
 .panel-pie {
   padding: 1rem 1.5rem;

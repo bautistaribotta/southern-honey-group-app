@@ -105,8 +105,8 @@
                   name="nombre" 
                   placeholder="Ej: Antonio" 
                   required
-                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{3,}"
-                  title="Mínimo 3 letras, sin números ni símbolos">
+                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{3,}">
+                <span class="mensaje-error">Mínimo 3 letras, sin números ni símbolos</span>
               </div>
 
               <div class="grupo-input">
@@ -116,8 +116,8 @@
                   id="apellido" 
                   name="apellido" 
                   placeholder="Ej: Garcia"
-                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{2,}"
-                  title="Mínimo 2 letras, sin números ni símbolos">
+                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{2,}">
+                <span class="mensaje-error">Mínimo 2 letras, sin números ni símbolos</span>
               </div>
 
               <div class="grupo-input">
@@ -130,9 +130,9 @@
                     name="telefono" 
                     placeholder="Ej: 02302..." 
                     required
-                    pattern="[\d]{6,}"
-                    title="Mínimo 6 números, sin letras ni simbolos">
+                    pattern="[\d]{6,}">
                 </div>
+                <span class="mensaje-error">Mínimo 6 números, sin letras ni símbolos</span>
               </div>
             </div>
           </section>
