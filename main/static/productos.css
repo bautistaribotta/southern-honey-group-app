@@ -214,6 +214,10 @@
 .etiqueta-alimento { background-color: #f7fee7; color: #4d7c0f; border: 1px solid #d9f99d; }
 .etiqueta-cera { background-color: #fefce8; color: #a16207; border: 1px solid #fef08a; }
 .etiqueta-madera { background-color: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
+.etiqueta-estampa { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+.etiqueta-insumos { background-color: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
+.etiqueta-medicamentos { background-color: #ffe4e6; color: #991b1b; border: 1px solid #fecdd3; }
+.etiqueta-otros { background-color: #f5f5f4; color: #57534e; border: 1px solid #d6d3d1; }
 
 /* --- ACCIONES --- */
 .acciones-tabla {
