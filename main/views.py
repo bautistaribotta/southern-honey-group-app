@@ -63,6 +63,10 @@ def productos(request):
         precio = request.POST.get("precio")
         cantidad = request.POST.get("stock")
 
+        # Si el usuario no ingresó un stock (campo vacío), lo coloco en 0
+        if not cantidad:
+            cantidad = 0
+
         # Si es una ELIMINACION, aqui traigo el id a borrar
         id_eliminar = request.POST.get("id_eliminar")
         if id_eliminar:

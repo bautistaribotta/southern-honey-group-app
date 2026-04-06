@@ -15,7 +15,7 @@ class Producto(models.Model):
     nombre = models.CharField(max_length=50)
     categoria = models.CharField(max_length=50, choices=categorias, null=True, blank=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    cantidad = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    cantidad = models.PositiveIntegerField(default=0)
     cantidad_vendida = models.PositiveIntegerField(default=0)
     activo = models.BooleanField(default=True)
     """
@@ -87,4 +87,10 @@ class DetalleOperacion(models.Model):
 
 
 class Pagos(models.Model):
-    operacion = models.ForeignKey(Cliente, on_delete=models.PROTECT, db_column='id_operacion')
+    operacion = models.ForeignKey(Operacion, on_delete=models.PROTECT, db_column='id_operacion')
+
+    class Meta:
+        db_table = 'pagos'
+
+    def __str__(self):
+        return f"Pago de la operacion: {self.operacion}"
