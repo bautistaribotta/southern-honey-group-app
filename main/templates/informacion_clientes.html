@@ -2,11 +2,12 @@
 {% load static %}
 
 {% block nombre-pestaña %}
-<title> Información Cliente - Southern Honey Group </title>
+<title> Información Cliente </title>
 {% endblock %}
 
 {% block links %}
 <link rel="stylesheet" href="{% static 'informacion_cliente.css' %}">
+<script rel></script>
 {% endblock %}
 
 {% block area-trabajo %}
@@ -91,7 +92,10 @@
     <section class="contenedor-operaciones">
         <div class="encabezado-operaciones">
             <h4><span class="material-symbols-outlined">history</span> Operaciones Realizadas</h4>
-            <button class="boton-nueva-op">
+            <button 
+                class="boton-nueva-op" 
+                data-id="{{ cliente.id }}" 
+                onclick="irANuevaOperacion('{{cliente.id}}')">
                 <span class="material-symbols-outlined">add</span>
                 Nueva Operación
             </button>
@@ -127,4 +131,13 @@
         </div>
     </section>
 </div>
+{% endblock %}
+
+{% block codigo-javascript %}
+<script>
+    // Redirecciono a la vista de nueva operacion al hacer click
+    function irANuevaOperacion(id) {
+        window.location.href = `/operaciones/${id}/`;
+    }
+</script>
 {% endblock %}
