@@ -1,117 +1,229 @@
-// Lógica para el manejo de CUIT y facturación
+/**
+ * -----------------------------------------------------------------------------
+ * 1. UTILIDADES GENERALES (BÚSQUEDA Y PAGINACIÓN)
+ * -----------------------------------------------------------------------------
+ */
+
+// Selecciono los elementos del DOM que voy a usar para la búsqueda
+const inputBusqueda = document.getElementById('buscar-cliente');
+const contenedorTabla = document.getElementById('tabla-clientes-container');
+
+/**
+ * Creo esta función para realizar las búsquedas de clientes mediante AJAX.
+ * Si recibe una URL (como al hacer click en la paginación), usa esa.
+ * Si no, construye la URL con el valor del input de búsqueda.
+ * @param {string|null} urlString - URL opcional para la paginación.
+ */
+const buscar = (urlString = null) => {
+  if (!inputBusqueda || !contenedorTabla) return;
+
+  const q = inputBusqueda.value;
+  let url;
+  
+  if (urlString) {
+    url = new URL(urlString, window.location.origin);
+  } else {
+    url = new URL(window.location.href);
+    url.searchParams.set('q', q);
+    url.searchParams.delete('page');
+  }
+
+  // Realizo la petición fetch indicando que es XMLHttpRequest
+  fetch(url, {
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+  })
+    .then((response) => response.text())
+    .then((html) => {
+      // Actualizo el contenedor con la nueva tabla
+      contenedorTabla.innerHTML = html;
+      
+      // Actualizo la URL en la barra del navegador sin recargar la página
+      window.history.pushState({}, '', url);
+      
+      // Vuelvo a vincular los eventos a los nuevos botones de paginación
+      vincularPaginacion();
+    })
+    .catch((error) => console.error('Error en la búsqueda:', error));
+};
+
+/**
+ * Creo esta función para atrapar los clicks en los botones de paginación
+ * y evitar que recarguen la página entera, usando AJAX en su lugar.
+ */
+const vincularPaginacion = () => {
+  if (!contenedorTabla) return;
+  const linksPaginacion = contenedorTabla.querySelectorAll('.paginacion-botones a');
+  
+  linksPaginacion.forEach((link) => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      buscar(link.href);
+    });
+  });
+};
+
+// Si existen los elementos, agrego los event listeners iniciales
+if (inputBusqueda) {
+  inputBusqueda.addEventListener('input', () => buscar());
+}
+vincularPaginacion();
+
+/**
+ * -----------------------------------------------------------------------------
+ * 2. FORMATO DE CUIT Y FACTURACIÓN
+ * -----------------------------------------------------------------------------
+ */
+
 const checkboxFactura = document.getElementById('factura');
 const campoCuit = document.getElementById('campo-cuit');
 const inputCuit = document.getElementById('cuit');
 
+/**
+ * Creo esta función para mostrar u ocultar el campo de CUIT 
+ * dependiendo de si el checkbox de facturación está marcado.
+ */
+const actualizarCuit = () => {
+  if (checkboxFactura && campoCuit) {
+    campoCuit.style.display = checkboxFactura.checked ? 'flex' : 'none';
+  }
+};
+
 if (checkboxFactura && campoCuit) {
-    function actualizarCuit() {
-        if (checkboxFactura.checked) {
-            campoCuit.style.display = 'flex';
-        } else {
-            campoCuit.style.display = 'none';
-        }
-    }
-    
-    checkboxFactura.addEventListener('change', actualizarCuit);
-    actualizarCuit(); 
+  checkboxFactura.addEventListener('change', actualizarCuit);
+  actualizarCuit(); 
 }
 
-// Formateo dinámico del CUIT (XX-XXXXXXXX-X)
+// Le doy formato dinámico al CUIT (XX-XXXXXXXX-X) mientras el usuario escribe
 if (inputCuit) {
-    inputCuit.addEventListener('input', function (e) {
-        // Elimino todo lo que no sea número
-        let valor = e.target.value.replace(/\D/g, '');
-        
-        // Aplico el formato de guiones automáticamente
-        if (valor.length > 2 && valor.length <= 10) {
-            valor = valor.slice(0, 2) + '-' + valor.slice(2);
-        } else if (valor.length > 10) {
-            valor = valor.slice(0, 2) + '-' + valor.slice(2, 10) + '-' + valor.slice(10, 11);
-        }
-        
-        e.target.value = valor;
-    });
-}
-
-// Redirecciono a la vista de detalles del cliente al hacer doble click
-function irAInformacionCliente(id) {
-    window.location.href = `/informacion_clientes/${id}/`;
-}
-
-// Configuro el panel para registrar un cliente nuevo
-function prepararPanelNuevoCliente() {
-    // Cambio los textos del panel a su estado original
-    document.querySelector('#slide-over-panel h3').innerText = 'Nuevo Cliente';
-    document.querySelector('#slide-over-panel .texto-cabecera p').innerText = 'Ingrese los datos para el registro';
-    document.querySelector('.boton-primario').innerText = 'Guardar Cliente';
-    document.querySelector('.icono-contenedor span').innerText = 'person_add';
-
-    // Limpio el formulario y el ID oculto
-    document.getElementById('form-cliente').reset();
-    document.getElementById('id_cliente').value = '';
+  inputCuit.addEventListener('input', (e) => {
+    // Elimino todo lo que no sea un número usando una expresión regular
+    let valor = e.target.value.replace(/\D/g, '');
     
-    // Verifico el estado del campo CUIT y abro el panel
-    actualizarCuit();
-    abrirSlideOver();
+    // Aplico el formato de guiones automáticamente
+    if (valor.length > 2 && valor.length <= 10) {
+      valor = `${valor.slice(0, 2)}-${valor.slice(2)}`;
+    } else if (valor.length > 10) {
+      valor = `${valor.slice(0, 2)}-${valor.slice(2, 10)}-${valor.slice(10, 11)}`;
+    }
+    
+    e.target.value = valor;
+  });
 }
 
-// Configuro el panel con los datos del cliente para editarlo
-function prepararPanelEditarCliente(id) {
-    // Pido los datos del cliente al servidor usando su ID
-    fetch(`/api/clientes/${id}/`)
-        .then(response => response.json())
-        .then(cliente => {
-            // Actualizo los textos del panel para la edición
-            document.querySelector('#slide-over-panel h3').innerText = 'Editar Cliente';
-            document.querySelector('#slide-over-panel .texto-cabecera p').innerText = 'Modifique los datos del perfil';
-            document.querySelector('.boton-primario').innerText = 'Actualizar Cliente';
-            document.querySelector('.icono-contenedor span').innerText = 'edit_note';
+/**
+ * -----------------------------------------------------------------------------
+ * 3. CONTROLADORES DE PANELES (NUEVO/EDITAR) Y REDIRECCIONES
+ * -----------------------------------------------------------------------------
+ */
 
-            // Relleno los campos del formulario con la información recibida
-            document.getElementById('id_cliente').value = cliente.id;
-            document.getElementById('nombre').value = cliente.nombre;
-            document.getElementById('apellido').value = cliente.apellido;
-            document.getElementById('telefono').value = cliente.telefono;
-            document.getElementById('localidad').value = cliente.localidad;
-            document.getElementById('direccion').value = cliente.direccion;
-            
-            // Si el cliente ya tiene un CUIT guardado en DB (solo números), le agrego los guiones para mostrarlo bonito
-            let cuitGuardado = cliente.cuit || '';
-            if (cuitGuardado.length === 11) {
-                cuitGuardado = cuitGuardado.slice(0, 2) + '-' + cuitGuardado.slice(2, 10) + '-' + cuitGuardado.slice(10, 11);
-            }
-            document.getElementById('cuit').value = cuitGuardado;
-            
-            document.getElementById('factura').checked = cliente.factura;
+/**
+ * Creo esta función para redireccionar a la vista de detalles del cliente
+ * al hacer doble click en una fila.
+ * @param {string|number} id - El ID del cliente
+ */
+const irAInformacionCliente = (id) => {
+  window.location.href = `/informacion_clientes/${id}/`;
+};
 
-            // Ajusto la visibilidad del CUIT y abro el panel
-            actualizarCuit();
-            abrirSlideOver();
-        })
-        .catch(error => {
-            crearToast('Error al cargar los datos del cliente', 'error');
-        });
-}
+/**
+ * Creo esta función para limpiar y configurar el panel lateral 
+ * cuando el usuario quiere registrar un nuevo cliente.
+ */
+const prepararPanelNuevoCliente = () => {
+  // Cambio los textos del panel a su estado original para la creación
+  document.querySelector('#slide-over-panel h3').innerText = 'Nuevo Cliente';
+  document.querySelector('#slide-over-panel .texto-cabecera p').innerText = 'Ingrese los datos para el registro';
+  document.querySelector('.boton-primario').innerText = 'Guardar Cliente';
+  document.querySelector('.icono-contenedor span').innerText = 'person_add';
 
-// Manejo los clicks en los botones de la tabla mediante delegación de eventos
-document.addEventListener('click', function(e) {
-    const botonEditar = e.target.closest('.boton-icono.editar');
-    const botonEliminar = e.target.closest('.boton-icono.eliminar');
+  // Limpio el formulario y me aseguro de vaciar el ID oculto
+  document.getElementById('form-cliente').reset();
+  document.getElementById('id_cliente').value = '';
+  
+  // Verifico el estado del campo CUIT y abro el panel
+  actualizarCuit();
+  if (typeof abrirSlideOver === 'function') abrirSlideOver();
+};
 
-    if (botonEditar) {
-        const id = botonEditar.dataset.id;
-        prepararPanelEditarCliente(id);
-    }
+/**
+ * Creo esta función para obtener los datos de un cliente y rellenar 
+ * el panel lateral para poder editarlo.
+ * @param {string|number} id - El ID del cliente a editar
+ */
+const prepararPanelEditarCliente = (id) => {
+  // Pido los datos del cliente a mi API interna
+  fetch(`/api/clientes/${id}/`)
+    .then((response) => response.json())
+    .then((cliente) => {
+      // Actualizo los textos del panel para indicar que es una edición
+      document.querySelector('#slide-over-panel h3').innerText = 'Editar Cliente';
+      document.querySelector('#slide-over-panel .texto-cabecera p').innerText = 'Modifique los datos del perfil';
+      document.querySelector('.boton-primario').innerText = 'Actualizar Cliente';
+      document.querySelector('.icono-contenedor span').innerText = 'edit_note';
 
-    if (botonEliminar) {
-        const id = botonEliminar.dataset.id;
-        const nombre = botonEliminar.dataset.nombre;
+      // Relleno los campos del formulario con la información recibida
+      document.getElementById('id_cliente').value = cliente.id;
+      document.getElementById('nombre').value = cliente.nombre;
+      document.getElementById('apellido').value = cliente.apellido;
+      document.getElementById('telefono').value = cliente.telefono;
+      document.getElementById('localidad').value = cliente.localidad;
+      document.getElementById('direccion').value = cliente.direccion;
+      
+      // Si el cliente ya tiene un CUIT en la BD, le agrego los guiones visuales
+      let cuitGuardado = cliente.cuit || '';
+      if (cuitGuardado.length === 11) {
+        cuitGuardado = `${cuitGuardado.slice(0, 2)}-${cuitGuardado.slice(2, 10)}-${cuitGuardado.slice(10, 11)}`;
+      }
+      document.getElementById('cuit').value = cuitGuardado;
+      
+      document.getElementById('factura').checked = cliente.factura;
 
-        // Relleno los datos en el modal de confirmación
-        document.getElementById('id_eliminar').value = id;
-        document.getElementById('texto-confirmacion-eliminar').innerHTML = `¿Confirma que quiere eliminar al cliente <b>${nombre}</b>?`;
+      // Ajusto la visibilidad del CUIT y abro el panel
+      actualizarCuit();
+      if (typeof abrirSlideOver === 'function') abrirSlideOver();
+    })
+    .catch((error) => {
+      console.error(error);
+      if (typeof crearToast === 'function') {
+        crearToast('Error al cargar los datos del cliente', 'error');
+      }
+    });
+};
 
-        // Abro el modal
-        abrirPanelEliminar();
-    }
+/**
+ * -----------------------------------------------------------------------------
+ * 4. DELEGACIÓN DE EVENTOS (CLICKS EN LA TABLA)
+ * -----------------------------------------------------------------------------
+ */
+
+/**
+ * Agrego un event listener general al documento para atrapar los clicks
+ * en los botones de editar o eliminar dentro de la tabla.
+ */
+document.addEventListener('click', (e) => {
+  const botonEditar = e.target.closest('.boton-icono.editar');
+  const botonEliminar = e.target.closest('.boton-icono.eliminar');
+
+  if (botonEditar) {
+    const id = botonEditar.dataset.id;
+    prepararPanelEditarCliente(id);
+  }
+
+  if (botonEliminar) {
+    const id = botonEliminar.dataset.id;
+    const nombre = botonEliminar.dataset.nombre;
+
+    // Relleno los datos en el modal de confirmación de eliminación
+    document.getElementById('id_eliminar').value = id;
+    document.getElementById('texto-confirmacion-eliminar').innerHTML = `¿Confirma que quiere eliminar al cliente <b>${nombre}</b>?`;
+
+    // Abro el modal
+    if (typeof abrirPanelEliminar === 'function') abrirPanelEliminar();
+  }
 });
+
+// Hago accesibles las funciones globales que el HTML necesita usar mediante atributos onclick
+window.irAInformacionCliente = irAInformacionCliente;
+window.prepararPanelNuevoCliente = prepararPanelNuevoCliente;

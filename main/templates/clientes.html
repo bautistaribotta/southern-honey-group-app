@@ -247,49 +247,6 @@
 {% endblock %}
 
 {% block codigo-javascript %}
-  <script src="{% static 'js/clientes.js' %}"></script>
   <script src="{% static 'js/paneles.js' %}"></script>
-  <script>
-    const inputBusqueda = document.getElementById('buscar-cliente');
-    const contenedorTabla = document.getElementById('tabla-clientes-container');
-
-    function buscar(url_string = null) {
-      const q = inputBusqueda.value;
-      let url;
-      
-      if (url_string) {
-        url = new URL(url_string, window.location.origin);
-      } else {
-        url = new URL(window.location.href);
-        url.searchParams.set('q', q);
-        url.searchParams.delete('page');
-      }
-
-      fetch(url, {
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest'
-        }
-      })
-      .then(response => response.text())
-      .then(html => {
-        contenedorTabla.innerHTML = html;
-        window.history.pushState({}, '', url);
-        vincularPaginacion();
-      })
-      .catch(error => console.error('Error en la búsqueda:', error));
-    }
-
-    function vincularPaginacion() {
-      const linksPaginacion = contenedorTabla.querySelectorAll('.paginacion-botones a');
-      linksPaginacion.forEach(link => {
-        link.addEventListener('click', function(e) {
-          e.preventDefault();
-          buscar(this.href);
-        });
-      });
-    }
-
-    inputBusqueda.addEventListener('input', () => buscar());
-    vincularPaginacion();
-  </script>
+  <script src="{% static 'js/clientes.js' %}"></script>
 {% endblock %}
