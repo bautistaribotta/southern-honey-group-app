@@ -63,8 +63,8 @@
   display: flex; 
   align-items: center; 
   gap: 0.5rem; 
-  background-color: #d0e1fb; 
-  color: #1e3a8a; 
+  background-color: var(--brand-olive); 
+  color: white; 
   padding: 0.25rem 0.75rem; 
   border-radius: 9999px; 
   font-size: 0.875rem; 

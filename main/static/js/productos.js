@@ -102,6 +102,7 @@ const prepararPanelEditarProducto = (id) => {
       document.querySelector('#slide-over-panel .texto-cabecera p').innerText = 'Modifique los datos del producto';
       document.querySelector('.boton-primario').innerText = 'Actualizar Producto';
       document.querySelector('.icono-contenedor span').innerText = 'edit_square';
+      document.querySelector('label[for="stock"]').innerText = 'Stock disponible';
 
       // Relleno el formulario con los datos reales
       document.getElementById('id_producto').value = producto.id;
