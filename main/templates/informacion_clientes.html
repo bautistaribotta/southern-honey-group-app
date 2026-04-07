@@ -92,13 +92,10 @@
     <section class="contenedor-operaciones">
         <div class="encabezado-operaciones">
             <h4><span class="material-symbols-outlined">history</span> Operaciones Realizadas</h4>
-            <button 
-                class="boton-nueva-op" 
-                data-id="{{ cliente.id }}" 
-                onclick="irANuevaOperacion('{{cliente.id}}')">
+            <a href="{% url 'operaciones' cliente.id %}" class="boton-nueva-op" data-id="{{ cliente.id }}"> 
                 <span class="material-symbols-outlined">add</span>
                 Nueva Operación
-            </button>
+            </a>
         </div>
         <div class="tabla-operaciones-container">
             <table class="tabla-operaciones">

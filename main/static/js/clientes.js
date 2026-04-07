@@ -225,5 +225,4 @@ document.addEventListener('click', (e) => {
 });
 
 // Hago accesibles las funciones globales que el HTML necesita usar mediante atributos onclick
-window.irAInformacionCliente = irAInformacionCliente;
 window.prepararPanelNuevoCliente = prepararPanelNuevoCliente;
