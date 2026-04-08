@@ -45,7 +45,7 @@
         <div class="panel-buscador">
           <div class="contenedor-input-busqueda">
             <span class="material-symbols-outlined icono-busqueda">search</span>
-            <input type="text" class="input-busqueda" placeholder="Buscar productos por nombre o categoría...">
+            <input type="text" class="input-busqueda" placeholder="Buscar productos por nombre o id...">
           </div>
         </div>
 
@@ -57,81 +57,56 @@
                 <th>Producto</th>
                 <th class="texto-centrado">Categoría</th>
                 <th class="texto-centrado">Stock</th>
-                <th class="texto-derecha">Precio</th>
+                <th class="texto-centrado">Precio</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
               
-              <!-- Ejemplo Producto 1 -->
+              <!-- Fila de productos -->
+              {% for producto in productos %}
               <tr class="fila-hover">
                 <td>
                   <div style="display: flex; align-items: center; gap: 0.75rem;">
                     <div>
-                      <div class="producto-info">Miel Multifloral 500g</div>
-                      <div class="producto-id">ID: 1</div>
+                      <div class="producto-info">{{producto.nombre}}</div>
+                      <div class="producto-id">ID: {{producto.id}}</div>
                     </div>
                   </div>
                 </td>
-                <td class="texto-centrado"><span class="etiqueta etiqueta-miel">Miel</span></td>
-                <td class="stock-valor">124 u.</td>
-                <td class="precio-valor font-bold">$1.250,00</td>
+                <td class="texto-centrado"><span class="etiqueta etiqueta-{{ producto.categoria|lower }}">{{ producto.categoria }}</span></td>
+                <td class="stock-valor">{{ producto.cantidad|floatformat:0 }}</td>
+                <td class="precio-valor font-bold">$ {{ producto.precio }}</td>
                 <td class="texto-derecha">
                   <button class="boton-agregar-producto" title="Añadir a la operación">
                     <span class="material-symbols-outlined">add</span>
                   </button>
                 </td>
               </tr>
-
-              <!-- Ejemplo Producto 2 -->
-              <tr class="fila-hover">
-                <td>
-                  <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <div>
-                      <div class="producto-info">Panal de Miel 250g</div>
-                      <div class="producto-id">ID: 2</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="texto-centrado"><span class="etiqueta etiqueta-alimento">Natural</span></td>
-                <td class="stock-valor">42 u.</td>
-                <td class="precio-valor font-bold">$2.100,00</td>
-                <td class="texto-derecha">
-                  <button class="boton-agregar-producto" title="Añadir a la operación">
-                    <span class="material-symbols-outlined">add</span>
-                  </button>
-                </td>
-              </tr>
-
-              <!-- Ejemplo Producto 3 -->
-              <tr class="fila-hover">
-                <td>
-                  <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <div>
-                      <div class="producto-info">Miel Cremosa 300g</div>
-                      <div class="producto-id">ID: 5</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="texto-centrado"><span class="etiqueta etiqueta-estampa">Especial</span></td>
-                <td class="stock-valor">8 u.</td>
-                <td class="precio-valor font-bold">$1.850,00</td>
-                <td class="texto-derecha">
-                  <button class="boton-agregar-producto" title="Añadir a la operación">
-                    <span class="material-symbols-outlined">add</span>
-                  </button>
-                </td>
-              </tr>
-
+              {% endfor %}
             </tbody>
           </table>
           
           <!-- Paginación Pequeña -->
           <div class="paginacion-compacta">
-            <span class="texto-gris" style="font-size: 0.75rem; font-weight: 500;">Mostrando 3 de 48 productos</span>
-            <div style="display: flex; gap: 0.5rem;">
-              <button class="boton-pag-compacto">Anterior</button>
-              <button class="boton-pag-compacto">Siguiente</button>
+            <span class="texto-gris" style="font-size: 0.75rem; font-weight: 500;">
+              Mostrando {{productos.start_index}}-{{productos.end_index}} de {{productos.paginator.count}} productos
+            </span>
+            <div class="paginacion-botones">
+              {% if productos.has_previous %}
+              <a href="?page={{ productos.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if categoria %}&categoria={{ categoria }}{% endif %}">
+                <button class="boton-paginacion">Anterior</button>
+              </a>
+              {% else %}
+              <button class="boton-paginacion" disabled>Anterior</button>
+              {% endif %}
+              {% if productos.has_next %}
+              <a href="?page={{ productos.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if categoria %}&categoria={{ categoria }}{% endif %}">
+                <button class="boton-paginacion">Siguiente</button>
+              </a>
+              {% else %}
+                <button class="boton-paginacion" disabled>Siguiente</button>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -153,7 +128,7 @@
               <thead>
                 <tr>
                   <th>Producto</th>
-                  <th class="texto-centrado">Cant.</th>
+                  <th class="texto-centrado">Cantidad</th>
                   <th class="texto-derecha"></th>
                 </tr>
               </thead>
@@ -215,12 +190,12 @@
           <div class="seccion-totales">
             <div class="fila-subtotal">
               <span class="texto-gris" style="font-weight: 500;">Subtotal</span>
-              <span class="font-bold text-slate-900">$4.600,00</span>
+              <span class="font-bold text-slate-900">$</span>
             </div>
             
             <div class="fila-total">
               <span>Total</span>
-              <span class="total-destacado">$4.600,00</span>
+              <span class="total-destacado">$</span>
             </div>
           </div>
 

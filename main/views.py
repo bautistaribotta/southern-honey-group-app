@@ -169,7 +169,7 @@ def clientes(request):
     
     if q:
         if q.isdigit():
-            # # Si es solo números, busco por ID (exacto o que contenga)
+            # Si es solo números, busco por ID (exacto o que contenga)
             clientes_list = clientes_list.filter(id__icontains=q)
         else:
             # Buscar por nombre o apellido
@@ -206,7 +206,20 @@ def informacion_clientes(request, id_cliente):
 @login_required()
 def operaciones(request, id_cliente):
     cliente = get_object_or_404(Cliente, id=id_cliente)
-    return render(request, "operaciones.html", context={"cliente": cliente})
+
+    productos = Producto.objects.filter(activo=True).order_by("nombre")
+
+    # Cargo de a 6 productos para tener un alto de tabla acorde
+    paginator_productos = Paginator(productos, 6)
+    pagina_numero = request.GET.get("page")
+    pagina_obj = paginator_productos.get_page(pagina_numero)
+
+    contexto = {
+        "cliente": cliente,
+        "productos": pagina_obj
+    }
+
+    return render(request, "operaciones.html", contexto)
 
 
 # Verifico que solo un administrador pueda ver la vista, tambien verifica que el usuario este logueado
