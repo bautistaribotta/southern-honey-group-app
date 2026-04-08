@@ -31,7 +31,7 @@
             <button class="boton-accion">
                 <span class="material-symbols-outlined">edit</span>
             </button>
-            <button class="boton-accion eliminar">
+            <button class="boton-accion eliminar" onclick="abrirPanelEliminarDesdePerfil('{{cliente.id}}', '{{cliente.nombre}} {{cliente.apellido}}')">
                 <span class="material-symbols-outlined">delete</span>
             </button>
         </div>
@@ -128,6 +128,37 @@
         </div>
     </section>
 </div>
+
+<!-- Panel de eliminacion y Fondo -->
+<form id="formulario-eliminar" action="{% url 'clientes' %}" method="POST">
+  {% csrf_token %}
+  <div id="contenedor-panel-eliminar">
+    <div id="contenedor-panel-fondo" onclick="cerrarPanelEliminar()"> </div>
+
+  <!-- Panel -->
+    <div id="panel-eliminar">
+      <input type="hidden" id="id_eliminar" name="id_eliminar" value="">
+      <input type="hidden" name="accion" value="eliminar"> 
+
+      <button type="button" class="boton-cerrar" id="icono-cerrar-panel-eliminar" onclick="cerrarPanelEliminar()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+
+      <div id="icono-advertencia">
+        <span class="material-symbols-outlined">warning</span>
+      </div>
+
+      <h3>Confirmar eliminación</h3>
+      <p id="texto-confirmacion-eliminar">¿Está seguro que quiere eliminar este cliente?</p>
+
+      <div class="acciones-modal">
+        <button type="button" class="boton-secundario" onclick="cerrarPanelEliminar()">No, mantener</button>
+        <button type="button" class="boton-primario" id="boton-confirmar-eliminar"><span>Sí, eliminar</span></button>
+      </div>
+    </div>
+  </div>
+</form>
+
 {% endblock %}
 
 {% block codigo-javascript %}
@@ -136,5 +167,51 @@
     function irANuevaOperacion(id) {
         window.location.href = `/operaciones/${id}/`;
     }
+
+    // Funciones para el panel de eliminar
+    function abrirPanelEliminarDesdePerfil(id, nombre) {
+        document.getElementById('id_eliminar').value = id;
+        document.getElementById('texto-confirmacion-eliminar').innerHTML = `¿Confirma que quiere eliminar al cliente <b>${nombre}</b>?`;
+        
+        document.getElementById('contenedor-panel-eliminar').classList.add('abierto');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarPanelEliminar() {
+        document.getElementById('contenedor-panel-eliminar').classList.remove('abierto');
+        document.body.style.overflow = 'auto';
+    }
+
+    // Lógica para mantener apretado el botón de eliminar durante 2 segundos
+    document.addEventListener('DOMContentLoaded', () => {
+        const btnEliminar = document.getElementById('boton-confirmar-eliminar');
+        if (btnEliminar) {
+            let timeoutId;
+            
+            const startHold = (e) => {
+                if (e.type === 'mousedown' && e.button !== 0) return;
+                if (e.type === 'touchstart') e.preventDefault();
+
+                btnEliminar.classList.add('manteniendo');
+                
+                timeoutId = setTimeout(() => {
+                    const form = document.getElementById('formulario-eliminar');
+                    if (form) form.submit();
+                }, 2000); // 2 segundos
+            };
+
+            const cancelHold = () => {
+                btnEliminar.classList.remove('manteniendo');
+                clearTimeout(timeoutId);
+            };
+
+            btnEliminar.addEventListener('mousedown', startHold);
+            btnEliminar.addEventListener('mouseup', cancelHold);
+            btnEliminar.addEventListener('mouseleave', cancelHold);
+            btnEliminar.addEventListener('touchstart', startHold, {passive: false});
+            btnEliminar.addEventListener('touchend', cancelHold);
+            btnEliminar.addEventListener('touchcancel', cancelHold);
+        }
+    });
 </script>
 {% endblock %}
