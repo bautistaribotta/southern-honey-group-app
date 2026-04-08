@@ -45,7 +45,7 @@
         <div class="panel-buscador">
           <div class="contenedor-input-busqueda">
             <span class="material-symbols-outlined icono-busqueda">search</span>
-            <input type="text" class="input-busqueda" placeholder="Buscar productos por nombre o id...">
+            <input type="text" class="input-busqueda" placeholder="Buscar productos por nombre o id">
           </div>
         </div>
 
@@ -55,7 +55,6 @@
             <thead>
               <tr>
                 <th>Producto</th>
-                <th class="texto-centrado">Categoría</th>
                 <th class="texto-centrado">Stock</th>
                 <th class="texto-centrado">Precio</th>
                 <th></th>
@@ -74,7 +73,6 @@
                     </div>
                   </div>
                 </td>
-                <td class="texto-centrado"><span class="etiqueta etiqueta-{{ producto.categoria|lower }}">{{ producto.categoria }}</span></td>
                 <td class="stock-valor">{{ producto.cantidad|floatformat:0 }}</td>
                 <td class="precio-valor font-bold">$ {{ producto.precio }}</td>
                 <td class="texto-derecha">
@@ -141,7 +139,7 @@
                     <div class="item-precio">$1.250,00 c/u</div>
                   </td>
                   <td class="texto-centrado">
-                    <input type="number" class="input-cantidad" value="2" min="1">
+                    <input type="number" class="input-cantidad" value="1" min="1">
                   </td>
                   <td class="texto-derecha">
                     <button class="boton-eliminar-item"><span class="material-symbols-outlined">delete</span></button>

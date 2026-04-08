@@ -204,6 +204,11 @@
 
 .stock-valor {
   font-weight: 600;
+  text-align: center;
+}
+
+.precio-valor {
+  text-align: right;
 }
 
 .boton-agregar-producto { 
@@ -253,20 +258,15 @@
   background-color: white;
   cursor: pointer;
   transition: all 0.2s;
-  font-family: inherit;
 }
 
-/* Efecto hover grisáceo SÓLO si no está deshabilitado */
 .boton-paginacion:hover:not(:disabled) {
   background-color: var(--stone-200);
-  color: var(--slate-900);
 }
 
-/* Efecto visual de "bloqueado" */
 .boton-paginacion:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background-color: #f8fafc;
 }
 
 /* --- COLUMNA DERECHA (Carrito / Resumen) --- */
