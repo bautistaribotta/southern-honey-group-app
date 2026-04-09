@@ -7,11 +7,18 @@ from django.contrib import messages
 
 from .models import Cliente, Producto, Operacion, DetalleOperacion
 from .services import (
-    nuevo_producto, editar_producto, eliminar_producto,
-    nuevo_cliente, editar_cliente,
-    get_cotizacion_oficial, get_cotizacion_blue,
-    obtener_datos_cliente, obtener_datos_producto, eliminar_cliente
+    nuevo_producto,
+    editar_producto,
+    eliminar_producto,
+    nuevo_cliente,
+    editar_cliente,
+    get_cotizacion_oficial,
+    get_cotizacion_blue,
+    obtener_datos_cliente,
+    obtener_datos_producto,
+    eliminar_cliente,
 )
+
 
 def login(request):
     if request.method == "POST":
@@ -43,10 +50,7 @@ para que se loguee. Todo esto implementado usando el wrapped @login_required
 def inicio(request):
     dolar_oficial = get_cotizacion_oficial()
     dolar_blue = get_cotizacion_blue()
-    contexto = {
-        "oficial": dolar_oficial,
-        "blue": dolar_blue
-    }
+    contexto = {"oficial": dolar_oficial, "blue": dolar_blue}
     return render(request, "inicio.html", contexto)
 
 
@@ -77,7 +81,9 @@ def productos(request):
         else:
             # Si es una EDICION
             if id_producto:
-                editar_producto(id_producto, nombre_producto, categoria, precio, cantidad, True)
+                editar_producto(
+                    id_producto, nombre_producto, categoria, precio, cantidad, True
+                )
                 messages.success(request, "Producto editado correctamente")
 
             # Si es un NUEVO producto
@@ -90,9 +96,9 @@ def productos(request):
     # Parámetros de búsqueda y filtrado
     q = request.GET.get("q", "")
     categoria_filtrada = request.GET.get("categoria", "")
-    
+
     productos = Producto.objects.filter(activo=True)
-    
+
     if q:
         if q.isdigit():
             # Si es solo números, busco por ID (exacto o que contenga)
@@ -100,10 +106,10 @@ def productos(request):
         else:
             # Si no, buscamos por nombre
             productos = productos.filter(nombre__icontains=q)
-            
+
     if categoria_filtrada:
         productos = productos.filter(categoria=categoria_filtrada)
-        
+
     productos = productos.order_by("nombre")
 
     # Cargo de a 5 productos
@@ -111,14 +117,10 @@ def productos(request):
     pagina_numero = request.GET.get("page")
     pagina_obj = paginator_productos.get_page(pagina_numero)
 
-    contexto = {
-        "productos": pagina_obj,
-        "q": q,
-        "categoria": categoria_filtrada
-    }
+    contexto = {"productos": pagina_obj, "q": q, "categoria": categoria_filtrada}
 
     # Si es una petición AJAX, devuelvo solo la tabla
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
         return render(request, "tabla_productos.html", contexto)
 
     return render(request, "productos.html", contexto)
@@ -134,7 +136,7 @@ def clientes(request):
         localidad = request.POST.get("localidad")
         direccion = request.POST.get("direccion")
         # El checkbox llega como 'on' si está marcado, lo convierto en un booleano
-        factura = request.POST.get("factura") == 'on'
+        factura = request.POST.get("factura") == "on"
         cuit = request.POST.get("cuit")
         if not factura:
             cuit = None
@@ -152,21 +154,39 @@ def clientes(request):
         else:
             # Si es una EDICION
             if id_cliente:
-                editar_cliente(id_cliente, nombre_cliente, apellido, telefono, localidad, direccion, factura, cuit, True)
+                editar_cliente(
+                    id_cliente,
+                    nombre_cliente,
+                    apellido,
+                    telefono,
+                    localidad,
+                    direccion,
+                    factura,
+                    cuit,
+                    True,
+                )
                 messages.success(request, "Cliente editado correctamente")
 
             # Si es un NUEVO cliente
             else:
-                nuevo_cliente(nombre_cliente, apellido, telefono, localidad, direccion, factura, cuit)
+                nuevo_cliente(
+                    nombre_cliente,
+                    apellido,
+                    telefono,
+                    localidad,
+                    direccion,
+                    factura,
+                    cuit,
+                )
                 messages.success(request, "Cliente agregado correctamente")
 
         return redirect("clientes")
 
     # Parámetros de búsqueda
     q = request.GET.get("q", "")
-    
+
     clientes_list = Cliente.objects.filter(activo=True)
-    
+
     if q:
         if q.isdigit():
             # Si es solo números, busco por ID (exacto o que contenga)
@@ -174,10 +194,11 @@ def clientes(request):
         else:
             # Buscar por nombre o apellido
             from django.db.models import Q
+
             clientes_list = clientes_list.filter(
                 Q(nombre__icontains=q) | Q(apellido__icontains=q)
             )
-            
+
     clientes_list = clientes_list.order_by("nombre")
 
     # Cargo de a 5 clientes
@@ -185,13 +206,10 @@ def clientes(request):
     pagina_numero = request.GET.get("page")
     pagina_obj = paginator_clientes.get_page(pagina_numero)
 
-    contexto = {
-        "clientes": pagina_obj,
-        "q": q
-    }
+    contexto = {"clientes": pagina_obj, "q": q}
 
     # Si es AJAX, devolvemos el parcial
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
         return render(request, "tabla_clientes.html", contexto)
 
     return render(request, "clientes.html", contexto)
@@ -214,10 +232,7 @@ def operaciones(request, id_cliente):
     pagina_numero = request.GET.get("page")
     pagina_obj = paginator_productos.get_page(pagina_numero)
 
-    contexto = {
-        "cliente": cliente,
-        "productos": pagina_obj
-    }
+    contexto = {"cliente": cliente, "productos": pagina_obj}
 
     return render(request, "operaciones.html", contexto)
 
@@ -237,14 +252,14 @@ def remitos(request):
 def obtener_cliente_json(request, id_cliente):
     from django.http import JsonResponse
     from .services import obtener_datos_cliente
-    
+
     # Obtengo los datos ya procesados y filtrados
     datos = obtener_datos_cliente(id_cliente)
-    
+
     if datos:
         # Si el cliente existe y está activo, devuelvo sus datos en formato JSON
         return JsonResponse(datos)
-    
+
     # Si el servicio me devuelve None (cliente no encontrado o inactivo), respondo con un error 404
     return JsonResponse({"Error": "Cliente no encontrado"}, status=404)
 
@@ -253,13 +268,13 @@ def obtener_cliente_json(request, id_cliente):
 def obtener_producto_json(request, id_producto):
     from django.http import JsonResponse
     from .services import obtener_datos_producto
-    
+
     datos = obtener_datos_producto(id_producto)
-    
+
     if datos:
         # Si el producto existe, devuelvo la respuesta exitosa en JSON
         return JsonResponse(datos)
-    
+
     # Si no lo encuentro o está inactivo, devuelvo un error 404
     return JsonResponse({"Error": "Producto no encontrado"}, status=404)
 
