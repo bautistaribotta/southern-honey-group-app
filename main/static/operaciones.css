@@ -497,13 +497,6 @@ input[type=number] {
   gap: 0.5rem;
 }
 
-.fila-subtotal {
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  font-size: 0.875rem;
-}
-
 .fila-total { 
   display: flex; 
   justify-content: space-between; 
@@ -511,9 +504,6 @@ input[type=number] {
   font-size: 1.125rem; 
   font-weight: 700; 
   color: var(--slate-900);
-  margin-top: 0.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(0,0,0,0.05);
 }
 
 .total-destacado { 
