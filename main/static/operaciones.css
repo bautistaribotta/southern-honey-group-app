@@ -334,6 +334,14 @@
   border-bottom: 1px solid var(--stone-200);
 }
 
+.tabla-carrito th:first-child,
+.tabla-carrito td:first-child {
+  width: 1%;
+  white-space: nowrap;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
 .tabla-carrito tbody tr:last-child td {
   border-bottom: none;
 }
@@ -346,7 +354,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 120px;
+  max-width: 220px;
 }
 
 .item-precio { 
@@ -354,6 +362,16 @@
   font-weight: 600;
   color: var(--slate-500); 
   margin: 0; 
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
 }
 
 .input-cantidad { 
