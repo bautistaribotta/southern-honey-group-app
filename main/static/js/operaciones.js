@@ -4,10 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputBusqueda = document.querySelector('.input-busqueda');
     const contenedorTabla = document.getElementById('contenedor-tabla-operaciones');
 
-    // Claves en sessionStorage para persistir el carrito entre paginación/búsqueda
+    // Clave en sessionStorage para persistir el carrito
     const STORAGE_KEY = 'carrito_operacion';
-    // Flag que indica si la navegación es interna (paginación/búsqueda dentro de operaciones)
-    const NAV_FLAG_KEY = 'carrito_nav_interna';
 
     // =============================================
     //  PERSISTENCIA DEL CARRITO (sessionStorage)
@@ -29,12 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function restaurarCarrito() {
-        const esNavInterna = sessionStorage.getItem(NAV_FLAG_KEY);
-        // Siempre consumimos la flag después de leerla
-        sessionStorage.removeItem(NAV_FLAG_KEY);
+        // Detectar si la página fue recargada (F5) o es una navegación nueva
+        const navegacion = performance.getEntriesByType('navigation')[0];
+        const esRecarga = navegacion && navegacion.type === 'reload';
 
-        if (!esNavInterna) {
-            // No venimos de paginación/búsqueda interna → limpiar cualquier carrito viejo
+        if (!esRecarga) {
+            // Es una navegación nueva (ej: volver al perfil y entrar de nuevo)
+            // → limpiar cualquier carrito viejo
             sessionStorage.removeItem(STORAGE_KEY);
             return;
         }
@@ -57,15 +56,9 @@ document.addEventListener('DOMContentLoaded', () => {
         ajustarStockVisual();
     }
 
-    /** Limpia el carrito y la flag del storage */
+    /** Limpia el carrito del storage */
     function limpiarCarritoStorage() {
         sessionStorage.removeItem(STORAGE_KEY);
-        sessionStorage.removeItem(NAV_FLAG_KEY);
-    }
-
-    /** Marca que la próxima navegación es interna (paginación/búsqueda) */
-    function marcarNavegacionInterna() {
-        sessionStorage.setItem(NAV_FLAG_KEY, 'true');
     }
 
     // =============================================
@@ -347,19 +340,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // limpiarCarritoStorage();
     });
 
-    // =============================================
-    //  NAVEGACIÓN INTERNA (preservar carrito)
-    // =============================================
-
-    // Los links de navegación fuera de operaciones NO marcan la flag,
-    // así que al volver el carrito se limpia automáticamente.
-    // Solo marcamos si la página se recarga (F5, etc.) ya que AJAX
-    // no recarga la página para búsqueda/paginación.
+    // Guardar el carrito antes de que la página se cierre o recargue
     window.addEventListener('beforeunload', function () {
-        // Si hay items en el carrito al recargar, preservarlos
         const filas = cuerpoCarrito.querySelectorAll('tr');
         if (filas.length > 0) {
-            marcarNavegacionInterna();
             guardarCarrito();
         }
     });
