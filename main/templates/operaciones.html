@@ -76,7 +76,11 @@
                 <td class="stock-valor">{{ producto.cantidad|floatformat:0 }}</td>
                 <td class="precio-valor font-bold">$ {{ producto.precio }}</td>
                 <td class="texto-derecha">
-                  <button class="boton-agregar-producto" title="Añadir a la operación">
+                  <button class="boton-agregar-producto" title="Añadir a la operación" 
+                          data-id="{{producto.id}}" 
+                          data-nombre="{{producto.nombre}}" 
+                          data-precio="{{producto.precio}}"
+                          data-stock="{{ producto.cantidad|floatformat:0 }}">
                     <span class="material-symbols-outlined">add</span>
                   </button>
                 </td>
@@ -130,21 +134,8 @@
                   <th class="texto-derecha"></th>
                 </tr>
               </thead>
-              <tbody>
-                
-              <!-- Listado de items -->
-                <tr>
-                  <td class="texto-centrado">
-                    <input type="number" class="input-cantidad" value="1" min="1">
-                  </td>
-                  <td>
-                    <div class="item-nombre">Nombre producto</div>
-                    <div class="item-precio">$ precio c/u</div>
-                  </td>
-                  <td class="texto-derecha">
-                    <button class="boton-eliminar-item"><span class="material-symbols-outlined">delete</span></button>
-                  </td>
-                </tr>
+              <tbody id="cuerpo-carrito">
+                <!-- Los items se agregarán aquí dinámicamente -->
               </tbody>
             </table>
           </div>
@@ -173,7 +164,7 @@
           <div class="seccion-totales">
             <div class="fila-total">
               <span>Total</span>
-              <span class="total-destacado">$</span>
+              <span class="total-destacado">$ 0.00</span>
             </div>
           </div>
 
@@ -203,4 +194,7 @@
       });
     });
   </script>
+
+  <!-- Script del Carrito y Lógica de Operaciones -->
+  <script src="{% static 'js/operaciones.js' %}"></script>
 {% endblock %}

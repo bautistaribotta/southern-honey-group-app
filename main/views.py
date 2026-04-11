@@ -225,14 +225,25 @@ def informacion_clientes(request, id_cliente):
 def operaciones(request, id_cliente):
     cliente = get_object_or_404(Cliente, id=id_cliente)
 
-    productos = Producto.objects.filter(activo=True).order_by("nombre")
+    # Parámetro de búsqueda
+    q = request.GET.get("q", "")
+
+    productos = Producto.objects.filter(activo=True)
+
+    if q:
+        if q.isdigit():
+            productos = productos.filter(id__icontains=q)
+        else:
+            productos = productos.filter(nombre__icontains=q)
+
+    productos = productos.order_by("nombre")
 
     # Cargo de a 6 productos para tener un alto de tabla acorde
     paginator_productos = Paginator(productos, 6)
     pagina_numero = request.GET.get("page")
     pagina_obj = paginator_productos.get_page(pagina_numero)
 
-    contexto = {"cliente": cliente, "productos": pagina_obj}
+    contexto = {"cliente": cliente, "productos": pagina_obj, "q": q}
 
     return render(request, "operaciones.html", contexto)
 
