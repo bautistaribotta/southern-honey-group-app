@@ -50,67 +50,8 @@
         </div>
 
         <!-- Tabla de Productos Disponibles -->
-        <div class="contenedor-tabla shadow-sm">
-          <table class="tabla-productos">
-            <thead>
-              <tr>
-                <th>Producto</th>
-                <th class="texto-centrado">Stock</th>
-                <th class="texto-centrado">Precio</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              
-              <!-- Fila de productos -->
-              {% for producto in productos %}
-              <tr class="fila-hover">
-                <td>
-                  <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <div>
-                      <div class="producto-info">{{producto.nombre}}</div>
-                      <div class="producto-id">ID: {{producto.id}}</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="stock-valor">{{ producto.cantidad|floatformat:0 }}</td>
-                <td class="precio-valor font-bold">$ {{ producto.precio }}</td>
-                <td class="texto-derecha">
-                  <button class="boton-agregar-producto" title="Añadir a la operación" 
-                          data-id="{{producto.id}}" 
-                          data-nombre="{{producto.nombre}}" 
-                          data-precio="{{producto.precio}}"
-                          data-stock="{{ producto.cantidad|floatformat:0 }}">
-                    <span class="material-symbols-outlined">add</span>
-                  </button>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          
-          <!-- Paginación Pequeña -->
-          <div class="paginacion-compacta">
-            <span class="texto-gris" style="font-size: 0.75rem; font-weight: 500;">
-              Mostrando {{productos.start_index}}-{{productos.end_index}} de {{productos.paginator.count}} productos
-            </span>
-            <div class="paginacion-botones">
-              {% if productos.has_previous %}
-              <a href="?page={{ productos.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if categoria %}&categoria={{ categoria }}{% endif %}">
-                <button class="boton-paginacion">Anterior</button>
-              </a>
-              {% else %}
-              <button class="boton-paginacion" disabled>Anterior</button>
-              {% endif %}
-              {% if productos.has_next %}
-              <a href="?page={{ productos.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if categoria %}&categoria={{ categoria }}{% endif %}">
-                <button class="boton-paginacion">Siguiente</button>
-              </a>
-              {% else %}
-                <button class="boton-paginacion" disabled>Siguiente</button>
-              {% endif %}
-            </div>
-          </div>
+        <div id="contenedor-tabla-operaciones" class="contenedor-tabla shadow-sm">
+          {% include "tabla_operaciones_productos.html" %}
         </div>
       </div>
 

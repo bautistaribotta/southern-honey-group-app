@@ -245,6 +245,10 @@ def operaciones(request, id_cliente):
 
     contexto = {"cliente": cliente, "productos": pagina_obj, "q": q}
 
+    # Si es una petición AJAX, devuelvo solo la tabla parcial
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return render(request, "tabla_operaciones_productos.html", contexto)
+
     return render(request, "operaciones.html", contexto)
 
 

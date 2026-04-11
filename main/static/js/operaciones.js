@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const botonesAgregar = document.querySelectorAll('.boton-agregar-producto');
     const cuerpoCarrito = document.getElementById('cuerpo-carrito');
     const elementoTotal = document.querySelector('.total-destacado');
     const inputBusqueda = document.querySelector('.input-busqueda');
+    const contenedorTabla = document.getElementById('contenedor-tabla-operaciones');
 
     // Claves en sessionStorage para persistir el carrito entre paginación/búsqueda
     const STORAGE_KEY = 'carrito_operacion';
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * Retorna { fila, stockCell, boton } o null si el producto no está en la página actual.
      */
     function buscarProductoEnTabla(idProducto) {
-        const boton = document.querySelector(`.boton-agregar-producto[data-id="${idProducto}"]`);
+        const boton = contenedorTabla.querySelector(`.boton-agregar-producto[data-id="${idProducto}"]`);
         if (!boton) return null;
 
         const fila = boton.closest('tr');
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function actualizarStockProducto(idProducto, stockDisponible) {
         const producto = buscarProductoEnTabla(idProducto);
-        if (!producto) return; // El producto no está en la página actual
+        if (!producto) return;
 
         producto.stockCell.textContent = stockDisponible;
 
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * Recorre los items del carrito y ajusta el stock visual de los productos
-     * que estén visibles en la tabla de listado. Se usa al restaurar el carrito.
+     * que estén visibles en la tabla de listado.
      */
     function ajustarStockVisual() {
         const filasCarrito = cuerpoCarrito.querySelectorAll('tr');
@@ -120,42 +120,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /**
-     * Obtiene el stock original de un producto.
-     * Primero busca en la tabla visible, si no está, busca en el carrito.
-     */
-    function obtenerStockOriginal(idProducto) {
-        // Buscar en la tabla de productos visible
-        const producto = buscarProductoEnTabla(idProducto);
-        if (producto) {
-            return parseInt(producto.boton.dataset.stock);
-        }
-
-        // Si no está visible, buscar en el carrito (ya fue agregado antes)
-        const filaCarrito = cuerpoCarrito.querySelector(`tr[data-id="${idProducto}"]`);
-        if (filaCarrito) {
-            return parseInt(filaCarrito.dataset.stockOriginal);
-        }
-
-        return 0;
-    }
-
     // =============================================
     //  LÓGICA DEL CARRITO
     // =============================================
 
-    // Manejar el evento de agregar producto al carrito
-    botonesAgregar.forEach(boton => {
-        boton.addEventListener('click', function () {
-            const id = this.dataset.id;
-            const nombre = this.dataset.nombre;
-            const precioStr = this.dataset.precio;
-            const precio = parseFloat(precioStr.replace(',', '.'));
-            const stockOriginal = parseInt(this.dataset.stock);
+    /**
+     * Vincula los botones de "agregar al carrito" de la tabla de productos.
+     * Se debe llamar cada vez que se reemplaza el contenido de la tabla (AJAX).
+     */
+    function vincularBotonesAgregar() {
+        const botones = contenedorTabla.querySelectorAll('.boton-agregar-producto');
+        botones.forEach(boton => {
+            boton.addEventListener('click', function () {
+                const id = this.dataset.id;
+                const nombre = this.dataset.nombre;
+                const precioStr = this.dataset.precio;
+                const precio = parseFloat(precioStr.replace(',', '.'));
+                const stockOriginal = parseInt(this.dataset.stock);
 
-            agregarAlCarrito(id, nombre, precio, stockOriginal);
+                agregarAlCarrito(id, nombre, precio, stockOriginal);
+            });
         });
-    });
+    }
 
     function agregarAlCarrito(id, nombre, precio, stockOriginal) {
         const filaExistente = cuerpoCarrito.querySelector(`tr[data-id="${id}"]`);
@@ -170,16 +156,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             inputCantidad.value = cantidadActual + 1;
-            // Actualizar el stock visual: restar 1
             actualizarStockProducto(id, stockOriginal - (cantidadActual + 1));
         } else {
-            // Validar que haya stock
             if (stockOriginal <= 0) {
                 return;
             }
 
             crearFilaCarrito(id, nombre, precio, 1, stockOriginal);
-            // Actualizar el stock visual: restar 1
             actualizarStockProducto(id, stockOriginal - 1);
         }
 
@@ -208,7 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Recalcular el total y validar stock cuando el usuario cambia la cantidad
         const inputCantidad = fila.querySelector('.input-cantidad');
-        let cantidadAnterior = cantidad;
 
         inputCantidad.addEventListener('input', function () {
             let val = parseInt(this.value);
@@ -218,29 +200,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.value = 1;
             }
 
-            // No permitir superar el stock original
             if (val > stockOriginal) {
                 val = stockOriginal;
                 this.value = stockOriginal;
             }
 
-            // Actualizar el stock visual con la diferencia
             const stockDisponible = stockOriginal - val;
             actualizarStockProducto(id, stockDisponible);
 
-            cantidadAnterior = val;
             actualizarTotal();
             guardarCarrito();
         });
 
-        // Lógica para eliminar la fila: restaurar stock y actualizar
+        // Lógica para restar de a 1 y eliminar la fila si llega a 0
         const botonEliminar = fila.querySelector('.boton-eliminar-item');
         botonEliminar.addEventListener('click', function () {
-            const cantidadEliminada = parseInt(inputCantidad.value);
-            fila.remove();
+            const cantidadActual = parseInt(inputCantidad.value);
 
-            // Restaurar el stock visual del producto
-            actualizarStockProducto(id, stockOriginal);
+            if (cantidadActual > 1) {
+                // Restar 1 a la cantidad
+                inputCantidad.value = cantidadActual - 1;
+                actualizarStockProducto(id, stockOriginal - (cantidadActual - 1));
+            } else {
+                // Cantidad es 1 → eliminar la fila y restaurar todo el stock
+                fila.remove();
+                actualizarStockProducto(id, stockOriginal);
+            }
 
             actualizarTotal();
             guardarCarrito();
@@ -263,39 +248,64 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =============================================
-    //  BUSCADOR DE PRODUCTOS
+    //  BUSCADOR DE PRODUCTOS (AJAX)
     // =============================================
 
     let timeoutBusqueda = null;
 
+    /**
+     * Realiza una búsqueda AJAX y reemplaza solo el contenido de la tabla.
+     * @param {string|null} urlString - URL opcional (ej: para paginación)
+     */
+    function buscarProductos(urlString = null) {
+        let url;
+
+        if (urlString) {
+            url = new URL(urlString, window.location.origin);
+        } else {
+            url = new URL(window.location.href);
+            url.searchParams.set('q', inputBusqueda.value.trim());
+            url.searchParams.delete('page');
+        }
+
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        })
+            .then(response => response.text())
+            .then(html => {
+                contenedorTabla.innerHTML = html;
+                // Re-vincular los botones de agregar y paginación tras reemplazar el HTML
+                vincularBotonesAgregar();
+                vincularPaginacion();
+                // Ajustar stock visual según el carrito actual
+                ajustarStockVisual();
+            })
+            .catch(error => console.error('Error en la búsqueda:', error));
+    }
+
+    /**
+     * Vincula los links de paginación para que funcionen via AJAX.
+     */
+    function vincularPaginacion() {
+        const linksPaginacion = contenedorTabla.querySelectorAll('.paginacion-botones a');
+
+        linksPaginacion.forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                buscarProductos(this.href);
+            });
+        });
+    }
+
+    // Escuchar el input de búsqueda con debounce
     inputBusqueda.addEventListener('input', function () {
         clearTimeout(timeoutBusqueda);
-        const query = this.value.trim();
-
-        // Debounce de 500ms para no recargar en cada tecla
         timeoutBusqueda = setTimeout(() => {
-            const url = new URL(window.location.href);
-
-            if (query) {
-                url.searchParams.set('q', query);
-            } else {
-                url.searchParams.delete('q');
-            }
-            // Resetear a la página 1 cuando se busca
-            url.searchParams.delete('page');
-
-            // Marcar como navegación interna para preservar el carrito
-            marcarNavegacionInterna();
-            window.location.href = url.toString();
-        }, 500);
+            buscarProductos();
+        }, 300);
     });
-
-    // Restaurar el texto de búsqueda en el input al cargar la página
-    const urlParams = new URLSearchParams(window.location.search);
-    const queryActual = urlParams.get('q');
-    if (queryActual) {
-        inputBusqueda.value = queryActual;
-    }
 
     // =============================================
     //  CONFIRMAR OPERACIÓN (preparar datos)
@@ -341,15 +351,16 @@ document.addEventListener('DOMContentLoaded', () => {
     //  NAVEGACIÓN INTERNA (preservar carrito)
     // =============================================
 
-    // Los links de paginación (href="?page=...") son navegación interna
-    document.addEventListener('click', function (e) {
-        const link = e.target.closest('a');
-        if (!link) return;
-
-        const href = link.getAttribute('href');
-        if (href && href.startsWith('?')) {
-            // Es un link de paginación → marcar para preservar el carrito
+    // Los links de navegación fuera de operaciones NO marcan la flag,
+    // así que al volver el carrito se limpia automáticamente.
+    // Solo marcamos si la página se recarga (F5, etc.) ya que AJAX
+    // no recarga la página para búsqueda/paginación.
+    window.addEventListener('beforeunload', function () {
+        // Si hay items en el carrito al recargar, preservarlos
+        const filas = cuerpoCarrito.querySelectorAll('tr');
+        if (filas.length > 0) {
             marcarNavegacionInterna();
+            guardarCarrito();
         }
     });
 
@@ -358,4 +369,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // =============================================
 
     restaurarCarrito();
+    vincularBotonesAgregar();
+    vincularPaginacion();
 });
