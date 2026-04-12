@@ -11,6 +11,28 @@ def nuevo_producto(nombre, categoria=None, precio=None, cantidad=None):
     return nuevo_producto
 
 
+def modificar_stock(id_producto, cantidad):
+    """
+    Modifica el stock de un producto sumando o restando según el valor de 'cantidad'.
+    - cantidad > 0 → suma stock (ingreso de mercadería, devolución, etc.)
+    - cantidad < 0 → resta stock (venta, egreso, etc.)
+
+    Retorna el producto actualizado o lanza ValueError si el stock quedaría negativo.
+    """
+    producto = get_object_or_404(Producto, id=id_producto, activo=True)
+
+    # Si estoy restando, valido que haya stock suficiente antes de operar
+    if cantidad < 0 and producto.cantidad < abs(cantidad):
+        raise ValueError(
+            f"Stock insuficiente para '{producto.nombre}'. "
+            f"Disponible: {producto.cantidad}, solicitado: {abs(cantidad)}"
+        )
+
+    producto.cantidad += cantidad
+    producto.save()
+    return producto
+
+
 def editar_producto(id_producto, nombre, categoria, precio, cantidad, activo):
     producto = get_object_or_404(Producto, id=id_producto)
 

@@ -156,6 +156,7 @@
 
 .acciones-edicion {
     display: flex;
+    justify-content: center;
     gap: 0.75rem;
     margin-top: 1.5rem;
     padding-top: 1.5rem;
