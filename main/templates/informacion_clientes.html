@@ -11,6 +11,27 @@
 {% endblock %}
 
 {% block area-trabajo %}
+<!-- Contenedor de Notificaciones Toast -->
+<div id="contenedor-toast" class="contenedor-toast">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="toast {{ message.tags }}">
+                <span class="material-symbols-outlined">
+                    {% if message.tags == 'success' %}check_circle
+                    {% elif message.tags == 'error' %}error
+                    {% else %}info{% endif %}
+                </span>
+                <div class="toast-contenido">
+                    <p>{{ message }}</p>
+                </div>
+                <button class="btn-cerrar-toast" onclick="cerrarToast(this.parentElement)">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
 <div id="espacio-trabajo-cliente">
     <a href="{% url 'clientes' %}" class="boton-volver">
         <span class="material-symbols-outlined">arrow_back</span>
@@ -28,7 +49,7 @@
             </div>
         </div>
         <div class="acciones-cliente">
-            <button class="boton-accion">
+            <button class="boton-accion" id="btn-editar-cliente">
                 <span class="material-symbols-outlined">edit</span>
             </button>
             <button class="boton-accion eliminar" onclick="abrirPanelEliminarDesdePerfil('{{cliente.id}}', '{{cliente.nombre}} {{cliente.apellido}}')">
@@ -42,57 +63,76 @@
         <h4><span class="material-symbols-outlined">badge</span> Información Personal</h4>
     </div>
 
-    <!-- TARJETA ÚNICA DE INFORMACIÓN -->
-    <div class="tarjeta-info-unica">
-        <div class="grid-datos-cliente">
-            <!-- Columna 1: Datos Personales -->
-            <div class="subseccion-datos">
+    <!-- TARJETA ÚNICA DE INFORMACIÓN (Formulario editable) -->
+    <form id="form-editar-cliente" action="{% url 'informacion_clientes' cliente.id %}" method="POST" autocomplete="off">
+        {% csrf_token %}
+        <input type="hidden" name="id_cliente" value="{{ cliente.id }}">
+
+        <div class="tarjeta-info-unica">
+            <div class="grid-datos-cliente">
+                <!-- Fila 1: Nombre | Localidad | Factura -->
                 <div class="campo-info">
                     <label>Nombre</label>
-                    <p>{{ cliente.nombre }}</p>
+                    <p class="valor-vista">{{ cliente.nombre }}</p>
+                    <input type="text" name="nombre" class="input-edicion" value="{{ cliente.nombre }}" required style="display: none;">
                 </div>
-                <div class="campo-info">
-                    <label>Apellido</label>
-                    <p>{{ cliente.apellido }}</p>
-                </div>
-                <div class="campo-info">
-                    <label>Teléfono</label>
-                    <div class="valor-con-icono">
-                        {{ cliente.telefono|default:"No registrado" }}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Columna 2: Ubicación -->
-            <div class="subseccion-datos">
                 <div class="campo-info">
                     <label>Localidad</label>
-                    <p>{{ cliente.localidad|default:"No registrada" }}</p>
+                    <p class="valor-vista">{{ cliente.localidad|default:"No registrada" }}</p>
+                    <input type="text" name="localidad" class="input-edicion" value="{{ cliente.localidad|default:'' }}" style="display: none;">
+                </div>
+                <div class="campo-info">
+                    <label>Factura la producción</label>
+                    <p class="valor-vista">{% if cliente.factura_produccion %}Sí{% else %}No{% endif %}</p>
+                    <label class="switch input-edicion" style="display: none;">
+                        <input type="checkbox" name="factura" {% if cliente.factura_produccion %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- Fila 2: Apellido | Dirección | CUIT -->
+                <div class="campo-info">
+                    <label>Apellido</label>
+                    <p class="valor-vista">{{ cliente.apellido }}</p>
+                    <input type="text" name="apellido" class="input-edicion" value="{{ cliente.apellido|default:'' }}" style="display: none;">
                 </div>
                 <div class="campo-info">
                     <label>Dirección</label>
-                    <p>{{ cliente.direccion|default:"No registrada" }}</p>
-                </div>
-            </div>
-
-            <!-- Columna 3: Facturación -->
-            <div class="subseccion-datos">
-                <div class="campo-info">
-                    <label>Factura la producción</label>
-                    <p>{% if cliente.factura_produccion %}Sí{% else %}No{% endif %}</p>
+                    <p class="valor-vista">{{ cliente.direccion|default:"No registrada" }}</p>
+                    <input type="text" name="direccion" class="input-edicion" value="{{ cliente.direccion|default:'' }}" style="display: none;">
                 </div>
                 <div class="campo-info">
                     <label>CUIT</label>
-                    <p>{{ cliente.cuit|default:"No registrado" }}</p>
+                    <p class="valor-vista">{{ cliente.cuit|default:"No registrado" }}</p>
+                    <input type="text" name="cuit" class="input-edicion" value="{{ cliente.cuit|default:'' }}" style="display: none;">
+                </div>
+
+                <!-- Fila 3: Teléfono -->
+                <div class="campo-info">
+                    <label>Teléfono</label>
+                    <p class="valor-vista">{{ cliente.telefono|default:"No registrado" }}</p>
+                    <input type="text" name="telefono" class="input-edicion" value="{{ cliente.telefono|default:'' }}" style="display: none;">
                 </div>
             </div>
+
+            <!-- Botones de guardar/cancelar (ocultos por defecto) -->
+            <div id="acciones-edicion" class="acciones-edicion" style="display: none;">
+                <button type="submit" class="boton-guardar-edicion">
+                    <span class="material-symbols-outlined">check</span>
+                    Guardar Cambios
+                </button>
+                <button type="button" class="boton-cancelar-edicion" id="btn-cancelar-edicion">
+                    <span class="material-symbols-outlined">close</span>
+                    Cancelar
+                </button>
+            </div>
         </div>
-    </div>
+    </form>
 
     <section class="contenedor-operaciones">
         <div class="encabezado-operaciones">
             <h4><span class="material-symbols-outlined">history</span> Operaciones Realizadas</h4>
-            <a href="{% url 'operaciones' cliente.id %}" class="boton-nueva-op" data-id="{{ cliente.id }}"> 
+            <a href="{% url 'operaciones' cliente.id %}" class="boton-nuevo" data-id="{{ cliente.id }}"> 
                 <span class="material-symbols-outlined">add</span>
                 Nueva Operación
             </a>
@@ -119,7 +159,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="3" style="text-align: center; padding: 2rem; color: var(--slate-500);">
+                        <td colspan="4" style="text-align: center; padding: 2rem; color: var(--slate-500);">
                             Este cliente no posee operaciones registradas.
                         </td>
                     </tr>
@@ -183,8 +223,75 @@
         document.body.style.overflow = 'auto';
     }
 
-    // Lógica para mantener apretado el botón de eliminar durante 2 segundos
+    // =============================================
+    //  EDICIÓN INLINE DE CLIENTE
+    // =============================================
+
     document.addEventListener('DOMContentLoaded', () => {
+        const btnEditar = document.getElementById('btn-editar-cliente');
+        const btnCancelar = document.getElementById('btn-cancelar-edicion');
+        const accionesEdicion = document.getElementById('acciones-edicion');
+        const valoresVista = document.querySelectorAll('.valor-vista');
+        const inputsEdicion = document.querySelectorAll('.input-edicion');
+        let editando = false;
+
+        function activarEdicion() {
+            editando = true;
+            // Ocultar textos, mostrar inputs
+            valoresVista.forEach(el => el.style.display = 'none');
+            inputsEdicion.forEach(el => el.style.display = '');
+            // Mostrar botones guardar/cancelar
+            accionesEdicion.style.display = '';
+            // Cambiar el botón de editar a estilo activo
+            btnEditar.classList.add('activo');
+            // Poner borde en la tarjeta
+            document.querySelector('.tarjeta-info-unica').classList.add('editando');
+        }
+
+        function desactivarEdicion() {
+            editando = false;
+            // Mostrar textos, ocultar inputs
+            valoresVista.forEach(el => el.style.display = '');
+            inputsEdicion.forEach(el => el.style.display = 'none');
+            // Ocultar botones guardar/cancelar
+            accionesEdicion.style.display = 'none';
+            // Quitar estilo activo
+            btnEditar.classList.remove('activo');
+            document.querySelector('.tarjeta-info-unica').classList.remove('editando');
+            // Restaurar valores originales en los inputs
+            document.getElementById('form-editar-cliente').reset();
+        }
+
+        btnEditar.addEventListener('click', () => {
+            if (editando) {
+                desactivarEdicion();
+            } else {
+                activarEdicion();
+            }
+        });
+
+        btnCancelar.addEventListener('click', () => {
+            desactivarEdicion();
+        });
+
+        // CUIT obligatorio si factura la producción
+        const checkFactura = document.querySelector('input[name="factura"]');
+        const inputCuit = document.querySelector('input[name="cuit"].input-edicion');
+
+        function actualizarRequiredCuit() {
+            if (checkFactura.checked) {
+                inputCuit.required = true;
+            } else {
+                inputCuit.required = false;
+                inputCuit.value = '';
+            }
+        }
+
+        checkFactura.addEventListener('change', actualizarRequiredCuit);
+        // Aplicar estado inicial
+        actualizarRequiredCuit();
+
+        // Lógica para mantener apretado el botón de eliminar durante 2 segundos
         const btnEliminar = document.getElementById('boton-confirmar-eliminar');
         if (btnEliminar) {
             let timeoutId;

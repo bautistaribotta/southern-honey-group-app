@@ -218,6 +218,28 @@ def clientes(request):
 @login_required()
 def informacion_clientes(request, id_cliente):
     cliente = get_object_or_404(Cliente, id=id_cliente, activo=True)
+
+    if request.method == "POST":
+        id_cliente_form = request.POST.get("id_cliente")
+        nombre = request.POST.get("nombre")
+        apellido = request.POST.get("apellido")
+        telefono = request.POST.get("telefono")
+        localidad = request.POST.get("localidad")
+        direccion = request.POST.get("direccion")
+        factura = request.POST.get("factura") == "on"
+        cuit = request.POST.get("cuit")
+        if not factura:
+            cuit = None
+        elif cuit:
+            cuit = cuit.replace("-", "")
+
+        editar_cliente(
+            id_cliente_form, nombre, apellido, telefono,
+            localidad, direccion, factura, cuit, True
+        )
+        messages.success(request, "Cliente editado correctamente")
+        return redirect("informacion_clientes", id_cliente=id_cliente)
+
     return render(request, "informacion_clientes.html", {"cliente": cliente})
 
 
