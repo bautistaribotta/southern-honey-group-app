@@ -16,6 +16,27 @@
 {% endblock %}
 
 {% block area-trabajo %}
+  <!-- Contenedor de Notificaciones Toast -->
+  <div id="contenedor-toast" class="contenedor-toast">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="toast {{ message.tags }}">
+          <span class="material-symbols-outlined">
+            {% if message.tags == 'success' %}check_circle
+            {% elif message.tags == 'error' %}error
+            {% else %}info{% endif %}
+          </span>
+          <div class="toast-contenido">
+            <p>{{ message }}</p>
+          </div>
+          <button class="btn-cerrar-toast" onclick="cerrarToast(this.parentElement)">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
   <section id="area-trabajo" class="area-operacion">
     
     <!-- Encabezado de la vista -->
@@ -86,8 +107,8 @@
             <p class="titulo-seccion-pago">Método de Pago</p>
             <div class="grid-metodos-pago">
               
-              <label class="metodo-pago seleccionado">
-                <input type="radio" name="metodo_pago" value="cuenta_corriente" checked class="hidden-radio">
+              <label class="metodo-pago">
+                <input type="radio" name="metodo_pago" value="cuenta_corriente" class="hidden-radio">
                 <span class="material-symbols-outlined icono-pago">auto_stories</span>
                 <span class="metodo-texto">Cta. Corriente</span>
               </label>

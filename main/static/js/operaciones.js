@@ -301,17 +301,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // =============================================
-    //  CONFIRMAR OPERACIÓN (preparar datos)
+    //  CONFIRMAR OPERACIÓN (enviar al servidor)
     // =============================================
 
     const botonConfirmar = document.querySelector('.boton-confirmar-operacion');
+
+    /**
+     * Obtiene el token CSRF de las cookies de Django.
+     * Es necesario para que Django acepte peticiones POST via fetch.
+     */
+    function obtenerCSRFToken() {
+        const cookie = document.cookie.split('; ').find(c => c.startsWith('csrftoken='));
+        return cookie ? cookie.split('=')[1] : '';
+    }
 
     botonConfirmar.addEventListener('click', function () {
         const filas = cuerpoCarrito.querySelectorAll('tr');
 
         // Validar que haya al menos un producto en el carrito
         if (filas.length === 0) {
-            alert('Agregá al menos un producto antes de confirmar.');
+            if (typeof notificarError === 'function') {
+                notificarError('Agregá al menos un producto antes de confirmar.');
+            } else {
+                alert('Agregá al menos un producto antes de confirmar.');
+            }
             return;
         }
 
@@ -325,19 +338,60 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Obtener el método de pago seleccionado
-        const metodoPago = document.querySelector('input[name="metodo_pago"]:checked').value;
+        const metodoPagoSeleccionado = document.querySelector('input[name="metodo_pago"]:checked');
 
-        // Armar el objeto con todos los datos de la operación
-        const datosOperacion = {
-            items: items,
-            metodo_pago: metodoPago
-        };
+        // Validar que se haya seleccionado un método de pago
+        if (!metodoPagoSeleccionado) {
+            if (typeof notificarError === 'function') {
+                notificarError('Seleccioná un método de pago antes de continuar.');
+            } else {
+                alert('Seleccioná un método de pago antes de continuar.');
+            }
+            return;
+        }
 
-        console.log('Datos listos para enviar al servidor:', datosOperacion);
+        const metodoPago = metodoPagoSeleccionado.value;
 
-        // TODO: Enviar datosOperacion al servidor via fetch/POST
-        // Una vez confirmado exitosamente, limpiar el carrito:
-        // limpiarCarritoStorage();
+        // Deshabilito el botón para evitar doble click
+        botonConfirmar.disabled = true;
+        botonConfirmar.textContent = 'Procesando...';
+
+        fetch(window.location.href, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': obtenerCSRFToken(),
+            },
+            body: JSON.stringify({
+                items: items,
+                metodo_pago: metodoPago,
+            }),
+        })
+            .then(response => response.json().then(data => ({ ok: response.ok, data })))
+            .then(({ ok, data }) => {
+                if (ok && data.ok) {
+                    limpiarCarritoStorage();
+                    window.location.href = `/informacion_clientes/${data.id_cliente}/`;
+                } else {
+                    if (typeof notificarError === 'function') {
+                        notificarError(data.error || 'Algo salió mal. Por favor, volvé a intentarlo.');
+                    } else {
+                        alert(data.error || 'Algo salió mal. Por favor, volvé a intentarlo.');
+                    }
+                    botonConfirmar.disabled = false;
+                    botonConfirmar.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Confirmar Operación';
+                }
+            })
+            .catch(error => {
+                console.error('Error en la petición:', error);
+                if (typeof notificarError === 'function') {
+                    notificarError('Algo salió mal. Por favor, volvé a intentarlo.');
+                } else {
+                    alert('Algo salió mal. Por favor, volvé a intentarlo.');
+                }
+                botonConfirmar.disabled = false;
+                botonConfirmar.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Confirmar Operación';
+            });
     });
 
     // Guardar el carrito antes de que la página se cierre o recargue

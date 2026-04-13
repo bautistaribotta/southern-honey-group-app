@@ -149,13 +149,19 @@
                 </thead>
                 <tbody>
                     {% for operacion in operaciones %}
-                    <tr>
-                        <td class="fecha-operacion">{{ operacion.fecha|date:"d/m/Y" }}</td>
-                        <td>
-                            <div class="detalle-principal">Operación #{{ operacion.id }}</div>
-                            <div class="detalle-secundario">{{ operacion.observaciones|default:"Sin observaciones" }}</div>
+                    <tr data-url="{% url 'informacion_operaciones' operacion.id %}" onclick="window.location.href=this.dataset.url" style="cursor: pointer;" class="fila-operacion">
+                        <td class="fecha-operacion">
+                            {{ operacion.fecha|date:"d/m/Y" }}
                         </td>
-                        <td class="monto-total">${{ operacion.monto_total }}</td>
+                        <td> 
+                            <div class="detalle-principal">{{ operacion.id }}</div>
+                        </td>
+                        <td class="estado">
+                            Estado
+                        </td>
+                        <td class="monto-total">
+                            ${{ operacion.monto_total }}
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>

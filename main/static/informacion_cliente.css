@@ -402,22 +402,20 @@
 }
 
 .detalle-principal {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--slate-900);
+    color: var(--slate-500);
+    font-weight: 500;
 }
 
-.detalle-secundario {
-    font-size: 0.875rem;
-    color: var(--slate-500);
-    margin-top: 0.125rem;
+.estado {
+    color: var(--brand-olive);
+    
 }
 
 .monto-total {
     text-align: right;
     font-size: 1.125rem;
     font-weight: 700;
-    color: var(--brand-olive);
+    color: var(--slate-700);
 }
 
 @media (max-width: 1024px) {

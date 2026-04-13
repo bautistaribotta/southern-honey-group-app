@@ -1,7 +1,7 @@
 from django.urls import path
 from main.views import (login, inicio,
                         productos, clientes,
-                        informacion_clientes, operaciones,
+                        informacion_clientes, informacion_operaciones, operaciones,
                         obtener_cliente_json, obtener_producto_json,
                         deudores, remitos, cerrar_sesion)
 
@@ -15,6 +15,7 @@ urlpatterns = [
     path('productos/', productos, name="productos"),
     path('clientes/', clientes, name="clientes"),
     path('informacion_clientes/<int:id_cliente>/', informacion_clientes, name="informacion_clientes"),
+    path('informacion_operaciones/<int:id_operacion>/', informacion_operaciones, name="informacion_operaciones"),
     path('operaciones/<int:id_cliente>/', operaciones, name="operaciones"),
     path('api/clientes/<int:id_cliente>/', obtener_cliente_json, name="obtener_cliente_json"),
     path('api/productos/<int:id_producto>/', obtener_producto_json, name="obtener_producto_json"),

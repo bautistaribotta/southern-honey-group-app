@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from django.shortcuts import get_object_or_404
-from .models import Producto, Cliente, Operacion
+from .models import Producto, Cliente, Operacion, DetalleOperacion
 
 
 def nuevo_producto(nombre, categoria=None, precio=None, cantidad=None):

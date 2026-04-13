@@ -1,9 +1,14 @@
+import json
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.core.paginator import Paginator
 from django.contrib import messages
+from django.http import JsonResponse
+from django.db import transaction
 
 from .models import Cliente, Producto, Operacion, DetalleOperacion
 from .services import (
@@ -17,6 +22,7 @@ from .services import (
     obtener_datos_cliente,
     obtener_datos_producto,
     eliminar_cliente,
+    modificar_stock,
 )
 
 
@@ -234,18 +240,93 @@ def informacion_clientes(request, id_cliente):
             cuit = cuit.replace("-", "")
 
         editar_cliente(
-            id_cliente_form, nombre, apellido, telefono,
-            localidad, direccion, factura, cuit, True
+            id_cliente_form,
+            nombre,
+            apellido,
+            telefono,
+            localidad,
+            direccion,
+            factura,
+            cuit,
+            True,
         )
         messages.success(request, "Cliente editado correctamente")
         return redirect("informacion_clientes", id_cliente=id_cliente)
 
-    return render(request, "informacion_clientes.html", {"cliente": cliente})
+    operaciones_cliente = Operacion.objects.filter(cliente=cliente).order_by("-fecha")
+
+    contexto = {"cliente": cliente, "operaciones": operaciones_cliente}
+
+    return render(request, "informacion_clientes.html", contexto)
 
 
 @login_required()
+def informacion_operaciones(request):
+    return render(request, "informacion_operaciones.html")
+
+
+@login_required()
+@ensure_csrf_cookie
 def operaciones(request, id_cliente):
     cliente = get_object_or_404(Cliente, id=id_cliente)
+
+    if request.method == "POST":
+        try:
+            datos = json.loads(request.body)
+            items = datos.get("items", [])
+            metodo_pago = datos.get("metodo_pago", "cuenta_corriente")  # Fallback
+
+            if not items:
+                return JsonResponse({"error": "El carrito está vacío"}, status=400)
+
+            with transaction.atomic():
+                # Creo la operación sin monto total (lo calculo después)
+                operacion = Operacion.objects.create(
+                    cliente=cliente,
+                    metodo_de_pago=metodo_pago,
+                )
+
+                monto_total = 0
+
+                for item in items:
+                    id_producto = item.get("id_producto")
+                    cantidad = int(item.get("cantidad", 0))
+
+                    producto = get_object_or_404(Producto, id=id_producto, activo=True)
+
+                    # Resto el stock y sumo a la cantidad vendida
+                    modificar_stock(id_producto, -cantidad)
+                    producto.refresh_from_db()
+                    producto.cantidad_vendida += cantidad
+                    producto.save()
+
+                    # Creo el detalle vinculado a la operación
+                    DetalleOperacion.objects.create(
+                        operacion=operacion,
+                        producto=producto,
+                        cantidad=cantidad,
+                    )
+
+                    monto_total += producto.precio * cantidad
+
+                # Actualizo el monto total de la operación
+                operacion.monto_total = monto_total
+                operacion.save()
+
+            return JsonResponse(
+                {
+                    "ok": True,
+                    "id_cliente": cliente.id,
+                    "id_operacion": operacion.id,
+                }
+            )
+
+        except ValueError as e:
+            return JsonResponse({"error": str(e)}, status=400)
+        except Exception as e:
+            return JsonResponse(
+                {"error": f"Error al procesar la operación: {e}"}, status=500
+            )
 
     # Parámetro de búsqueda
     q = request.GET.get("q", "")
@@ -287,9 +368,6 @@ def remitos(request):
 
 @login_required
 def obtener_cliente_json(request, id_cliente):
-    from django.http import JsonResponse
-    from .services import obtener_datos_cliente
-
     # Obtengo los datos ya procesados y filtrados
     datos = obtener_datos_cliente(id_cliente)
 
@@ -303,9 +381,6 @@ def obtener_cliente_json(request, id_cliente):
 
 @login_required
 def obtener_producto_json(request, id_producto):
-    from django.http import JsonResponse
-    from .services import obtener_datos_producto
-
     datos = obtener_datos_producto(id_producto)
 
     if datos:
@@ -319,3 +394,15 @@ def obtener_producto_json(request, id_producto):
 def cerrar_sesion(request):
     auth_logout(request)
     return redirect("login")
+
+
+@login_required()
+def informacion_operaciones(request, id_operacion):
+    operacion = get_object_or_404(Operacion, id=id_operacion)
+    detalles = DetalleOperacion.objects.filter(operacion=operacion)
+    
+    contexto = {
+        "operacion": operacion,
+        "detalles": detalles,
+    }
+    return render(request, "informacion_operaciones.html", contexto)
