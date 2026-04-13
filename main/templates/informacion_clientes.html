@@ -154,7 +154,17 @@
                             {{ operacion.fecha|date:"d/m/Y" }}
                         </td>
                         <td> 
-                            <div class="detalle-principal">{{ operacion.id }}</div>
+                            <div class="detalle-principal">
+                                <ul style="list-style-type: none; padding: 0; margin: 0;">
+                                    {% for detalle in operacion.detalleoperacion_set.all %}
+                                        <li style="font-size: 0.9em; color: var(--slate-600);">
+                                            {{ detalle.cantidad|floatformat:0 }}x {{ detalle.producto.nombre }}
+                                        </li>
+                                    {% empty %}
+                                        <li style="font-size: 0.9em; color: var(--slate-400);">Sin productos</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
                         </td>
                         <td class="estado">
                             Estado

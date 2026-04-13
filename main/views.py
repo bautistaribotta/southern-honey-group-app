@@ -253,7 +253,9 @@ def informacion_clientes(request, id_cliente):
         messages.success(request, "Cliente editado correctamente")
         return redirect("informacion_clientes", id_cliente=id_cliente)
 
-    operaciones_cliente = Operacion.objects.filter(cliente=cliente).order_by("-fecha")
+    operaciones_cliente = Operacion.objects.filter(cliente=cliente).prefetch_related(
+        "detalleoperacion_set__producto"
+    ).order_by("-fecha")
 
     contexto = {"cliente": cliente, "operaciones": operaciones_cliente}
 
