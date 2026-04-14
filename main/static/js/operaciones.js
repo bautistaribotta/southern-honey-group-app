@@ -91,9 +91,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (stockDisponible <= 0) {
             producto.boton.disabled = true;
             producto.boton.classList.add('boton-sin-stock');
+            producto.boton.title = "No hay stock disponible de este producto";
         } else {
             producto.boton.disabled = false;
             producto.boton.classList.remove('boton-sin-stock');
+            producto.boton.title = "Añadir a la operación";
         }
     }
 

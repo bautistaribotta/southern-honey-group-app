@@ -21,11 +21,13 @@
       <td class="stock-valor">{{ producto.cantidad|floatformat:0 }}</td>
       <td class="precio-valor font-bold">$ {{ producto.precio }}</td>
       <td class="texto-derecha">
-        <button class="boton-agregar-producto" title="Añadir a la operación" 
+        <button class="boton-agregar-producto{% if producto.cantidad <= 0 %} boton-sin-stock{% endif %}" 
+                title="{% if producto.cantidad <= 0 %}No hay stock disponible de este producto{% else %}Añadir a la operación{% endif %}" 
                 data-id="{{producto.id}}" 
                 data-nombre="{{producto.nombre}}" 
                 data-precio="{{producto.precio}}"
-                data-stock="{{ producto.cantidad|floatformat:0 }}">
+                data-stock="{{ producto.cantidad|floatformat:0 }}"
+                {% if producto.cantidad <= 0 %}disabled{% endif %}>
           <span class="material-symbols-outlined">add</span>
         </button>
       </td>

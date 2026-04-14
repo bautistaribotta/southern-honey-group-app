@@ -349,6 +349,9 @@ def operaciones(request, id_cliente):
                 operacion.monto_total = monto_total
                 operacion.save()
 
+            # Enviar mensaje de éxito a través del framework de mensajes de Django
+            messages.success(request, "Operación creada correctamente")
+            
             return JsonResponse(
                 {
                     "ok": True,
