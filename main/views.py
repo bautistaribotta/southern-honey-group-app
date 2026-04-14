@@ -7,10 +7,11 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.core.paginator import Paginator
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.db import transaction
 
 from .models import Cliente, Producto, Operacion, DetalleOperacion
+from .pdf_services import Remito
 from .services import (
     nuevo_producto,
     editar_producto,
@@ -24,6 +25,7 @@ from .services import (
     eliminar_cliente,
     modificar_stock,
 )
+from .pdf_services import Remito
 
 
 def login(request):
@@ -221,7 +223,7 @@ def clientes(request):
     return render(request, "clientes.html", contexto)
 
 
-@login_required()
+@login_required
 def informacion_clientes(request, id_cliente):
     cliente = get_object_or_404(Cliente, id=id_cliente, activo=True)
 
@@ -262,12 +264,44 @@ def informacion_clientes(request, id_cliente):
     return render(request, "informacion_clientes.html", contexto)
 
 
-@login_required()
-def informacion_operaciones(request):
-    return render(request, "informacion_operaciones.html")
+@login_required
+def informacion_operaciones(request, id_operacion):
+    operacion = get_object_or_404(Operacion, id=id_operacion)
+    cliente = operacion.cliente
+    detalles = DetalleOperacion.objects.filter(operacion=operacion)
+    """
+        Como esta relacionado en Django la operacion con el detalle
+        Solo le paso el la operacion que acabo de encontrar en la Query anterior
+    """
+
+    # Armamos la lista estructurada de los productos para enviarlo al PDF
+    lista_productos = []
+    for d in detalles:
+        lista_productos.append({
+            'cantidad': d.cantidad,
+            'detalle': d.producto.nombre,
+            'precio_unitario': d.producto.precio
+        })
+
+    pdf = Remito(
+        id_operacion=operacion.id,
+        fecha=operacion.fecha,
+        nombre=cliente.nombre,
+        localidad=cliente.localidad if cliente.localidad else "",
+        direccion=cliente.direccion if cliente.direccion else "",
+        productos=lista_productos,
+        apellido=cliente.apellido if cliente.apellido else "",
+        cuit=cliente.cuit if cliente.cuit else ""
+    )
+
+    pdf_bytes = pdf.generate_pdf()
+    response = HttpResponse(pdf_bytes, content_type="application/pdf")
+    response["Content-Disposition"] = f'inline; filename="remito_{operacion.id}.pdf"'
+
+    return response
 
 
-@login_required()
+@login_required
 @ensure_csrf_cookie
 def operaciones(request, id_cliente):
     cliente = get_object_or_404(Cliente, id=id_cliente)
@@ -365,6 +399,7 @@ def deudores(request):
 
 @login_required
 def remitos(request):
+    # TODO: ¿Tiene sentido una vista de remitos si puedo verlo por cliente?
     return render(request, "remitos.html")
 
 
@@ -396,15 +431,3 @@ def obtener_producto_json(request, id_producto):
 def cerrar_sesion(request):
     auth_logout(request)
     return redirect("login")
-
-
-@login_required()
-def informacion_operaciones(request, id_operacion):
-    operacion = get_object_or_404(Operacion, id=id_operacion)
-    detalles = DetalleOperacion.objects.filter(operacion=operacion)
-    
-    contexto = {
-        "operacion": operacion,
-        "detalles": detalles,
-    }
-    return render(request, "informacion_operaciones.html", contexto)

@@ -149,7 +149,7 @@
                 </thead>
                 <tbody>
                     {% for operacion in operaciones %}
-                    <tr data-url="{% url 'informacion_operaciones' operacion.id %}" onclick="window.location.href=this.dataset.url" style="cursor: pointer;" class="fila-operacion">
+                    <tr data-url="{% url 'informacion_operaciones' operacion.id %}" onclick="window.open(this.dataset.url, '_blank')" style="cursor: pointer;" class="fila-operacion">
                         <td class="fecha-operacion">
                             {{ operacion.fecha|date:"d/m/Y" }}
                         </td>
