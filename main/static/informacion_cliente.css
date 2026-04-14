@@ -408,7 +408,7 @@
 
 .estado {
     color: var(--brand-olive);
-    
+    text-align: center;
 }
 
 .monto-total {
