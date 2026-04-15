@@ -105,8 +105,15 @@
         <input type="hidden" id="id_producto" name="id_producto">
         <div class="campo-formulario">
           <label for="nombre">Nombre del Producto</label>
-          <input type="text" id="nombre" name="nombre" class="input-estandar" placeholder="Ej: Miel Orgánica 500g"
-            required pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}">
+          <input 
+            type="text" 
+            id="nombre" 
+            name="nombre" 
+            class="input-estandar" 
+            placeholder="Ej: Miel Orgánica 500g"
+            maxlength="30"
+            required 
+            pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}">
           <span class="mensaje-error">Mínimo 3 caracteres. No se permiten símbolos.</span>
         </div>
 
@@ -130,15 +137,26 @@
           <label for="precio">Precio Unitario</label>
           <div class="contenedor-input-prefijo">
             <span class="prefijo-input">$</span>
-            <input type="number" step="1" id="precio" name="precio" class="input-estandar 
-                input-con-prefijo" placeholder="0.00" required>
+            <input 
+              type="number" 
+              step="1" id="precio" 
+              name="precio" 
+              class="input-estandar input-con-prefijo" 
+              placeholder="0" 
+              required>
           </div>
           <span class="mensaje-error">Por favor, ingrese un precio válido.</span>
         </div>
 
         <div class="campo-formulario">
           <label for="stock">Stock Inicial (Opcional)</label>
-          <input type="number" step="1" id="stock" name="stock" class="input-estandar" placeholder="0">
+          <input 
+            type="number" 
+            step="1" 
+            id="stock" 
+            name="stock" 
+            class="input-estandar" 
+            placeholder="0">
           <span class="mensaje-error" id="error-stock">El stock debe ser un número entero (sin puntos ni comas).</span>
         </div>
       </form>

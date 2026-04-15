@@ -498,15 +498,6 @@
   box-shadow: 0 0 0 1px #dc2626 !important;
 }
 
-/* Cuando el input es VÁLIDO y no está vacío (oliva) */
-.campo-formulario input:valid:not(:placeholder-shown) {
-  border-color: var(--brand-olive) !important;
-}
-
-.campo-formulario input:valid:not(:placeholder-shown):focus {
-  box-shadow: 0 0 0 1px var(--brand-olive) !important;
-}
-
 /* Mensajes de error */
 .campo-formulario input:invalid:not(:placeholder-shown) ~ .mensaje-error,
 .campo-formulario input:invalid:not(:placeholder-shown) + .mensaje-error {
@@ -520,14 +511,6 @@
 
 .contenedor-input-prefijo input:invalid:not(:placeholder-shown):focus {
   box-shadow: 0 0 0 1px #dc2626 !important;
-}
-
-.contenedor-input-prefijo input:valid:not(:placeholder-shown) {
-  border-color: var(--brand-olive) !important;
-}
-
-.contenedor-input-prefijo input:valid:not(:placeholder-shown):focus {
-  box-shadow: 0 0 0 1px var(--brand-olive) !important;
 }
 
 .campo-formulario:has(.contenedor-input-prefijo input:invalid:not(:placeholder-shown)) .mensaje-error {
@@ -579,13 +562,6 @@
   background-color: #3f5022;
   box-shadow: 0 10px 15px -3px rgba(85, 107, 47, 0.3);
 }
-
-/* --- VARIABLES --- */
-:root {
-  --color-rojo-eliminacion: #dc2626;
-}
-
-/* ... (resto del código) ... */
 
 /* Panel de eliminacion */
 #contenedor-panel-eliminar {

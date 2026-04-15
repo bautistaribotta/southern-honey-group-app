@@ -494,15 +494,6 @@
   box-shadow: 0 0 0 1px #dc2626 !important;
 }
 
-/* Cuando el input es VÁLIDO y no está vacío (oliva) */
-.grupo-input input:valid:not(:placeholder-shown) {
-  border-color: var(--brand-olive) !important;
-}
-
-.grupo-input input:valid:not(:placeholder-shown):focus {
-  box-shadow: 0 0 0 1px var(--brand-olive) !important;
-}
-
 /* Mensajes de error */
 .grupo-input input:invalid:not(:placeholder-shown) ~ .mensaje-error,
 .grupo-input input:invalid:not(:placeholder-shown) + .mensaje-error {
@@ -516,14 +507,6 @@
 
 .input-con-icono input:invalid:not(:placeholder-shown):focus {
   box-shadow: 0 0 0 1px #dc2626 !important;
-}
-
-.input-con-icono input:valid:not(:placeholder-shown) {
-  border-color: var(--brand-olive) !important;
-}
-
-.input-con-icono input:valid:not(:placeholder-shown):focus {
-  box-shadow: 0 0 0 1px var(--brand-olive) !important;
 }
 
 .grupo-input:has(.input-con-icono input:invalid:not(:placeholder-shown)) .mensaje-error {
