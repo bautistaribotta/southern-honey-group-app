@@ -173,5 +173,16 @@ if (inputStock && errorStock) {
   });
 }
 
+// Autocapitalizar la primera letra al escribir en el nombre del producto
+const inputNombreProducto = document.getElementById('nombre');
+if (inputNombreProducto) {
+  inputNombreProducto.addEventListener('input', (e) => {
+    let valor = e.target.value;
+    if (valor.length > 0) {
+      e.target.value = valor.charAt(0).toUpperCase() + valor.slice(1);
+    }
+  });
+}
+
 // Hago accesibles las funciones que el HTML llama mediante "onclick"
 window.prepararPanelNuevoProducto = prepararPanelNuevoProducto;

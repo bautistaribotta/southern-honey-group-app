@@ -13,9 +13,7 @@ class Producto(models.Model):
         ("Otros", "Otros"),
     ]
     nombre = models.CharField(max_length=50)
-    categoria = models.CharField(
-        max_length=50, choices=categorias, null=True, blank=True
-    )
+    categoria = models.CharField(max_length=50, choices=categorias, null=True, blank=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     cantidad = models.PositiveIntegerField(default=0)
     cantidad_vendida = models.PositiveIntegerField(default=0)
@@ -54,21 +52,13 @@ class Cliente(models.Model):
 
 
 class Operacion(models.Model):
-    cliente = models.ForeignKey(
-        Cliente, on_delete=models.CASCADE, db_column="id_cliente"
-    )
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, db_column="id_cliente")
     fecha = models.DateTimeField(auto_now_add=True)
     observaciones = models.CharField(max_length=200, null=True, blank=True)
-    monto_total = models.DecimalField(
-        max_digits=15, decimal_places=2, null=True, blank=True
-    )
+    monto_total = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     metodo_de_pago = models.CharField(max_length=50)
-    valor_dolar = models.DecimalField(
-        max_digits=10, decimal_places=2, null=True, blank=True
-    )
-    valor_kilo_miel = models.DecimalField(
-        max_digits=10, decimal_places=2, null=True, blank=True
-    )
+    valor_dolar = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    valor_kilo_miel = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     # Obligo a Django a nombrar la tabla como "operaciones"
     class Meta:
@@ -79,13 +69,9 @@ class Operacion(models.Model):
 
 
 class DetalleOperacion(models.Model):
-    operacion = models.ForeignKey(
-        Operacion, on_delete=models.CASCADE, db_column="id_operacion"
-    )
+    operacion = models.ForeignKey(Operacion, on_delete=models.CASCADE, db_column="id_operacion")
     # Usamos PROTECT para evitar que el borrado de un producto elimine registros históricos de ventas
-    producto = models.ForeignKey(
-        Producto, on_delete=models.PROTECT, db_column="id_producto"
-    )
+    producto = models.ForeignKey(Producto, on_delete=models.PROTECT, db_column="id_producto")
     cantidad = models.DecimalField(max_digits=10, decimal_places=2)
 
     # Obligo a Django a nombrar la tabla como "detalle_operaciones"
@@ -103,9 +89,7 @@ class DetalleOperacion(models.Model):
 
 
 class Pagos(models.Model):
-    operacion = models.ForeignKey(
-        Operacion, on_delete=models.PROTECT, db_column="id_operacion"
-    )
+    operacion = models.ForeignKey(Operacion, on_delete=models.PROTECT, db_column="id_operacion")
 
     class Meta:
         db_table = "pagos"

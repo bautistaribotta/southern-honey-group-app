@@ -95,20 +95,11 @@ if (checkboxFactura && campoCuit) {
   actualizarCuit(); 
 }
 
-// Le doy formato dinámico al CUIT (XX-XXXXXXXX-X) mientras el usuario escribe
+// Solo permito números en el CUIT mientras el usuario escribe
 if (inputCuit) {
   inputCuit.addEventListener('input', (e) => {
-    // Elimino todo lo que no sea un número usando una expresión regular
-    let valor = e.target.value.replace(/\D/g, '');
-    
-    // Aplico el formato de guiones automáticamente
-    if (valor.length > 2 && valor.length <= 10) {
-      valor = `${valor.slice(0, 2)}-${valor.slice(2)}`;
-    } else if (valor.length > 10) {
-      valor = `${valor.slice(0, 2)}-${valor.slice(2, 10)}-${valor.slice(10, 11)}`;
-    }
-    
-    e.target.value = valor;
+    // Elimino todo lo que no sea un número dejando puramente dígitos
+    e.target.value = e.target.value.replace(/\D/g, '');
   });
 }
 
@@ -171,12 +162,8 @@ const prepararPanelEditarCliente = (id) => {
       document.getElementById('localidad').value = cliente.localidad;
       document.getElementById('direccion').value = cliente.direccion;
       
-      // Si el cliente ya tiene un CUIT en la BD, le agrego los guiones visuales
-      let cuitGuardado = cliente.cuit || '';
-      if (cuitGuardado.length === 11) {
-        cuitGuardado = `${cuitGuardado.slice(0, 2)}-${cuitGuardado.slice(2, 10)}-${cuitGuardado.slice(10, 11)}`;
-      }
-      document.getElementById('cuit').value = cuitGuardado;
+      // El CUIT se muestra en crudo (solo números) de la BD
+      document.getElementById('cuit').value = cliente.cuit || '';
       
       document.getElementById('factura').checked = cliente.factura;
 
@@ -222,6 +209,17 @@ document.addEventListener('click', (e) => {
     // Abro el modal
     if (typeof abrirPanelEliminar === 'function') abrirPanelEliminar();
   }
+});
+
+// Autocapitalizar la primera letra al escribir en campos de nombre y apellido
+const inputsNombres = document.querySelectorAll('input[name="nombre"], input[name="apellido"]');
+inputsNombres.forEach(input => {
+  input.addEventListener('input', (e) => {
+    let valor = e.target.value;
+    if (valor.length > 0) {
+      e.target.value = valor.charAt(0).toUpperCase() + valor.slice(1);
+    }
+  });
 });
 
 // Hago accesibles las funciones globales que el HTML necesita usar mediante atributos onclick

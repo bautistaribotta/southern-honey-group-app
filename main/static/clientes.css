@@ -485,19 +485,45 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Cuando el input es inválido y no está vacío (para no mostrar errores apenas se abre el form) */
+/* Cuando el input es inválido y no está vacío */
 .grupo-input input:invalid:not(:placeholder-shown) {
-  border-color: #dc2626;
+  border-color: #dc2626 !important;
 }
 
+.grupo-input input:invalid:not(:placeholder-shown):focus {
+  box-shadow: 0 0 0 1px #dc2626 !important;
+}
+
+/* Cuando el input es VÁLIDO y no está vacío (oliva) */
+.grupo-input input:valid:not(:placeholder-shown) {
+  border-color: var(--brand-olive) !important;
+}
+
+.grupo-input input:valid:not(:placeholder-shown):focus {
+  box-shadow: 0 0 0 1px var(--brand-olive) !important;
+}
+
+/* Mensajes de error */
 .grupo-input input:invalid:not(:placeholder-shown) ~ .mensaje-error,
 .grupo-input input:invalid:not(:placeholder-shown) + .mensaje-error {
   display: block;
 }
 
-/* Si tiene icono, el input es hijo de un div, así que apuntamos al padre */
+/* Si tiene icono, el input es hijo de un div */
 .input-con-icono input:invalid:not(:placeholder-shown) {
-  border-color: #dc2626;
+  border-color: #dc2626 !important;
+}
+
+.input-con-icono input:invalid:not(:placeholder-shown):focus {
+  box-shadow: 0 0 0 1px #dc2626 !important;
+}
+
+.input-con-icono input:valid:not(:placeholder-shown) {
+  border-color: var(--brand-olive) !important;
+}
+
+.input-con-icono input:valid:not(:placeholder-shown):focus {
+  box-shadow: 0 0 0 1px var(--brand-olive) !important;
 }
 
 .grupo-input:has(.input-con-icono input:invalid:not(:placeholder-shown)) .mensaje-error {

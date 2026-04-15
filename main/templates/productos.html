@@ -52,14 +52,14 @@
       <div class="contenedor-filtro">
         <select id="filtro-categoria" class="select-filtro">
           <option value="" {% if not categoria %}selected{% endif %}>Todas las Categorías</option>
-          <option value="Miel" {% if categoria=="Miel" %}selected{% endif %}>Miel</option>
-          <option value="Alimento" {% if categoria=="Alimento" %}selected{% endif %}>Alimento</option>
-          <option value="Cera" {% if categoria=="Cera" %}selected{% endif %}>Cera</option>
-          <option value="Madera" {% if categoria=="Madera" %}selected{% endif %}>Madera</option>
-          <option value="Estampa" {% if categoria=="Estampa" %}selected{% endif %}>Estampa</option>
-          <option value="Insumos" {% if categoria=="Insumos" %}selected{% endif %}>Insumos</option>
-          <option value="Medicamentos" {% if categoria=="Medicamentos" %}selected{% endif %}>Medicamentos</option>
-          <option value="Otros" {% if categoria=="Otros" %}selected{% endif %}>Otros</option>
+          <option value="Miel" {% if categoria == "Miel" %}selected{% endif %}>Miel</option>
+          <option value="Alimento" {% if categoria == "Alimento" %}selected{% endif %}>Alimento</option>
+          <option value="Cera" {% if categoria == "Cera" %}selected{% endif %}>Cera</option>
+          <option value="Madera" {% if categoria == "Madera" %}selected{% endif %}>Madera</option>
+          <option value="Estampa" {% if categoria == "Estampa" %}selected{% endif %}>Estampa</option>
+          <option value="Insumos" {% if categoria == "Insumos" %}selected{% endif %}>Insumos</option>
+          <option value="Medicamentos" {% if categoria == "Medicamentos" %}selected{% endif %}>Medicamentos</option>
+          <option value="Otros" {% if categoria == "Otros" %}selected{% endif %}>Otros</option>
         </select>
         <span class="material-symbols-outlined icono-filtro">filter_list</span>
       </div>

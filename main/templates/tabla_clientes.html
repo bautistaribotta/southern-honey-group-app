@@ -13,11 +13,11 @@
       <tr class="fila-cliente" data-id="{{ cliente.id }}">
         <td class="td-enlace">
           <a href="{% url 'informacion_clientes' cliente.id %}" class="enlace-fila">
-            <div class="cliente-nombre"> {{ cliente.nombre }} {{ cliente.apellido|default:"" }} </div>
+            <div class="cliente-nombre"> {{ cliente.nombre }} {% if cliente.apellido and cliente.apellido != 'None' %}{{ cliente.apellido }}{% endif %} </div>
             <div class="cliente-id"> ID: {{ cliente.id }} </div>
           </a>
         </td>
-        <td class="td-enlace"> <a href="{% url 'informacion_clientes' cliente.id %}" class="enlace-fila">{{ cliente.localidad }}</a> </td>
+        <td class="td-enlace"> <a href="{% url 'informacion_clientes' cliente.id %}" class="enlace-fila">{{ cliente.localidad|default:"-" }}</a> </td>
         <td class="td-enlace"> <a href="{% url 'informacion_clientes' cliente.id %}" class="enlace-fila">{{ cliente.direccion|default:"-" }}</a> </td>
         <td class="texto-centrado td-enlace"> <a href="{% url 'informacion_clientes' cliente.id %}" class="enlace-fila">{{ cliente.telefono }}</a> </td>
         <td>

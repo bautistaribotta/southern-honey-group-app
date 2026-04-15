@@ -41,10 +41,10 @@
     <div class="cabecera-detalle">
         <div class="info-principal">
             <div class="avatar-cliente">
-                {{ cliente.nombre|slice:":1" }}{{ cliente.apellido|slice:":1" }}
+                {{ cliente.nombre|slice:":1" }}{% if cliente.apellido and cliente.apellido != 'None' %}{{ cliente.apellido|slice:":1" }}{% endif %}
             </div>
             <div>
-                <h3 class="nombre-cliente-titulo">{{ cliente.nombre }} {{ cliente.apellido }}</h3>
+                <h3 class="nombre-cliente-titulo">{{ cliente.nombre }} {% if cliente.apellido and cliente.apellido != 'None' %}{{ cliente.apellido }}{% endif %}</h3>
                 <p class="id-cliente-subtitulo">ID: {{ cliente.id }}</p>
             </div>
         </div>
@@ -74,7 +74,7 @@
                 <div class="campo-info">
                     <label>Nombre</label>
                     <p class="valor-vista">{{ cliente.nombre }}</p>
-                    <input type="text" name="nombre" class="input-edicion" value="{{ cliente.nombre }}" required style="display: none;">
+                    <input type="text" name="nombre" class="input-edicion" value="{{ cliente.nombre }}" required style="display: none;" maxlength="26" pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{3,26}" title="Mínimo 3, máximo 26 letras, sin símbolos ni números.">
                 </div>
                 <div class="campo-info">
                     <label>Localidad</label>
@@ -94,7 +94,7 @@
                 <div class="campo-info">
                     <label>Apellido</label>
                     <p class="valor-vista">{{ cliente.apellido }}</p>
-                    <input type="text" name="apellido" class="input-edicion" value="{{ cliente.apellido|default:'' }}" style="display: none;">
+                    <input type="text" name="apellido" class="input-edicion" value="{{ cliente.apellido|default:'' }}" style="display: none;" maxlength="26" pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{2,26}" title="Mínimo 2, máximo 26 letras, sin símbolos ni números.">
                 </div>
                 <div class="campo-info">
                     <label>Dirección</label>
@@ -306,6 +306,17 @@
         checkFactura.addEventListener('change', actualizarRequiredCuit);
         // Aplicar estado inicial
         actualizarRequiredCuit();
+
+        // Autocapitalizar la primera letra al escribir en campos de nombre y apellido
+        const inputsNombres = document.querySelectorAll('input[name="nombre"], input[name="apellido"]');
+        inputsNombres.forEach(input => {
+            input.addEventListener('input', (e) => {
+                let valor = e.target.value;
+                if (valor.length > 0) {
+                    e.target.value = valor.charAt(0).toUpperCase() + valor.slice(1);
+                }
+            });
+        });
 
         // Lógica para mantener apretado el botón de eliminar durante 2 segundos
         const btnEliminar = document.getElementById('boton-confirmar-eliminar');

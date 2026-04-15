@@ -105,8 +105,9 @@
                   name="nombre" 
                   placeholder="Ej: Antonio" 
                   required
-                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{3,}">
-                <span class="mensaje-error">Mínimo 3 letras, sin números ni símbolos</span>
+                  maxlength="26"
+                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{3,26}">
+                <span class="mensaje-error">Mínimo 3 letras, máximo 26, sin números ni símbolos</span>
               </div>
 
               <div class="grupo-input">
@@ -116,8 +117,9 @@
                   id="apellido" 
                   name="apellido" 
                   placeholder="Ej: Garcia"
-                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{2,}">
-                <span class="mensaje-error">Mínimo 2 letras, sin números ni símbolos</span>
+                  maxlength="26"
+                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{2,26}">
+                <span class="mensaje-error">Mínimo 2 letras, máximo 26, sin números ni símbolos</span>
               </div>
 
               <div class="grupo-input">
@@ -125,11 +127,12 @@
                 <div class="input-con-icono">
                   <span class="material-symbols-outlined">call</span>
                   <input 
-                    type="text" 
+                    type="number" 
                     id="telefono" 
                     name="telefono" 
                     placeholder="Ej: 02302..." 
                     required
+                    maxlength="16"
                     pattern="[\d]{6,}">
                 </div>
                 <span class="mensaje-error">Mínimo 6 números, sin letras ni símbolos</span>
@@ -152,8 +155,9 @@
                   id="localidad" 
                   name="localidad" 
                   placeholder="Ej: Córdoba Capital"
-                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{4,}"
-                  title="Mínimo 4 letras. No se permiten simbolos">
+                  maxlength="30"
+                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{4,}">
+                <span class="mensaje-error">Mínimo 4 caracteres (Solo letras y numeros)</span>
               </div>
 
               <div class="grupo-input">
@@ -163,8 +167,9 @@
                   id="direccion" 
                   name="direccion" 
                   placeholder="Calle y número"
-                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}"
-                  title="Mínimo 3 caracteres. No se permiten simbolos">
+                  maxlength="30"
+                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}">
+                <span class="mensaje-error">Mínimo 3 caracteres (Solo letras y numeros)</span>
               </div>
             </div>
           </section>
@@ -194,9 +199,10 @@
                   type="text" 
                   id="cuit" 
                   name="cuit" 
-                  placeholder="00-00000000-0"
-                  pattern="[\d]{10,}"
-                  title="Mínimo 10 caracteres. Solo se permiten números">
+                  placeholder="Ej: 20123456780"
+                  maxlength="11"
+                  pattern="[\d]{10,11}">
+                <span class="mensaje-error">Debe ingresar exactamente de 10 a 11 números, sin guiones</span>
               </div>
             </div>
           </section>
