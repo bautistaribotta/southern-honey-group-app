@@ -2,206 +2,192 @@
 {% load static %}
 
 {% block nombre-pestaña %}
-  <title> Productos </title>
+<title> Productos </title>
 {% endblock %}
 
 {% block links %}
-  <link rel="stylesheet" href="{% static 'productos.css' %}">
+<link rel="stylesheet" href="{% static 'productos.css' %}">
 {% endblock %}
 
 {% block cabecera %}
-  <div id="titulos-cabecera">
-    <h2> Inventario de Productos </h2>
-    <p> Gestione el stock aquí, agregue, edite o elimine productos </p>
-  </div>
+<div id="titulos-cabecera">
+  <h2> Inventario de Productos </h2>
+  <p> Gestione el stock aquí, agregue, edite o elimine productos </p>
+</div>
 {% endblock %}
 
 {% block area-trabajo %}
-  <!-- Contenedor de Notificaciones Toast -->
-  <div id="contenedor-toast" class="contenedor-toast">
-    {% if messages %}
-      {% for message in messages %}
-        <div class="toast {{ message.tags }}">
-          <span class="material-symbols-outlined">
-            {% if message.tags == 'success' %}check_circle
-            {% elif message.tags == 'error' %}error
-            {% else %}info{% endif %}
-          </span>
-          <div class="toast-contenido">
-            <p>{{ message }}</p>
-          </div>
-          <button class="btn-cerrar-toast" onclick="cerrarToast(this.parentElement)">
-            <span class="material-symbols-outlined">close</span>
-          </button>
-        </div>
-      {% endfor %}
-    {% endif %}
+<!-- Contenedor de Notificaciones Toast -->
+<div id="contenedor-toast" class="contenedor-toast">
+  {% if messages %}
+  {% for message in messages %}
+  <div class="toast {{ message.tags }}">
+    <span class="material-symbols-outlined">
+      {% if message.tags == 'success' %}check_circle
+      {% elif message.tags == 'error' %}error
+      {% else %}info{% endif %}
+    </span>
+    <div class="toast-contenido">
+      <p>{{ message }}</p>
+    </div>
+    <button class="btn-cerrar-toast" onclick="cerrarToast(this.parentElement)">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% endif %}
+</div>
+
+<!-- ÁREA DE TRABAJO DE PRODUCTOS -->
+<section id="area-trabajo">
+  <!-- Controles Superiores: Buscador y Filtros -->
+  <div class="barra-herramientas">
+    <div class="grupo-busqueda">
+      <div class="contenedor-input-busqueda">
+        <span class="material-symbols-outlined icono-busqueda">search</span>
+        <input type="text" id="buscar-producto" class="input-busqueda" placeholder="Buscar productos por nombre o id"
+          value="{{ q|default:'' }}">
+      </div>
+
+      <div class="contenedor-filtro">
+        <select id="filtro-categoria" class="select-filtro">
+          <option value="" {% if not categoria %}selected{% endif %}>Todas las Categorías</option>
+          <option value="Miel" {% if categoria=="Miel" %}selected{% endif %}>Miel</option>
+          <option value="Alimento" {% if categoria=="Alimento" %}selected{% endif %}>Alimento</option>
+          <option value="Cera" {% if categoria=="Cera" %}selected{% endif %}>Cera</option>
+          <option value="Madera" {% if categoria=="Madera" %}selected{% endif %}>Madera</option>
+          <option value="Estampa" {% if categoria=="Estampa" %}selected{% endif %}>Estampa</option>
+          <option value="Insumos" {% if categoria=="Insumos" %}selected{% endif %}>Insumos</option>
+          <option value="Medicamentos" {% if categoria=="Medicamentos" %}selected{% endif %}>Medicamentos</option>
+          <option value="Otros" {% if categoria=="Otros" %}selected{% endif %}>Otros</option>
+        </select>
+        <span class="material-symbols-outlined icono-filtro">filter_list</span>
+      </div>
+    </div>
+
+    <button class="boton-nuevo" onclick="prepararPanelNuevoProducto()">
+      <span class="material-symbols-outlined">add</span>
+      Nuevo Producto
+    </button>
   </div>
 
-  <!-- ÁREA DE TRABAJO DE PRODUCTOS -->
-  <section id="area-trabajo">
-    <!-- Controles Superiores: Buscador y Filtros -->
-    <div class="barra-herramientas">
-      <div class="grupo-busqueda">
-        <div class="contenedor-input-busqueda">
-          <span class="material-symbols-outlined icono-busqueda">search</span>
-          <input type="text" id="buscar-producto" class="input-busqueda" placeholder="Buscar productos por nombre o id" value="{{ q|default:'' }}">
+  <!-- Tabla de Productos -->
+  <div class="contenedor-tabla" id="tabla-productos-container">
+    {% include 'tabla_productos.html' %}
+  </div>
+</section>
+
+<!-- PANEL LATERAL NUEVO PRODUCTO (SLIDE-OVER) -->
+<div id="contenedor-slide-over">
+  <div id="slide-over-fondo" onclick="cerrarSlideOver()"> </div>
+
+  <div id="slide-over-panel">
+    <!-- Cabecera del Panel -->
+    <header class="panel-cabecera">
+      <div class="panel-titulo-fila">
+        <div class="icono-contenedor">
+          <span class="material-symbols-outlined">inventory_2</span>
         </div>
-        
-        <div class="contenedor-filtro">
-          <select id="filtro-categoria" class="select-filtro">
-            <option value="" {% if not categoria %}selected{% endif %}>Todas las Categorías</option>
-            <option value="Miel" {% if categoria == "Miel" %}selected{% endif %}>Miel</option>
-            <option value="Alimento" {% if categoria == "Alimento" %}selected{% endif %}>Alimento</option>
-            <option value="Cera" {% if categoria == "Cera" %}selected{% endif %}>Cera</option>
-            <option value="Madera" {% if categoria == "Madera" %}selected{% endif %}>Madera</option>
-            <option value="Estampa" {% if categoria == "Estampa" %}selected{% endif %}>Estampa</option>
-            <option value="Insumos" {% if categoria == "Insumos" %}selected{% endif %}>Insumos</option>
-            <option value="Medicamentos" {% if categoria == "Medicamentos" %}selected{% endif %}>Medicamentos</option>
-            <option value="Otros" {% if categoria == "Otros" %}selected{% endif %}>Otros</option>
-          </select>
-          <span class="material-symbols-outlined icono-filtro">filter_list</span>
+        <div class="texto-cabecera">
+          <h3>Nuevo Producto</h3>
+          <p>Complete los detalles para el inventario</p>
         </div>
       </div>
-      
-      <button class="boton-nuevo" onclick="prepararPanelNuevoProducto()">
-        <span class="material-symbols-outlined">add</span>
-        Nuevo Producto
+      <button class="boton-cerrar-panel" onclick="cerrarSlideOver()">
+        <span class="material-symbols-outlined">close</span>
       </button>
-    </div>
+    </header>
 
-    <!-- Tabla de Productos -->
-    <div class="contenedor-tabla" id="tabla-productos-container">
-      {% include 'tabla_productos.html' %}
-    </div>
-  </section>
-
-  <!-- PANEL LATERAL NUEVO PRODUCTO (SLIDE-OVER) -->
-  <div id="contenedor-slide-over">
-    <div id="slide-over-fondo" onclick="cerrarSlideOver()"> </div>
-    
-    <div id="slide-over-panel">
-      <!-- Cabecera del Panel -->
-      <header class="panel-cabecera">
-        <div class="panel-titulo-fila">
-          <div class="icono-contenedor">
-            <span class="material-symbols-outlined">inventory_2</span>
-          </div>
-          <div class="texto-cabecera">
-            <h3>Nuevo Producto</h3>
-            <p>Complete los detalles para el inventario</p>
-          </div>
+    <!-- Cuerpo del Panel (Formulario) -->
+    <div class="panel-cuerpo">
+      <form class="formulario-producto" id="form-producto" method="POST" autocomplete="off">
+        {% csrf_token %}
+        <input type="hidden" id="id_producto" name="id_producto">
+        <div class="campo-formulario">
+          <label for="nombre">Nombre del Producto</label>
+          <input type="text" id="nombre" name="nombre" class="input-estandar" placeholder="Ej: Miel Orgánica 500g"
+            required pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}">
+          <span class="mensaje-error">Mínimo 3 caracteres. No se permiten símbolos.</span>
         </div>
-        <button class="boton-cerrar-panel" onclick="cerrarSlideOver()">
-          <span class="material-symbols-outlined">close</span>
-        </button>
-      </header>
 
-      <!-- Cuerpo del Panel (Formulario) -->
-      <div class="panel-cuerpo">
-        <form class="formulario-producto" id="form-producto" method="POST" autocomplete="off">
-          {% csrf_token %}
-          <input type="hidden" id="id_producto" name="id_producto">
-          <div class="campo-formulario">
-            <label for="nombre">Nombre del Producto</label>
-            <input 
-              type="text" 
-              id="nombre" 
-              name="nombre" 
-              class="input-estandar" 
-              placeholder="Ej: Miel Orgánica 500g" 
-              required
-              pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}">
-            <span class="mensaje-error">Mínimo 3 caracteres. No se permiten símbolos.</span>
+        <div class="campo-formulario">
+          <label for="categoria">Categoría</label>
+          <select id="categoria" name="categoria" class="select-estandar" required
+            title="Seleccione una de las opciones disponibles">
+            <option value="" disabled selected>Seleccione una categoría</option>
+            <option value="Miel">Miel</option>
+            <option value="Alimento">Alimento</option>
+            <option value="Cera">Cera</option>
+            <option value="Madera">Madera</option>
+            <option value="Estampa">Estampa</option>
+            <option value="Insumos">Insumos</option>
+            <option value="Medicamentos">Medicamentos</option>
+            <option value="Otros">Otros</option>
+          </select>
+        </div>
+
+        <div class="campo-formulario">
+          <label for="precio">Precio Unitario</label>
+          <div class="contenedor-input-prefijo">
+            <span class="prefijo-input">$</span>
+            <input type="number" step="1" id="precio" name="precio" class="input-estandar 
+                input-con-prefijo" placeholder="0.00" required>
           </div>
+          <span class="mensaje-error">Por favor, ingrese un precio válido.</span>
+        </div>
 
-          <div class="campo-formulario">
-            <label for="categoria">Categoría</label>
-            <select 
-              id="categoria" 
-              name="categoria" 
-              class="select-estandar" 
-              required
-              title="Seleccione una de las opciones disponibles">
-              <option value="" disabled selected>Seleccione una categoría</option>
-              <option value="Miel">Miel</option>
-              <option value="Alimento">Alimento</option>
-              <option value="Cera">Cera</option>
-              <option value="Madera">Madera</option>
-              <option value="Estampa">Estampa</option>
-              <option value="Insumos">Insumos</option>
-              <option value="Medicamentos">Medicamentos</option>
-              <option value="Otros">Otros</option>
-            </select>
-          </div>
+        <div class="campo-formulario">
+          <label for="stock">Stock Inicial (Opcional)</label>
+          <input type="number" step="1" id="stock" name="stock" class="input-estandar" placeholder="0">
+          <span class="mensaje-error" id="error-stock">El stock debe ser un número entero (sin puntos ni comas).</span>
+        </div>
+      </form>
+    </div>
 
-          <div class="campo-formulario">
-            <label for="precio">Precio Unitario</label>
-            <div class="contenedor-input-prefijo">
-              <span class="prefijo-input">$</span>
-              <input 
-                type="number" 
-                step="1" 
-                id="precio" 
-                name="precio" 
-                class="input-estandar 
-                input-con-prefijo" 
-                placeholder="0.00" 
-                required>
-            </div>
-            <span class="mensaje-error">Por favor, ingrese un precio válido.</span>
-          </div>
-
-          <div class="campo-formulario">
-            <label for="stock">Stock Inicial (Opcional)</label>
-            <input type="number" step="1" id="stock" name="stock" class="input-estandar" placeholder="0">
-          </div>
-        </form>
-      </div>
-
-      <!-- Pie del Panel -->
-      <div class="panel-pie">
-        <button type="submit" form="form-producto" class="boton-primario">Guardar Producto</button>
-        <button type="button" class="boton-secundario" onclick="cerrarSlideOver()">Cancelar</button>
-      </div>
+    <!-- Pie del Panel -->
+    <div class="panel-pie">
+      <button type="submit" form="form-producto" class="boton-primario">Guardar Producto</button>
+      <button type="button" class="boton-secundario" onclick="cerrarSlideOver()">Cancelar</button>
     </div>
   </div>
+</div>
 
-  <!-- Panel de eliminacion y Fondo -->
-  <form  id="formulario-eliminar" method="POST">
-    {% csrf_token %}
-    <div id="contenedor-panel-eliminar">
-      <div id="contenedor-panel-fondo" onclick="cerrarPanelEliminar()"> </div>
+<!-- Panel de eliminacion y Fondo -->
+<form id="formulario-eliminar" method="POST">
+  {% csrf_token %}
+  <div id="contenedor-panel-eliminar">
+    <div id="contenedor-panel-fondo" onclick="cerrarPanelEliminar()"> </div>
 
     <!-- Panel -->
-      <div id="panel-eliminar">
-        <!-- Guardo el id del producto y dejo el value vacio, JS lo rellena-->
-        <input type="hidden" id="id_eliminar" name="id_eliminar" value="">
+    <div id="panel-eliminar">
+      <!-- Guardo el id del producto y dejo el value vacio, JS lo rellena-->
+      <input type="hidden" id="id_eliminar" name="id_eliminar" value="">
 
-        <!-- Le indico a Django: el input se llamada "accion" y vale un str "eliminar" -->
-        <input type="hidden" name="accion" value="eliminar"> 
+      <!-- Le indico a Django: el input se llamada "accion" y vale un str "eliminar" -->
+      <input type="hidden" name="accion" value="eliminar">
 
-        <button type="button" class="boton-cerrar-panel" id="icono-cerrar-panel-eliminar" onclick="cerrarPanelEliminar()">
-          <span class="material-symbols-outlined">close</span>
-        </button>
+      <button type="button" class="boton-cerrar-panel" id="icono-cerrar-panel-eliminar" onclick="cerrarPanelEliminar()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
 
-        <div id="icono-advertencia">
-          <span class="material-symbols-outlined">warning</span>
-        </div>
-
-        <h3>Confirmar eliminación</h3>
-        <p id="texto-confirmacion-eliminar">¿Está seguro que quiere eliminar este producto?</p>
-
-        <div class="acciones-modal">
-          <button type="button" class="boton-secundario" onclick="cerrarPanelEliminar()">No, mantener</button>
-          <button type="button" class="boton-primario-eliminar" id="boton-confirmar-eliminar"><span>Sí, eliminar</span></button>
-        </div>
+      <div id="icono-advertencia">
+        <span class="material-symbols-outlined">warning</span>
       </div>
-    </form>
-  </div>
+
+      <h3>Confirmar eliminación</h3>
+      <p id="texto-confirmacion-eliminar">¿Está seguro que quiere eliminar este producto?</p>
+
+      <div class="acciones-modal">
+        <button type="button" class="boton-secundario" onclick="cerrarPanelEliminar()">No, mantener</button>
+        <button type="button" class="boton-primario-eliminar" id="boton-confirmar-eliminar"><span>Sí,
+            eliminar</span></button>
+      </div>
+    </div>
+</form>
+</div>
 {% endblock %}
 
 {% block codigo-javascript %}
-  <script src="{% static 'js/paneles.js' %}"></script>
-  <script src="{% static 'js/productos.js' %}"></script>
+<script src="{% static 'js/paneles.js' %}"></script>
+<script src="{% static 'js/productos.js' %}"></script>
 {% endblock %}

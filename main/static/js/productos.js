@@ -152,5 +152,26 @@ document.addEventListener('click', (e) => {
   }
 });
 
+// Validación para campo de stock (avisa sobre puntos y comas)
+const inputStock = document.getElementById('stock');
+const errorStock = document.getElementById('error-stock');
+
+if (inputStock && errorStock) {
+  inputStock.addEventListener('input', (e) => {
+    // Verificamos si hay error por decimales
+    if (inputStock.validity.stepMismatch || inputStock.validity.badInput || inputStock.value.includes('.') || inputStock.value.includes(',')) {
+      errorStock.style.display = 'block';
+    } else {
+      errorStock.style.display = 'none';
+    }
+  });
+
+  inputStock.addEventListener('keydown', (e) => {
+    if (e.key === '.' || e.key === ',') {
+      errorStock.style.display = 'block';
+    }
+  });
+}
+
 // Hago accesibles las funciones que el HTML llama mediante "onclick"
 window.prepararPanelNuevoProducto = prepararPanelNuevoProducto;
