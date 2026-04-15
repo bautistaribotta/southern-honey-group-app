@@ -1,5 +1,8 @@
-/* Nota: La barra lateral, header y layout base se heredan de inicio.css */
+:root {
+  --color-rojo-eliminacion: #dc2626;
+}
 
+/* Nota: La barra lateral, header y layout base se heredan de inicio.css */
 #titulos-cabecera h2 {
   margin-bottom: 0.25rem;
 }
@@ -572,12 +575,12 @@
   justify-content: center;
   align-items: center;
   visibility: hidden;
-  transition: visibility 0.3s;
+  transition: visibility 0.3s; /* Permite que la animación de salida termine antes de ocultar */
 }
 
 #contenedor-panel-eliminar.abierto {
   visibility: visible;
-  transition: none;
+  transition: none; /* Aparece al instante para dejar que los hijos se animen */
 }
 
 #contenedor-panel-fondo {
@@ -606,7 +609,7 @@
   flex-direction: column;
   text-align: center;
   
-  /* Animación de entrada */
+  /* Animación de entrada: escala y opacidad */
   opacity: 0;
   transform: scale(0.95);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -672,7 +675,7 @@
   gap: 1rem;
 }
 
-.boton-primario-eliminar {
+#boton-confirmar-eliminar {
   background-color: var(--color-rojo-eliminacion);
   color: white;
   border: none;
@@ -681,13 +684,6 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-}
-
-.boton-primario-eliminar:hover {
-  filter: brightness(0.9);
-}
-
-#boton-confirmar-eliminar {
   position: relative;
   overflow: hidden;
   user-select: none;
@@ -715,4 +711,8 @@
 #boton-confirmar-eliminar.manteniendo::before {
   width: 100%;
   transition: width 2s linear;
+}
+
+#boton-confirmar-eliminar:hover {
+  filter: brightness(0.9);
 }
