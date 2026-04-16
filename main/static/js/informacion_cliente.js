@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('form-editar-cliente').reset();
         
         // Al resetear el formulario, el checkbox vuelve a su estado original,
-        // pero no dispara el evento 'change'. Forzamos la actualización aquí
+        // pero no dispara el evento 'change'. Fuerzo la actualización aquí
         // para que se remueva el atributo 'required' y desaparezca el error en rojo.
         if (typeof actualizarRequiredCuit === 'function') {
             actualizarRequiredCuit();
@@ -144,6 +144,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (inputCuit) {
         inputCuit.addEventListener('input', (e) => {
             e.target.value = e.target.value.replace(/\D/g, '');
+            
+            // Si el usuario escribe algo y el switch de factura está apagado, lo enciendo automáticamente
+            if (e.target.value.length > 0 && checkFactura && !checkFactura.checked) {
+                checkFactura.checked = true;
+                // Actualizo el atributo 'required' llamando a la función
+                actualizarRequiredCuit();
+            }
         });
     }
 });
