@@ -85,8 +85,18 @@ const inputCuit = document.getElementById('cuit');
  * dependiendo de si el checkbox de facturación está marcado.
  */
 const actualizarCuit = () => {
-  if (checkboxFactura && campoCuit) {
-    campoCuit.style.display = checkboxFactura.checked ? 'flex' : 'none';
+  if (checkboxFactura && campoCuit && inputCuit) {
+    const facturacionActiva = checkboxFactura.checked;
+    campoCuit.style.display = facturacionActiva ? 'flex' : 'none';
+    
+    // Si la facturación está activa, el CUIT es estrictamente obligatorio
+    if (facturacionActiva) {
+      inputCuit.setAttribute('required', 'required');
+    } else {
+      inputCuit.removeAttribute('required');
+      // Opcional: limpiar el CUIT si se desactiva la facturación
+      // inputCuit.value = ''; 
+    }
   }
 };
 

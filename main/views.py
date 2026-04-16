@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.db import transaction
 
-from .models import Cliente, Producto, Operacion, DetalleOperacion
+from .models import Cliente, Producto, Operacion, DetalleOperacion, Pago
 from .pdf_services import Remito
 from .services import (
     nuevo_producto,
@@ -18,14 +18,13 @@ from .services import (
     eliminar_producto,
     nuevo_cliente,
     editar_cliente,
+    eliminar_cliente,
     get_cotizacion_oficial,
     get_cotizacion_blue,
     obtener_datos_cliente,
     obtener_datos_producto,
-    eliminar_cliente,
     modificar_stock,
 )
-from .pdf_services import Remito
 
 
 def login(request):
@@ -255,11 +254,14 @@ def informacion_clientes(request, id_cliente):
         messages.success(request, "Cliente editado correctamente")
         return redirect("informacion_clientes", id_cliente=id_cliente)
 
-    operaciones_cliente = Operacion.objects.filter(cliente=cliente).prefetch_related(
-        "detalleoperacion_set__producto"
-    ).order_by("-fecha")
+    operaciones_cliente = Operacion.objects.filter(cliente=cliente).prefetch_related("detalleoperacion_set__producto").order_by("-fecha")
 
-    contexto = {"cliente": cliente, "operaciones": operaciones_cliente}
+    # Cargo de a 5 operaciones
+    paginator_operaciones = Paginator(operaciones_cliente, 5)
+    pagina_numero = request.GET.get("page")
+    pagina_obj = paginator_operaciones.get_page(pagina_numero)
+
+    contexto = {"cliente": cliente, "operaciones": pagina_obj}
 
     return render(request, "informacion_clientes.html", contexto)
 

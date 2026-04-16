@@ -148,6 +148,39 @@
     min-height: auto;
 }
 
+/* --- VALIDACIONES DE EDICIÓN --- */
+.mensaje-error {
+    display: none;
+    color: #dc2626;
+    font-size: 0.75rem;
+    margin-top: 0.35rem;
+    font-weight: 500;
+    animation: aparecer 0.3s ease;
+}
+
+/* Regla de seguridad: Si no estamos editando, NUNCA mostrar errores */
+.tarjeta-info-unica:not(.editando) .mensaje-error {
+    display: none !important;
+}
+
+@keyframes aparecer {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.campo-info .input-edicion:invalid:not(:placeholder-shown) {
+    border-color: #dc2626 !important;
+}
+
+.campo-info .input-edicion:invalid:not(:placeholder-shown):focus {
+    box-shadow: 0 0 0 1px #dc2626 !important;
+}
+
+.campo-info .input-edicion:invalid:not(:placeholder-shown) ~ .mensaje-error,
+.campo-info .input-edicion:invalid:not(:placeholder-shown) + .mensaje-error {
+    display: block;
+}
+
 .boton-accion.activo {
     background-color: var(--brand-olive);
     color: white;
@@ -593,4 +626,50 @@
 
 #boton-confirmar-eliminar:hover {
   filter: brightness(0.9);
+}
+
+/* --- PAGINACIÓN --- */
+.paginacion {
+  padding: 1rem 2rem;
+  border-top: 1px solid var(--stone-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: white;
+}
+
+.paginacion-info {
+  font-size: 0.75rem;
+  color: var(--slate-500);
+}
+
+.paginacion-info span {
+  font-weight: 600;
+  color: var(--slate-700);
+}
+
+.paginacion-botones {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.boton-paginacion {
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--stone-200);
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--slate-600);
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.boton-paginacion:hover:not(:disabled) {
+  background-color: var(--stone-200);
+}
+
+.boton-paginacion:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

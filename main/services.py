@@ -168,11 +168,14 @@ def get_cotizacion_miel():
 
         # Busco la celda que contiene el texto de referencia
         etiqueta_clara = soup.find("td", string=lambda t: t and "Miel Clara" in t)
-        # El precio está en la siguiente celda (el hermano de la etiqueta encontrada)
-        precio_miel_clara = etiqueta_clara.find_next_sibling("td").text
-
-        miel_clara_limpia = "".join(filter(str.isdigit, precio_miel_clara))
-        return miel_clara_limpia
+        
+        if etiqueta_clara:
+            # El precio está en la siguiente celda (el hermano de la etiqueta encontrada)
+            precio_miel_clara = etiqueta_clara.find_next_sibling("td").text
+            miel_clara_limpia = "".join(filter(str.isdigit, precio_miel_clara))
+            return miel_clara_limpia
+        
+        return None
     except Exception as e:
         print(f"Error al obtener cotización miel: {e}")  # TODO: Quitar a futuro
         return None
