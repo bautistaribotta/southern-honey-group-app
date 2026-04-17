@@ -205,6 +205,7 @@ def crear_operacion(cliente, items, metodo_pago):
 def editar_operacion(id_operacion, **kwargs):
     operacion = get_object_or_404(Operacion, id=id_operacion)
     detalles = DetalleOperacion.objects.filter(operacion=operacion)
+    pass
 
     # TODO: ¿Como modifico la operacion?
 

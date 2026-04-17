@@ -294,7 +294,8 @@ def informacion_operaciones(request, id_operacion):
         direccion=cliente.direccion if cliente.direccion else "",
         productos=lista_productos,
         apellido=cliente.apellido if cliente.apellido else "",
-        cuit=cliente.cuit if cliente.cuit else ""
+        cuit=cliente.cuit if cliente.cuit else "",
+        telefono=cliente.telefono if cliente.telefono else ""
     )
 
     pdf_bytes = pdf.generate_pdf()
