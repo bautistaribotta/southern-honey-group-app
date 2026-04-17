@@ -42,7 +42,7 @@ def modificar_stock(id_producto, cantidad):
     """
     producto = get_object_or_404(Producto, id=id_producto, activo=True)
 
-    # Si estoy restando, valido que haya stock suficiente antes de operar
+    # Si estoy restando, válido que haya stock suficiente antes de operar
     if cantidad < 0 and producto.cantidad < abs(cantidad):
         raise ValueError(
             f"Stock insuficiente para '{producto.nombre}'. "
@@ -156,52 +156,6 @@ def eliminar_cliente(id_cliente):
     return cliente
 
 
-def get_cotizacion_oficial():
-    url_dolar_oficial = "https://dolarapi.com/v1/dolares/oficial"
-    try:
-        respuesta = requests.get(url_dolar_oficial, verify=True)
-        datos = respuesta.json()
-        return {"compra": datos.get("compra"), "venta": datos.get("venta")}
-    except Exception as e:
-        print(f"Error al obtener cotización oficial: {e}")  # TODO: Quitar a futuro
-        return {"compra": None, "venta": None}
-
-
-def get_cotizacion_blue():
-    url_dolar_blue = "https://dolarapi.com/v1/dolares/blue"
-    try:
-        respuesta = requests.get(url_dolar_blue, verify=True)
-        datos = respuesta.json()
-        return {"compra": datos.get("compra"), "venta": datos.get("venta")}
-    except Exception as e:
-        print(
-            f"Error al obtener cotización del dolar blue: {e}"
-        )  # TODO: Quitar a futuro
-        return {"compra": None, "venta": None}
-
-
-def get_cotizacion_miel():
-    url = r"https://infomiel.com/"
-    try:
-        respuesta = requests.get(url)
-        html_resp = respuesta.text
-        soup = BeautifulSoup(html_resp, "html.parser")
-
-        # Busco la celda que contiene el texto de referencia
-        etiqueta_clara = soup.find("td", string=lambda t: t and "Miel Clara" in t)
-        
-        if etiqueta_clara:
-            # El precio está en la siguiente celda (el hermano de la etiqueta encontrada)
-            precio_miel_clara = etiqueta_clara.find_next_sibling("td").text
-            miel_clara_limpia = "".join(filter(str.isdigit, precio_miel_clara))
-            return miel_clara_limpia
-        
-        return None
-    except Exception as e:
-        print(f"Error al obtener cotización miel: {e}")  # TODO: Quitar a futuro
-        return None
-
-
 def crear_operacion(cliente, items, metodo_pago):
     with transaction.atomic():
         # Creo la operación sin monto total (lo calculo después)
@@ -249,10 +203,72 @@ def crear_operacion(cliente, items, metodo_pago):
 
 
 def editar_operacion(id_operacion, **kwargs):
-    # TODO: Implementar la lógica para editar una operación en el futuro
-    pass
+    operacion = get_object_or_404(Operacion, id=id_operacion)
+    detalles = DetalleOperacion.objects.filter(operacion=operacion)
+
+    with transaction.atomic():
+        # 1. Devuelvo el stock de forma segura
+        for detalle in detalles:
+            modificar_stock(detalle.producto.id, +detalle.cantidad)
+
+        # 2. Modifico la cantidad vendida
+        producto = detalle.producto
+        producto.cantidad_vendida -= detalle.cantidad
+        producto.save()
+
+        detalle.delete()
+
+        # 3. Borro la fila del detalle de la operacion
+        # Borro todas las filas y las vuelvo a escribir?
+
 
 
 def cancelar_operacion(id_operacion):
     # TODO: Implementar la lógica para cancelar una operación en el futuro
     pass
+
+
+def get_cotizacion_oficial():
+    url_dolar_oficial = "https://dolarapi.com/v1/dolares/oficial"
+    try:
+        respuesta = requests.get(url_dolar_oficial, verify=True)
+        datos = respuesta.json()
+        return {"compra": datos.get("compra"), "venta": datos.get("venta")}
+    except Exception as e:
+        print(f"Error al obtener cotización oficial: {e}")  # TODO: Quitar a futuro
+        return {"compra": None, "venta": None}
+
+
+def get_cotizacion_blue():
+    url_dolar_blue = "https://dolarapi.com/v1/dolares/blue"
+    try:
+        respuesta = requests.get(url_dolar_blue, verify=True)
+        datos = respuesta.json()
+        return {"compra": datos.get("compra"), "venta": datos.get("venta")}
+    except Exception as e:
+        print(
+            f"Error al obtener cotización del dolar blue: {e}"
+        )  # TODO: Quitar a futuro
+        return {"compra": None, "venta": None}
+
+
+def get_cotizacion_miel():
+    url = r"https://infomiel.com/"
+    try:
+        respuesta = requests.get(url)
+        html_resp = respuesta.text
+        soup = BeautifulSoup(html_resp, "html.parser")
+
+        # Busco la celda que contiene el texto de referencia
+        etiqueta_clara = soup.find("td", string=lambda t: t and "Miel Clara" in t)
+        
+        if etiqueta_clara:
+            # El precio está en la siguiente celda (el hermano de la etiqueta encontrada)
+            precio_miel_clara = etiqueta_clara.find_next_sibling("td").text
+            miel_clara_limpia = "".join(filter(str.isdigit, precio_miel_clara))
+            return miel_clara_limpia
+        
+        return None
+    except Exception as e:
+        print(f"Error al obtener cotización miel: {e}")  # TODO: Quitar a futuro
+        return None

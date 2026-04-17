@@ -108,7 +108,7 @@
                 <div class="campo-info">
                     <label>CUIT</label>
                     <p class="valor-vista">{{ cliente.cuit|default:"N/A" }}</p>
-                    <input type="text" name="cuit" class="input-edicion" value="{{ cliente.cuit|default:'' }}" style="display: none;" minlength="10" maxlength="11">
+                    <input type="text" name="cuit" class="input-edicion" value="{{ cliente.cuit|default:'' }}" style="display: none;" maxlength="11" pattern="[\d]{10,11}">
                     <span class="mensaje-error">Debe ingresar exactamente de 10 a 11 números, sin guiones</span>
                 </div>
 
