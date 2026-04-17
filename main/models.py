@@ -54,9 +54,9 @@ class Cliente(models.Model):
 class Operacion(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, db_column="id_cliente")
     fecha = models.DateTimeField(auto_now_add=True)
+    activa = models.BooleanField(default=True)
     observaciones = models.CharField(max_length=200, null=True, blank=True)
     monto_total = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
-    metodo_de_pago = models.CharField(max_length=50)
     valor_dolar = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     valor_kilo_miel = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 

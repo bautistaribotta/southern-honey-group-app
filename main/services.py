@@ -206,21 +206,13 @@ def editar_operacion(id_operacion, **kwargs):
     operacion = get_object_or_404(Operacion, id=id_operacion)
     detalles = DetalleOperacion.objects.filter(operacion=operacion)
 
-    with transaction.atomic():
-        # 1. Devuelvo el stock de forma segura
-        for detalle in detalles:
-            modificar_stock(detalle.producto.id, +detalle.cantidad)
+    # TODO: ¿Como modifico la operacion?
 
-        # 2. Modifico la cantidad vendida
-        producto = detalle.producto
-        producto.cantidad_vendida -= detalle.cantidad
-        producto.save()
-
-        detalle.delete()
-
-        # 3. Borro la fila del detalle de la operacion
-        # Borro todas las filas y las vuelvo a escribir?
-
+    """
+    1. Modifico el monto y el medio de pago de la Operacion (Padre)
+    2. 
+    3. 
+    """
 
 
 def cancelar_operacion(id_operacion):
