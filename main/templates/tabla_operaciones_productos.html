@@ -49,14 +49,14 @@
   </span>
   <div class="paginacion-botones">
     {% if productos.has_previous %}
-    <a href="?page={{ productos.previous_page_number }}{% if q %}&q={{ q }}{% endif %}">
+    <a href="?page={{ productos.previous_page_number }}{% if q %}&q={{ q }}{% endif %}#contenedor-tabla-operaciones">
       <button class="boton-paginacion">Anterior</button>
     </a>
     {% else %}
     <button class="boton-paginacion" disabled>Anterior</button>
     {% endif %}
     {% if productos.has_next %}
-    <a href="?page={{ productos.next_page_number }}{% if q %}&q={{ q }}{% endif %}">
+    <a href="?page={{ productos.next_page_number }}{% if q %}&q={{ q }}{% endif %}#contenedor-tabla-operaciones">
       <button class="boton-paginacion">Siguiente</button>
     </a>
     {% else %}

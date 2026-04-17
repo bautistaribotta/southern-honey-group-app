@@ -1,3 +1,7 @@
+html {
+    scroll-behavior: smooth;
+}
+
 #perfil-usuario-container {
     display: none !important; /* Borro el logout */
 }

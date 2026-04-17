@@ -135,7 +135,7 @@
         </div>
     </form>
 
-    <section class="contenedor-operaciones">
+    <section id="seccion-operaciones" class="contenedor-operaciones">
         <div class="encabezado-operaciones">
             <h4><span class="material-symbols-outlined">history</span> Operaciones Realizadas</h4>
             <a href="{% url 'operaciones' cliente.id %}" class="boton-nuevo" data-id="{{ cliente.id }}"> 
@@ -196,7 +196,7 @@
               </div>
               <div class="paginacion-botones">
                 {% if operaciones.has_previous %}
-                  <a href="?page={{ operaciones.previous_page_number }}">
+                  <a href="?page={{ operaciones.previous_page_number }}#seccion-operaciones">
                     <button class="boton-paginacion">Anterior</button>
                   </a>
                 {% else %}
@@ -204,7 +204,7 @@
                 {% endif %}
 
                 {% if operaciones.has_next %}
-                  <a href="?page={{ operaciones.next_page_number }}">
+                  <a href="?page={{ operaciones.next_page_number }}#seccion-operaciones">
                     <button class="boton-paginacion">Siguiente</button>
                   </a>
                 {% else %}
