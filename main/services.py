@@ -1,7 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 from django.shortcuts import get_object_or_404
-from .models import Producto, Cliente, Operacion, DetalleOperacion
+from django.db import transaction
+from .models import Producto, Cliente, Operacion, DetalleOperacion, Pago
 
 
 def nuevo_producto(nombre, categoria=None, precio=None, cantidad=None):
@@ -9,6 +10,26 @@ def nuevo_producto(nombre, categoria=None, precio=None, cantidad=None):
         nombre=nombre, categoria=categoria, precio=precio, cantidad=cantidad
     )
     return nuevo_producto
+
+
+def obtener_datos_producto(id_producto):
+    try:
+        # Busco el producto asegurándome de que esté activo en el inventario
+        producto = Producto.objects.get(id=id_producto, activo=True)
+
+        # Estructuro la información en un diccionario limpio para que la API JSON lo consuma fácilmente
+        return {
+            "id": producto.id,
+            "nombre": producto.nombre,
+            "categoria": producto.categoria,
+            "precio": str(
+                producto.precio
+            ),  # Convierto el Decimal a string para evitar errores de serialización JSON
+            "cantidad": str(producto.cantidad),
+        }
+    except Producto.DoesNotExist:
+        # Si el producto no existe o está inactivo, devuelvo None
+        return None
 
 
 def modificar_stock(id_producto, cantidad):
@@ -77,6 +98,27 @@ def nuevo_cliente(
     return nuevo_cliente
 
 
+def obtener_datos_cliente(id_cliente):
+    try:
+        # Busco al cliente asegurándome de que esté activo para no exponer datos de registros "eliminados"
+        cliente = Cliente.objects.get(id=id_cliente, activo=True)
+
+        # Estructuro la información en un diccionario para que sea fácil de consumir,
+        # ya sea para una respuesta JSON o para cualquier otra lógica interna del sistema
+        return {
+            "id": cliente.id,
+            "nombre": cliente.nombre,
+            "apellido": cliente.apellido,
+            "telefono": cliente.telefono,
+            "localidad": cliente.localidad,
+            "direccion": cliente.direccion,
+            "factura": cliente.factura_produccion,
+            "cuit": cliente.cuit,
+        }
+    except Cliente.DoesNotExist:
+        return None
+
+
 def editar_cliente(
     id_cliente,
     nombre,
@@ -112,27 +154,6 @@ def eliminar_cliente(id_cliente):
     cliente.activo = False
     cliente.save()
     return cliente
-
-
-def obtener_datos_cliente(id_cliente):
-    try:
-        # Busco al cliente asegurándome de que esté activo para no exponer datos de registros "eliminados"
-        cliente = Cliente.objects.get(id=id_cliente, activo=True)
-
-        # Estructuro la información en un diccionario para que sea fácil de consumir,
-        # ya sea para una respuesta JSON o para cualquier otra lógica interna del sistema
-        return {
-            "id": cliente.id,
-            "nombre": cliente.nombre,
-            "apellido": cliente.apellido,
-            "telefono": cliente.telefono,
-            "localidad": cliente.localidad,
-            "direccion": cliente.direccion,
-            "factura": cliente.factura_produccion,
-            "cuit": cliente.cuit,
-        }
-    except Cliente.DoesNotExist:
-        return None
 
 
 def get_cotizacion_oficial():
@@ -181,21 +202,57 @@ def get_cotizacion_miel():
         return None
 
 
-def obtener_datos_producto(id_producto):
-    try:
-        # Busco el producto asegurándome de que esté activo en el inventario
-        producto = Producto.objects.get(id=id_producto, activo=True)
+def crear_operacion(cliente, items, metodo_pago):
+    with transaction.atomic():
+        # Creo la operación sin monto total (lo calculo después)
+        operacion = Operacion.objects.create(
+            cliente=cliente,
+            metodo_de_pago=metodo_pago,
+        )
 
-        # Estructuro la información en un diccionario limpio para que la API JSON lo consuma fácilmente
-        return {
-            "id": producto.id,
-            "nombre": producto.nombre,
-            "categoria": producto.categoria,
-            "precio": str(
-                producto.precio
-            ),  # Convierto el Decimal a string para evitar errores de serialización JSON
-            "cantidad": str(producto.cantidad),
-        }
-    except Producto.DoesNotExist:
-        # Si el producto no existe o está inactivo, devuelvo None
-        return None
+        monto_total = 0
+
+        for item in items:
+            id_producto = item.get("id_producto")
+            cantidad = int(item.get("cantidad", 0))
+
+            producto = get_object_or_404(Producto, id=id_producto, activo=True)
+
+            # Resto el stock y sumo a la cantidad vendida
+            modificar_stock(id_producto, -cantidad)
+            producto.refresh_from_db()
+            producto.cantidad_vendida += cantidad
+            producto.save()
+
+            # Creo el detalle vinculado a la operación
+            DetalleOperacion.objects.create(
+                operacion=operacion,
+                producto=producto,
+                cantidad=cantidad,
+            )
+
+            monto_total += producto.precio * cantidad
+
+        # Actualizo el monto total de la operación
+        operacion.monto_total = monto_total
+        operacion.save()
+
+        # Si el método de pago es "debito", generamos automáticamente un pago
+        if metodo_pago.lower() == "debito" or metodo_pago.lower() == "débito":
+            Pago.objects.create(
+                operacion=operacion,
+                medio_pago="Debito",
+                monto=int(monto_total)  # Se castea a entero porque en el modelo Pago es IntegerField
+            )
+
+    return operacion
+
+
+def editar_operacion(id_operacion, **kwargs):
+    # TODO: Implementar la lógica para editar una operación en el futuro
+    pass
+
+
+def cancelar_operacion(id_operacion):
+    # TODO: Implementar la lógica para cancelar una operación en el futuro
+    pass

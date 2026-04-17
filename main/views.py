@@ -24,6 +24,7 @@ from .services import (
     obtener_datos_cliente,
     obtener_datos_producto,
     modificar_stock,
+    crear_operacion,
 )
 
 
@@ -317,39 +318,8 @@ def operaciones(request, id_cliente):
             if not items:
                 return JsonResponse({"error": "El carrito está vacío"}, status=400)
 
-            with transaction.atomic():
-                # Creo la operación sin monto total (lo calculo después)
-                operacion = Operacion.objects.create(
-                    cliente=cliente,
-                    metodo_de_pago=metodo_pago,
-                )
-
-                monto_total = 0
-
-                for item in items:
-                    id_producto = item.get("id_producto")
-                    cantidad = int(item.get("cantidad", 0))
-
-                    producto = get_object_or_404(Producto, id=id_producto, activo=True)
-
-                    # Resto el stock y sumo a la cantidad vendida
-                    modificar_stock(id_producto, -cantidad)
-                    producto.refresh_from_db()
-                    producto.cantidad_vendida += cantidad
-                    producto.save()
-
-                    # Creo el detalle vinculado a la operación
-                    DetalleOperacion.objects.create(
-                        operacion=operacion,
-                        producto=producto,
-                        cantidad=cantidad,
-                    )
-
-                    monto_total += producto.precio * cantidad
-
-                # Actualizo el monto total de la operación
-                operacion.monto_total = monto_total
-                operacion.save()
+            # Delegamos toda la lógica de creación a la capa de servicios
+            operacion = crear_operacion(cliente, items, metodo_pago)
 
             # Enviar mensaje de éxito a través del framework de mensajes de Django
             messages.success(request, "Operación creada correctamente")
