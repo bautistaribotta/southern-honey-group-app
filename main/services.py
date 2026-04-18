@@ -252,8 +252,31 @@ def editar_operacion(id_operacion, cliente, items, observaciones=None):
 
 
 def cancelar_operacion(id_operacion):
-    # TODO: Implementar la lógica para cancelar una operación en el futuro
-    pass
+    with transaction.atomic():
+        operacion = get_object_or_404(Operacion, id=id_operacion)
+        
+        # Si ya está cancelada, no hacemos nada
+        if not operacion.activa:
+            return operacion
+
+        detalles = DetalleOperacion.objects.filter(operacion=operacion)
+
+        # Restauramos el stock de cada producto en el detalle
+        for detalle in detalles:
+            producto = detalle.producto
+            modificar_stock(producto.id, detalle.cantidad)
+            
+            # Restamos de la cantidad vendida históricamente
+            producto.refresh_from_db()
+            producto.cantidad_vendida -= detalle.cantidad
+            producto.save()
+
+        # Marcamos la operación como inactiva (cancelada)
+        operacion.activa = False
+        operacion.save()
+
+    return operacion
+
 
 
 def get_cotizacion_oficial():
