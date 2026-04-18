@@ -157,10 +157,18 @@ def eliminar_cliente(id_cliente):
 
 
 def crear_operacion(cliente, items, metodo_pago):
+    # Obtenemos las cotizaciones actuales antes de la transacción
+    cotizacion_dolar = get_cotizacion_oficial()
+    valor_dolar = cotizacion_dolar.get("venta") if cotizacion_dolar else None
+    
+    valor_miel = get_cotizacion_miel()
+
     with transaction.atomic():
-        # Creo la operación sin monto total (lo calculo después)
+        # Creo la operación con las cotizaciones actuales
         operacion = Operacion.objects.create(
             cliente=cliente,
+            valor_dolar=valor_dolar,
+            valor_kilo_miel=valor_miel
         )
 
         monto_total = 0

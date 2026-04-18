@@ -64,6 +64,22 @@ class Operacion(models.Model):
     class Meta:
         db_table = "operaciones"
 
+    @property
+    def estado_pago(self):
+        if not self.activa:
+            return "Cancelada"
+        
+        # Importamos Sum aquí para evitar problemas de importación circular o uso innecesario en el módulo
+        from django.db.models import Sum
+        total_pagado = self.pago_set.aggregate(total=Sum('monto'))['total'] or 0
+        
+        if total_pagado == 0:
+            return "Debe"
+        elif total_pagado >= (self.monto_total or 0):
+            return "Pagada"
+        else:
+            return "Pago Parcial"
+
     def __str__(self):
         return f"Operación {self.id} - {self.cliente}"
 

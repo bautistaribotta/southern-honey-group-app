@@ -205,7 +205,15 @@
                             </div>
                         </td>
                         <td class="estado" style="text-align: center;">
-                            -
+                            {% if operacion.estado_pago == 'Pagada' %}
+                                <span class="pildora-estado pagada">Pagada</span>
+                            {% elif operacion.estado_pago == 'Pago Parcial' %}
+                                <span class="pildora-estado parcial">Pago Parcial</span>
+                            {% elif operacion.estado_pago == 'Debe' %}
+                                <span class="pildora-estado debe">Debe</span>
+                            {% elif operacion.estado_pago == 'Cancelada' %}
+                                <span class="pildora-estado cancelada">Cancelada</span>
+                            {% endif %}
                         </td>
                         <td class="monto-total">
                             ${{ operacion.monto_total }}
