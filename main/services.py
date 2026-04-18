@@ -161,7 +161,6 @@ def crear_operacion(cliente, items, metodo_pago):
         # Creo la operación sin monto total (lo calculo después)
         operacion = Operacion.objects.create(
             cliente=cliente,
-            metodo_de_pago=metodo_pago,
         )
 
         monto_total = 0
@@ -192,28 +191,64 @@ def crear_operacion(cliente, items, metodo_pago):
         operacion.save()
 
         # Si el método de pago es "debito", generamos automáticamente un pago
-        if metodo_pago.lower() == "debito" or metodo_pago.lower() == "débito":
+        if metodo_pago.lower() == "contado":
             Pago.objects.create(
                 operacion=operacion,
-                medio_pago="Debito",
+                medio_pago="Contado",
                 monto=int(monto_total)  # Se castea a entero porque en el modelo Pago es IntegerField
             )
 
     return operacion
 
 
-def editar_operacion(id_operacion, **kwargs):
-    operacion = get_object_or_404(Operacion, id=id_operacion)
-    detalles = DetalleOperacion.objects.filter(operacion=operacion)
-    pass
+def editar_operacion(id_operacion, cliente, items, observaciones=None):
+    with transaction.atomic():
+        operacion = get_object_or_404(Operacion, id=id_operacion)
 
-    # TODO: ¿Como modifico la operacion?
+        # 1. Restaurar stock de los detalles actuales y eliminarlos
+        detalles_anteriores = DetalleOperacion.objects.filter(operacion=operacion)
+        for detalle in detalles_anteriores:
+            producto = detalle.producto
+            # Devolvemos el stock: sumamos la cantidad que se había restado
+            modificar_stock(producto.id, detalle.cantidad)
+            # Actualizamos cantidad vendida (restamos lo que se había sumado)
+            producto.refresh_from_db()
+            producto.cantidad_vendida -= detalle.cantidad
+            producto.save()
+            # Eliminamos el detalle
+            detalle.delete()
 
-    """
-    1. Modifico el monto y el medio de pago de la Operacion (Padre)
-    2. 
-    3. 
-    """
+        # 2. Procesar los nuevos items
+        monto_total = 0
+        for item in items:
+            id_producto = item.get("id_producto")
+            cantidad = int(item.get("cantidad", 0))
+
+            producto = get_object_or_404(Producto, id=id_producto, activo=True)
+
+            # Resto el stock
+            modificar_stock(id_producto, -cantidad)
+            producto.refresh_from_db()
+            producto.cantidad_vendida += cantidad
+            producto.save()
+
+            # Creo el detalle vinculado a la operación
+            DetalleOperacion.objects.create(
+                operacion=operacion,
+                producto=producto,
+                cantidad=cantidad,
+            )
+
+            monto_total += producto.precio * cantidad
+
+        # 3. Actualizar la operación padre (sin tocar valor_dolar ni valor_kilo_miel)
+        operacion.cliente = cliente
+        if observaciones is not None:
+            operacion.observaciones = observaciones
+        operacion.monto_total = monto_total
+        operacion.save()
+
+    return operacion
 
 
 def cancelar_operacion(id_operacion):
