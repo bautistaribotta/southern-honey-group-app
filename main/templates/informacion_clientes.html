@@ -87,7 +87,10 @@
                     <label>Factura la producción</label>
                     <p class="valor-vista">{% if cliente.factura_produccion %}Sí{% else %}No{% endif %}</p>
                     <label class="switch input-edicion" style="display: none;">
-                        <input type="checkbox" name="factura" id="checkbox-factura" {% if cliente.factura_produccion %}checked{% endif %}>
+                        <input 
+                            type="checkbox" 
+                            name="factura" 
+                            id="checkbox-factura" {% if cliente.factura_produccion %}checked{% endif %}>
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -96,19 +99,40 @@
                 <div class="campo-info">
                     <label>Apellido</label>
                     <p class="valor-vista">{{ cliente.apellido|default:"N/A" }}</p>
-                    <input type="text" name="apellido" class="input-edicion" value="{{ cliente.apellido|default:'' }}" style="display: none;" maxlength="26" pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{2,26}">
+                    <input 
+                        type="text" 
+                        name="apellido" 
+                        class="input-edicion" 
+                        value="{{ cliente.apellido|default:'' }}" 
+                        style="display: none;" 
+                        maxlength="26" 
+                        pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{2,26}">
                     <span class="mensaje-error">Mínimo 2 letras, máximo 26, sin números ni símbolos</span>
                 </div>
                 <div class="campo-info">
                     <label>Dirección</label>
                     <p class="valor-vista">{{ cliente.direccion|default:"N/A" }}</p>
-                    <input type="text" name="direccion" class="input-edicion" value="{{ cliente.direccion|default:'' }}" style="display: none;" maxlength="30" pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}">
+                    <input 
+                        type="text" 
+                        name="direccion" 
+                        class="input-edicion" 
+                        value="{{ cliente.direccion|default:'' }}" 
+                        style="display: none;" 
+                        maxlength="30" 
+                        pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}">
                     <span class="mensaje-error">Mínimo 3 caracteres (Solo letras y numeros)</span>
                 </div>
                 <div class="campo-info">
                     <label>CUIT</label>
                     <p class="valor-vista">{{ cliente.cuit|default:"N/A" }}</p>
-                    <input type="text" name="cuit" class="input-edicion" value="{{ cliente.cuit|default:'' }}" style="display: none;" maxlength="11" pattern="[\d]{10,11}">
+                    <input 
+                        type="text" 
+                        name="cuit" 
+                        class="input-edicion" 
+                        value="{{ cliente.cuit|default:'' }}" 
+                        style="display: none;" 
+                        maxlength="11" 
+                        pattern="[\d]{10,11}">
                     <span class="mensaje-error">Debe ingresar exactamente de 10 a 11 números, sin guiones</span>
                 </div>
 
@@ -116,7 +140,15 @@
                 <div class="campo-info">
                     <label>Teléfono</label>
                     <p class="valor-vista">{{ cliente.telefono|default:"N/A" }}</p>
-                    <input type="text" name="telefono" class="input-edicion" value="{{ cliente.telefono|default:'' }}" required style="display: none;" maxlength="16" pattern="[\d]{6,}">
+                    <input 
+                        type="text" 
+                        name="telefono" 
+                        class="input-edicion" 
+                        value="{{ cliente.telefono|default:'' }}" 
+                        required 
+                        style="display: none;" 
+                        maxlength="16" 
+                        pattern="[\d]{6,}">
                     <span class="mensaje-error">Mínimo 6 números, sin letras ni símbolos</span>
                 </div>
             </div>
@@ -224,8 +256,16 @@
 
   <!-- Panel -->
     <div id="panel-eliminar">
-      <input type="hidden" id="id_eliminar" name="id_eliminar" value="">
-      <input type="hidden" name="accion" value="eliminar"> 
+      <input 
+        type="hidden" 
+        id="id_eliminar" 
+        name="id_eliminar" 
+        value="">
+
+      <input 
+        type="hidden" 
+        name="accion" 
+        value="eliminar"> 
 
       <button type="button" class="boton-cerrar" id="icono-cerrar-panel-eliminar" onclick="cerrarPanelEliminar()">
         <span class="material-symbols-outlined">close</span>
