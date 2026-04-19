@@ -21,7 +21,7 @@
           </span>
         </td>
         <td class="stock-valor"> {{ producto.cantidad|floatformat:0 }} </td>
-        <td class="precio-valor"> $ {{ producto.precio }} </td>
+        <td class="precio-valor"> $ {{ producto.precio|floatformat:"-2" }} </td>
         <td>
           <div class="acciones-tabla">
             <button class="boton-icono editar" title="Editar" data-id="{{ producto.id }}">

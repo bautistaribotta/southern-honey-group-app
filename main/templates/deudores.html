@@ -55,11 +55,11 @@
               <td><div class="deudor-id"> {{ deudor.id }} </div></td>
               <td><div class="deudor-nombre"> {{ deudor.cliente }} </div></td>
               <td> {{ deudor.fecha|date:"d/m/Y" }} </td>
-              <td class="valor-pesos"> $ {{ deudor.monto_total }} </td>
-              <td class="valor-usd"> {{ deudor.valor_dolar }} </td>
-              <td class="valor-usd"> - </td>
-              <td class="valor-miel"> {{ deudor.valor_kilo_miel }} </td>
-              <td class="valor-miel"> - </td>
+              <td class="valor-pesos"> $ {{ deudor.deuda_pesos|floatformat:"-2" }} </td>
+              <td class="valor-usd"> {% if deudor.deuda_dolar_historico != None %}$ {{ deudor.deuda_dolar_historico|floatformat:"-2" }}{% else %}-{% endif %} </td>
+              <td class="valor-usd"> {% if deudor.deuda_dolar_actual != None %}$ {{ deudor.deuda_dolar_actual|floatformat:"-2" }}{% else %}-{% endif %} </td>
+              <td class="valor-miel"> {% if deudor.kg_miel_historico != None %}{{ deudor.kg_miel_historico|floatformat:"-2" }} kg{% else %}-{% endif %} </td>
+              <td class="valor-miel"> {% if deudor.kg_miel_actual != None %}{{ deudor.kg_miel_actual|floatformat:"-2" }} kg{% else %}-{% endif %} </td>
             </tr>
           {% empty %}
             <tr>

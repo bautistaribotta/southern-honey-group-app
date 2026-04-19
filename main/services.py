@@ -2,6 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 from django.shortcuts import get_object_or_404
 from django.db import transaction
+from django.db.models import Sum, F, Value
+from django.db.models.functions import Coalesce
 from .models import Producto, Cliente, Operacion, DetalleOperacion, Pago
 
 
@@ -77,15 +79,7 @@ def eliminar_producto(id_producto):
     return producto
 
 
-def nuevo_cliente(
-    nombre,
-    apellido=None,
-    telefono=None,
-    localidad=None,
-    direccion=None,
-    factura_produccion=False,
-    cuit=None,
-):
+def nuevo_cliente(nombre, apellido=None, telefono=None, localidad=None, direccion=None, factura_produccion=False, cuit=None):
     nuevo_cliente = Cliente.objects.create(
         nombre=nombre,
         apellido=apellido,
@@ -119,17 +113,7 @@ def obtener_datos_cliente(id_cliente):
         return None
 
 
-def editar_cliente(
-    id_cliente,
-    nombre,
-    apellido,
-    telefono,
-    localidad,
-    direccion,
-    factura_produccion,
-    cuit,
-    activo,
-):
+def editar_cliente(id_cliente, nombre, apellido, telefono, localidad, direccion, factura_produccion, cuit, activo):
     cliente = get_object_or_404(Cliente, id=id_cliente)
 
     cliente.nombre = nombre
@@ -159,8 +143,18 @@ def eliminar_cliente(id_cliente):
 def crear_operacion(cliente, items, metodo_pago):
     # Obtenemos las cotizaciones actuales antes de la transacción
     cotizacion_dolar = get_cotizacion_oficial()
-    valor_dolar = cotizacion_dolar.get("venta") if cotizacion_dolar else None
-    
+    if cotizacion_dolar:
+        valor_dolar = cotizacion_dolar.get("venta")
+    else:
+        # TODO
+        """
+        Si no se puede obtener la cotizacion del dolar se debe
+        pedir al usuario que ingrese el valor de forma manual mediante 
+        un modal que lo comunique
+        """
+
+        valor_dolar = None
+
     valor_miel = get_cotizacion_miel()
 
     with transaction.atomic():
@@ -198,7 +192,7 @@ def crear_operacion(cliente, items, metodo_pago):
         operacion.monto_total = monto_total
         operacion.save()
 
-        # Si el método de pago es "contado", generamos automáticamente un pago
+        # Si el pago es "contado", generamos automáticamente un pago
         if metodo_pago.lower() == "contado":
             Pago.objects.create(
                 operacion=operacion,
@@ -211,7 +205,7 @@ def crear_operacion(cliente, items, metodo_pago):
 def servicio_cancelar_operacion(id_operacion):
     with transaction.atomic():
         operacion = get_object_or_404(Operacion, id=id_operacion)
-        
+
         # Si ya está cancelada, no hacemos nada
         if not operacion.activa:
             return operacion
@@ -222,7 +216,7 @@ def servicio_cancelar_operacion(id_operacion):
         for detalle in detalles:
             producto = detalle.producto
             modificar_stock(producto.id, detalle.cantidad)
-            
+
             # Restamos de la cantidad vendida históricamente
             producto.refresh_from_db()
             producto.cantidad_vendida -= detalle.cantidad
@@ -234,6 +228,55 @@ def servicio_cancelar_operacion(id_operacion):
 
     return operacion
 
+
+def obtener_listado_deudores():
+    dolar_actual_data = get_cotizacion_blue()
+    dolar_actual = float(dolar_actual_data.get("venta") or 1) # Prevención división por 0 si falla la API
+    
+    miel_actual_data = get_cotizacion_miel()
+    try:
+        miel_actual = float(miel_actual_data) if miel_actual_data else None
+    except ValueError:
+        miel_actual = None
+
+    # Filtramos operaciones activas donde el total pagado es menor al monto total
+    operaciones_adeudadas = (
+        Operacion.objects.filter(activa=True)
+        .annotate(pagado=Coalesce(Sum('pago__monto'), Value(0)))
+        .filter(monto_total__gt=F('pagado'))
+        .select_related('cliente')
+        .order_by('-fecha')
+    )
+
+    lista_deudores = []
+    for operacion in operaciones_adeudadas:
+        deuda_pesos = float(operacion.monto_total) - operacion.pagado
+        
+        # Cálculos del dólar
+        valor_dolar_historico = float(operacion.valor_dolar) if operacion.valor_dolar else None
+        
+        # Usamos división porque el total está en pesos (Pesos / Valor Dólar = Dólares)
+        deuda_dolar_historico = (deuda_pesos / valor_dolar_historico) if valor_dolar_historico else None
+        deuda_dolar_actual = (deuda_pesos / dolar_actual) if dolar_actual else None
+
+        # Cálculos de la Miel
+        valor_miel_historico = float(operacion.valor_kilo_miel) if operacion.valor_kilo_miel else None
+        
+        kg_miel_historico = (deuda_pesos / valor_miel_historico) if valor_miel_historico else None
+        kg_miel_actual = (deuda_pesos / miel_actual) if miel_actual else None
+
+        lista_deudores.append({
+            "id": operacion.id,
+            "cliente": f"{operacion.cliente.nombre} {operacion.cliente.apellido or ''}".strip(),
+            "fecha": operacion.fecha,
+            "deuda_pesos": deuda_pesos,
+            "deuda_dolar_historico": round(deuda_dolar_historico, 2) if deuda_dolar_historico else None,
+            "deuda_dolar_actual": round(deuda_dolar_actual, 2) if deuda_dolar_actual else None,
+            "kg_miel_historico": round(kg_miel_historico, 2) if kg_miel_historico else None,
+            "kg_miel_actual": round(kg_miel_actual, 2) if kg_miel_actual else None
+        })
+
+    return lista_deudores
 
 
 def get_cotizacion_oficial():
@@ -269,14 +312,30 @@ def get_cotizacion_miel():
 
         # Busco la celda que contiene el texto de referencia
         etiqueta_clara = soup.find("td", string=lambda t: t and "Miel Clara" in t)
-        
+
         if etiqueta_clara:
             # El precio está en la siguiente celda (el hermano de la etiqueta encontrada)
             precio_miel_clara = etiqueta_clara.find_next_sibling("td").text
-            miel_clara_limpia = "".join(filter(str.isdigit, precio_miel_clara))
-            return miel_clara_limpia
-        
+            
+            # Formatos posibles: "$ 1.500,00", "$1500", "1.500"
+            # 1. Quitamos espacios y signos $
+            miel_limpia = precio_miel_clara.replace("$", "").replace(" ", "")
+            # 2. Si tiene coma (decimales en formato latino), reemplazamos los puntos (miles) por nada y la coma por punto
+            if "," in miel_limpia:
+                miel_limpia = miel_limpia.replace(".", "").replace(",", ".")
+            else:
+                # Si no tiene coma, asumo que los puntos pueden ser miles o no
+                # (Infomiel usa formato 1.500,00 o similar)
+                # Para estar seguros, extraemos solo digitos y puntos
+                pass # Python's float can handle basic strings, but let's be safe
+            
+            # Como regla general, limpiamos todo lo que no sea digito o punto
+            miel_final = "".join(c for c in miel_limpia if c.isdigit() or c == '.')
+            
+            return float(miel_final) if miel_final else None
+
         return None
     except Exception as e:
         print(f"Error al obtener cotización miel: {e}")  # TODO: Quitar a futuro
         return None
+

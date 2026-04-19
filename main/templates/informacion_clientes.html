@@ -217,7 +217,7 @@
                             {% endif %}
                         </td>
                         <td class="monto-total">
-                            ${{ operacion.monto_total }}
+                            ${{ operacion.monto_total|floatformat:"-2" }}
                         </td>
                         <td class="acciones-operacion" style="text-align: center;">
                             <div style="display: flex; justify-content: center; gap: 0.5rem;">

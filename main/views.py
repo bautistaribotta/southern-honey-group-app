@@ -26,6 +26,7 @@ from .services import (
     modificar_stock,
     crear_operacion,
     servicio_cancelar_operacion,
+    obtener_listado_deudores,
 )
 
 
@@ -408,7 +409,9 @@ def cancelar_operacion(request, id_operacion):
 # Verifico que solo un administrador pueda ver la vista, tambien verifica que el usuario este logueado
 @staff_member_required(login_url="inicio")
 def deudores(request):
-    return render(request, "deudores.html")
+    lista_deudores = obtener_listado_deudores()
+    contexto = {"deudores": lista_deudores}
+    return render(request, "deudores.html", contexto)
 
 
 def cerrar_sesion(request):
