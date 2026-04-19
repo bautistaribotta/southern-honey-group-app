@@ -456,7 +456,7 @@ html {
 }
 
 .acciones-operacion {
-  padding: 1.25rem 2rem;
+  padding: 1.25rem 1rem;
 }
 
 .boton-icono-tabla {
@@ -476,6 +476,7 @@ html {
   font-size: 1.25rem;
 }
 
+.boton-icono-tabla.pagos:hover,
 .boton-icono-tabla.editar:hover {
   color: var(--brand-olive);
   background-color: #556b2f1a;

@@ -183,7 +183,7 @@
                         <th>Detalle de Operación</th>
                         <th style="text-align: center;">Estado</th>
                         <th style="text-align: right;">Monto Total</th>
-                        <th style="text-align: right; padding-right: 2rem;">Acciones</th>
+                        <th style="text-align: center;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -219,8 +219,11 @@
                         <td class="monto-total">
                             ${{ operacion.monto_total }}
                         </td>
-                        <td class="acciones-operacion" style="text-align: right; padding-right: 2rem;">
-                            <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                        <td class="acciones-operacion" style="text-align: center;">
+                            <div style="display: flex; justify-content: center; gap: 0.5rem;">
+                                <button class="boton-icono-tabla pagos" title="Añadir Pago" onclick="event.stopPropagation();">
+                                    <span class="material-symbols-outlined">payments</span>
+                                </button>
                                 <button class="boton-icono-tabla editar" title="Editar Operación" onclick="event.stopPropagation();">
                                     <span class="material-symbols-outlined">edit</span>
                                 </button>
