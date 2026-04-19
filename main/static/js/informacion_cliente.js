@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (inputCuit) {
         inputCuit.addEventListener('input', (e) => {
             e.target.value = e.target.value.replace(/\D/g, '');
-            
+
             // Si el usuario escribe algo y el switch de factura está apagado, lo enciendo automáticamente
             if (e.target.value.length > 0 && checkFactura && !checkFactura.checked) {
                 checkFactura.checked = true;
@@ -153,4 +153,108 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    });
+
+// Función para abrir el modal de cancelar operación
+function abrirModalCancelarOperacion(id) {
+    const modal = document.getElementById('contenedor-modal-cancelar');
+    const btnConfirmar = document.getElementById('boton-confirmar-cancelar');
+    const textoConfirmacion = document.getElementById('texto-confirmacion-cancelar');
+    
+    // Inyectamos el ID de la operación en el texto
+    textoConfirmacion.innerHTML = `¿Seguro que quiere cancelar la operacion <b>#${id}</b>? Los productos seran devueltos al stock automaticamente`;
+    
+    // Guardamos el ID en el botón para saber qué operación cancelar
+    btnConfirmar.setAttribute('data-id', id);
+    
+    modal.classList.add('abierto');
+    document.body.style.overflow = 'hidden';
+}
+
+// Función para cerrar el modal de cancelar operación
+function cerrarModalCancelarOperacion() {
+    const modal = document.getElementById('contenedor-modal-cancelar');
+    const btnConfirmar = document.getElementById('boton-confirmar-cancelar');
+    
+    modal.classList.remove('abierto');
+    document.body.style.overflow = 'auto';
+    
+    // Limpiamos el estado del botón
+    btnConfirmar.classList.remove('manteniendo');
+}
+
+// Lógica de "mantener" para el botón de cancelar operación
+document.addEventListener('DOMContentLoaded', () => {
+    const btnConfirmarCancelar = document.getElementById('boton-confirmar-cancelar');
+    if (btnConfirmarCancelar) {
+        let timeoutId;
+        
+        const startHold = (e) => {
+            if (e.type === 'mousedown' && e.button !== 0) return;
+            // No prevenimos default en touch para permitir scroll si fuera necesario, 
+            // pero aquí como es un modal fijo, podemos ser más estrictos
+            if (e.type === 'touchstart') e.preventDefault();
+
+            btnConfirmarCancelar.classList.add('manteniendo');
+            
+            timeoutId = setTimeout(() => {
+                const id = btnConfirmarCancelar.getAttribute('data-id');
+                ejecutarCancelacionOperacion(id);
+            }, 2000); // 2 segundos
+        };
+
+        const cancelHold = () => {
+            btnConfirmarCancelar.classList.remove('manteniendo');
+            clearTimeout(timeoutId);
+        };
+
+        btnConfirmarCancelar.addEventListener('mousedown', startHold);
+        btnConfirmarCancelar.addEventListener('mouseup', cancelHold);
+        btnConfirmarCancelar.addEventListener('mouseleave', cancelHold);
+        btnConfirmarCancelar.addEventListener('touchstart', startHold, {passive: false});
+        btnConfirmarCancelar.addEventListener('touchend', cancelHold);
+        btnConfirmarCancelar.addEventListener('touchcancel', cancelHold);
+    }
+    
+    // ... (resto del DOMContentLoaded existente)
 });
+
+// Función que realiza la petición AJAX final
+async function ejecutarCancelacionOperacion(id) {
+    try {
+        const response = await fetch(`/cancelar_operacion/${id}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            alert("Hubo un error al cancelar la operación.");
+            cerrarModalCancelarOperacion();
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Ocurrió un error inesperado.");
+        cerrarModalCancelarOperacion();
+    }
+}
+
+// Función auxiliar para obtener el CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}

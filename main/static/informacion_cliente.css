@@ -455,6 +455,37 @@ html {
     color: var(--slate-700);
 }
 
+.acciones-operacion {
+  padding: 1.25rem 2rem;
+}
+
+.boton-icono-tabla {
+  background: none;
+  border: none;
+  padding: 0.375rem;
+  color: var(--slate-400);
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.boton-icono-tabla span {
+  font-size: 1.25rem;
+}
+
+.boton-icono-tabla.editar:hover {
+  color: var(--brand-olive);
+  background-color: #556b2f1a;
+}
+
+.boton-icono-tabla.cancelar:hover {
+  color: #dc2626;
+  background-color: #fef2f2;
+}
+
 .pildora-estado {
   display: inline-flex;
   align-items: center;
@@ -506,7 +537,7 @@ html {
   --color-rojo-eliminacion: #dc2626;
 }
 
-#contenedor-panel-eliminar {
+#contenedor-panel-eliminar, #contenedor-modal-cancelar {
   position: fixed;
   inset: 0;
   z-index: 2000;
@@ -517,12 +548,12 @@ html {
   transition: visibility 0.3s;
 }
 
-#contenedor-panel-eliminar.abierto {
+#contenedor-panel-eliminar.abierto, #contenedor-modal-cancelar.abierto {
   visibility: visible;
   transition: none;
 }
 
-#contenedor-panel-fondo {
+#contenedor-panel-fondo, #contenedor-modal-fondo-cancelar {
   position: absolute;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.4);
@@ -531,16 +562,17 @@ html {
   transition: opacity 0.3s ease-in-out;
 }
 
-#contenedor-panel-eliminar.abierto #contenedor-panel-fondo {
+#contenedor-panel-eliminar.abierto #contenedor-panel-fondo,
+#contenedor-modal-cancelar.abierto #contenedor-modal-fondo-cancelar {
   opacity: 1;
 }
 
-#panel-eliminar {
+#panel-eliminar, #panel-cancelar-operacion {
   position: relative;
   background-color: white;
   border-radius: 12px;
   border: 1px solid #4b632d1a;
-  padding: 2rem 2rem;
+  padding: 2.5rem 2rem 2rem 2rem;
   width: 90%;
   max-width: 450px;
   box-shadow: 0 20px 25px -5px #0000001a;
@@ -553,34 +585,36 @@ html {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-#contenedor-panel-eliminar.abierto #panel-eliminar {
+#contenedor-panel-eliminar.abierto #panel-eliminar,
+#contenedor-modal-cancelar.abierto #panel-cancelar-operacion {
   opacity: 1;
   transform: scale(1);
 }
 
-#icono-cerrar-panel-eliminar {
+.boton-cerrar {
   position: absolute;
-  top: 1rem; 
-  right: 1rem;
-  width: auto;
+  top: 0.75rem; 
+  right: 0.75rem;
+  width: 32px;
+  height: 32px;
   background: none;
   border: none;
   color: var(--slate-400);
   cursor: pointer;
-  padding: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   transition: all 0.2s;
+  z-index: 10;
 }
 
-#icono-cerrar-panel-eliminar:hover {
+.boton-cerrar:hover {
   background-color: #f1f5f9;
   color: var(--slate-600);
 }
 
-#icono-advertencia {
+#icono-advertencia, #icono-advertencia-cancelar {
   color: var(--color-rojo-eliminacion);
   align-self: center;
   margin-bottom: 1rem;
@@ -588,19 +622,19 @@ html {
   justify-content: center;
 }
 
-#icono-advertencia span {
+#icono-advertencia span, #icono-advertencia-cancelar span {
   font-size: 4rem;
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
 }
 
-#panel-eliminar h3 {
+#panel-eliminar h3, #panel-cancelar-operacion h3 {
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--slate-900);
   margin-bottom: 0.5rem;
 }
 
-#panel-eliminar p {
+#panel-eliminar p, #panel-cancelar-operacion p {
   font-size: 0.875rem;
   color: var(--slate-500);
   margin-bottom: 1.5rem;
@@ -617,9 +651,9 @@ html {
   background-color: white;
   color: var(--slate-700);
   border: 1px solid var(--stone-200);
-  padding: 0.875rem;
-  border-radius: 0.75rem;
-  font-weight: 700;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
   font-size: 0.875rem;
   cursor: pointer;
   transition: background 0.2s;
@@ -629,13 +663,14 @@ html {
   background-color: #f8fafc; 
 }
 
-#boton-confirmar-eliminar {
+#boton-confirmar-eliminar, #boton-confirmar-cancelar {
   background-color: var(--color-rojo-eliminacion);
   color: white;
   border: none;
   padding: 0.75rem;
   border-radius: 0.5rem;
   font-weight: 600;
+  font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
@@ -644,13 +679,13 @@ html {
   -webkit-user-select: none;
 }
 
-#boton-confirmar-eliminar span {
+#boton-confirmar-eliminar span, #boton-confirmar-cancelar span {
   position: relative;
   z-index: 2;
   pointer-events: none;
 }
 
-#boton-confirmar-eliminar::before {
+#boton-confirmar-eliminar::before, #boton-confirmar-cancelar::before {
   content: "";
   position: absolute;
   top: 0;
@@ -662,12 +697,12 @@ html {
   z-index: 1;
 }
 
-#boton-confirmar-eliminar.manteniendo::before {
+#boton-confirmar-eliminar.manteniendo::before, #boton-confirmar-cancelar.manteniendo::before {
   width: 100%;
   transition: width 2s linear;
 }
 
-#boton-confirmar-eliminar:hover {
+#boton-confirmar-eliminar:hover, #boton-confirmar-cancelar:hover {
   filter: brightness(0.9);
 }
 

@@ -25,6 +25,7 @@ from .services import (
     obtener_datos_producto,
     modificar_stock,
     crear_operacion,
+    cancelar_operacion,
 )
 
 
@@ -407,3 +408,15 @@ def obtener_producto_json(request, id_producto):
 def cerrar_sesion(request):
     auth_logout(request)
     return redirect("login")
+
+
+@login_required
+def cancelar_operacion_view(request, id_operacion):
+    if request.method == "POST":
+        try:
+            cancelar_operacion(id_operacion)
+            messages.success(request, "Operación cancelada correctamente")
+            return JsonResponse({"ok": True})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+    return JsonResponse({"error": "Método no permitido"}, status=405)

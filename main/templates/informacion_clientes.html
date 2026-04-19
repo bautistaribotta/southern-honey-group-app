@@ -183,6 +183,7 @@
                         <th>Detalle de Operación</th>
                         <th style="text-align: center;">Estado</th>
                         <th style="text-align: right;">Monto Total</th>
+                        <th style="text-align: right; padding-right: 2rem;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -218,10 +219,20 @@
                         <td class="monto-total">
                             ${{ operacion.monto_total }}
                         </td>
+                        <td class="acciones-operacion" style="text-align: right; padding-right: 2rem;">
+                            <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                                <button class="boton-icono-tabla editar" title="Editar Operación" onclick="event.stopPropagation();">
+                                    <span class="material-symbols-outlined">edit</span>
+                                </button>
+                                <button class="boton-icono-tabla cancelar" title="Cancelar Operación" data-id="{{ operacion.id }}" onclick="event.stopPropagation(); abrirModalCancelarOperacion(this.dataset.id);">
+                                    <span class="material-symbols-outlined">delete</span>
+                                </button>
+                            </div>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="4" style="text-align: center; padding: 2rem; color: var(--slate-500);">
+                        <td colspan="5" style="text-align: center; padding: 2rem; color: var(--slate-500);">
                             Este cliente no posee operaciones registradas.
                         </td>
                     </tr>
@@ -254,6 +265,28 @@
             </div>
         </div>
     </section>
+</div>
+
+<!-- Modal para Cancelar Operación -->
+<div id="contenedor-modal-cancelar">
+    <div id="contenedor-modal-fondo-cancelar" onclick="cerrarModalCancelarOperacion()"></div>
+    <div id="panel-cancelar-operacion">
+        <button type="button" class="boton-cerrar" onclick="cerrarModalCancelarOperacion()">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+
+        <div id="icono-advertencia-cancelar">
+            <span class="material-symbols-outlined">warning</span>
+        </div>
+
+        <h3>Confirmar cancelación</h3>
+        <p id="texto-confirmacion-cancelar">¿Está seguro que desea cancelar esta operación? El stock de los productos será devuelto al inventario automáticamente.</p>
+
+        <div class="acciones-modal">
+            <button type="button" class="boton-secundario" onclick="cerrarModalCancelarOperacion()">No, volver</button>
+            <button type="button" class="boton-primario" id="boton-confirmar-cancelar"><span>Sí, cancelar</span></button>
+        </div>
+    </div>
 </div>
 
 <!-- Panel de eliminacion y Fondo -->
