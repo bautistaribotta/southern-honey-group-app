@@ -1,0 +1,56 @@
+      <table class="tabla-deudores">
+        <thead>
+          <tr id="encabezado-tabla-deudores">
+            <th> ID </th>
+            <th> Nombre </th>
+            <th> Fecha </th>
+            <th> Pesos </th>
+            <th> USD/Hist </th>
+            <th> USD/Hoy </th>
+            <th> Kg Miel/Hist </th>
+            <th> Kg Miel/Hoy </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for deudor in deudores %}
+            <tr>
+              <td><div class="deudor-id"> {{ deudor.id }} </div></td>
+              <td><div class="deudor-nombre"> {{ deudor.cliente }} </div></td>
+              <td> {{ deudor.fecha|date:"d/m/Y" }} </td>
+              <td class="valor-pesos"> $ {{ deudor.deuda_pesos|floatformat:"-2" }} </td>
+              <td class="valor-usd"> {% if deudor.deuda_dolar_historico != None %}$ {{ deudor.deuda_dolar_historico|floatformat:"-2" }}{% else %}-{% endif %} </td>
+              <td class="valor-usd"> {% if deudor.deuda_dolar_actual != None %}$ {{ deudor.deuda_dolar_actual|floatformat:"-2" }}{% else %}-{% endif %} </td>
+              <td class="valor-miel"> {% if deudor.kg_miel_historico != None %}{{ deudor.kg_miel_historico|floatformat:"-2" }} kg{% else %}-{% endif %} </td>
+              <td class="valor-miel"> {% if deudor.kg_miel_actual != None %}{{ deudor.kg_miel_actual|floatformat:"-2" }} kg{% else %}-{% endif %} </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="8" style="text-align: center;"> No hay deudores registrados. </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      
+      <!-- Paginación -->
+      <div class="paginacion">
+        <div class="paginacion-info">
+          Mostrando <span>{{ deudores.start_index|default:0 }}-{{ deudores.end_index|default:0 }}</span> de <span>{{ deudores.paginator.count|default:0 }}</span> deudores
+        </div>
+        <div class="paginacion-botones">
+          {% if deudores.has_previous %}
+            <a href="?page={{ deudores.previous_page_number }}{% if q %}&q={{ q }}{% endif %}">
+              <button class="boton-paginacion">Anterior</button>
+            </a>
+          {% else %}
+            <button class="boton-paginacion" disabled>Anterior</button>
+          {% endif %}
+
+          {% if deudores.has_next %}
+            <a href="?page={{ deudores.next_page_number }}{% if q %}&q={{ q }}{% endif %}">
+              <button class="boton-paginacion">Siguiente</button>
+            </a>
+          {% else %}
+            <button class="boton-paginacion" disabled>Siguiente</button>
+          {% endif %}
+        </div>
+      </div>

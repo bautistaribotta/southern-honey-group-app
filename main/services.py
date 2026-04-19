@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.db.models import Sum, F, Value
 from django.db.models.functions import Coalesce
+from django.core.cache import cache
 from .models import Producto, Cliente, Operacion, DetalleOperacion, Pago
 
 
@@ -229,7 +230,7 @@ def servicio_cancelar_operacion(id_operacion):
     return operacion
 
 
-def obtener_listado_deudores():
+def obtener_listado_deudores(q=""):
     dolar_actual_data = get_cotizacion_blue()
     dolar_actual = float(dolar_actual_data.get("venta") or 1) # Prevención división por 0 si falla la API
     
@@ -247,6 +248,15 @@ def obtener_listado_deudores():
         .select_related('cliente')
         .order_by('-fecha')
     )
+
+    if q:
+        from django.db.models import Q
+        if q.isdigit():
+            operaciones_adeudadas = operaciones_adeudadas.filter(id__icontains=q)
+        else:
+            operaciones_adeudadas = operaciones_adeudadas.filter(
+                Q(cliente__nombre__icontains=q) | Q(cliente__apellido__icontains=q)
+            )
 
     lista_deudores = []
     for operacion in operaciones_adeudadas:
@@ -280,22 +290,34 @@ def obtener_listado_deudores():
 
 
 def get_cotizacion_oficial():
+    cotizacion = cache.get("cotizacion_oficial")
+    if cotizacion:
+        return cotizacion
+
     url_dolar_oficial = "https://dolarapi.com/v1/dolares/oficial"
     try:
         respuesta = requests.get(url_dolar_oficial, verify=True)
         datos = respuesta.json()
-        return {"compra": datos.get("compra"), "venta": datos.get("venta")}
+        resultado = {"compra": datos.get("compra"), "venta": datos.get("venta")}
+        cache.set("cotizacion_oficial", resultado, 3600)  # Cache por 1 hora
+        return resultado
     except Exception as e:
         print(f"Error al obtener cotización oficial: {e}")  # TODO: Quitar a futuro
         return {"compra": None, "venta": None}
 
 
 def get_cotizacion_blue():
+    cotizacion = cache.get("cotizacion_blue")
+    if cotizacion:
+        return cotizacion
+
     url_dolar_blue = "https://dolarapi.com/v1/dolares/blue"
     try:
         respuesta = requests.get(url_dolar_blue, verify=True)
         datos = respuesta.json()
-        return {"compra": datos.get("compra"), "venta": datos.get("venta")}
+        resultado = {"compra": datos.get("compra"), "venta": datos.get("venta")}
+        cache.set("cotizacion_blue", resultado, 3600)  # Cache por 1 hora
+        return resultado
     except Exception as e:
         print(
             f"Error al obtener cotización del dolar blue: {e}"
@@ -304,6 +326,10 @@ def get_cotizacion_blue():
 
 
 def get_cotizacion_miel():
+    cotizacion = cache.get("cotizacion_miel")
+    if cotizacion:
+        return cotizacion
+
     url = r"https://infomiel.com/"
     try:
         respuesta = requests.get(url)
@@ -324,15 +350,14 @@ def get_cotizacion_miel():
             if "," in miel_limpia:
                 miel_limpia = miel_limpia.replace(".", "").replace(",", ".")
             else:
-                # Si no tiene coma, asumo que los puntos pueden ser miles o no
-                # (Infomiel usa formato 1.500,00 o similar)
-                # Para estar seguros, extraemos solo digitos y puntos
-                pass # Python's float can handle basic strings, but let's be safe
+                pass # Python's float can handle basic strings
             
             # Como regla general, limpiamos todo lo que no sea digito o punto
             miel_final = "".join(c for c in miel_limpia if c.isdigit() or c == '.')
             
-            return float(miel_final) if miel_final else None
+            resultado = float(miel_final) if miel_final else None
+            cache.set("cotizacion_miel", resultado, 3600)  # Cache por 1 hora
+            return resultado
 
         return None
     except Exception as e:

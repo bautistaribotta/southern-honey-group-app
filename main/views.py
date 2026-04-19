@@ -409,13 +409,18 @@ def cancelar_operacion(request, id_operacion):
 # Verifico que solo un administrador pueda ver la vista, tambien verifica que el usuario este logueado
 @staff_member_required(login_url="inicio")
 def deudores(request):
-    lista_deudores = obtener_listado_deudores()
+    q = request.GET.get("q", "")
+    lista_deudores = obtener_listado_deudores(q)
     
     paginator_deudores = Paginator(lista_deudores, 5)
     pagina_numero = request.GET.get("page")
     pagina_obj = paginator_deudores.get_page(pagina_numero)
     
-    contexto = {"deudores": pagina_obj}
+    contexto = {"deudores": pagina_obj, "q": q}
+    
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return render(request, "tabla_deudores.html", contexto)
+        
     return render(request, "deudores.html", contexto)
 
 
