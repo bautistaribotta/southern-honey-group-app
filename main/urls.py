@@ -22,6 +22,5 @@ urlpatterns = [
     path('api/clientes/<int:id_cliente>/', obtener_cliente_json, name="obtener_cliente_json"),
     path('api/productos/<int:id_producto>/', obtener_producto_json, name="obtener_producto_json"),
     path('deudores/', deudores, name="deudores"),
-    path('remitos/', remitos, name="remitos"),
     path('cerrar_sesion', cerrar_sesion, name="cerrar_sesion")
 ]

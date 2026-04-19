@@ -411,12 +411,6 @@ def deudores(request):
     return render(request, "deudores.html")
 
 
-@login_required
-def remitos(request):
-    # TODO: ¿Tiene sentido una vista de remitos si puedo verlo por cliente?
-    return render(request, "remitos.html")
-
-
 def cerrar_sesion(request):
     auth_logout(request)
     return redirect("login")
