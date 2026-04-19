@@ -221,10 +221,12 @@
                         </td>
                         <td class="acciones-operacion" style="text-align: center;">
                             <div style="display: flex; justify-content: center; gap: 0.5rem;">
-                                <button class="boton-icono-tabla pagos" title="Añadir Pago" onclick="event.stopPropagation();">
+                                <button class="boton-icono-tabla pagos" title="Añadir Pago" 
+                                    {% if operacion.estado_pago == 'Cancelada' or operacion.estado_pago == 'Pagada' %}disabled{% else %}onclick="event.stopPropagation(); abrirModalPago('{{ operacion.id }}', '{{ operacion.monto_total|default_if_none:0|stringformat:"f" }}', '{{ operacion.total_pagado|default_if_none:0|stringformat:"f" }}');"{% endif %}>
                                     <span class="material-symbols-outlined">payments</span>
                                 </button>
-                                <button class="boton-icono-tabla cancelar" title="Cancelar Operación" data-id="{{ operacion.id }}" onclick="event.stopPropagation(); abrirModalCancelarOperacion(this.dataset.id);">
+                                <button class="boton-icono-tabla cancelar" title="Cancelar Operación" data-id="{{ operacion.id }}" 
+                                    {% if operacion.estado_pago == 'Cancelada' %}disabled{% else %}onclick="event.stopPropagation(); abrirModalCancelarOperacion(this.dataset.id);"{% endif %}>
                                     <span class="material-symbols-outlined">delete</span>
                                 </button>
                             </div>
@@ -326,6 +328,40 @@
     </div>
   </div>
 </form>
+
+<!-- Modal para Añadir Pago -->
+<div id="contenedor-modal-pago">
+    <div id="contenedor-modal-fondo-pago" onclick="cerrarModalPago()"></div>
+    <div id="panel-pago">
+        <button type="button" class="boton-cerrar" onclick="cerrarModalPago()">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+
+        <div id="icono-pago-modal">
+            <span class="material-symbols-outlined">payments</span>
+        </div>
+
+        <h3 id="titulo-modal-pago">Añadir pago</h3>
+        <p id="texto-info-pago">Monto restante a pagar: <strong id="monto-restante-pago">$0.00</strong></p>
+
+        <form id="form-registrar-pago" onsubmit="event.preventDefault(); procesarPago();">
+            <input type="hidden" id="id_operacion_pago" value="">
+            <div class="campo-info" style="text-align: left; margin-bottom: 1.5rem;">
+                <label for="input-monto-pago" style="display: block; margin-bottom: 0.5rem; color: var(--slate-700); font-weight: 500;">Monto a pagar</label>
+                <div style="position: relative; display: block;">
+                    <span style="position: absolute; left: 0.75rem; top: 0.6rem; color: var(--slate-500); font-weight: 600; pointer-events: none;">$</span>
+                    <input type="number" id="input-monto-pago" class="input-edicion" style="padding-left: 1.75rem; width: 100%; box-sizing: border-box;" min="0.01" step="0.01" required placeholder=" ">
+                    <span class="mensaje-error" style="margin-top: 0.5rem;">Ingrese un monto válido y menor o igual al restante</span>
+                </div>
+            </div>
+
+            <div class="acciones-modal">
+                <button type="submit" id="boton-confirmar-pago">Registrar pago</button>
+                <button type="button" class="boton-secundario" onclick="cerrarModalPago()">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 {% endblock %}
 

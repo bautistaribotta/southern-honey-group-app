@@ -394,7 +394,7 @@ def operaciones(request, id_cliente):
 
 
 @login_required
-def cancelar_operacion_view(request, id_operacion):
+def cancelar_operacion(request, id_operacion):
     if request.method == "POST":
         try:
             cancelar_operacion(id_operacion)
@@ -420,3 +420,40 @@ def remitos(request):
 def cerrar_sesion(request):
     auth_logout(request)
     return redirect("login")
+
+@login_required
+@ensure_csrf_cookie
+def registrar_pago(request, id_operacion):
+    if request.method == "POST":
+        try:
+            operacion = get_object_or_404(Operacion, id=id_operacion)
+            datos = json.loads(request.body)
+            monto_str = datos.get("monto")
+            
+            if not monto_str:
+                return JsonResponse({"error": "Debe ingresar un monto."}, status=400)
+                
+            monto = float(monto_str)
+            if monto <= 0:
+                return JsonResponse({"error": "El monto debe ser mayor a 0."}, status=400)
+                
+            restante = float(operacion.monto_total or 0) - float(operacion.total_pagado)
+            
+            if monto > restante:
+                return JsonResponse({"error": "El monto no puede superar el restante a pagar."}, status=400)
+                
+            # Crear el pago
+            Pago.objects.create(
+                operacion=operacion,
+                monto=int(monto) # Castear a entero por el modelo
+            )
+            
+            messages.success(request, "Pago registrado correctamente")
+            return JsonResponse({"ok": True})
+            
+        except ValueError:
+            return JsonResponse({"error": "Monto inválido."}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": f"Error al registrar el pago: {str(e)}"}, status=500)
+            
+    return JsonResponse({"error": "Método no permitido"}, status=405)

@@ -258,3 +258,88 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
+// =============================================
+//  MODAL AÑADIR PAGO
+// =============================================
+
+function abrirModalPago(idOperacion, montoTotalStr, totalPagadoStr) {
+    // Reemplazamos coma por punto para float en caso de que venga con formato regional
+    const montoTotal = parseFloat(montoTotalStr.replace(',', '.')) || 0;
+    const totalPagado = parseFloat(totalPagadoStr.replace(',', '.')) || 0;
+    const restante = montoTotal - totalPagado;
+    
+    document.getElementById('id_operacion_pago').value = idOperacion;
+    
+    document.getElementById('titulo-modal-pago').innerHTML = `Añadir pago a la operación <b>#${idOperacion}</b>`;
+    
+    // Formatear a 2 decimales para mostrar
+    document.getElementById('monto-restante-pago').textContent = `$${restante.toFixed(2)}`;
+    
+    const inputMonto = document.getElementById('input-monto-pago');
+    inputMonto.value = '';
+    // Guardamos el máximo permitido (se usa en la validación)
+    inputMonto.max = restante.toFixed(2);
+    
+    const modal = document.getElementById('contenedor-modal-pago');
+    modal.classList.add('abierto');
+    document.body.style.overflow = 'hidden';
+    
+    // Enfocar el input después de que se abra el modal
+    setTimeout(() => {
+        inputMonto.focus();
+    }, 100);
+}
+
+function cerrarModalPago() {
+    const modal = document.getElementById('contenedor-modal-pago');
+    modal.classList.remove('abierto');
+    document.body.style.overflow = 'auto';
+}
+
+function procesarPago() {
+    const idOperacion = document.getElementById('id_operacion_pago').value;
+    const monto = document.getElementById('input-monto-pago').value;
+    const maxPermitido = document.getElementById('input-monto-pago').max;
+    
+    if (!monto || isNaN(monto) || parseFloat(monto) <= 0) {
+        alert("Ingrese un monto válido.");
+        return;
+    }
+    
+    if (parseFloat(monto) > parseFloat(maxPermitido)) {
+        alert(`El monto no puede superar el restante a pagar ($${maxPermitido}).`);
+        return;
+    }
+    
+    const btn = document.getElementById('boton-confirmar-pago');
+    btn.disabled = true;
+    const spanOriginal = btn.innerHTML;
+    btn.innerHTML = '<span>Procesando...</span>';
+    
+    fetch(`/registrar_pago/${idOperacion}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ monto: monto })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.ok) {
+            cerrarModalPago();
+            window.location.reload(); 
+        } else {
+            alert(data.error || "Hubo un error al registrar el pago.");
+            btn.disabled = false;
+            btn.innerHTML = spanOriginal;
+        }
+    })
+    .catch(err => {
+        console.error("Error al procesar pago:", err);
+        alert("Error de conexión. Intente nuevamente.");
+        btn.disabled = false;
+        btn.innerHTML = spanOriginal;
+    });
+}

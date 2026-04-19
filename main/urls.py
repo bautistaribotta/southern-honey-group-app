@@ -3,7 +3,7 @@ from main.views import (login, inicio,
                         productos, clientes,
                         informacion_clientes, informacion_operaciones, operaciones,
                         obtener_cliente_json, obtener_producto_json,
-                        deudores, remitos, cerrar_sesion, cancelar_operacion_view)
+                        deudores, remitos, cerrar_sesion, cancelar_operacion, registrar_pago)
 
 """
 La sentencia name="nombre_del_archivo" se usa 
@@ -16,7 +16,8 @@ urlpatterns = [
     path('clientes/', clientes, name="clientes"),
     path('informacion_clientes/<int:id_cliente>/', informacion_clientes, name="informacion_clientes"),
     path('informacion_operaciones/<int:id_operacion>/', informacion_operaciones, name="informacion_operaciones"),
-    path('cancelar_operacion/<int:id_operacion>/', cancelar_operacion_view, name="cancelar_operacion"),
+    path('cancelar_operacion/<int:id_operacion>/', cancelar_operacion, name="cancelar_operacion"),
+    path('registrar_pago/<int:id_operacion>/', registrar_pago, name="registrar_pago"),
     path('operaciones/<int:id_cliente>/', operaciones, name="operaciones"),
     path('api/clientes/<int:id_cliente>/', obtener_cliente_json, name="obtener_cliente_json"),
     path('api/productos/<int:id_producto>/', obtener_producto_json, name="obtener_producto_json"),

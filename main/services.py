@@ -208,56 +208,6 @@ def crear_operacion(cliente, items, metodo_pago):
     return operacion
 
 
-def editar_operacion(id_operacion, cliente, items, observaciones=None):
-    with transaction.atomic():
-        operacion = get_object_or_404(Operacion, id=id_operacion)
-
-        # 1. Restaurar stock de los detalles actuales y eliminarlos
-        detalles_anteriores = DetalleOperacion.objects.filter(operacion=operacion)
-        for detalle in detalles_anteriores:
-            producto = detalle.producto
-            # Devolvemos el stock: sumamos la cantidad que se había restado
-            modificar_stock(producto.id, detalle.cantidad)
-            # Actualizamos cantidad vendida (restamos lo que se había sumado)
-            producto.refresh_from_db()
-            producto.cantidad_vendida -= detalle.cantidad
-            producto.save()
-            # Eliminamos el detalle
-            detalle.delete()
-
-        # 2. Procesar los nuevos items
-        monto_total = 0
-        for item in items:
-            id_producto = item.get("id_producto")
-            cantidad = int(item.get("cantidad", 0))
-
-            producto = get_object_or_404(Producto, id=id_producto, activo=True)
-
-            # Resto el stock
-            modificar_stock(id_producto, -cantidad)
-            producto.refresh_from_db()
-            producto.cantidad_vendida += cantidad
-            producto.save()
-
-            # Creo el detalle vinculado a la operación
-            DetalleOperacion.objects.create(
-                operacion=operacion,
-                producto=producto,
-                cantidad=cantidad,
-            )
-
-            monto_total += producto.precio * cantidad
-
-        # 3. Actualizar la operación padre (sin tocar valor_dolar ni valor_kilo_miel)
-        operacion.cliente = cliente
-        if observaciones is not None:
-            operacion.observaciones = observaciones
-        operacion.monto_total = monto_total
-        operacion.save()
-
-    return operacion
-
-
 def cancelar_operacion(id_operacion):
     with transaction.atomic():
         operacion = get_object_or_404(Operacion, id=id_operacion)
