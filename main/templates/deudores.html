@@ -72,11 +72,24 @@
       <!-- Paginación -->
       <div class="paginacion">
         <div class="paginacion-info">
-          Mostrando <span>1-5</span> de <span>0</span> deudores
+          Mostrando <span>{{ deudores.start_index|default:0 }}-{{ deudores.end_index|default:0 }}</span> de <span>{{ deudores.paginator.count|default:0 }}</span> deudores
         </div>
         <div class="paginacion-botones">
-          <button class="boton-paginacion" disabled>Anterior</button>
-          <button class="boton-paginacion" disabled>Siguiente</button>
+          {% if deudores.has_previous %}
+            <a href="?page={{ deudores.previous_page_number }}">
+              <button class="boton-paginacion">Anterior</button>
+            </a>
+          {% else %}
+            <button class="boton-paginacion" disabled>Anterior</button>
+          {% endif %}
+
+          {% if deudores.has_next %}
+            <a href="?page={{ deudores.next_page_number }}">
+              <button class="boton-paginacion">Siguiente</button>
+            </a>
+          {% else %}
+            <button class="boton-paginacion" disabled>Siguiente</button>
+          {% endif %}
         </div>
       </div>
     </div>

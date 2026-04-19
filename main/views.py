@@ -410,7 +410,12 @@ def cancelar_operacion(request, id_operacion):
 @staff_member_required(login_url="inicio")
 def deudores(request):
     lista_deudores = obtener_listado_deudores()
-    contexto = {"deudores": lista_deudores}
+    
+    paginator_deudores = Paginator(lista_deudores, 5)
+    pagina_numero = request.GET.get("page")
+    pagina_obj = paginator_deudores.get_page(pagina_numero)
+    
+    contexto = {"deudores": pagina_obj}
     return render(request, "deudores.html", contexto)
 
 
