@@ -105,14 +105,8 @@ class DetalleOperacion(models.Model):
 
 
 class Pago(models.Model):
-    medios_de_pago = [
-        ("Efectivo", "Efectivo"),
-        ("Transferencia", "Transferencia"),
-        ("Debito", "Debito"),
-    ]
     operacion = models.ForeignKey(Operacion, on_delete=models.CASCADE, db_column="id_operacion")
     fecha = models.DateTimeField(auto_now_add=True)
-    medio_pago = models.CharField(max_length=50, choices=medios_de_pago)
     monto = models.IntegerField()
 
     class Meta:
