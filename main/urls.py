@@ -3,7 +3,7 @@ from main.views import (login, inicio,
                         productos, clientes,
                         informacion_clientes, informacion_operaciones, operaciones,
                         obtener_cliente_json, obtener_producto_json,
-                        deudores, remitos, cerrar_sesion, cancelar_operacion, registrar_pago)
+                        deudores, cerrar_sesion, cancelar_operacion, registrar_pago)
 
 """
 La sentencia name="nombre_del_archivo" se usa 
