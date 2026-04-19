@@ -200,8 +200,7 @@ def crear_operacion(cliente, items, metodo_pago):
 
         # Si el método de pago es "debito", generamos automáticamente un pago
         if metodo_pago.lower() == "contado":
-            Pago.objects.create(
-                operacion=operacion,
+            Pago.objects.create(operacion=operacion,
                 medio_pago="Contado",
                 monto=int(monto_total)  # Se castea a entero porque en el modelo Pago es IntegerField
             )

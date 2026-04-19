@@ -136,6 +136,18 @@ def productos(request):
 
 
 @login_required
+def obtener_producto_json(request, id_producto):
+    datos = obtener_datos_producto(id_producto)
+
+    if datos:
+        # Si el producto existe, devuelvo la respuesta exitosa en JSON
+        return JsonResponse(datos)
+
+    # Si no lo encuentro o está inactivo, devuelvo un error 404
+    return JsonResponse({"Error": "Producto no encontrado"}, status=404)
+
+
+@login_required
 def clientes(request):
     if request.method == "POST":
         id_cliente = request.POST.get("id_cliente")
@@ -269,6 +281,19 @@ def informacion_clientes(request, id_cliente):
 
 
 @login_required
+def obtener_cliente_json(request, id_cliente):
+    # Obtengo los datos ya procesados y filtrados
+    datos = obtener_datos_cliente(id_cliente)
+
+    if datos:
+        # Si el cliente existe y está activo, devuelvo sus datos en formato JSON
+        return JsonResponse(datos)
+
+    # Si el servicio me devuelve None (cliente no encontrado o inactivo), respondo con un error 404
+    return JsonResponse({"Error": "Cliente no encontrado"}, status=404)
+
+
+@login_required
 def informacion_operaciones(request, id_operacion):
     operacion = get_object_or_404(Operacion, id=id_operacion)
     cliente = operacion.cliente
@@ -368,6 +393,18 @@ def operaciones(request, id_cliente):
     return render(request, "operaciones.html", contexto)
 
 
+@login_required
+def cancelar_operacion_view(request, id_operacion):
+    if request.method == "POST":
+        try:
+            cancelar_operacion(id_operacion)
+            messages.success(request, "Operación cancelada correctamente")
+            return JsonResponse({"ok": True})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+    return JsonResponse({"error": "Método no permitido"}, status=405)
+
+
 # Verifico que solo un administrador pueda ver la vista, tambien verifica que el usuario este logueado
 @staff_member_required(login_url="inicio")
 def deudores(request):
@@ -380,43 +417,6 @@ def remitos(request):
     return render(request, "remitos.html")
 
 
-@login_required
-def obtener_cliente_json(request, id_cliente):
-    # Obtengo los datos ya procesados y filtrados
-    datos = obtener_datos_cliente(id_cliente)
-
-    if datos:
-        # Si el cliente existe y está activo, devuelvo sus datos en formato JSON
-        return JsonResponse(datos)
-
-    # Si el servicio me devuelve None (cliente no encontrado o inactivo), respondo con un error 404
-    return JsonResponse({"Error": "Cliente no encontrado"}, status=404)
-
-
-@login_required
-def obtener_producto_json(request, id_producto):
-    datos = obtener_datos_producto(id_producto)
-
-    if datos:
-        # Si el producto existe, devuelvo la respuesta exitosa en JSON
-        return JsonResponse(datos)
-
-    # Si no lo encuentro o está inactivo, devuelvo un error 404
-    return JsonResponse({"Error": "Producto no encontrado"}, status=404)
-
-
 def cerrar_sesion(request):
     auth_logout(request)
     return redirect("login")
-
-
-@login_required
-def cancelar_operacion_view(request, id_operacion):
-    if request.method == "POST":
-        try:
-            cancelar_operacion(id_operacion)
-            messages.success(request, "Operación cancelada correctamente")
-            return JsonResponse({"ok": True})
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
-    return JsonResponse({"error": "Método no permitido"}, status=405)
