@@ -25,7 +25,7 @@ from .services import (
     obtener_datos_producto,
     modificar_stock,
     crear_operacion,
-    cancelar_operacion,
+    servicio_cancelar_operacion,
 )
 
 
@@ -397,7 +397,7 @@ def operaciones(request, id_cliente):
 def cancelar_operacion(request, id_operacion):
     if request.method == "POST":
         try:
-            cancelar_operacion(id_operacion)
+            servicio_cancelar_operacion(id_operacion)
             messages.success(request, "Operación cancelada correctamente")
             return JsonResponse({"ok": True})
         except Exception as e:

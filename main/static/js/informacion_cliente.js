@@ -233,12 +233,21 @@ async function ejecutarCancelacionOperacion(id) {
         if (response.ok) {
             window.location.reload();
         } else {
-            alert("Hubo un error al cancelar la operación.");
+            const data = await response.json().catch(() => ({}));
+            if (typeof notificarError === 'function') {
+                notificarError(data.error || "Hubo un error al cancelar la operación.");
+            } else {
+                alert(data.error || "Hubo un error al cancelar la operación.");
+            }
             cerrarModalCancelarOperacion();
         }
     } catch (error) {
         console.error("Error:", error);
-        alert("Ocurrió un error inesperado.");
+        if (typeof notificarError === 'function') {
+            notificarError("Ocurrió un error inesperado al cancelar la operación.");
+        } else {
+            alert("Ocurrió un error inesperado al cancelar la operación.");
+        }
         cerrarModalCancelarOperacion();
     }
 }
@@ -303,12 +312,15 @@ function procesarPago() {
     const maxPermitido = document.getElementById('input-monto-pago').max;
     
     if (!monto || isNaN(monto) || parseFloat(monto) <= 0) {
-        alert("Ingrese un monto válido.");
+        if (typeof notificarError === 'function') notificarError("Ingrese un monto válido.");
+        else alert("Ingrese un monto válido.");
         return;
     }
     
     if (parseFloat(monto) > parseFloat(maxPermitido)) {
-        alert(`El monto no puede superar el restante a pagar ($${maxPermitido}).`);
+        const err = `El monto no puede superar el restante a pagar ($${maxPermitido}).`;
+        if (typeof notificarError === 'function') notificarError(err);
+        else alert(err);
         return;
     }
     
@@ -331,14 +343,18 @@ function procesarPago() {
             cerrarModalPago();
             window.location.reload(); 
         } else {
-            alert(data.error || "Hubo un error al registrar el pago.");
+            const err = data.error || "Hubo un error al registrar el pago.";
+            if (typeof notificarError === 'function') notificarError(err);
+            else alert(err);
             btn.disabled = false;
             btn.innerHTML = spanOriginal;
         }
     })
     .catch(err => {
         console.error("Error al procesar pago:", err);
-        alert("Error de conexión. Intente nuevamente.");
+        const msg = "Error de conexión. Intente nuevamente.";
+        if (typeof notificarError === 'function') notificarError(msg);
+        else alert(msg);
         btn.disabled = false;
         btn.innerHTML = spanOriginal;
     });

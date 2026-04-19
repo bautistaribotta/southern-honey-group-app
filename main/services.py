@@ -208,7 +208,7 @@ def crear_operacion(cliente, items, metodo_pago):
     return operacion
 
 
-def cancelar_operacion(id_operacion):
+def servicio_cancelar_operacion(id_operacion):
     with transaction.atomic():
         operacion = get_object_or_404(Operacion, id=id_operacion)
         
