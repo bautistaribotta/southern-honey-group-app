@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Selecciono los elementos del DOM que voy a usar para la búsqueda
     const inputBusqueda = document.getElementById('buscar-deudor');
     const contenedorTabla = document.getElementById('tabla-deudores-container');
-    const inputMonto = document.getElementById('filtrar-monto');
 
     /**
      * Función para realizar las búsquedas de deudores mediante AJAX.
@@ -19,9 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
             url = new URL(window.location.href);
             if (inputBusqueda) {
                 url.searchParams.set('q', inputBusqueda.value);
-            }
-            if (inputMonto && inputMonto.value) {
-                url.searchParams.set('monto', inputMonto.value); // Preparado por si en el futuro se implementa el filtro de monto
             }
             url.searchParams.delete('page');
         }
@@ -65,10 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Agrego los event listeners iniciales
     if (inputBusqueda) {
         inputBusqueda.addEventListener('input', () => buscar());
-    }
-
-    if (inputMonto) {
-        inputMonto.addEventListener('input', () => buscar());
     }
 
     vincularPaginacion();
