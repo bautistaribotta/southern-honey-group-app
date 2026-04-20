@@ -231,7 +231,7 @@ def servicio_cancelar_operacion(id_operacion):
 
 
 def obtener_listado_deudores(q=""):
-    dolar_actual_data = get_cotizacion_blue()
+    dolar_actual_data = get_cotizacion_oficial()
     dolar_actual = float(dolar_actual_data.get("venta") or 1) # Prevención división por 0 si falla la API
     
     miel_actual_data = get_cotizacion_miel()

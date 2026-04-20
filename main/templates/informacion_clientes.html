@@ -195,13 +195,18 @@
                         <td> 
                             <div class="detalle-principal">
                                 <ul style="list-style-type: none; padding: 0; margin: 0;">
-                                    {% for detalle in operacion.detalleoperacion_set.all %}
+                                    {% for detalle in operacion.detalleoperacion_set.all|slice:":2" %}
                                         <li style="font-size: 0.9em; color: var(--slate-600);">
                                             {{ detalle.cantidad|floatformat:0 }}x {{ detalle.producto.nombre }}
                                         </li>
                                     {% empty %}
                                         <li style="font-size: 0.9em; color: var(--slate-400);">Sin productos</li>
                                     {% endfor %}
+                                    {% if operacion.detalleoperacion_set.count > 2 %}
+                                        <li style="font-size: 0.85em; color: var(--slate-400); font-style: italic; margin-top: 0.125rem;">
+                                            ... y {{ operacion.detalleoperacion_set.count|add:"-2" }} más
+                                        </li>
+                                    {% endif %}
                                 </ul>
                             </div>
                         </td>
