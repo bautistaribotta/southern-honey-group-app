@@ -261,6 +261,7 @@ def obtener_listado_deudores(q=""):
 
     lista_deudores = []
     for operacion in operaciones_adeudadas:
+        # La deuda es igual al monto total - los pagos registrados en esa operacion
         deuda_pesos = float(operacion.monto_total) - float(operacion.pagado)
         
         # Cálculos del dólar
