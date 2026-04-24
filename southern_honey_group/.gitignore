@@ -1,3 +1,5 @@
-.env
-venv/ # Para que no se suban las librerias
 *.sqlite3 # Por si se crea a futuro una nueva DB
+.env
+venv/
+**/__pycache__/
+*.pyc
