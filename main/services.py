@@ -197,7 +197,7 @@ def crear_operacion(cliente, items, metodo_pago):
         if metodo_pago.lower() == "contado":
             Pago.objects.create(
                 operacion=operacion,
-                monto=int(monto_total)  # Se castea a entero porque en el modelo Pago es IntegerField
+                monto=monto_total
             )
 
     return operacion
@@ -241,9 +241,10 @@ def obtener_listado_deudores(q=""):
         miel_actual = None
 
     # Filtramos operaciones activas donde el total pagado es menor al monto total
+    from django.db.models import DecimalField
     operaciones_adeudadas = (
         Operacion.objects.filter(activa=True)
-        .annotate(pagado=Coalesce(Sum('pago__monto'), Value(0)))
+        .annotate(pagado=Coalesce(Sum('pago__monto'), Value(0), output_field=DecimalField()))
         .filter(monto_total__gt=F('pagado'))
         .select_related('cliente')
         .order_by('-fecha')
@@ -352,7 +353,7 @@ def get_cotizacion_miel():
             else:
                 pass # Python's float can handle basic strings
             
-            # Como regla general, limpiamos todo lo que no sea digito o punto
+            # Como regla general, limpiamos lo que no sea digito o punto
             miel_final = "".join(c for c in miel_limpia if c.isdigit() or c == '.')
             
             resultado = float(miel_final) if miel_final else None

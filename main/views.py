@@ -452,9 +452,9 @@ def registrar_pago(request, id_operacion):
             # Crear el pago
             Pago.objects.create(
                 operacion=operacion,
-                monto=int(monto) # Castear a entero por el modelo
+                monto=monto
             )
-            
+
             messages.success(request, "Pago registrado correctamente")
             return JsonResponse({"ok": True})
             
