@@ -84,16 +84,17 @@ const prepararPanelNuevoProducto = () => {
   // Limpio el formulario y el ID oculto
   document.getElementById('form-producto').reset();
   document.getElementById('id_producto').value = '';
-  
+  document.getElementById('campo-stock-container').style.display = 'flex';
+
   if (typeof abrirSlideOver === 'function') abrirSlideOver();
 };
 
-/**
- * Creo esta función para traer la información de un producto desde la API
- * y llenar los campos del panel lateral para editarlo.
- * @param {string|number} id - El ID del producto
- */
-const prepararPanelEditarProducto = (id) => {
+  /**
+  * Creo esta función para traer la información de un producto desde la API
+  * y llenar los campos del panel lateral para editarlo.
+  * @param {string|number} id - El ID del producto
+  */
+  const prepararPanelEditarProducto = (id) => {
   fetch(`/api/productos/${id}/`)
     .then((response) => response.json())
     .then((producto) => {
@@ -102,14 +103,15 @@ const prepararPanelEditarProducto = (id) => {
       document.querySelector('#slide-over-panel .texto-cabecera p').innerText = 'Modifique los datos del producto';
       document.querySelector('.boton-primario').innerText = 'Actualizar Producto';
       document.querySelector('.icono-contenedor span').innerText = 'edit_square';
-      document.querySelector('label[for="stock"]').innerText = 'Stock disponible';
 
       // Relleno el formulario con los datos reales
       document.getElementById('id_producto').value = producto.id;
       document.getElementById('nombre').value = producto.nombre;
       document.getElementById('categoria').value = producto.categoria;
       document.getElementById('precio').value = producto.precio;
-      document.getElementById('stock').value = producto.cantidad;
+
+      // Oculto el campo de stock porque se maneja en un modal aparte
+      document.getElementById('campo-stock-container').style.display = 'none';
 
       if (typeof abrirSlideOver === 'function') abrirSlideOver();
     })
@@ -134,6 +136,7 @@ const prepararPanelEditarProducto = (id) => {
 document.addEventListener('click', (e) => {
   const botonEditar = e.target.closest('.boton-icono.editar');
   const botonEliminar = e.target.closest('.boton-icono.eliminar');
+  const botonAgregarStock = e.target.closest('.boton-icono.agregar-stock');
 
   if (botonEditar) {
     const id = botonEditar.dataset.id;
@@ -149,6 +152,11 @@ document.addEventListener('click', (e) => {
     document.getElementById('texto-confirmacion-eliminar').innerHTML = `¿Confirma que quiere eliminar el producto <b>${nombre}</b>?`;
 
     if (typeof abrirPanelEliminar === 'function') abrirPanelEliminar();
+  }
+
+  if (botonAgregarStock) {
+    // Por ahora solo manejo el click, el usuario hará el modal aparte
+    console.log("Click en agregar stock para el producto:", botonAgregarStock.dataset.id);
   }
 });
 
