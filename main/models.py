@@ -110,7 +110,7 @@ class DetalleOperacion(models.Model):
 class Pago(models.Model):
     operacion = models.ForeignKey(Operacion, on_delete=models.CASCADE, db_column="id_operacion")
     fecha = models.DateTimeField(auto_now_add=True)
-    monto = models.IntegerField()
+    monto = models.DecimalField(max_digits=15, decimal_places=2)
 
     class Meta:
         db_table = "pagos"
