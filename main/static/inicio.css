@@ -327,3 +327,24 @@ body {
   from { transform: translateX(0); opacity: 1; }
   to { transform: translateX(120%); opacity: 0; }
 }
+
+/* --- ADAPTACIÓN PARA PANTALLAS GRANDES --- */
+@media (min-width: 1440px) {
+  html {
+    font-size: 18px; /* Aumenta el tamaño base de la fuente (1rem = 18px) */
+  }
+  
+  #barra-lateral {
+    width: 320px; /* Expande la barra lateral para mantener proporción */
+  }
+}
+
+@media (min-width: 1920px) {
+  html {
+    font-size: 20px; /* Aumenta el tamaño base para monitores Full HD (1rem = 20px) */
+  }
+  
+  #barra-lateral {
+    width: 360px;
+  }
+}
