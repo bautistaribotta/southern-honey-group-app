@@ -221,5 +221,29 @@ const cerrarModalStock = () => {
 
 window.cerrarModalStock = cerrarModalStock;
 
+// Validación del formulario de stock antes de enviar
+const formStock = document.getElementById('formulario-stock');
+if (formStock) {
+  formStock.addEventListener('submit', (e) => {
+    const radioQuitar = document.getElementById('accion-quitar');
+    const inputCantidad = document.getElementById('cantidad-modificar');
+    const spanStockActual = document.getElementById('cantidad-stock-actual');
+    
+    if (radioQuitar && radioQuitar.checked) {
+      const cantidad = parseInt(inputCantidad.value, 10) || 0;
+      const stockActual = parseInt(spanStockActual.innerText, 10) || 0;
+      
+      if (cantidad > stockActual) {
+        e.preventDefault(); // Detener el envío del formulario
+        if (typeof crearToast === 'function') {
+          crearToast('No se puede quitar más stock del existente.', 'error');
+        } else {
+          alert('No se puede quitar más stock del existente.');
+        }
+      }
+    }
+  });
+}
+
 // Hago accesibles las funciones que el HTML llama mediante "onclick"
 window.prepararPanelNuevoProducto = prepararPanelNuevoProducto;

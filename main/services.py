@@ -47,10 +47,7 @@ def modificar_stock(id_producto, cantidad):
 
     # Si estoy restando, válido que haya stock suficiente antes de operar
     if cantidad < 0 and producto.cantidad < abs(cantidad):
-        raise ValueError(
-            f"Stock insuficiente para '{producto.nombre}'. "
-            f"Disponible: {producto.cantidad}, solicitado: {abs(cantidad)}"
-        )
+        raise ValueError("No se puede quitar más stock del existente.")
 
     producto.cantidad += cantidad
     producto.save()
