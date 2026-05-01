@@ -202,6 +202,50 @@
     </div>
 </form>
 </div>
+
+<!-- Modal Modificar Stock -->
+<form id="formulario-stock" method="POST">
+  {% csrf_token %}
+  <div id="contenedor-modal-stock">
+    <div id="fondo-modal-stock" onclick="cerrarModalStock()"> </div>
+
+    <div id="modal-stock">
+      <input type="hidden" id="id_producto_stock" name="id_producto_stock" value="">
+      <input type="hidden" name="accion" value="modificar_stock">
+
+      <button type="button" class="boton-cerrar-panel" id="cerrar-modal-stock" onclick="cerrarModalStock()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+
+      <h3 class="titulo-modal">Modificar stock</h3>
+      <p id="nombre-producto-stock" class="texto-modal">Producto</p>
+      
+      <div class="info-stock-actual">
+        <label>Stock actual:</label>
+        <span id="cantidad-stock-actual">0</span>
+      </div>
+
+      <div class="controles-stock">
+        <div class="selector-accion-stock">
+          <label class="switch">
+            <input type="checkbox" id="switch-accion-stock" name="tipo_modificacion" value="quitar">
+            <span class="slider round"></span>
+          </label>
+          <span id="texto-accion-stock">Añadir</span>
+        </div>
+        
+        <div class="input-cantidad-container">
+          <input type="number" id="cantidad-modificar" name="cantidad" class="input-estandar" min="1" value="1" required>
+        </div>
+      </div>
+
+      <div class="acciones-modal">
+        <button type="submit" class="boton-verde-oliva" id="boton-actualizar-stock">Actualizar stock</button>
+        <button type="button" class="boton-secundario" onclick="cerrarModalStock()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</form>
 {% endblock %}
 
 {% block codigo-javascript %}

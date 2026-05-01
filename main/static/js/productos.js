@@ -155,8 +155,30 @@ document.addEventListener('click', (e) => {
   }
 
   if (botonAgregarStock) {
-    // Por ahora solo manejo el click, el usuario hará el modal aparte
-    console.log("Click en agregar stock para el producto:", botonAgregarStock.dataset.id);
+    const id = botonAgregarStock.dataset.id;
+    const nombre = botonAgregarStock.dataset.nombre;
+    const stock = botonAgregarStock.dataset.stock;
+    
+    // Configuro el modal de stock
+    document.getElementById('id_producto_stock').value = id;
+    document.getElementById('nombre-producto-stock').innerText = nombre;
+    document.getElementById('cantidad-stock-actual').innerText = stock;
+    
+    // Resetear al estado "Añadir"
+    const switchStock = document.getElementById('switch-accion-stock');
+    if (switchStock) {
+      switchStock.checked = false;
+      document.getElementById('texto-accion-stock').innerText = 'Añadir';
+      document.getElementById('texto-accion-stock').style.color = 'var(--brand-olive)';
+      switchStock.value = 'añadir';
+    }
+    
+    document.getElementById('cantidad-modificar').value = 1;
+    
+    const modalStock = document.getElementById('contenedor-modal-stock');
+    if (modalStock) {
+      modalStock.classList.add('abierto');
+    }
   }
 });
 
@@ -188,6 +210,33 @@ if (inputNombreProducto) {
     let valor = e.target.value;
     if (valor.length > 0) {
       e.target.value = valor.charAt(0).toUpperCase() + valor.slice(1);
+    }
+  });
+}
+
+// Lógica del modal de stock
+const cerrarModalStock = () => {
+  const modalStock = document.getElementById('contenedor-modal-stock');
+  if (modalStock) {
+    modalStock.classList.remove('abierto');
+  }
+};
+
+window.cerrarModalStock = cerrarModalStock;
+
+// Evento del switch de stock
+const switchStock = document.getElementById('switch-accion-stock');
+if (switchStock) {
+  switchStock.addEventListener('change', (e) => {
+    const textoAccion = document.getElementById('texto-accion-stock');
+    if (e.target.checked) {
+      textoAccion.innerText = 'Quitar';
+      textoAccion.style.color = 'var(--color-rojo-eliminacion)';
+      e.target.value = 'quitar';
+    } else {
+      textoAccion.innerText = 'Añadir';
+      textoAccion.style.color = 'var(--brand-olive)';
+      e.target.value = 'añadir';
     }
   });
 }

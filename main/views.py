@@ -81,9 +81,35 @@ def productos(request):
         if not cantidad:
             cantidad = 0
 
-        # Si es una ELIMINACION, aqui traigo el id a borrar
+        # Verifico qué acción se está realizando
+        accion = request.POST.get("accion")
         id_eliminar = request.POST.get("id_eliminar")
-        if id_eliminar:
+
+        if accion == "modificar_stock":
+            id_producto_stock = request.POST.get("id_producto_stock")
+            tipo_modificacion = request.POST.get("tipo_modificacion")
+            cantidad_modificar = request.POST.get("cantidad")
+            
+            if id_producto_stock and cantidad_modificar:
+                try:
+                    cantidad_modificar = int(cantidad_modificar)
+                    if tipo_modificacion == "quitar":
+                        cantidad_modificar = -cantidad_modificar
+                        
+                    modificar_stock(id_producto_stock, cantidad_modificar)
+                    
+                    if tipo_modificacion == "quitar":
+                        messages.success(request, "Stock reducido correctamente")
+                    else:
+                        messages.success(request, "Stock añadido correctamente")
+                except ValueError as e:
+                    messages.error(request, str(e))
+                except Exception as e:
+                    messages.error(request, f"Error al modificar el stock: {str(e)}")
+                    
+            return redirect("productos")
+
+        elif id_eliminar:
             eliminar_producto(id_eliminar)
             messages.success(request, "Producto eliminado correctamente")
             return redirect("productos")
@@ -393,6 +419,42 @@ def operaciones(request, id_cliente):
 
     return render(request, "operaciones.html", contexto)
 
+@login_required
+@ensure_csrf_cookie
+def registrar_pago(request, id_operacion):
+    if request.method == "POST":
+        try:
+            operacion = get_object_or_404(Operacion, id=id_operacion)
+            datos = json.loads(request.body)
+            monto_str = datos.get("monto")
+
+            if not monto_str:
+                return JsonResponse({"error": "Debe ingresar un monto."}, status=400)
+
+            monto = float(monto_str)
+            if monto <= 0:
+                return JsonResponse({"error": "El monto debe ser mayor a 0."}, status=400)
+
+            restante = float(operacion.monto_total or 0) - float(operacion.total_pagado)
+
+            if monto > restante:
+                return JsonResponse({"error": "El monto no puede superar el restante a pagar."}, status=400)
+
+            # Crear el pago
+            Pago.objects.create(
+                operacion=operacion,
+                monto=monto
+            )
+
+            messages.success(request, "Pago registrado correctamente")
+            return JsonResponse({"ok": True})
+
+        except ValueError:
+            return JsonResponse({"error": "Monto inválido."}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": f"Error al registrar el pago: {str(e)}"}, status=500)
+
+    return JsonResponse({"error": "Método no permitido"}, status=405)
 
 @login_required
 def cancelar_operacion(request, id_operacion):
@@ -427,40 +489,3 @@ def deudores(request):
 def cerrar_sesion(request):
     auth_logout(request)
     return redirect("login")
-
-@login_required
-@ensure_csrf_cookie
-def registrar_pago(request, id_operacion):
-    if request.method == "POST":
-        try:
-            operacion = get_object_or_404(Operacion, id=id_operacion)
-            datos = json.loads(request.body)
-            monto_str = datos.get("monto")
-            
-            if not monto_str:
-                return JsonResponse({"error": "Debe ingresar un monto."}, status=400)
-                
-            monto = float(monto_str)
-            if monto <= 0:
-                return JsonResponse({"error": "El monto debe ser mayor a 0."}, status=400)
-                
-            restante = float(operacion.monto_total or 0) - float(operacion.total_pagado)
-            
-            if monto > restante:
-                return JsonResponse({"error": "El monto no puede superar el restante a pagar."}, status=400)
-                
-            # Crear el pago
-            Pago.objects.create(
-                operacion=operacion,
-                monto=monto
-            )
-
-            messages.success(request, "Pago registrado correctamente")
-            return JsonResponse({"ok": True})
-            
-        except ValueError:
-            return JsonResponse({"error": "Monto inválido."}, status=400)
-        except Exception as e:
-            return JsonResponse({"error": f"Error al registrar el pago: {str(e)}"}, status=500)
-            
-    return JsonResponse({"error": "Método no permitido"}, status=405)
