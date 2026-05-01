@@ -92,6 +92,7 @@ def productos(request):
             
             if id_producto_stock and cantidad_modificar:
                 try:
+                    producto = Producto.objects.get(id=id_producto_stock)
                     cantidad_modificar = int(cantidad_modificar)
                     if tipo_modificacion == "quitar":
                         cantidad_modificar = -cantidad_modificar
@@ -99,9 +100,11 @@ def productos(request):
                     modificar_stock(id_producto_stock, cantidad_modificar)
                     
                     if tipo_modificacion == "quitar":
-                        messages.success(request, "Stock reducido correctamente")
+                        messages.success(request, f"Se quitó {abs(cantidad_modificar)} cantidad de {producto.nombre}")
                     else:
-                        messages.success(request, "Stock añadido correctamente")
+                        messages.success(request, f"Se agregó {abs(cantidad_modificar)} cantidad de {producto.nombre}")
+                except Producto.DoesNotExist:
+                    messages.error(request, "El producto no existe.")
                 except ValueError as e:
                     messages.error(request, str(e))
                 except Exception as e:

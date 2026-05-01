@@ -164,13 +164,10 @@ document.addEventListener('click', (e) => {
     document.getElementById('nombre-producto-stock').innerText = nombre;
     document.getElementById('cantidad-stock-actual').innerText = stock;
     
-    // Resetear al estado "Añadir"
-    const switchStock = document.getElementById('switch-accion-stock');
-    if (switchStock) {
-      switchStock.checked = false;
-      document.getElementById('texto-accion-stock').innerText = 'Añadir';
-      document.getElementById('texto-accion-stock').style.color = 'var(--brand-olive)';
-      switchStock.value = 'añadir';
+    // Resetear al estado "Añadir" (Segmented Control)
+    const radioAñadir = document.getElementById('accion-añadir');
+    if (radioAñadir) {
+      radioAñadir.checked = true;
     }
     
     document.getElementById('cantidad-modificar').value = 1;
@@ -223,23 +220,6 @@ const cerrarModalStock = () => {
 };
 
 window.cerrarModalStock = cerrarModalStock;
-
-// Evento del switch de stock
-const switchStock = document.getElementById('switch-accion-stock');
-if (switchStock) {
-  switchStock.addEventListener('change', (e) => {
-    const textoAccion = document.getElementById('texto-accion-stock');
-    if (e.target.checked) {
-      textoAccion.innerText = 'Quitar';
-      textoAccion.style.color = 'var(--color-rojo-eliminacion)';
-      e.target.value = 'quitar';
-    } else {
-      textoAccion.innerText = 'Añadir';
-      textoAccion.style.color = 'var(--brand-olive)';
-      e.target.value = 'añadir';
-    }
-  });
-}
 
 // Hago accesibles las funciones que el HTML llama mediante "onclick"
 window.prepararPanelNuevoProducto = prepararPanelNuevoProducto;

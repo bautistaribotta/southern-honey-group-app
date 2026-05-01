@@ -226,16 +226,27 @@
       </div>
 
       <div class="controles-stock">
-        <div class="selector-accion-stock">
-          <label class="switch">
-            <input type="checkbox" id="switch-accion-stock" name="tipo_modificacion" value="quitar">
-            <span class="slider round"></span>
+        <label class="label-accion-stock">Tipo de movimiento</label>
+        
+        <div class="segmented-control">
+          <input type="radio" id="accion-añadir" name="tipo_modificacion" value="añadir" checked>
+          <label for="accion-añadir" class="segment-label">
+            <span class="material-symbols-outlined">add_circle</span> Añadir
           </label>
-          <span id="texto-accion-stock">Añadir</span>
+
+          <input type="radio" id="accion-quitar" name="tipo_modificacion" value="quitar">
+          <label for="accion-quitar" class="segment-label">
+            <span class="material-symbols-outlined">do_not_disturb_on</span> Quitar
+          </label>
+          <div class="segment-background"></div>
         </div>
         
         <div class="input-cantidad-container">
-          <input type="number" id="cantidad-modificar" name="cantidad" class="input-estandar" min="1" value="1" required>
+          <label for="cantidad-modificar" class="label-accion-stock">Cantidad a modificar</label>
+          <div class="input-wrapper">
+            <input type="number" id="cantidad-modificar" name="cantidad" class="input-estandar texto-centrado" min="1" value="1" required>
+            <span class="unidad-medida">uds</span>
+          </div>
         </div>
       </div>
 
