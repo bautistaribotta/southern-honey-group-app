@@ -100,9 +100,11 @@ def productos(request):
                     modificar_stock(id_producto_stock, cantidad_modificar)
                     
                     if tipo_modificacion == "quitar":
-                        messages.success(request, f"Se quitó {abs(cantidad_modificar)} cantidad de {producto.nombre}")
+                        unidad_str = "unidad" if abs(cantidad_modificar) == 1 else "unidades"
+                        messages.success(request, f"Se quitó {abs(cantidad_modificar)} {unidad_str} de {producto.nombre}")
                     else:
-                        messages.success(request, f"Se agregó {abs(cantidad_modificar)} cantidad de {producto.nombre}")
+                        unidad_str = "unidad" if abs(cantidad_modificar) == 1 else "unidades"
+                        messages.success(request, f"Se agregó {abs(cantidad_modificar)} {unidad_str} de {producto.nombre}")
                 except Producto.DoesNotExist:
                     messages.error(request, "El producto no existe.")
                 except ValueError as e:
