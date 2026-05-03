@@ -63,6 +63,7 @@ class Operacion(models.Model):
     # Obligo a Django a nombrar la tabla como "operaciones"
     class Meta:
         db_table = "operaciones"
+        verbose_name_plural = "Operaciones"
 
     @property
     def total_pagado(self):
@@ -114,6 +115,7 @@ class Pago(models.Model):
 
     class Meta:
         db_table = "pagos"
+        verbose_name_plural = "Pagos"
 
     def __str__(self):
         return f"Pago de la operacion: {self.operacion}"

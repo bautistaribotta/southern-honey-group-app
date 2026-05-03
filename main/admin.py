@@ -1,8 +1,9 @@
 from django.contrib import admin
-from .models import Cliente, Producto, Operacion, DetalleOperacion
+from .models import Cliente, Producto, Operacion, DetalleOperacion, Pago
 
 admin.site.register(Cliente)
 admin.site.register(Producto)
+admin.site.register(Pago)
 
 
 class DetalleOperacionInline(admin.TabularInline):

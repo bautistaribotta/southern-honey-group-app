@@ -113,6 +113,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.type === 'touchstart') e.preventDefault();
 
             btnEliminar.classList.add('manteniendo');
+            const span = btnEliminar.querySelector('span');
+            if (span) {
+                if (!btnEliminar.dataset.textoOriginal) {
+                    btnEliminar.dataset.textoOriginal = span.innerText;
+                }
+                span.innerText = "Mantenga presionado...";
+            }
             
             timeoutId = setTimeout(() => {
                 const form = document.getElementById('formulario-eliminar');
@@ -122,6 +129,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const cancelHold = () => {
             btnEliminar.classList.remove('manteniendo');
+            const span = btnEliminar.querySelector('span');
+            if (span && btnEliminar.dataset.textoOriginal) {
+                span.innerText = btnEliminar.dataset.textoOriginal;
+            }
             clearTimeout(timeoutId);
         };
 
@@ -181,6 +192,10 @@ function cerrarModalCancelarOperacion() {
     
     // Limpiamos el estado del botón
     btnConfirmar.classList.remove('manteniendo');
+    const span = btnConfirmar.querySelector('span');
+    if (span && btnConfirmar.dataset.textoOriginal) {
+        span.innerText = btnConfirmar.dataset.textoOriginal;
+    }
 }
 
 // Lógica de "mantener" para el botón de cancelar operación
@@ -196,6 +211,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.type === 'touchstart') e.preventDefault();
 
             btnConfirmarCancelar.classList.add('manteniendo');
+            const span = btnConfirmarCancelar.querySelector('span');
+            if (span) {
+                if (!btnConfirmarCancelar.dataset.textoOriginal) {
+                    btnConfirmarCancelar.dataset.textoOriginal = span.innerText;
+                }
+                span.innerText = "Mantenga presionado...";
+            }
             
             timeoutId = setTimeout(() => {
                 const id = btnConfirmarCancelar.getAttribute('data-id');
@@ -205,6 +227,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const cancelHold = () => {
             btnConfirmarCancelar.classList.remove('manteniendo');
+            const span = btnConfirmarCancelar.querySelector('span');
+            if (span && btnConfirmarCancelar.dataset.textoOriginal) {
+                span.innerText = btnConfirmarCancelar.dataset.textoOriginal;
+            }
             clearTimeout(timeoutId);
         };
 

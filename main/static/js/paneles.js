@@ -18,6 +18,15 @@ function abrirPanelEliminar() {
 function cerrarPanelEliminar() {
     document.getElementById('contenedor-panel-eliminar').classList.remove('abierto');
     document.body.style.overflow = 'auto';
+    
+    const btnEliminar = document.getElementById('boton-confirmar-eliminar');
+    if (btnEliminar) {
+        btnEliminar.classList.remove('manteniendo');
+        const span = btnEliminar.querySelector('span');
+        if (span && btnEliminar.dataset.textoOriginal) {
+            span.innerText = btnEliminar.dataset.textoOriginal;
+        }
+    }
 }
 
 // Lógica para mantener apretado el botón de eliminar durante 3 segundos
@@ -36,6 +45,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             btnEliminar.classList.add('manteniendo');
+            const span = btnEliminar.querySelector('span');
+            if (span) {
+                if (!btnEliminar.dataset.textoOriginal) {
+                    btnEliminar.dataset.textoOriginal = span.innerText;
+                }
+                span.innerText = "Mantenga presionado...";
+            }
             
             timeoutId = setTimeout(() => {
                 const form = document.getElementById('formulario-eliminar');
@@ -45,6 +61,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const cancelHold = () => {
             btnEliminar.classList.remove('manteniendo');
+            const span = btnEliminar.querySelector('span');
+            if (span && btnEliminar.dataset.textoOriginal) {
+                span.innerText = btnEliminar.dataset.textoOriginal;
+            }
             clearTimeout(timeoutId);
         };
 
