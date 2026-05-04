@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'southern_honey_group.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-if ENVIRONMENT == 'production':
+if ENVIRONMENT == 'production' or ENVIRONMENT == "demonstration":
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
