@@ -326,6 +326,14 @@ function abrirModalPago(idOperacion, montoTotalStr, totalPagadoStr) {
     }, 100);
 }
 
+function completarPagoTotal() {
+    const inputMonto = document.getElementById('input-monto-pago');
+    if (inputMonto && inputMonto.max) {
+        inputMonto.value = inputMonto.max;
+        inputMonto.focus();
+    }
+}
+
 function cerrarModalPago() {
     const modal = document.getElementById('contenedor-modal-pago');
     modal.classList.remove('abierto');
