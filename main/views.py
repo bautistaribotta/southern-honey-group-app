@@ -436,11 +436,13 @@ def registrar_pago(request, id_operacion):
             if not monto_str:
                 return JsonResponse({"error": "Debe ingresar un monto."}, status=400)
 
-            monto = float(monto_str)
+            # Usamos Decimal para máxima precisión en dinero
+            from decimal import Decimal
+            monto = Decimal(monto_str)
             if monto <= 0:
                 return JsonResponse({"error": "El monto debe ser mayor a 0."}, status=400)
 
-            restante = float(operacion.monto_total or 0) - float(operacion.total_pagado)
+            restante = Decimal(str(operacion.monto_total or 0)) - Decimal(str(operacion.total_pagado))
 
             if monto > restante:
                 return JsonResponse({"error": "El monto no puede superar el restante a pagar."}, status=400)

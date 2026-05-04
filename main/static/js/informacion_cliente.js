@@ -343,8 +343,12 @@ function procesarPago() {
         return;
     }
     
-    if (parseFloat(monto) > parseFloat(maxPermitido)) {
-        const err = `El monto no puede superar el restante a pagar ($${maxPermitido}).`;
+    // Redondeamos ambos a 2 decimales para evitar problemas de precisión float
+    const montoNum = Math.round(parseFloat(monto) * 100) / 100;
+    const maxNum = Math.round(parseFloat(maxPermitido) * 100) / 100;
+    
+    if (montoNum > maxNum) {
+        const err = `El monto no puede superar el restante a pagar ($${maxNum.toFixed(2)}).`;
         if (typeof notificarError === 'function') notificarError(err);
         else alert(err);
         return;
