@@ -1,5 +1,7 @@
 from pathlib import Path
 import os
+
+from django.conf.global_settings import ALLOWED_HOSTS
 from dotenv import load_dotenv
 
 # Load .env file
@@ -20,6 +22,11 @@ ENVIRONMENT = os.getenv('ENVIRONMENT', 'development')
 if ENVIRONMENT == 'production':
     DEBUG = False
     ALLOWED_HOSTS = ['bautistaribotta.pythonanywhere.com']
+
+elif ENVIRONMENT == "demonstration":
+    DEBUG = False
+    ALLOWED_HOSTS = ['juanbautistaribotta.pythonanywhere.com']
+
 else:
     DEBUG = True
     ALLOWED_HOSTS = []
