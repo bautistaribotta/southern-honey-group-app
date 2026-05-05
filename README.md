@@ -1,5 +1,7 @@
 # Southern Honey Group - Staff Portal
 
+## Prueba la demo: https://juanbautistaribotta.pythonanywhere.com/
+
 Portal interno de gestión administrativa, control de stock, clientes y facturación desarrollado para la empresa Southern Honey Group. Este sistema centraliza las operaciones diarias, digitalizando el seguimiento de inventarios y la información financiera en tiempo real.
 
 El proyecto es desarrollado, diseñado y mantenido de manera independiente, abarcando tanto la arquitectura del backend como el diseño de la interfaz de usuario.
