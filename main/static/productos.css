@@ -166,9 +166,11 @@
   padding: 1rem 1.5rem;
   font-size: 0.875rem;
   border-bottom: 1px solid var(--stone-200);
+  color: var(--slate-700);
 }
 
 .tabla-productos tbody tr {
+  height: 73px;
   transition: all 0.2s ease;
 }
 

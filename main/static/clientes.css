@@ -151,6 +151,7 @@
 }
 
 .tabla-clientes tbody tr {
+  height: 73px;
   transition: all 0.2s ease;
 }
 
