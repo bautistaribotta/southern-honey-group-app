@@ -7,7 +7,7 @@ class Producto(models.Model):
         ("Alimento", "Alimento"),
         ("Cera", "Cera"),
         ("Madera", "Madera"),
-        ("Estampa", "Estampa"),
+        ("Estampado", "Estampado"),
         ("Insumos", "Insumos"),
         ("Medicamentos", "Medicamentos"),
         ("Otros", "Otros"),
