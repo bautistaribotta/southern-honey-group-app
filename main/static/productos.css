@@ -3,7 +3,7 @@
   --color-rojo-eliminacion: #dc2626;
 }
 
-/* Nota: La barra lateral, header y layout base se heredan de inicio.css */
+/* Nota: La barra lateral, header y layout base se heredan de base.css */
 #titulos-cabecera h2 {
   margin-bottom: 0.25rem;
 }
