@@ -119,3 +119,14 @@ class Pago(models.Model):
 
     def __str__(self):
         return f"Pago de la operacion: {self.operacion}"
+
+
+class Cotizaciones(models.Model):
+    articulo = models.CharField(max_length=25, unique=True)
+    monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+    class Meta:
+        db_table = "cotizaciones"
+
+    def __str__(self):
+        return f"Cotizacion {self.articulo}: {self.monto}"
