@@ -20,7 +20,6 @@ from .services import (
     editar_cliente,
     eliminar_cliente,
     get_cotizacion_oficial,
-    get_cotizacion_blue,
     obtener_datos_cliente,
     obtener_datos_producto,
     modificar_stock,
@@ -59,8 +58,7 @@ para que se loguee. Todo esto implementado usando el wrapped @login_required
 @login_required
 def inicio(request):
     dolar_oficial = get_cotizacion_oficial()
-    dolar_blue = get_cotizacion_blue()
-    contexto = {"oficial": dolar_oficial, "blue": dolar_blue}
+    contexto = {"oficial": dolar_oficial}
     return render(request, "inicio.html", contexto)
 
 

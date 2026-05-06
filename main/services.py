@@ -305,61 +305,9 @@ def get_cotizacion_oficial():
         return {"compra": None, "venta": None}
 
 
-def get_cotizacion_blue():
-    cotizacion = cache.get("cotizacion_blue")
-    if cotizacion:
-        return cotizacion
-
-    url_dolar_blue = "https://dolarapi.com/v1/dolares/blue"
-    try:
-        respuesta = requests.get(url_dolar_blue, verify=True)
-        datos = respuesta.json()
-        resultado = {"compra": datos.get("compra"), "venta": datos.get("venta")}
-        cache.set("cotizacion_blue", resultado, 3600)  # Cache por 1 hora
-        return resultado
-    except Exception as e:
-        print(
-            f"Error al obtener cotización del dolar blue: {e}"
-        )  # TODO: Quitar a futuro
-        return {"compra": None, "venta": None}
-
 
 def get_cotizacion_miel():
-    cotizacion = cache.get("cotizacion_miel")
-    if cotizacion:
-        return cotizacion
-
-    url = r"https://infomiel.com/"
-    try:
-        respuesta = requests.get(url)
-        html_resp = respuesta.text
-        soup = BeautifulSoup(html_resp, "html.parser")
-
-        # Busco la celda que contiene el texto de referencia
-        etiqueta_clara = soup.find("td", string=lambda t: t and "Miel Clara" in t)
-
-        if etiqueta_clara:
-            # El precio está en la siguiente celda (el hermano de la etiqueta encontrada)
-            precio_miel_clara = etiqueta_clara.find_next_sibling("td").text
-            
-            # Formatos posibles: "$ 1.500,00", "$1500", "1.500"
-            # 1. Quitamos espacios y signos $
-            miel_limpia = precio_miel_clara.replace("$", "").replace(" ", "")
-            # 2. Si tiene coma (decimales en formato latino), reemplazamos los puntos (miles) por nada y la coma por punto
-            if "," in miel_limpia:
-                miel_limpia = miel_limpia.replace(".", "").replace(",", ".")
-            else:
-                pass # Python's float can handle basic strings
-            
-            # Como regla general, limpiamos lo que no sea digito o punto
-            miel_final = "".join(c for c in miel_limpia if c.isdigit() or c == '.')
-            
-            resultado = float(miel_final) if miel_final else None
-            cache.set("cotizacion_miel", resultado, 3600)  # Cache por 1 hora
-            return resultado
-
-        return None
-    except Exception as e:
-        print(f"Error al obtener cotización miel: {e}")  # TODO: Quitar a futuro
-        return None
+    # TODO: Debo implementar la llamada a la base de datos para obtener las cotizaciones de la miel y la cera.
+    # Por ahora, devuelvo un valor temporal.
+    return 1.00
 
