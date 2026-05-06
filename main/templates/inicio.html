@@ -20,31 +20,46 @@
 {% block area-trabajo %}
   <!-- Área de Trabajo -->
   <section id="area-trabajo">
-    <div class="tarjeta-info">
-      <h3>Bienvenido al sistema</h3>
-      <p>Selecciona una opción en el menú lateral para comenzar a operar.</p>
-    </div>
     <div id="contenedor-cotizaciones">
+      
+      <div id="superior">
+        <article class="tarjeta-info">
+          <h3>Dolar oficial compra</h3>
+          <p>$ {{oficial.compra}}</p>
+        </article>
 
-      <article class="tarjeta-info">
-        <h3>Dolar oficial compra</h3>
-        <p>$ {{oficial.compra}}</p>
-      </article>
+        <article class="tarjeta-info">
+          <h3>Dolar oficial venta</h3>
+          <p>$ {{oficial.venta}}</p>
+        </article>
+      </div>
 
-      <article class="tarjeta-info">
-        <h3>Dolar oficial venta</h3>
-        <p>$ {{oficial.venta}}</p>
-      </article>
+      <div id="inferior">
+        <article class="tarjeta-info">
+          <h3>Miel 34mm</h3>
+          <p>$ 1000</p>
+        </article>
 
-      <article class="tarjeta-info">
-        <h3>Dolar blue compra</h3>
-        <p>$ {{blue.compra}}</p>
-      </article>
+        <article class="tarjeta-info"> 
+          <h3>Miel 50mm</h3>
+          <p>$ 1000</p>
+        </article>
 
-      <article class="tarjeta-info">
-        <h3>Dolar blue venta</h3>
-        <p>$ {{blue.venta}}</p>
-      </article>
+        <article class="tarjeta-info"> 
+          <h3>Miel +50mm</h3>
+          <p>$ 1000</p>
+        </article>
+
+        <article class="tarjeta-info"> 
+          <h3>Cera Operculo</h3>
+          <p>$ 1000</p>
+        </article>
+
+        <article class="tarjeta-info"> 
+          <h3>Cera Recupero</h3>
+          <p>$ 1000</p>
+        </article>
+      </div>
 
     </div>
   </section>
