@@ -49,11 +49,23 @@
             Clientes
           </a>
         </li>
+        <li>
+          <a href="" class="item-menu">
+            <span class="material-symbols-outlined">local_shipping</span>
+            Viajes
+          </a>
+        </li>
         {% if user.is_staff %}
         <li>
           <a href="{% url 'deudores' %}" class="item-menu {% if request.resolver_match.url_name == 'deudores' %} activo {% endif %}">
             <span class="material-symbols-outlined">payments</span>
             Deudores
+          </a>
+        </li>
+        <li>
+          <a href="" class="item-menu">
+            <span class="material-symbols-outlined">inventory</span>
+            Mercado Libre
           </a>
         </li>
         {% endif %}

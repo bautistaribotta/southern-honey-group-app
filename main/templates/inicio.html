@@ -35,32 +35,117 @@
       </div>
 
       <div id="inferior">
-        <article class="tarjeta-info">
+        <article class="tarjeta-info" data-articulo="Miel 34mm">
           <h3>Miel 34mm</h3>
-          <p>$ 1000</p>
+          <p>$ <span class="monto">{{ cotizaciones.Miel_34mm }}</span></p>
         </article>
 
-        <article class="tarjeta-info"> 
+        <article class="tarjeta-info" data-articulo="Miel 50mm"> 
           <h3>Miel 50mm</h3>
-          <p>$ 1000</p>
+          <p>$ <span class="monto">{{ cotizaciones.Miel_50mm }}</span></p>
         </article>
 
-        <article class="tarjeta-info"> 
+        <article class="tarjeta-info" data-articulo="Miel +50mm"> 
           <h3>Miel +50mm</h3>
-          <p>$ 1000</p>
+          <p>$ <span class="monto">{{ cotizaciones.Miel_plus50mm }}</span></p>
         </article>
 
-        <article class="tarjeta-info"> 
+        <article class="tarjeta-info" data-articulo="Cera Operculo"> 
           <h3>Cera Operculo</h3>
-          <p>$ 1000</p>
+          <p>$ <span class="monto">{{ cotizaciones.Cera_Operculo }}</span></p>
         </article>
 
-        <article class="tarjeta-info"> 
+        <article class="tarjeta-info" data-articulo="Cera Recupero"> 
           <h3>Cera Recupero</h3>
-          <p>$ 1000</p>
+          <p>$ <span class="monto">{{ cotizaciones.Cera_Recupero }}</span></p>
         </article>
       </div>
 
-    </div>
-  </section>
-{% endblock %}
+      </div>
+      </section>
+
+      <script src="{% static 'js/notifications.js' %}"></script>
+      <script>
+      document.addEventListener('DOMContentLoaded', function() {
+      const tarjetas = document.querySelectorAll('.tarjeta-info[data-articulo]');
+
+      tarjetas.forEach(tarjeta => {
+        tarjeta.style.cursor = 'pointer';
+
+        tarjeta.addEventListener('click', function(e) {
+          const montoSpan = this.querySelector('.monto');
+          if (this.querySelector('input')) return; // Evitar múltiples inputs
+
+          const valorActual = montoSpan.textContent;
+          const input = document.createElement('input');
+          input.type = 'number';
+          input.step = '0.01';
+          input.value = valorActual;
+          input.className = 'input-edicion';
+          input.style.width = '100px';
+          input.style.fontSize = 'inherit';
+          input.style.textAlign = 'center';
+
+          montoSpan.style.display = 'none';
+          montoSpan.parentNode.appendChild(input);
+          input.focus();
+
+          const guardar = () => {
+            const nuevoValor = input.value;
+            const articulo = this.dataset.articulo;
+
+            if (nuevoValor === valorActual) {
+              input.remove();
+              montoSpan.style.display = 'inline';
+              return;
+            }
+
+            fetch('{% url "actualizar_cotizacion" %}', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+              },
+              body: JSON.stringify({
+                articulo: articulo,
+                monto: nuevoValor
+              })
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.ok) {
+                montoSpan.textContent = nuevoValor;
+                notificarExito('Cotización actualizada correctamente');
+              } else {
+                notificarError('Error al actualizar: ' + data.error);
+              }
+              input.remove();
+              montoSpan.style.display = 'inline';
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              notificarError('Error de conexión');
+              input.remove();
+              montoSpan.style.display = 'inline';
+            });
+          };
+
+          input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+              guardar();
+            }
+          });
+
+          input.addEventListener('blur', function() {
+            guardar();
+          });
+
+          // Prevenir que el click en el input propague al article
+          input.addEventListener('click', function(e) {
+            e.stopPropagation();
+          });
+        });
+      });
+      });
+      </script>
+      {% endblock %}

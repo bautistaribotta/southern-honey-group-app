@@ -20,6 +20,8 @@ from .services import (
     editar_cliente,
     eliminar_cliente,
     get_cotizacion_oficial,
+    get_cotizaciones,
+    actualizar_cotizacion,
     obtener_datos_cliente,
     obtener_datos_producto,
     modificar_stock,
@@ -58,8 +60,28 @@ para que se loguee. Todo esto implementado usando el wrapped @login_required
 @login_required
 def inicio(request):
     dolar_oficial = get_cotizacion_oficial()
-    contexto = {"oficial": dolar_oficial}
+    cotizaciones = get_cotizaciones()
+    contexto = {"oficial": dolar_oficial, "cotizaciones": cotizaciones}
     return render(request, "inicio.html", contexto)
+
+
+@login_required
+@ensure_csrf_cookie
+def actualizar_cotizacion_ajax(request):
+    if request.method == "POST":
+        try:
+            datos = json.loads(request.body)
+            articulo = datos.get("articulo")
+            monto = datos.get("monto")
+
+            if articulo and monto is not None:
+                actualizar_cotizacion(articulo, monto)
+                return JsonResponse({"ok": True})
+            else:
+                return JsonResponse({"error": "Datos incompletos"}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+    return JsonResponse({"error": "Método no permitido"}, status=405)
 
 
 @login_required

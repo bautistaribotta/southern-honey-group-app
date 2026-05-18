@@ -141,6 +141,17 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
+/* Para cuando la tabla esta vacia, quito los efectos hover */
+.tabla-deudores tbody tr.fila-vacia:hover,
+.tabla-deudores tbody tr.fila-vacia:active {
+  pointer-events: none;
+  transform: none;
+  background-color: transparent;
+  box-shadow: none;
+  cursor: default;
+}
+
+
 /* --- PAGINACIÓN --- */
 .paginacion {
   padding: 1rem 1.5rem;

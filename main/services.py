@@ -5,7 +5,7 @@ from django.db import transaction
 from django.db.models import Sum, F, Value
 from django.db.models.functions import Coalesce
 from django.core.cache import cache
-from .models import Producto, Cliente, Operacion, DetalleOperacion, Pago
+from .models import Producto, Cliente, Operacion, DetalleOperacion, Pago, Cotizaciones
 
 
 def nuevo_producto(nombre, categoria=None, precio=None, cantidad=None):
@@ -129,11 +129,8 @@ def editar_cliente(id_cliente, nombre, apellido, telefono, localidad, direccion,
 
 def eliminar_cliente(id_cliente):
     cliente = get_object_or_404(Cliente, id=id_cliente)
-    """
-    Marco el cliente como inactivo en lugar de borrarlo
-    Esto es para no perder el historial de sus compras pasadas
-    """
     cliente.activo = False
+
     cliente.save()
     return cliente
 
@@ -144,13 +141,6 @@ def crear_operacion(cliente, items, metodo_pago):
     if cotizacion_dolar:
         valor_dolar = cotizacion_dolar.get("venta")
     else:
-        # TODO
-        """
-        Si no se puede obtener la cotizacion del dolar se debe
-        pedir al usuario que ingrese el valor de forma manual mediante 
-        un modal que lo comunique
-        """
-
         valor_dolar = None
 
     valor_miel = get_cotizacion_miel()
@@ -301,13 +291,46 @@ def get_cotizacion_oficial():
         cache.set("cotizacion_oficial", resultado, 3600)  # Cache por 1 hora
         return resultado
     except Exception as e:
-        print(f"Error al obtener cotización oficial: {e}")  # TODO: Quitar a futuro
         return {"compra": None, "venta": None}
 
 
+def get_cotizaciones():
+    """
+    Obtiene todas las cotizaciones guardadas en la base de datos.
+    Retorna un diccionario con el formato {articulo_sanitizado: monto}
+    donde los caracteres especiales se reemplazan para facilitar su uso en templates.
+    """
+    articulos_esperados = ["Miel 34mm", "Miel 50mm", "Miel +50mm", "Cera Operculo", "Cera Recupero"]
+    cotizaciones_db = {c.articulo: c.monto for c in Cotizaciones.objects.all()}
+    
+    resultado = {}
+    for art in articulos_esperados:
+        # Sanitizar la clave para que sea un identificador válido en Django Templates
+        clave = art.replace(" ", "_").replace("+", "plus")
+        resultado[clave] = cotizaciones_db.get(art, 0)
+        
+    return resultado
+
+
+def actualizar_cotizacion(articulo, monto):
+    """
+    Actualiza o crea una cotización en la base de datos.
+    """
+    cotizacion, created = Cotizaciones.objects.update_or_create(
+        articulo=articulo,
+        defaults={"monto": monto}
+    )
+    return cotizacion
+
 
 def get_cotizacion_miel():
-    # TODO: Debo implementar la llamada a la base de datos para obtener las cotizaciones de la miel y la cera.
-    # Por ahora, devuelvo un valor temporal.
-    return 1.00
+    """
+    Obtiene la cotización de la miel. Se toma 'Miel 50mm' como referencia por defecto.
+    """
+    try:
+        miel = Cotizaciones.objects.get(articulo="Miel 50mm")
+        return miel.monto
+    except Cotizaciones.DoesNotExist:
+        return 1.00
+
 

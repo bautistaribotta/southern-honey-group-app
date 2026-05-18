@@ -3,7 +3,8 @@ from main.views import (login, inicio,
                         productos, clientes,
                         informacion_clientes, informacion_operaciones, operaciones,
                         obtener_cliente_json, obtener_producto_json,
-                        deudores, cerrar_sesion, cancelar_operacion, registrar_pago)
+                        deudores, cerrar_sesion, cancelar_operacion, registrar_pago,
+                        actualizar_cotizacion_ajax)
 
 """
 La sentencia name="nombre_del_archivo" se usa 
@@ -12,6 +13,7 @@ para que Django sepa la ruta relativa del .html
 urlpatterns = [
     path('', login, name="login"),
     path('inicio/', inicio, name="inicio"),
+    path('actualizar_cotizacion/', actualizar_cotizacion_ajax, name="actualizar_cotizacion"),
     path('productos/', productos, name="productos"),
     path('clientes/', clientes, name="clientes"),
     path('informacion_clientes/<int:id_cliente>/', informacion_clientes, name="informacion_clientes"),
