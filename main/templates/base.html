@@ -50,7 +50,7 @@
           </a>
         </li>
         <li>
-          <a href="" class="item-menu">
+          <a href="{% url 'viajes' %}" class="item-menu {% if request.resolver_match.url_name == 'viajes' %} activo {% endif %}">
             <span class="material-symbols-outlined">local_shipping</span>
             Viajes
           </a>
@@ -62,13 +62,13 @@
             Deudores
           </a>
         </li>
+        {% endif %}
         <li>
-          <a href="" class="item-menu">
+          <a href="{% url 'mercado_libre' %}" class="item-menu {% if request.resolver_match.url_name == 'mercado_libre' %} activo {% endif %}">
             <span class="material-symbols-outlined">inventory</span>
             Mercado Libre
           </a>
         </li>
-        {% endif %}
       </ul>
     </nav>
 

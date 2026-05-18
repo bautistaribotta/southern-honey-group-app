@@ -1,10 +1,8 @@
 from django.urls import path
-from main.views import (login, inicio,
-                        productos, clientes,
-                        informacion_clientes, informacion_operaciones, operaciones,
-                        obtener_cliente_json, obtener_producto_json,
-                        deudores, cerrar_sesion, cancelar_operacion, registrar_pago,
-                        actualizar_cotizacion_ajax)
+from main.views import (login, inicio, actualizar_cotizacion_ajax,
+                        productos, clientes, informacion_clientes, informacion_operaciones,
+                        operaciones, cancelar_operacion, registrar_pago, obtener_cliente_json,
+                        obtener_producto_json, viajes, deudores, mercado_libre, cerrar_sesion)
 
 """
 La sentencia name="nombre_del_archivo" se usa 
@@ -23,6 +21,8 @@ urlpatterns = [
     path('operaciones/<int:id_cliente>/', operaciones, name="operaciones"),
     path('api/clientes/<int:id_cliente>/', obtener_cliente_json, name="obtener_cliente_json"),
     path('api/productos/<int:id_producto>/', obtener_producto_json, name="obtener_producto_json"),
+    path('viajes/', viajes, name="viajes"),
     path('deudores/', deudores, name="deudores"),
+    path('mercado_libre/', mercado_libre, name="mercado_libre"),
     path('cerrar_sesion', cerrar_sesion, name="cerrar_sesion")
 ]

@@ -444,6 +444,7 @@ def operaciones(request, id_cliente):
 
     return render(request, "operaciones.html", contexto)
 
+
 @login_required
 @ensure_csrf_cookie
 def registrar_pago(request, id_operacion):
@@ -483,6 +484,7 @@ def registrar_pago(request, id_operacion):
 
     return JsonResponse({"error": "Método no permitido"}, status=405)
 
+
 @login_required
 def cancelar_operacion(request, id_operacion):
     if request.method == "POST":
@@ -493,6 +495,11 @@ def cancelar_operacion(request, id_operacion):
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
     return JsonResponse({"error": "Método no permitido"}, status=405)
+
+
+@login_required
+def viajes(request):
+    return render(request, "viajes.html")
 
 
 # Verifico que solo un administrador pueda ver la vista, tambien verifica que el usuario este logueado
@@ -511,6 +518,10 @@ def deudores(request):
         return render(request, "tabla_deudores.html", contexto)
         
     return render(request, "deudores.html", contexto)
+
+
+def mercado_libre(request):
+    return render(request, "mercado_libre.html")
 
 
 def cerrar_sesion(request):
