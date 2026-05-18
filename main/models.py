@@ -130,3 +130,43 @@ class Cotizaciones(models.Model):
 
     def __str__(self):
         return f"Cotizacion {self.articulo}: {self.monto}"
+
+
+class Choferes(models.Model):
+    nombre = models.CharField(max_length=25)
+    apellido = models.CharField(max_length=25)
+    total_viajes = models.IntegerField(default=0)
+    # TODO: Unique Constraint con el nombre y apellido del chofer
+
+    class Meta:
+        db_table = "choferes"
+
+    def __str__(self):
+        return f"Chofer: {self.nombre}"
+
+
+class Vehiculo(models.Model):
+    nombre = models.CharField(max_length=30)
+    patente = models.CharField(max_length=7)
+    total_viajes = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = "vehiculos"
+
+    def __str__(self):
+        return f"Vehiculo"
+
+
+class Viajes(models.Model):
+    # TODO: LLAVES FORANEAS CHOFER - VEHICULO Y ¿Remitos?
+    inicio_caja = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    fecha_inicio = models.DateTimeField(auto_now_add=True)
+    fecha_vuelta = models.DateTimeField(null=True, blank=True)
+    gastos = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    final_caja = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    class Meta:
+        db_table = "viajes"
+
+    def __str__(self):
+        return f"viaje {self.id}"
