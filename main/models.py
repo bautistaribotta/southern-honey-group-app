@@ -1,3 +1,5 @@
+from dataclasses import field, fields
+
 from django.db import models
 
 
@@ -12,7 +14,7 @@ class Producto(models.Model):
         ("Medicamentos", "Medicamentos"),
         ("Otros", "Otros"),
     ]
-    nombre = models.CharField(max_length=50)
+    nombre = models.CharField(max_length=50, unique=True)
     categoria = models.CharField(max_length=50, choices=categorias, null=True, blank=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     cantidad = models.PositiveIntegerField(default=0)
@@ -136,10 +138,15 @@ class Chofer(models.Model):
     nombre = models.CharField(max_length=25)
     apellido = models.CharField(max_length=25)
     total_viajes = models.IntegerField(default=0)
-    # TODO: Unique Constraint con el nombre y apellido del chofer
 
     class Meta:
         db_table = "choferes"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["nombre", "apellido"],
+                name="unique_nombre_apellido_chofer"
+            )
+        ]
 
     def __str__(self):
         return f"Chofer: {self.nombre}"
@@ -158,7 +165,7 @@ class Vehiculo(models.Model):
 
 
 class Viaje(models.Model):
-    # TODO: LLAVES FORANEAS CHOFER - VEHICULO Y ¿Remitos?
+    # TODO: LLAVES FORANEAS ¿Remitos?
     chofer = models.ForeignKey(Chofer, on_delete=models.PROTECT)
     vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT)
     inicio_caja = models.DecimalField(max_digits=10, decimal_places=2, default=0)
