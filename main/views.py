@@ -9,8 +9,6 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.db import transaction
-
-from .models import Cliente, Producto, Operacion, DetalleOperacion, Pago
 from .pdf_services import Remito
 from .services import (
     nuevo_producto,

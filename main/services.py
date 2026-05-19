@@ -5,7 +5,7 @@ from django.db import transaction
 from django.db.models import Sum, F, Value
 from django.db.models.functions import Coalesce
 from django.core.cache import cache
-from .models import Producto, Cliente, Operacion, DetalleOperacion, Pago, Cotizaciones, Choferes, Vehiculo, Viajes
+from .models import Producto, Cliente, Operacion, DetalleOperacion, Pago, Cotizaciones, Chofer, Vehiculo, Viaje
 
 
 def nuevo_producto(nombre, categoria=None, precio=None, cantidad=None):

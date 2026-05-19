@@ -132,7 +132,7 @@ class Cotizaciones(models.Model):
         return f"Cotizacion {self.articulo}: {self.monto}"
 
 
-class Choferes(models.Model):
+class Chofer(models.Model):
     nombre = models.CharField(max_length=25)
     apellido = models.CharField(max_length=25)
     total_viajes = models.IntegerField(default=0)
@@ -157,8 +157,10 @@ class Vehiculo(models.Model):
         return f"Vehiculo"
 
 
-class Viajes(models.Model):
+class Viaje(models.Model):
     # TODO: LLAVES FORANEAS CHOFER - VEHICULO Y ¿Remitos?
+    chofer = models.ForeignKey(Chofer, on_delete=models.PROTECT)
+    vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT)
     inicio_caja = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     fecha_inicio = models.DateTimeField(auto_now_add=True)
     fecha_vuelta = models.DateTimeField(null=True, blank=True)
