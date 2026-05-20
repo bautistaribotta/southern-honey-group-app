@@ -64,7 +64,6 @@
 /* --- TABLA DE VIAJES --- */
 .tabla-viajes {
   width: 100%;
-  text-align: left;
   border-collapse: collapse;
 }
 
@@ -82,19 +81,19 @@
   z-index: 10;
 }
 
-.tabla-viajes th.texto-derecha {
-  text-align: right;
+.alineado-izq {
+  text-align: left;
 }
 
-.texto-centrado {
+.alineado-centro {
   text-align: center;
 }
 
 /* Anchos de columnas */
 .tabla-viajes th:nth-child(1) { width: 30%; } /* Chofer */
 .tabla-viajes th:nth-child(2) { width: 30%; } /* Vehiculo */
-.tabla-viajes th:nth-child(4) { width: 20%; } /* Fecha de inicio */
-.tabla-viajes th:nth-child(5) { width: 20%;}  /* Fecha de vuelta */
+.tabla-viajes th:nth-child(3) { width: 20%; } /* Fecha de inicio */
+.tabla-viajes th:nth-child(4) { width: 20%; } /* Fecha de vuelta */
 
 .tabla-viajes td {
   padding: 1rem 1.5rem;
@@ -135,4 +134,186 @@
   background-color: #f1f5f9;
   transform: translateY(-1px);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* Alineaciones específicas */
+.alineado-izq, .alineado-izq .enlace-fila {
+  text-align: left;
+}
+
+.alineado-centro, .alineado-centro .enlace-fila {
+  text-align: center;
+}
+
+/* --- PANEL LATERAL (SLIDE-OVER) --- */
+#contenedor-slide-over {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  visibility: hidden;
+  overflow: hidden;
+  display: flex;
+  justify-content: flex-end;
+  /* Transición de visibilidad con delay para que el panel alcance a salir */
+  transition: visibility 0.3s;
+}
+
+#contenedor-slide-over.slide-over-abierto {
+  visibility: visible;
+  pointer-events: auto;
+  transition: none; /* Al abrir no necesitamos delay */
+}
+
+#slide-over-fondo {
+  position: absolute;
+  inset: 0;
+  background-color: #0f172a66;
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+#contenedor-slide-over.slide-over-abierto #slide-over-fondo {
+  opacity: 1;
+}
+
+#slide-over-panel {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  background-color: white;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -10px 0 25px rgba(0, 0, 0, 0.1);
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* MEJORAS DE ANIMACION IGUALES A PRODUCTOS */
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+#contenedor-slide-over.slide-over-abierto #slide-over-panel {
+  transform: translateX(0);
+}
+
+/* CABECERA */
+.panel-cabecera {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.panel-titulo-fila {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.icono-contenedor {
+  background-color: rgba(75, 99, 45, 0.1);
+  color: var(--brand-olive);
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icono-contenedor span { font-size: 22px; }
+
+.texto-cabecera h3 {
+  color: var(--slate-900);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.texto-cabecera p {
+  color: var(--slate-500);
+  font-size: 0.75rem;
+}
+
+.boton-cerrar {
+  background: none;
+  border: none;
+  color: var(--slate-400);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.boton-cerrar:hover { background-color: rgba(0,0,0,0.05); }
+
+/* CUERPO Y SCROLL */
+.panel-cuerpo {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.panel-cuerpo::-webkit-scrollbar { width: 5px; }
+.panel-cuerpo::-webkit-scrollbar-thumb {
+  background-color: var(--stone-200);
+  border-radius: 10px;
+}
+
+/* PIE */
+.panel-pie {
+  padding: 1.5rem;
+  border-top: 1px solid rgba(75, 99, 45, 0.1);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  background-color: var(--background-light);
+  position: sticky;
+  bottom: 0;
+}
+
+.boton-primario {
+  background-color: var(--brand-olive);
+  color: white;
+  border: none;
+  padding: 0.875rem;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  box-shadow: 0 10px 15px -3px rgba(75, 99, 45, 0.2);
+  transition: all 0.2s;
+}
+
+.boton-primario:hover { 
+  filter: brightness(1.1); 
+}
+
+.boton-primario:active { 
+  transform: scale(0.98); 
+}
+
+.boton-secundario {
+  background-color: white;
+  color: var(--slate-700);
+  border: 1px solid var(--stone-200);
+  padding: 0.875rem;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.boton-secundario:hover {
+  background-color: #f8fafc;
 }

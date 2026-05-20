@@ -31,7 +31,7 @@
           <span class="material-symbols-outlined">add</span>
           Nuevo Viaje
         </button>
-        <button class="boton-nuevo secundario" id="btn-nuevo-chofer">
+        <button class="boton-nuevo secundario" id="btn-nuevo-chofer" onclick="abrirSlideOver()">
           <span class="material-symbols-outlined">person_add</span>
           Nuevo Chofer
         </button>
@@ -43,22 +43,59 @@
       <table class="tabla-viajes">
         <thead>
           <tr>
-            <th>Chofer</th>
-            <th>Vehículo</th>
-            <th>Fecha de Inicio</th>
-            <th>Fecha de Regreso</th>
+            <th class="alineado-izq">Chofer</th>
+            <th class="alineado-izq">Vehículo</th>
+            <th class="alineado-centro">Fecha de Inicio</th>
+            <th class="alineado-centro">Fecha de Regreso</th>
           </tr>
         </thead>
         <tbody>
           <!-- FILAS -->
           <tr class="fila-viaje">
-            <td class="td-enlace"> <a href="#" class="enlace-fila"> </a> </td>
+            <td class="td-enlace"> <a href="#" class="enlace-fila"> Miguel Arrieta </a> </td>
+            <td class="td-enlace"> <a href="#" class="enlace-fila"> Camion </a> </td>
+            <td class="td-enlace alineado-centro"> <a href="#" class="enlace-fila"> 12/05/26 </a> </td>
+            <td class="td-enlace alineado-centro"> <a href="#" class="enlace-fila"> 13/05/26 </a> </td>
           </tr>
         </tbody>
       </table>
     </div>
 
   </section>
+
+  <!-- PANEL LATERAL NUEVO CHOFER (SLIDE-OVER) -->
+  <div id="contenedor-slide-over">
+    <div id="slide-over-fondo" onclick="cerrarSlideOver()"></div>
+
+    <div id="slide-over-panel">
+      <!-- 1. Cabecera -->
+      <header class="panel-cabecera">
+        <div class="panel-titulo-fila">
+          <div class="icono-contenedor">
+            <span class="material-symbols-outlined">person_add</span>
+          </div>
+          <div class="texto-cabecera">
+            <h3>Nuevo Chofer</h3>
+            <p>Ingrese los datos para el registro</p>
+          </div>
+        </div>
+        <button type="button" class="boton-cerrar" onclick="cerrarSlideOver()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </header>
+
+      <!-- 2. Cuerpo con Scroll -->
+      <main class="panel-cuerpo">
+        
+      </main>
+
+      <!-- 3. Pie del Panel -->
+      <footer class="panel-pie">
+        <button type="button" class="boton-primario">Guardar Chofer</button>
+        <button type="button" class="boton-secundario" onclick="cerrarSlideOver()">Cancelar</button>
+      </footer>
+    </div>
+  </div>
 {% endblock %}
 
 {% block codigo-javascript %}

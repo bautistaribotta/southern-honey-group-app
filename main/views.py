@@ -352,7 +352,7 @@ def informacion_operaciones(request, id_operacion):
     detalles = DetalleOperacion.objects.filter(operacion=operacion)
     """
         Como esta relacionado en Django la operacion con el detalle
-        Solo le paso el la operacion que acabo de encontrar en la Query anterior
+        Solo le paso el de la operacion que acabo de encontrar en la Query anterior
     """
 
     # Armamos la lista estructurada de los productos para enviarlo al PDF
@@ -520,6 +520,7 @@ def deudores(request):
     return render(request, "deudores.html", contexto)
 
 
+@login_required
 def mercado_libre(request):
     return render(request, "mercado_libre.html")
 
