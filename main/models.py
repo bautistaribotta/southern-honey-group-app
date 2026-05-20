@@ -138,6 +138,7 @@ class Chofer(models.Model):
     nombre = models.CharField(max_length=25)
     apellido = models.CharField(max_length=25)
     total_viajes = models.IntegerField(default=0)
+    activo = models.BooleanField(default=True)
 
     class Meta:
         db_table = "choferes"
@@ -156,6 +157,7 @@ class Vehiculo(models.Model):
     nombre = models.CharField(max_length=30)
     patente = models.CharField(max_length=7)
     total_viajes = models.IntegerField(default=0)
+    activo = models.BooleanField(default=True)
 
     class Meta:
         db_table = "vehiculos"
@@ -168,6 +170,7 @@ class Viaje(models.Model):
     # TODO: LLAVES FORANEAS ¿Remitos?
     chofer = models.ForeignKey(Chofer, on_delete=models.PROTECT)
     vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT)
+    destino = models.CharField(max_length=30, null=False, default="")
     inicio_caja = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     fecha_inicio = models.DateTimeField(auto_now_add=True)
     fecha_vuelta = models.DateTimeField(null=True, blank=True)

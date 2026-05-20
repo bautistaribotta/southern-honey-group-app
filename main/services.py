@@ -332,5 +332,3 @@ def get_cotizacion_miel():
         return miel.monto
     except Cotizaciones.DoesNotExist:
         return 1.00
-
-
