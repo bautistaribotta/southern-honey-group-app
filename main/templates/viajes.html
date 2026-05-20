@@ -17,7 +17,48 @@
 {% endblock %}
 
 {% block area-trabajo %}
-<div></div>
+  <!-- ÁREA DE TRABAJO -->
+  <section id="area-trabajo" style="display: flex; flex-direction: column; flex: 1;">
+    
+    <!-- Controles Superiores -->
+    <div class="barra-herramientas">
+      <div class="grupo-busqueda">
+        <!-- Espacio reservado para mantener la alineación de flexbox -->
+      </div>
+      
+      <div style="display: flex; gap: 1rem;">
+        <button class="boton-nuevo" id="btn-nuevo-viaje">
+          <span class="material-symbols-outlined">add</span>
+          Nuevo Viaje
+        </button>
+        <button class="boton-nuevo secundario" id="btn-nuevo-chofer">
+          <span class="material-symbols-outlined">person_add</span>
+          Nuevo Chofer
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabla de Viajes -->
+    <div class="contenedor-tabla" id="tabla-viajes-container"> 
+      <table class="tabla-viajes">
+        <thead>
+          <tr>
+            <th>Chofer</th>
+            <th>Vehículo</th>
+            <th>Fecha de Inicio</th>
+            <th>Fecha de Regreso</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- FILAS -->
+          <tr class="fila-viaje">
+            <td class="td-enlace"> <a href="#" class="enlace-fila"> </a> </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </section>
 {% endblock %}
 
 {% block codigo-javascript %}

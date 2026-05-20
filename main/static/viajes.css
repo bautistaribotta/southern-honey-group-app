@@ -1,0 +1,138 @@
+/* --- BARRA DE HERRAMIENTAS (Botonera) --- */
+.barra-herramientas {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.grupo-busqueda {
+  display: flex;
+  gap: 1rem;
+  flex: 1;
+}
+
+.boton-nuevo {
+  background-color: var(--brand-olive);
+  color: white;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 4px 6px -1px rgba(85, 107, 47, 0.2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.boton-nuevo:hover {
+  background-color: #3f5022;
+}
+
+.boton-nuevo:active {
+  transform: scale(0.95);
+}
+
+.boton-nuevo.secundario {
+  background-color: white;
+  color: var(--slate-700);
+  border: 1px solid var(--stone-200);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.boton-nuevo.secundario:hover {
+  background-color: #f8fafc;
+  border-color: var(--slate-400);
+}
+
+/* --- CONTENEDOR PRINCIPAL TABLA --- */
+.contenedor-tabla {
+  background-color: white;
+  border: 1px solid var(--stone-200);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px #0000000d;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* --- TABLA DE VIAJES --- */
+.tabla-viajes {
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+}
+
+.tabla-viajes th {
+  padding: 1rem 1.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--slate-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background-color: #f8fafc;
+  border-bottom: 1px solid var(--stone-200);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tabla-viajes th.texto-derecha {
+  text-align: right;
+}
+
+.texto-centrado {
+  text-align: center;
+}
+
+/* Anchos de columnas */
+.tabla-viajes th:nth-child(1) { width: 30%; } /* Chofer */
+.tabla-viajes th:nth-child(2) { width: 30%; } /* Vehiculo */
+.tabla-viajes th:nth-child(4) { width: 20%; } /* Fecha de inicio */
+.tabla-viajes th:nth-child(5) { width: 20%;}  /* Fecha de vuelta */
+
+.tabla-viajes td {
+  padding: 1rem 1.5rem;
+  font-size: 0.875rem;
+  border-bottom: 1px solid var(--stone-200);
+  color: var(--slate-700);
+}
+
+.tabla-viajes tbody tr {
+  height: 73px;
+  transition: all 0.2s ease;
+}
+
+.tabla-viajes tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Enlaces de Fila */
+.td-enlace {
+  padding: 0 !important; 
+}
+
+.enlace-fila {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 1rem 1.5rem; 
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.2s ease;
+}
+
+.fila-viaje {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.fila-viaje:hover {
+  background-color: #f1f5f9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
