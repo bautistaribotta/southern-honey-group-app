@@ -86,7 +86,40 @@
 
       <!-- 2. Cuerpo con Scroll -->
       <main class="panel-cuerpo">
-        
+        <section class="seccion-bloque">
+          <div class="subtitulo-formulario">
+            <span class="material-symbols-outlined">badge</span>
+            <h4>Información del chofer</h4>
+          </div>
+
+          <div class="sub-panel-datos">
+            <div class="grupo-input">
+              <label for="nombre-chofer">Nombre</label>
+              <input 
+                type="text" 
+                id="nombre-chofer" 
+                name="nombre_chofer" 
+                placeholder="Ej: Juan" 
+                required
+                maxlength="25"
+                pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{3,25}">
+              <span class="mensaje-error">Mínimo 3 letras, máximo 25, sin números ni símbolos</span>
+            </div>
+
+            <div class="grupo-input">
+              <label for="apellido-chofer">Apellido</label>
+              <input 
+                type="text" 
+                id="apellido-chofer" 
+                name="apellido_chofer" 
+                placeholder="Ej: Perez"
+                required
+                maxlength="25"
+                pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{2,25}">
+              <span class="mensaje-error">Mínimo 2 letras, máximo 25, sin números ni símbolos</span>
+            </div>
+          </div>
+        </section>
       </main>
 
       <!-- 3. Pie del Panel -->
