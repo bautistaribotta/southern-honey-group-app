@@ -27,11 +27,11 @@
       </div>
       
       <div style="display: flex; gap: 1rem;">
-        <button class="boton-nuevo" id="btn-nuevo-viaje">
+        <button class="boton-nuevo" id="btn-nuevo-viaje" onclick="abrirSlideOver('slide-over-viaje')">
           <span class="material-symbols-outlined">add</span>
           Nuevo Viaje
         </button>
-        <button class="boton-nuevo secundario" id="btn-nuevo-chofer" onclick="abrirSlideOver()">
+        <button class="boton-nuevo secundario" id="btn-nuevo-chofer" onclick="abrirSlideOver('slide-over-chofer')">
           <span class="material-symbols-outlined">person_add</span>
           Nuevo Chofer
         </button>
@@ -64,8 +64,8 @@
   </section>
 
   <!-- PANEL LATERAL NUEVO CHOFER (SLIDE-OVER) -->
-  <div id="contenedor-slide-over">
-    <div id="slide-over-fondo" onclick="cerrarSlideOver()"></div>
+  <div id="slide-over-chofer">
+    <div id="slide-over-fondo" onclick="cerrarSlideOver('slide-over-chofer')"></div>
 
     <div id="slide-over-panel">
       <!-- 1. Cabecera -->
@@ -79,7 +79,7 @@
             <p>Ingrese los datos para el registro</p>
           </div>
         </div>
-        <button type="button" class="boton-cerrar" onclick="cerrarSlideOver()">
+        <button type="button" class="boton-cerrar" onclick="cerrarSlideOver('slide-over-chofer')">
           <span class="material-symbols-outlined">close</span>
         </button>
       </header>
@@ -124,13 +124,127 @@
 
       <!-- 3. Pie del Panel -->
       <footer class="panel-pie">
+        <button type="button" class="boton-secundario" onclick="cerrarSlideOver('slide-over-chofer')">Cancelar</button>
         <button type="button" class="boton-primario">Guardar Chofer</button>
-        <button type="button" class="boton-secundario" onclick="cerrarSlideOver()">Cancelar</button>
       </footer>
+    </div>
+  </div>
+
+  <!-- PANEL LATERAL NUEVO VIAJE (SLIDE-OVER) -->
+  <div id="slide-over-viaje">
+    <div id="slide-over-fondo" onclick="cerrarSlideOver('slide-over-viaje')"></div>
+
+    <div id="slide-over-panel">
+      <form id="form-viaje" autocomplete="off">
+        <!-- 1. Cabecera -->
+        <header class="panel-cabecera">
+          <div class="panel-titulo-fila">
+            <div class="icono-contenedor">
+              <span class="material-symbols-outlined">route</span>
+            </div>
+            <div class="texto-cabecera">
+              <h3>Nuevo Viaje</h3>
+              <p>Complete los detalles del nuevo viaje</p>
+            </div>
+          </div>
+          <button type="button" class="boton-cerrar" onclick="cerrarSlideOver('slide-over-viaje')">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </header>
+
+        <!-- 2. Cuerpo con Scroll -->
+        <main class="panel-cuerpo">
+          <section class="seccion-bloque">
+            <div class="subtitulo-formulario">
+              <span class="material-symbols-outlined">local_shipping</span>
+              <h4>Detalles del Viaje</h4>
+            </div>
+
+            <div class="sub-panel-datos">
+              <div class="grupo-input">
+                <label for="chofer-viaje">Chofer</label>
+                <select id="chofer-viaje" name="chofer" required style="padding: 0.75rem 0.875rem; background-color: #f8fafc; border: 1px solid var(--stone-200); border-radius: 0.75rem; font-size: 0.875rem; font-family: inherit; outline: none;">
+                  <option value="" disabled selected>Seleccione un chofer</option>
+                  <!-- Opciones dinámicas aquí -->
+                </select>
+              </div>
+
+              <div class="grupo-input">
+                <label for="vehiculo-viaje">Vehículo</label>
+                <select id="vehiculo-viaje" name="vehiculo" required style="padding: 0.75rem 0.875rem; background-color: #f8fafc; border: 1px solid var(--stone-200); border-radius: 0.75rem; font-size: 0.875rem; font-family: inherit; outline: none;">
+                  <option value="" disabled selected>Seleccione un vehículo</option>
+                  <!-- Opciones dinámicas aca -->
+                </select>
+              </div>
+
+              <div class="grupo-input">
+                <label for="destino-viaje">Destino</label>
+                <input 
+                  type="text" 
+                  id="destino-viaje" 
+                  name="destino" 
+                  placeholder="Ej: Buenos Aires" 
+                  required
+                  maxlength="30">
+              </div>
+
+              <div class="grupo-input">
+                <label for="inicio-caja-viaje">Inicio de Caja</label>
+                <div class="input-con-icono">
+                  <span>$</span>
+                  <input 
+                    type="number" 
+                    id="inicio-caja-viaje" 
+                    name="inicio_caja" 
+                    placeholder="0.00"
+                    step="1"
+                    min="0"
+                    required>
+                </div>
+              </div>
+
+              <div class="grupo-input">
+                <label for="fecha-inicio-viaje">Fecha de Inicio</label>
+                <input 
+                  type="date" 
+                  id="fecha-inicio-viaje" 
+                  name="fecha_inicio" 
+                  required>
+              </div>
+
+              <div class="grupo-input">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <label for="fecha-regreso-viaje">Fecha de Regreso</label>
+                  <span style="font-size: 0.75rem; color: var(--slate-500);">(Opcional)</span>
+                </div>
+                <input 
+                  type="date" 
+                  id="fecha-regreso-viaje" 
+                  name="fecha_regreso">
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <!-- 3. Pie del Panel -->
+        <footer class="panel-pie">
+          <button type="submit" class="boton-primario">Guardar Viaje</button>
+          <button type="button" class="boton-secundario" onclick="cerrarSlideOver('slide-over-viaje')">Cancelar</button>
+        </footer>
+      </form>
     </div>
   </div>
 {% endblock %}
 
 {% block codigo-javascript %}
-<script></script>
+<script>
+  // Autocompletar la fecha de inicio con la fecha actual al cargar la página
+  document.addEventListener('DOMContentLoaded', () => {
+    const inputFechaInicio = document.getElementById('fecha-inicio-viaje');
+    if (inputFechaInicio) {
+      const hoy = new Date().toISOString().split('T')[0];
+      inputFechaInicio.value = hoy;
+    }
+  });
+</script>
 {% endblock %}

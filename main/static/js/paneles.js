@@ -1,12 +1,12 @@
 // Funciones para abrir y cerrar el panel lateral en productos y clientes
 /* Estas funciones le agregan o le quitan la clase "slide-over-abierto" al elemento con el id correspondiente */
-function abrirSlideOver() {
-    document.getElementById('contenedor-slide-over').classList.add('slide-over-abierto');
+function abrirSlideOver(idContenedor = 'contenedor-slide-over') {
+    document.getElementById(idContenedor).classList.add('slide-over-abierto');
     document.body.style.overflow = 'hidden';
 }
 
-function cerrarSlideOver() {
-    document.getElementById('contenedor-slide-over').classList.remove('slide-over-abierto');
+function cerrarSlideOver(idContenedor = 'contenedor-slide-over') {
+    document.getElementById(idContenedor).classList.remove('slide-over-abierto');
     document.body.style.overflow = 'auto';
 }
 

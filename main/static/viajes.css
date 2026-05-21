@@ -146,7 +146,8 @@
 }
 
 /* --- PANEL LATERAL (SLIDE-OVER) --- */
-#contenedor-slide-over {
+#slide-over-chofer,
+#slide-over-viaje {
   position: fixed;
   inset: 0;
   z-index: 100;
@@ -158,7 +159,8 @@
   transition: visibility 0.3s;
 }
 
-#contenedor-slide-over.slide-over-abierto {
+#slide-over-chofer.slide-over-abierto,
+#slide-over-viaje.slide-over-abierto {
   visibility: visible;
   pointer-events: auto;
   transition: none; /* Al abrir no necesitamos delay */
@@ -173,7 +175,8 @@
   transition: opacity 0.3s ease-in-out;
 }
 
-#contenedor-slide-over.slide-over-abierto #slide-over-fondo {
+#slide-over-chofer.slide-over-abierto #slide-over-fondo,
+#slide-over-viaje.slide-over-abierto #slide-over-fondo {
   opacity: 1;
 }
 
@@ -195,7 +198,14 @@
   -webkit-font-smoothing: antialiased;
 }
 
-#contenedor-slide-over.slide-over-abierto #slide-over-panel {
+#form-viaje {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#slide-over-chofer.slide-over-abierto #slide-over-panel,
+#slide-over-viaje.slide-over-abierto #slide-over-panel {
   transform: translateX(0);
 }
 

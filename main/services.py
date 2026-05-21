@@ -332,3 +332,57 @@ def get_cotizacion_miel():
         return miel.monto
     except Cotizaciones.DoesNotExist:
         return 1.00
+
+
+def crear_chofer(nombre, apellido):
+    nuevo_chofer = Chofer.objects.create(
+        nombre=nombre,
+        apellido=apellido
+    )
+    return nuevo_chofer
+
+
+def editar_chofer(id_chofer, nombre, apellido, activo):
+    chofer = get_object_or_404(Chofer, id=id_chofer)
+    chofer.nombre = nombre
+    chofer.apellido = apellido
+    chofer.activo = activo
+    
+    chofer.save()
+    return chofer
+
+
+def eliminar_chofer(id_chofer):
+    chofer = get_object_or_404(Chofer, id=id_chofer)
+    # Borrado lógico
+    chofer.activo = False
+    
+    chofer.save()
+    return chofer
+
+
+def crear_vehiculo(nombre, patente):
+    nuevo_vehiculo = Vehiculo.objects.create(
+        nombre=nombre,
+        patente=patente
+    )
+    return nuevo_vehiculo
+
+
+def editar_vehiculo(id_vehiculo, nombre, patente, activo):
+    vehiculo = get_object_or_404(Vehiculo, id=id_vehiculo)
+    vehiculo.nombre = nombre
+    vehiculo.patente = patente
+    vehiculo.activo = activo
+    
+    vehiculo.save()
+    return vehiculo
+
+
+def eliminar_vehiculo(id_vehiculo):
+    vehiculo = get_object_or_404(Vehiculo, id=id_vehiculo)
+    # Borrado lógico
+    vehiculo.activo = False
+    
+    vehiculo.save()
+    return vehiculo
