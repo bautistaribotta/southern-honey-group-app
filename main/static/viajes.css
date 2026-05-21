@@ -198,7 +198,8 @@
   -webkit-font-smoothing: antialiased;
 }
 
-#form-viaje {
+#form-viaje,
+#form-chofer {
   height: 100%;
   display: flex;
   flex-direction: column;

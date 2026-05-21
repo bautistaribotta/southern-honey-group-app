@@ -63,79 +63,13 @@
 
   </section>
 
-  <!-- PANEL LATERAL NUEVO CHOFER (SLIDE-OVER) -->
-  <div id="slide-over-chofer">
-    <div id="slide-over-fondo" onclick="cerrarSlideOver('slide-over-chofer')"></div>
-
-    <div id="slide-over-panel">
-      <!-- 1. Cabecera -->
-      <header class="panel-cabecera">
-        <div class="panel-titulo-fila">
-          <div class="icono-contenedor">
-            <span class="material-symbols-outlined">person_add</span>
-          </div>
-          <div class="texto-cabecera">
-            <h3>Nuevo Chofer</h3>
-            <p>Ingrese los datos para el registro</p>
-          </div>
-        </div>
-        <button type="button" class="boton-cerrar" onclick="cerrarSlideOver('slide-over-chofer')">
-          <span class="material-symbols-outlined">close</span>
-        </button>
-      </header>
-
-      <!-- 2. Cuerpo con Scroll -->
-      <main class="panel-cuerpo">
-        <section class="seccion-bloque">
-          <div class="subtitulo-formulario">
-            <span class="material-symbols-outlined">badge</span>
-            <h4>Información del chofer</h4>
-          </div>
-
-          <div class="sub-panel-datos">
-            <div class="grupo-input">
-              <label for="nombre-chofer">Nombre</label>
-              <input 
-                type="text" 
-                id="nombre-chofer" 
-                name="nombre_chofer" 
-                placeholder="Ej: Juan" 
-                required
-                maxlength="25"
-                pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{3,25}">
-              <span class="mensaje-error">Mínimo 3 letras, máximo 25, sin números ni símbolos</span>
-            </div>
-
-            <div class="grupo-input">
-              <label for="apellido-chofer">Apellido</label>
-              <input 
-                type="text" 
-                id="apellido-chofer" 
-                name="apellido_chofer" 
-                placeholder="Ej: Perez"
-                required
-                maxlength="25"
-                pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{2,25}">
-              <span class="mensaje-error">Mínimo 2 letras, máximo 25, sin números ni símbolos</span>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <!-- 3. Pie del Panel -->
-      <footer class="panel-pie">
-        <button type="button" class="boton-primario">Guardar Chofer</button>
-        <button type="button" class="boton-secundario" onclick="cerrarSlideOver('slide-over-chofer')">Cancelar</button>
-      </footer>
-    </div>
-  </div>
-
   <!-- PANEL LATERAL NUEVO VIAJE (SLIDE-OVER) -->
   <div id="slide-over-viaje">
     <div id="slide-over-fondo" onclick="cerrarSlideOver('slide-over-viaje')"></div>
 
     <div id="slide-over-panel">
       <form id="form-viaje" method="post" autocomplete="off">
+        {% csrf_token %}
         <!-- 1. Cabecera -->
         <header class="panel-cabecera">
           <div class="panel-titulo-fila">
@@ -231,6 +165,76 @@
         <footer class="panel-pie">
           <button type="submit" class="boton-primario">Guardar Viaje</button>
           <button type="button" class="boton-secundario" onclick="cerrarSlideOver('slide-over-viaje')">Cancelar</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- PANEL LATERAL NUEVO CHOFER (SLIDE-OVER) -->
+  <div id="slide-over-chofer">
+    <div id="slide-over-fondo" onclick="cerrarSlideOver('slide-over-chofer')"></div>
+
+    <div id="slide-over-panel">
+      <form id="form-chofer" method="post" autocomplete="off">
+        {% csrf_token %}
+        <!-- 1. Cabecera -->
+        <header class="panel-cabecera">
+          <div class="panel-titulo-fila">
+            <div class="icono-contenedor">
+              <span class="material-symbols-outlined">person_add</span>
+            </div>
+            <div class="texto-cabecera">
+              <h3>Nuevo Chofer</h3>
+              <p>Ingrese los datos para el registro</p>
+            </div>
+          </div>
+          <button type="button" class="boton-cerrar" onclick="cerrarSlideOver('slide-over-chofer')">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </header>
+
+        <!-- 2. Cuerpo con Scroll -->
+        <main class="panel-cuerpo">
+          <section class="seccion-bloque">
+            <div class="subtitulo-formulario">
+              <span class="material-symbols-outlined">badge</span>
+              <h4>Información del chofer</h4>
+            </div>
+
+            <div class="sub-panel-datos">
+              <div class="grupo-input">
+                <label for="nombre-chofer">Nombre</label>
+                <input 
+                  type="text" 
+                  id="nombre-chofer" 
+                  name="nombre_chofer" 
+                  placeholder="Ej: Juan" 
+                  required
+                  maxlength="25"
+                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{3,25}">
+                <span class="mensaje-error">Mínimo 3 letras, máximo 25, sin números ni símbolos</span>
+              </div>
+
+              <div class="grupo-input">
+                <label for="apellido-chofer">Apellido</label>
+                <input 
+                  type="text" 
+                  id="apellido-chofer" 
+                  name="apellido_chofer" 
+                  placeholder="Ej: Perez"
+                  required
+                  maxlength="25"
+                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{2,25}">
+                <span class="mensaje-error">Mínimo 2 letras, máximo 25, sin números ni símbolos</span>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <!-- 3. Pie del Panel -->
+        <footer class="panel-pie">
+          <button type="submit" class="boton-primario">Guardar Chofer</button>
+          <button type="button" class="boton-secundario" onclick="cerrarSlideOver('slide-over-chofer')">Cancelar</button>
         </footer>
       </form>
     </div>
