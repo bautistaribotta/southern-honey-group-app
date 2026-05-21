@@ -124,8 +124,8 @@
 
       <!-- 3. Pie del Panel -->
       <footer class="panel-pie">
-        <button type="button" class="boton-secundario" onclick="cerrarSlideOver('slide-over-chofer')">Cancelar</button>
         <button type="button" class="boton-primario">Guardar Chofer</button>
+        <button type="button" class="boton-secundario" onclick="cerrarSlideOver('slide-over-chofer')">Cancelar</button>
       </footer>
     </div>
   </div>
@@ -165,7 +165,7 @@
                 <label for="chofer-viaje">Chofer</label>
                 <select id="chofer-viaje" name="chofer" required style="padding: 0.75rem 0.875rem; background-color: #f8fafc; border: 1px solid var(--stone-200); border-radius: 0.75rem; font-size: 0.875rem; font-family: inherit; outline: none;">
                   <option value="" disabled selected>Seleccione un chofer</option>
-                  <!-- Opciones dinámicas aquí -->
+                  <!-- Opciones dinámicas aca -->
                 </select>
               </div>
 
@@ -185,7 +185,8 @@
                   name="destino" 
                   placeholder="Ej: Buenos Aires" 
                   required
-                  maxlength="30">
+                  maxlength="30"
+                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{4,}">
               </div>
 
               <div class="grupo-input">
@@ -199,7 +200,8 @@
                     placeholder="0.00"
                     step="1"
                     min="0"
-                    required>
+                    required
+                    pattern="[0-9+]">
                 </div>
               </div>
 
@@ -213,9 +215,8 @@
               </div>
 
               <div class="grupo-input">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <label for="fecha-regreso-viaje">Fecha de Regreso</label>
-                  <span style="font-size: 0.75rem; color: var(--slate-500);">(Opcional)</span>
+                <div style="display: flex; justify-content: start;">
+                  <label for="fecha-regreso-viaje">Fecha de Regreso (Opcional)</label>
                 </div>
                 <input 
                   type="date" 
