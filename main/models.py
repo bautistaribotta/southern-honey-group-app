@@ -175,7 +175,10 @@ class Viaje(models.Model):
     fecha_inicio = models.DateTimeField(auto_now_add=True)
     fecha_vuelta = models.DateTimeField(null=True, blank=True)
     gastos = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    final_caja = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    @property
+    def final_caja(self):
+        return self.inicio_caja - self.gastos
 
     class Meta:
         db_table = "viajes"

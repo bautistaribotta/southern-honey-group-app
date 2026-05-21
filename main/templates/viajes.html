@@ -135,7 +135,7 @@
     <div id="slide-over-fondo" onclick="cerrarSlideOver('slide-over-viaje')"></div>
 
     <div id="slide-over-panel">
-      <form id="form-viaje" autocomplete="off">
+      <form id="form-viaje" method="post" autocomplete="off">
         <!-- 1. Cabecera -->
         <header class="panel-cabecera">
           <div class="panel-titulo-fila">
@@ -163,7 +163,7 @@
             <div class="sub-panel-datos">
               <div class="grupo-input">
                 <label for="chofer-viaje">Chofer</label>
-                <select id="chofer-viaje" name="chofer" required style="padding: 0.75rem 0.875rem; background-color: #f8fafc; border: 1px solid var(--stone-200); border-radius: 0.75rem; font-size: 0.875rem; font-family: inherit; outline: none;">
+                <select id="chofer-viaje" name="id_chofer" required style="padding: 0.75rem 0.875rem; background-color: #f8fafc; border: 1px solid var(--stone-200); border-radius: 0.75rem; font-size: 0.875rem; font-family: inherit; outline: none;">
                   <option value="" disabled selected>Seleccione un chofer</option>
                   <!-- Opciones dinámicas aca -->
                 </select>
@@ -171,7 +171,7 @@
 
               <div class="grupo-input">
                 <label for="vehiculo-viaje">Vehículo</label>
-                <select id="vehiculo-viaje" name="vehiculo" required style="padding: 0.75rem 0.875rem; background-color: #f8fafc; border: 1px solid var(--stone-200); border-radius: 0.75rem; font-size: 0.875rem; font-family: inherit; outline: none;">
+                <select id="vehiculo-viaje" name="id_vehiculo" required style="padding: 0.75rem 0.875rem; background-color: #f8fafc; border: 1px solid var(--stone-200); border-radius: 0.75rem; font-size: 0.875rem; font-family: inherit; outline: none;">
                   <option value="" disabled selected>Seleccione un vehículo</option>
                   <!-- Opciones dinámicas aca -->
                 </select>
@@ -195,7 +195,7 @@
                   <span>$</span>
                   <input 
                     type="number" 
-                    id="inicio-caja-viaje" 
+                    id="inicio-caja" 
                     name="inicio_caja" 
                     placeholder="0.00"
                     step="1"
@@ -210,7 +210,7 @@
                 <input 
                   type="date" 
                   id="fecha-inicio-viaje" 
-                  name="fecha_inicio" 
+                  name="fecha_inicio_viaje" 
                   required>
               </div>
 
@@ -221,7 +221,7 @@
                 <input 
                   type="date" 
                   id="fecha-regreso-viaje" 
-                  name="fecha_regreso">
+                  name="fecha_regreso_viaje">
               </div>
             </div>
           </section>

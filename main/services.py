@@ -386,3 +386,16 @@ def eliminar_vehiculo(id_vehiculo):
     
     vehiculo.save()
     return vehiculo
+
+
+def crear_viaje(id_chofer, id_vehiculo, destino, inicio_caja, fecha_inicio, fecha_vuelta, gastos, final_caja):
+    nuevo_viaje =  Viaje.objects.create(
+        id_chofer = id_chofer,
+        id_vehiculo = id_vehiculo,
+        destino = destino,
+        inicio_caja = inicio_caja,
+        fecha_inicio = fecha_inicio,
+        fecha_vuelta = fecha_vuelta,
+        gastos = gastos,
+        final_caja = final_caja
+    )

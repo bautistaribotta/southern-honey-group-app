@@ -499,6 +499,21 @@ def cancelar_operacion(request, id_operacion):
 
 @login_required
 def viajes(request):
+    if request.method == "POST":
+        id_chofer = request.POST.get("id_chofer")
+        id_vehiculo = request.POST.get("id_vehiculo")
+        destino = request.POST.get("destino")
+        inicio_caja = request.POST.get("inicio_caja")
+        fecha_inicio_viaje = request.POST.get("fecha_inicio_viaje")
+        fecha_regreso_viaje = request.POST.get("facha_regreso_viaje")
+
+        if not fecha_regreso_viaje:
+            fecha_regreso_viaje = None
+        else:
+            fecha_regreso_viaje = fecha_regreso_viaje
+
+
+
     return render(request, "viajes.html")
 
 
