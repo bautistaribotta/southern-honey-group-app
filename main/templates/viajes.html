@@ -35,6 +35,10 @@
           <span class="material-symbols-outlined">person_add</span>
           Nuevo Chofer
         </button>
+        <button class="boton-nuevo secundario" id="btn-nuevo-vehiculo" onclick="abrirSlideOver('slide-over-vehiculo')">
+          <span class="material-symbols-outlined">local_shipping</span>
+          Nuevo Vehículo
+        </button>
       </div>
     </div>
 
@@ -70,6 +74,7 @@
     <div id="slide-over-panel">
       <form id="form-viaje" method="post" autocomplete="off">
         {% csrf_token %}
+        <input type="hidden" name="accion" value="nuevo_viaje">
         <!-- 1. Cabecera -->
         <header class="panel-cabecera">
           <div class="panel-titulo-fila">
@@ -177,6 +182,7 @@
     <div id="slide-over-panel">
       <form id="form-chofer" method="post" autocomplete="off">
         {% csrf_token %}
+        <input type="hidden" name="accion" value="nuevo_chofer">
         <!-- 1. Cabecera -->
         <header class="panel-cabecera">
           <div class="panel-titulo-fila">
@@ -205,7 +211,7 @@
               <div class="grupo-input">
                 <label for="nombre-chofer">Nombre</label>
                 <input 
-                  type="text" 
+                  type="text"
                   id="nombre-chofer" 
                   name="nombre_chofer" 
                   placeholder="Ej: Juan" 
@@ -239,8 +245,74 @@
       </form>
     </div>
   </div>
-{% endblock %}
 
+  <!-- PANEL LATERAL NUEVO VEHÍCULO (SLIDE-OVER) -->
+  <div id="slide-over-vehiculo">
+    <div id="slide-over-fondo" onclick="cerrarSlideOver('slide-over-vehiculo')"></div>
+
+    <div id="slide-over-panel">
+      <form id="form-vehiculo" method="post" autocomplete="off">
+        {% csrf_token %}
+        <input type="hidden" name="accion" value="nuevo_vehiculo">
+        <!-- 1. Cabecera -->
+        <header class="panel-cabecera">
+          <div class="panel-titulo-fila">
+            <div class="icono-contenedor">
+              <span class="material-symbols-outlined">local_shipping</span>
+            </div>
+            <div class="texto-cabecera">
+              <h3>Nuevo Vehículo</h3>
+              <p>Ingrese los datos para el registro</p>
+            </div>
+          </div>
+          <button type="button" class="boton-cerrar" onclick="cerrarSlideOver('slide-over-vehiculo')">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </header>
+
+        <!-- 2. Cuerpo con Scroll -->
+        <main class="panel-cuerpo">
+          <section class="seccion-bloque">
+            <div class="subtitulo-formulario">
+              <span class="material-symbols-outlined">info</span>
+              <h4>Información del vehículo</h4>
+            </div>
+
+            <div class="sub-panel-datos">
+              <div class="grupo-input">
+                <label for="nombre-vehiculo">Nombre / Modelo</label>
+                <input 
+                  type="text" 
+                  id="nombre-vehiculo" 
+                  name="nombre_vehiculo" 
+                  placeholder="Ej: Traffic Peugeot" 
+                  required
+                  maxlength="30">
+              </div>
+
+              <div class="grupo-input">
+                <label for="patente-vehiculo">Patente</label>
+                <input 
+                  type="text" 
+                  id="patente-vehiculo" 
+                  name="patente_vehiculo" 
+                  placeholder="Ej: AB123CD"
+                  required
+                  maxlength="7">
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <!-- 3. Pie del Panel -->
+        <footer class="panel-pie">
+          <button type="submit" class="boton-primario">Guardar Vehículo</button>
+          <button type="button" class="boton-secundario" onclick="cerrarSlideOver('slide-over-vehiculo')">Cancelar</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+{% endblock %}
 {% block codigo-javascript %}
 <script>
   // Autocompletar la fecha de inicio con la fecha actual al cargar la página

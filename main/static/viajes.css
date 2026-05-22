@@ -147,7 +147,8 @@
 
 /* --- PANEL LATERAL (SLIDE-OVER) --- */
 #slide-over-chofer,
-#slide-over-viaje {
+#slide-over-viaje,
+#slide-over-vehiculo {
   position: fixed;
   inset: 0;
   z-index: 100;
@@ -160,7 +161,8 @@
 }
 
 #slide-over-chofer.slide-over-abierto,
-#slide-over-viaje.slide-over-abierto {
+#slide-over-viaje.slide-over-abierto,
+#slide-over-vehiculo.slide-over-abierto {
   visibility: visible;
   pointer-events: auto;
   transition: none; /* Al abrir no necesitamos delay */
@@ -176,7 +178,8 @@
 }
 
 #slide-over-chofer.slide-over-abierto #slide-over-fondo,
-#slide-over-viaje.slide-over-abierto #slide-over-fondo {
+#slide-over-viaje.slide-over-abierto #slide-over-fondo,
+#slide-over-vehiculo.slide-over-abierto #slide-over-fondo {
   opacity: 1;
 }
 
@@ -199,14 +202,16 @@
 }
 
 #form-viaje,
-#form-chofer {
+#form-chofer,
+#form-vehiculo {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
 #slide-over-chofer.slide-over-abierto #slide-over-panel,
-#slide-over-viaje.slide-over-abierto #slide-over-panel {
+#slide-over-viaje.slide-over-abierto #slide-over-panel,
+#slide-over-vehiculo.slide-over-abierto #slide-over-panel {
   transform: translateX(0);
 }
 
@@ -446,4 +451,5 @@
 
 .grupo-input:has(.input-con-icono input:invalid:not(:placeholder-shown)) .mensaje-error {
   display: block;
+}display: block;
 }

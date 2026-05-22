@@ -27,7 +27,7 @@ from .services import (
     modificar_stock,
     crear_operacion,
     servicio_cancelar_operacion,
-    obtener_listado_deudores,
+    obtener_listado_deudores, crear_vehiculo,
 )
 
 
@@ -500,19 +500,34 @@ def cancelar_operacion(request, id_operacion):
 @login_required
 def viajes(request):
     if request.method == "POST":
-        id_chofer = request.POST.get("id_chofer")
-        id_vehiculo = request.POST.get("id_vehiculo")
-        destino = request.POST.get("destino")
-        inicio_caja = request.POST.get("inicio_caja")
-        fecha_inicio_viaje = request.POST.get("fecha_inicio_viaje")
-        fecha_regreso_viaje = request.POST.get("facha_regreso_viaje")
+        accion = request.POST.get("accion")
 
-        if not fecha_regreso_viaje:
-            fecha_regreso_viaje = None
-        else:
-            fecha_regreso_viaje = fecha_regreso_viaje
+        if accion == "nuevo_viaje":
+            id_chofer = request.POST.get("id_chofer")
+            id_vehiculo = request.POST.get("id_vehiculo")
+            destino = request.POST.get("destino")
+            inicio_caja = request.POST.get("inicio_caja")
+            fecha_inicio_viaje = request.POST.get("fecha_inicio_viaje")
+            fecha_regreso_viaje = request.POST.get("facha_regreso_viaje")
+            if not fecha_regreso_viaje:
+                fecha_regreso_viaje = None
+            else:
+                fecha_regreso_viaje = fecha_regreso_viaje
 
+            # TODO: Crear la funcion en services.py
+            crear_viaje(id_chofer, id_vehiculo, destino, inicio_caja, fecha_inicio_viaje, fecha_regreso_viaje)
 
+        elif accion == "nuevo_chofer":
+            nombre_chofer = request.POST.get("nombre_chofer")
+            apellido_chofer = request.POST.get("apellido_chofer")
+
+            crear_chofer(nombre_chofer, apellido_chofer)
+
+        elif accion == "nuevo_vehiculo":
+            nombre_vehiculo = request.POST.get("nombre_vehiculo")
+            patente_vehiculo = request.POST.get("patente_vehiculo")
+
+            crear_vehiculo(nombre_vehiculo, patente_vehiculo)
 
     return render(request, "viajes.html")
 

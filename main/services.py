@@ -399,3 +399,13 @@ def crear_viaje(id_chofer, id_vehiculo, destino, inicio_caja, fecha_inicio, fech
         gastos = gastos,
         final_caja = final_caja
     )
+
+
+def editar_viaje(id_viaje):
+    # TODO: Funcion para editar
+    pass
+
+
+def cancelar_viaje(id_viaje):
+    # TODO: ¿Funcion para eliminar y/o cancelar viajes?
+    pass
