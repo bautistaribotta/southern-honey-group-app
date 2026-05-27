@@ -6,8 +6,25 @@ function abrirSlideOver(idContenedor = 'contenedor-slide-over') {
 }
 
 function cerrarSlideOver(idContenedor = 'contenedor-slide-over') {
-    document.getElementById(idContenedor).classList.remove('slide-over-abierto');
+    const contenedor = document.getElementById(idContenedor);
+    contenedor.classList.remove('slide-over-abierto');
     document.body.style.overflow = 'auto';
+
+    // Buscamos si hay un formulario dentro de este panel específico
+    const formulario = contenedor.querySelector('form');
+    if (formulario) {
+        // Limpiamos los datos del formulario al cerrarlo (resetea inputs, selects, etc)
+        formulario.reset();
+        
+        // Si el formulario tiene campos ocultos (como id_cliente o id_producto para edición), los vaciamos
+        const camposOcultos = formulario.querySelectorAll('input[type="hidden"]');
+        camposOcultos.forEach(campo => {
+            // No vaciamos los tokens de seguridad ni el campo de "accion" que rutea la vista
+            if (campo.name !== 'csrfmiddlewaretoken' && campo.name !== 'accion') {
+                campo.value = '';
+            }
+        });
+    }
 }
 
 function abrirPanelEliminar() {
