@@ -155,7 +155,7 @@ class Chofer(models.Model):
 
 class Vehiculo(models.Model):
     nombre = models.CharField(max_length=30)
-    patente = models.CharField(max_length=7)
+    patente = models.CharField(max_length=7, unique=True)
     total_viajes = models.IntegerField(default=0)
     activo = models.BooleanField(default=True)
 
@@ -172,8 +172,8 @@ class Viaje(models.Model):
     vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT, db_column="id_vehiculo")
     destino = models.CharField(max_length=30, null=False, default="")
     inicio_caja = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    fecha_inicio = models.DateTimeField(auto_now_add=True)
-    fecha_vuelta = models.DateTimeField(null=True, blank=True)
+    fecha_inicio = models.DateField()
+    fecha_vuelta = models.DateField(null=True, blank=True)
     gastos = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     @property

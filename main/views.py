@@ -27,7 +27,13 @@ from .services import (
     modificar_stock,
     crear_operacion,
     servicio_cancelar_operacion,
-    obtener_listado_deudores, crear_vehiculo,
+    obtener_listado_deudores,
+    crear_chofer,
+    crear_vehiculo,
+    crear_viaje,
+    obtener_choferes_activos,
+    obtener_vehiculos_activos,
+    obtener_viajes,
 )
 
 
@@ -508,28 +514,41 @@ def viajes(request):
             destino = request.POST.get("destino")
             inicio_caja = request.POST.get("inicio_caja")
             fecha_inicio_viaje = request.POST.get("fecha_inicio_viaje")
-            fecha_regreso_viaje = request.POST.get("facha_regreso_viaje")
+            fecha_regreso_viaje = request.POST.get("fecha_regreso_viaje")
             if not fecha_regreso_viaje:
                 fecha_regreso_viaje = None
-            else:
-                fecha_regreso_viaje = fecha_regreso_viaje
 
-            # TODO: Crear la funcion en services.py
             crear_viaje(id_chofer, id_vehiculo, destino, inicio_caja, fecha_inicio_viaje, fecha_regreso_viaje)
+            messages.success(request, "Viaje registrado exitosamente.")
 
         elif accion == "nuevo_chofer":
             nombre_chofer = request.POST.get("nombre_chofer")
             apellido_chofer = request.POST.get("apellido_chofer")
 
             crear_chofer(nombre_chofer, apellido_chofer)
+            messages.success(request, "Chofer registrado exitosamente.")
 
         elif accion == "nuevo_vehiculo":
             nombre_vehiculo = request.POST.get("nombre_vehiculo")
             patente_vehiculo = request.POST.get("patente_vehiculo")
 
             crear_vehiculo(nombre_vehiculo, patente_vehiculo)
+            messages.success(request, "Vehículo registrado exitosamente.")
 
-    return render(request, "viajes.html")
+        return redirect("viajes")
+
+    lista_viajes = obtener_viajes()
+    paginator = Paginator(lista_viajes, 5)
+    pagina_numero = request.GET.get("page")
+    page_obj = paginator.get_page(pagina_numero)
+
+    contexto = {
+        "page_obj": page_obj,
+        "choferes": obtener_choferes_activos(),
+        "vehiculos": obtener_vehiculos_activos()
+    }
+
+    return render(request, "viajes.html", contexto)
 
 
 # Verifico que solo un administrador pueda ver la vista, tambien verifica que el usuario este logueado

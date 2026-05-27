@@ -388,18 +388,29 @@ def eliminar_vehiculo(id_vehiculo):
     return vehiculo
 
 
-def crear_viaje(id_chofer, id_vehiculo, destino, inicio_caja, fecha_inicio, fecha_vuelta, gastos, final_caja):
-    nuevo_viaje =  Viaje.objects.create(
-        chofer = id_chofer,
-        vehiculo = id_vehiculo,
-        destino = destino,
-        inicio_caja = inicio_caja,
-        fecha_inicio = fecha_inicio,
-        fecha_vuelta = fecha_vuelta,
-        gastos = gastos,
-        final_caja = final_caja
+def crear_viaje(id_chofer, id_vehiculo, destino, inicio_caja, fecha_inicio, fecha_vuelta=None):
+    nuevo_viaje = Viaje.objects.create(
+        chofer_id=id_chofer,
+        vehiculo_id=id_vehiculo,
+        destino=destino,
+        inicio_caja=inicio_caja,
+        fecha_inicio=fecha_inicio,
+        fecha_vuelta=fecha_vuelta,
+        gastos=0
     )
+    return nuevo_viaje
 
+
+def obtener_choferes_activos():
+    return Chofer.objects.filter(activo=True).order_by('nombre')
+
+
+def obtener_vehiculos_activos():
+    return Vehiculo.objects.filter(activo=True).order_by('nombre')
+
+
+def obtener_viajes():
+    return Viaje.objects.select_related('chofer', 'vehiculo').order_by('-fecha_inicio')
 
 def editar_viaje(id_viaje):
     # TODO: Funcion para editar
