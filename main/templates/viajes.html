@@ -63,6 +63,31 @@
           </tr>
         </tbody>
       </table>
+      
+      <!-- PAGINACION -->
+      <div class="paginacion">
+        <div class="paginacion-info">
+          Mostrando <span>{{ page_obj.start_index|default:"0" }}-{{ page_obj.end_index|default:"0" }}</span>
+          de <span>{{ page_obj.paginator.count|default:"0" }}</span> viajes
+        </div>
+        <div class="paginacion-botones">
+          {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}">
+              <button class="boton-paginacion">Anterior</button>
+            </a>
+          {% else %}
+            <button class="boton-paginacion" disabled>Anterior</button>
+          {% endif %}
+          
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">
+              <button class="boton-paginacion">Siguiente</button>
+            </a>
+          {% else %}
+            <button class="boton-paginacion" disabled>Siguiente</button>
+          {% endif %}
+        </div>
+      </div>
     </div>
 
   </section>
