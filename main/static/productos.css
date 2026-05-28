@@ -445,7 +445,7 @@
 
 .campo-formulario label {
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--slate-700);
 }
 
@@ -500,19 +500,14 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Cuando el input es inválido y no está vacío */
+/* Cuando el input es requerido/inválido (todos se muestran rojos por defecto) */
+/* Se quita el rojo temporalmente cuando el usuario hace focus/click para rellenarlos */
 .campo-formulario input:invalid:not(:placeholder-shown) {
   border-color: oklch(57.71% 0.2152 27.33) !important;
 }
 
 .campo-formulario input:invalid:not(:placeholder-shown):focus {
   box-shadow: 0 0 0 1px oklch(57.71% 0.2152 27.33) !important;
-}
-
-/* Mensajes de error */
-.campo-formulario input:invalid:not(:placeholder-shown) ~ .mensaje-error,
-.campo-formulario input:invalid:not(:placeholder-shown) + .mensaje-error {
-  display: block;
 }
 
 /* Si tiene prefijo (como el símbolo $ en el precio) */
@@ -522,6 +517,12 @@
 
 .contenedor-input-prefijo input:invalid:not(:placeholder-shown):focus {
   box-shadow: 0 0 0 1px oklch(57.71% 0.2152 27.33) !important;
+}
+
+/* Mensajes de error en texto: se muestran solo si el usuario ya escribió algo incorrecto */
+.campo-formulario input:invalid:not(:placeholder-shown) ~ .mensaje-error,
+.campo-formulario input:invalid:not(:placeholder-shown) + .mensaje-error {
+  display: block;
 }
 
 .campo-formulario:has(.contenedor-input-prefijo input:invalid:not(:placeholder-shown)) .mensaje-error {

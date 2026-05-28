@@ -25,6 +25,34 @@ function cerrarSlideOver(idContenedor = 'contenedor-slide-over') {
             }
         });
     }
+
+    // LÓGICA ESPECÍFICA PARA EL MODAL DE VIAJES:
+    // Si cerramos el modal de viaje, debemos borrar todos los inputs de destinos extra
+    if (idContenedor === 'slide-over-viaje') {
+        const contenedorDestinos = document.getElementById('contenedor-destinos');
+        if (contenedorDestinos) {
+            // Buscamos todos los inputs dentro del contenedor
+            const inputsDestino = contenedorDestinos.querySelectorAll('input[name="destino"]');
+            // Si hay más de 1, eliminamos desde el segundo en adelante
+            if (inputsDestino.length > 1) {
+                for (let i = 1; i < inputsDestino.length; i++) {
+                    inputsDestino[i].remove();
+                }
+            }
+            // Ocultamos el botón de quitar destino
+            const btnQuitarDestino = document.getElementById('btn-quitar-destino');
+            if (btnQuitarDestino) {
+                btnQuitarDestino.style.display = 'none';
+            }
+        }
+        
+        // Volvemos a popular la fecha de inicio por defecto
+        const inputFechaInicio = document.getElementById('fecha-inicio-viaje');
+        if (inputFechaInicio) {
+            const hoy = new Date().toISOString().split('T')[0];
+            inputFechaInicio.value = hoy;
+        }
+    }
 }
 
 function abrirPanelEliminar() {

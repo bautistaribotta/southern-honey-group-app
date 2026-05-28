@@ -511,14 +511,16 @@ def viajes(request):
         if accion == "nuevo_viaje":
             id_chofer = request.POST.get("id_chofer")
             id_vehiculo = request.POST.get("id_vehiculo")
-            destino = request.POST.get("destino")
+            # Obtenemos el destino como una lista, aunque por ahora desde el HTML llegue solo uno.
+            # getlist() captura todos los <input name="destino"> si hubiera varios.
+            destinos = request.POST.getlist("destino") 
             inicio_caja = request.POST.get("inicio_caja")
             fecha_inicio_viaje = request.POST.get("fecha_inicio_viaje")
             fecha_regreso_viaje = request.POST.get("fecha_regreso_viaje")
             if not fecha_regreso_viaje:
                 fecha_regreso_viaje = None
 
-            crear_viaje(id_chofer, id_vehiculo, destino, inicio_caja, fecha_inicio_viaje, fecha_regreso_viaje)
+            crear_viaje(id_chofer, id_vehiculo, destinos, inicio_caja, fecha_inicio_viaje, fecha_regreso_viaje)
             messages.success(request, "Viaje registrado exitosamente.")
 
         elif accion == "nuevo_chofer":

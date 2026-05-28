@@ -90,7 +90,15 @@
               </a> 
             </td>
             <td class="td-enlace"> <a href="#" class="enlace-fila"> {{ viaje.chofer.nombre }} {{ viaje.chofer.apellido }} </a> </td>
-            <td class="td-enlace"> <a href="#" class="enlace-fila"> {{ viaje.destino }} </a> </td>
+            <td class="td-enlace"> 
+              <a href="#" class="enlace-fila" title="{% for d in viaje.destinos.all %}{{ d.destino }}{% if not forloop.last %}, {% endif %}{% endfor %}"> 
+                {% if viaje.destinos.all %}
+                  {{ viaje.destinos.first.destino }}{% if viaje.destinos.all|length > 1 %}...{% endif %}
+                {% else %}
+                  Sin destinos
+                {% endif %}
+              </a> 
+            </td>
             <td class="td-enlace alineado-centro"> <a href="#" class="enlace-fila"> {{ viaje.fecha_inicio|date:"d/m/y" }} </a> </td>
             <td class="td-enlace alineado-centro"> <a href="#" class="enlace-fila"> {{ viaje.fecha_vuelta|date:"d/m/y"|default:"En curso" }} </a> </td>
           </tr>
@@ -171,6 +179,7 @@
                   <option value="{{ chofer.id }}">{{ chofer.nombre }} {{ chofer.apellido }}</option>
                   {% endfor %}
                 </select>
+                <span class="mensaje-error">Por favor, seleccione un chofer de la lista.</span>
               </div>
 
               <div class="grupo-input">
@@ -181,9 +190,10 @@
                   <option value="{{ vehiculo.id }}">{{ vehiculo.nombre }} ({{ vehiculo.patente }})</option>
                   {% endfor %}
                 </select>
+                <span class="mensaje-error">Por favor, seleccione un vehículo de la lista.</span>
               </div>
 
-              <div class="grupo-input">
+              <div class="grupo-input" id="contenedor-destinos">
                 <label for="destino-viaje">Destino</label>
                 <input 
                   type="text" 
@@ -193,6 +203,18 @@
                   required
                   maxlength="30"
                   pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{4,}">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.125rem;">
+                  <button type="button" id="btn-agregar-destino" style="background: none; border: none; color: var(--brand-olive); font-weight: 600; text-align: left; cursor: pointer; padding: 0.25rem 0; font-size: 0.875rem; display: flex; align-items: center; gap: 0.25rem; width: fit-content;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">add_circle</span>
+                    Añadir un destino
+                  </button>
+                  <button type="button" id="btn-quitar-destino" style="background: none; border: none; color: oklch(57.71% 0.2152 27.33); font-weight: 600; text-align: right; cursor: pointer; padding: 0.25rem 0; font-size: 0.875rem; display: none; align-items: center; gap: 0.25rem; width: fit-content;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">do_not_disturb_on</span>
+                    Quitar destino
+                  </button>
+                </div>
+                <span class="mensaje-error">Mínimo 4 caracteres (Solo letras y números)</span>
               </div>
 
               <div class="grupo-input">
@@ -209,6 +231,7 @@
                     required
                     pattern="[0-9+]">
                 </div>
+                <span class="mensaje-error">Por favor, ingrese un monto válido.</span>
               </div>
 
               <div class="grupo-input">
@@ -218,6 +241,7 @@
                   id="fecha-inicio-viaje" 
                   name="fecha_inicio_viaje" 
                   required>
+                <span class="mensaje-error">Por favor, seleccione una fecha válida.</span>
               </div>
 
               <div class="grupo-input">
@@ -228,6 +252,7 @@
                   type="date" 
                   id="fecha-regreso-viaje" 
                   name="fecha_regreso_viaje">
+                <span class="mensaje-error">La fecha ingresada no es válida.</span>
               </div>
             </div>
           </section>
@@ -283,9 +308,10 @@
                   name="nombre_chofer" 
                   placeholder="Ej: Juan" 
                   required
+                  minlength="3"
                   maxlength="25"
-                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{3,25}">
-                <span class="mensaje-error">Mínimo 3 letras, máximo 25, sin números ni símbolos</span>
+                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{3,}">
+                <span class="mensaje-error">Mínimo 3 letras, sin números ni símbolos</span>
               </div>
 
               <div class="grupo-input">
@@ -296,9 +322,10 @@
                   name="apellido_chofer" 
                   placeholder="Ej: Perez"
                   required
+                  minlength="3"
                   maxlength="25"
-                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{2,25}">
-                <span class="mensaje-error">Mínimo 2 letras, máximo 25, sin números ni símbolos</span>
+                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{3,}">
+                <span class="mensaje-error">Mínimo 3 letras, sin números ni símbolos</span>
               </div>
             </div>
           </section>
@@ -354,18 +381,25 @@
                   name="nombre_vehiculo" 
                   placeholder="Ej: Traffic Peugeot" 
                   required
-                  maxlength="30">
+                  minlength="3"
+                  maxlength="30"
+                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}">
+                <span class="mensaje-error">Mínimo 3 caracteres (Solo letras y números)</span>
               </div>
 
               <div class="grupo-input">
                 <label for="patente-vehiculo">Patente</label>
                 <input 
+                  oninput="this.value = this.value.toUpperCase()"
                   type="text" 
                   id="patente-vehiculo" 
                   name="patente_vehiculo" 
                   placeholder="Ej: AB123CD"
                   required
-                  maxlength="7">
+                  minlength="6"
+                  maxlength="7"
+                  pattern="[a-zA-Z0-9]{6,7}">
+                <span class="mensaje-error">Debe tener 6 o 7 caracteres, sin espacios ni guiones</span>
               </div>
             </div>
           </section>
@@ -382,12 +416,51 @@
 {% endblock %}
 {% block codigo-javascript %}
 <script>
-  // Autocompletar la fecha de inicio con la fecha actual al cargar la página
   document.addEventListener('DOMContentLoaded', () => {
+    // Autocompletar la fecha de inicio con la fecha actual al cargar la página
     const inputFechaInicio = document.getElementById('fecha-inicio-viaje');
     if (inputFechaInicio) {
       const hoy = new Date().toISOString().split('T')[0];
       inputFechaInicio.value = hoy;
+    }
+
+    // Lógica para añadir y quitar dinámicamente múltiples destinos
+    const btnAgregarDestino = document.getElementById('btn-agregar-destino');
+    const btnQuitarDestino = document.getElementById('btn-quitar-destino');
+    const contenedorDestinos = document.getElementById('contenedor-destinos');
+    
+    if (btnAgregarDestino && btnQuitarDestino && contenedorDestinos) {
+      const contenedorBotones = btnAgregarDestino.parentElement;
+
+      // Evento Agregar
+      btnAgregarDestino.addEventListener('click', () => {
+        const nuevoInput = document.createElement('input');
+        nuevoInput.type = 'text';
+        nuevoInput.name = 'destino';
+        nuevoInput.placeholder = 'Siguiente destino...';
+        nuevoInput.required = true;
+        nuevoInput.maxLength = 30;
+        nuevoInput.pattern = '[a-zA-ZÁÉÍÓÚáéíóúñÑ\\s\\d]{4,}';
+        nuevoInput.style.marginTop = '0.5rem';
+        
+        contenedorDestinos.insertBefore(nuevoInput, contenedorBotones);
+
+        // Mostrar botón de quitar si hay más de 1 input
+        btnQuitarDestino.style.display = 'flex';
+      });
+
+      // Evento Quitar
+      btnQuitarDestino.addEventListener('click', () => {
+        const inputs = contenedorDestinos.querySelectorAll('input[name="destino"]');
+        if (inputs.length > 1) {
+          inputs[inputs.length - 1].remove(); // Borra el último input añadido
+        }
+        
+        // Ocultar el botón de quitar si solo queda el input original
+        if (inputs.length - 1 <= 1) {
+          btnQuitarDestino.style.display = 'none';
+        }
+      });
     }
   });
 </script>

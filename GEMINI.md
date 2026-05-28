@@ -1,0 +1,2 @@
+## Directivas del Repositorio
+- En este repositorio, utilizaremos EXCLUSIVAMENTE el sistema de color `oklch` para cualquier declaración de colores en CSS, HTML o JS (evitar Hexadecimal, RGB, HSL, etc).

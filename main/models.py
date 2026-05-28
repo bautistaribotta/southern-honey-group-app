@@ -1,5 +1,4 @@
 from dataclasses import field, fields
-
 from django.db import models
 
 
@@ -92,7 +91,6 @@ class Operacion(models.Model):
 
 class DetalleOperacion(models.Model):
     operacion = models.ForeignKey(Operacion, on_delete=models.CASCADE, db_column="id_operacion")
-    # Usamos PROTECT para evitar que el borrado de un producto elimine registros históricos de ventas
     producto = models.ForeignKey(Producto, on_delete=models.PROTECT, db_column="id_producto")
     cantidad = models.DecimalField(max_digits=10, decimal_places=2)
 
@@ -170,7 +168,6 @@ class Viaje(models.Model):
     # TODO: LLAVES FORANEAS ¿Remitos?
     chofer = models.ForeignKey(Chofer, on_delete=models.PROTECT, db_column="id_chofer")
     vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT, db_column="id_vehiculo")
-    destino = models.CharField(max_length=30, null=False, default="")
     inicio_caja = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     fecha_inicio = models.DateField()
     fecha_vuelta = models.DateField(null=True, blank=True)
@@ -185,3 +182,14 @@ class Viaje(models.Model):
 
     def __str__(self):
         return f"viaje {self.id}"
+
+
+class DetalleViaje(models.Model):
+    viaje = models.ForeignKey(Viaje, on_delete=models.CASCADE, related_name="destinos", db_column="id_viaje")
+    destino = models.CharField(max_length=30)
+
+    class Meta:
+        db_table = "detalle_viajes"
+
+    def __str__(self):
+        return f"Destino {self.destino} (Viaje {self.viaje_id})"

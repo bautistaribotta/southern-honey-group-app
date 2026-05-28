@@ -388,16 +388,33 @@ def eliminar_vehiculo(id_vehiculo):
     return vehiculo
 
 
-def crear_viaje(id_chofer, id_vehiculo, destino, inicio_caja, fecha_inicio, fecha_vuelta=None):
-    nuevo_viaje = Viaje.objects.create(
-        chofer_id=id_chofer,
-        vehiculo_id=id_vehiculo,
-        destino=destino,
-        inicio_caja=inicio_caja,
-        fecha_inicio=fecha_inicio,
-        fecha_vuelta=fecha_vuelta,
-        gastos=0
-    )
+def crear_viaje(id_chofer, id_vehiculo, destinos, inicio_caja, fecha_inicio, fecha_vuelta=None):
+    """
+    Crea un viaje (maestro) y sus destinos asociados (detalle) usando una transacción atómica.
+    'destinos' debe ser una lista de strings. Ejemplo: ["Buenos Aires", "Rosario"].
+    """
+    with transaction.atomic():
+        # 1. Creamos el viaje (Tabla Maestra)
+        nuevo_viaje = Viaje.objects.create(
+            chofer_id=id_chofer,
+            vehiculo_id=id_vehiculo,
+            inicio_caja=inicio_caja,
+            fecha_inicio=fecha_inicio,
+            fecha_vuelta=fecha_vuelta,
+            gastos=0
+        )
+
+        # 2. Iteramos sobre la lista de destinos para crear el Detalle
+        for destino_nombre in destinos:
+            # Quitamos espacios extra en blanco por seguridad
+            nombre_limpio = destino_nombre.strip()
+            if nombre_limpio:
+                DetalleViaje.objects.create(
+                    viaje=nuevo_viaje,
+                    destino=nombre_limpio
+                )
+
+    # Si todo sale bien, la transacción se guarda ('commit'). Si algo falla, se deshace todo ('rollback').
     return nuevo_viaje
 
 
@@ -410,7 +427,7 @@ def obtener_vehiculos_activos():
 
 
 def obtener_viajes():
-    return Viaje.objects.select_related('chofer', 'vehiculo').order_by('-fecha_inicio')
+    return Viaje.objects.select_related('chofer', 'vehiculo').prefetch_related('destinos').order_by('-fecha_inicio')
 
 def editar_viaje(id_viaje):
     # TODO: Funcion para editar

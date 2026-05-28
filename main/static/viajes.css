@@ -439,7 +439,8 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Cuando el input es inválido y no está vacío */
+/* Cuando el input es requerido/inválido (todos se muestran rojos por defecto) */
+/* Se quita el rojo temporalmente cuando el usuario hace focus/click para rellenarlos */
 .grupo-input input:invalid:not(:placeholder-shown) {
   border-color: oklch(57.71% 0.2152 27.33) !important;
 }
@@ -448,19 +449,19 @@
   box-shadow: 0 0 0 1px oklch(57.71% 0.2152 27.33) !important;
 }
 
-/* Mensajes de error */
-.grupo-input input:invalid:not(:placeholder-shown) ~ .mensaje-error,
-.grupo-input input:invalid:not(:placeholder-shown) + .mensaje-error {
-  display: block;
-}
-
-/* Si tiene icono, el input es hijo de un div */
+/* Para los inputs con icono (como Inicio de caja) */
 .input-con-icono input:invalid:not(:placeholder-shown) {
   border-color: oklch(57.71% 0.2152 27.33) !important;
 }
 
 .input-con-icono input:invalid:not(:placeholder-shown):focus {
   box-shadow: 0 0 0 1px oklch(57.71% 0.2152 27.33) !important;
+}
+
+/* Mensajes de error en texto: se muestran solo si el usuario ya escribió algo incorrecto */
+.grupo-input input:invalid:not(:placeholder-shown) ~ .mensaje-error,
+.grupo-input input:invalid:not(:placeholder-shown) + .mensaje-error {
+  display: block;
 }
 
 .grupo-input:has(.input-con-icono input:invalid:not(:placeholder-shown)) .mensaje-error {
