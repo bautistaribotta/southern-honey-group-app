@@ -90,10 +90,11 @@
 }
 
 /* Anchos de columnas */
-.tabla-viajes th:nth-child(1) { width: 30%; } /* Chofer */
-.tabla-viajes th:nth-child(2) { width: 30%; } /* Vehiculo */
-.tabla-viajes th:nth-child(3) { width: 20%; } /* Fecha de inicio */
-.tabla-viajes th:nth-child(4) { width: 20%; } /* Fecha de vuelta */
+.tabla-viajes th:nth-child(1) { width: 20%; } /* Vehiculo */
+.tabla-viajes th:nth-child(2) { width: 25%; } /* Chofer */
+.tabla-viajes th:nth-child(3) { width: 25%; } /* Destino */
+.tabla-viajes th:nth-child(4) { width: 15%; } /* Fecha de inicio */
+.tabla-viajes th:nth-child(5) { width: 15%; } /* Fecha de vuelta */
 
 .tabla-viajes td {
   padding: 1rem 1.5rem;
@@ -143,6 +144,19 @@
 
 .alineado-centro, .alineado-centro .enlace-fila {
   text-align: center;
+}
+
+/* Estilos de tipografía en celdas (Vehículo) */
+.vehiculo-patente {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--slate-400);
+  margin-top: 0.125rem;
+}
+
+.vehiculo-nombre {
+  font-weight: 600;
+  color: var(--slate-900);
 }
 
 /* --- PANEL LATERAL (SLIDE-OVER) --- */

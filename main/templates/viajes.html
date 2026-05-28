@@ -72,8 +72,9 @@
       <table class="tabla-viajes">
         <thead>
           <tr>
-            <th class="alineado-izq">Chofer</th>
             <th class="alineado-izq">Vehículo</th>
+            <th class="alineado-izq">Chofer</th>
+            <th class="alineado-izq">Destino</th>
             <th class="alineado-centro">Fecha de Inicio</th>
             <th class="alineado-centro">Fecha de Regreso</th>
           </tr>
@@ -82,14 +83,20 @@
           <!-- FILAS -->
           {% for viaje in page_obj %}
           <tr class="fila-viaje">
+            <td class="td-enlace"> 
+              <a href="#" class="enlace-fila"> 
+                <div class="vehiculo-nombre">{{ viaje.vehiculo.nombre }}</div>
+                <div class="vehiculo-patente">{{ viaje.vehiculo.patente }}</div>
+              </a> 
+            </td>
             <td class="td-enlace"> <a href="#" class="enlace-fila"> {{ viaje.chofer.nombre }} {{ viaje.chofer.apellido }} </a> </td>
-            <td class="td-enlace"> <a href="#" class="enlace-fila"> {{ viaje.vehiculo.nombre }} ({{ viaje.vehiculo.patente }}) </a> </td>
+            <td class="td-enlace"> <a href="#" class="enlace-fila"> {{ viaje.destino }} </a> </td>
             <td class="td-enlace alineado-centro"> <a href="#" class="enlace-fila"> {{ viaje.fecha_inicio|date:"d/m/y" }} </a> </td>
             <td class="td-enlace alineado-centro"> <a href="#" class="enlace-fila"> {{ viaje.fecha_vuelta|date:"d/m/y"|default:"En curso" }} </a> </td>
           </tr>
           {% empty %}
           <tr>
-            <td colspan="4" class="alineado-centro">No hay viajes registrados.</td>
+            <td colspan="5" class="alineado-centro">No hay viajes registrados.</td>
           </tr>
           {% endfor %}
         </tbody>
