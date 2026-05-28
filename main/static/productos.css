@@ -1,6 +1,6 @@
 :root {
-  --color_verde-semi-oliva: #556b2f34;
-  --color-rojo-eliminacion: #dc2626;
+  --color_verde-semi-oliva: oklch(49.55% 0.0896 126.19 / 0.203922);
+  --color-rojo-eliminacion: oklch(57.71% 0.2152 27.33);
 }
 
 /* Nota: La barra lateral, header y layout base se heredan de base.css */
@@ -50,7 +50,7 @@
   font-size: 0.875rem;
   color: var(--slate-700);
   outline: none;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px oklch(0.00% 0.0000 0.00 / 0.05);
   transition: all 0.2s;
   font-family: inherit;
 }
@@ -81,7 +81,7 @@
   font-size: 0.875rem;
   color: var(--slate-700);
   outline: none;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px oklch(0.00% 0.0000 0.00 / 0.05);
   cursor: pointer;
   min-width: 160px;
   font-family: inherit;
@@ -111,7 +111,7 @@
   font-size: 0.875rem;
   font-weight: 600;
   border: none;
-  box-shadow: 0 4px 6px -1px rgba(85, 107, 47, 0.2);
+  box-shadow: 0 4px 6px -1px oklch(49.55% 0.0896 126.19 / 0.2);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -121,7 +121,7 @@
 }
 
 .boton-nuevo:hover {
-  background-color: #3f5022; /* un tono más oscuro de oliva */
+  background-color: oklch(40.51% 0.0725 126.25); /* un tono más oscuro de oliva */
 }
 
 .boton-nuevo:active {
@@ -133,7 +133,7 @@
   background-color: white;
   border: 1px solid var(--stone-200);
   border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px oklch(0.00% 0.0000 0.00 / 0.05);
   overflow: hidden; /* Mantiene los bordes redondeados */
 }
 
@@ -150,7 +150,7 @@
   color: var(--slate-500);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  background-color: #f8fafc;
+  background-color: oklch(98.42% 0.0034 247.86);
   border-bottom: 1px solid var(--stone-200);
 }
 
@@ -215,14 +215,14 @@
   font-weight: 500;
 }
 
-.etiqueta-miel { background-color: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
-.etiqueta-alimento { background-color: #f7fee7; color: #4d7c0f; border: 1px solid #d9f99d; }
-.etiqueta-cera { background-color: #fefce8; color: #a16207; border: 1px solid #fef08a; }
-.etiqueta-madera { background-color: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
-.etiqueta-estampa { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
-.etiqueta-insumos { background-color: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
-.etiqueta-medicamentos { background-color: #ffe4e6; color: #991b1b; border: 1px solid #fecdd3; }
-.etiqueta-otros { background-color: #f5f5f4; color: #57534e; border: 1px solid #d6d3d1; }
+.etiqueta-miel { background-color: oklch(98.69% 0.0214 95.28); color: oklch(55.53% 0.1455 49.00); border: 1px solid oklch(92.43% 0.1151 95.75); }
+.etiqueta-alimento { background-color: oklch(98.57% 0.0310 120.76); color: oklch(53.22% 0.1405 131.59); border: 1px solid oklch(93.82% 0.1217 124.32); }
+.etiqueta-cera { background-color: oklch(98.73% 0.0262 102.21); color: oklch(55.38% 0.1207 66.44); border: 1px solid oklch(94.51% 0.1243 101.54); }
+.etiqueta-madera { background-color: oklch(97.96% 0.0158 73.68); color: oklch(55.34% 0.1739 38.40); border: 1px solid oklch(95.42% 0.0372 75.16); }
+.etiqueta-estampa { background-color: oklch(96.83% 0.0069 247.90); color: oklch(44.55% 0.0374 257.28); border: 1px solid oklch(86.90% 0.0198 252.89); }
+.etiqueta-insumos { background-color: oklch(92.99% 0.0334 272.79); color: oklch(39.84% 0.1773 277.37); border: 1px solid oklch(86.99% 0.0622 274.04); }
+.etiqueta-medicamentos { background-color: oklch(94.14% 0.0298 12.58); color: oklch(44.37% 0.1613 26.90); border: 1px solid oklch(89.24% 0.0559 10.00); }
+.etiqueta-otros { background-color: oklch(96.99% 0.0013 106.42); color: oklch(44.44% 0.0096 73.64); border: 1px solid oklch(86.87% 0.0043 56.37); }
 
 .acciones-tabla {
   display: flex;
@@ -260,7 +260,7 @@
 
 .boton-icono.eliminar:hover {
   color: var(--color-rojo-eliminacion);
-  background-color: #fef2f2;
+  background-color: oklch(97.05% 0.0129 17.38);
 }
 
 /* --- PAGINACIÓN --- */
@@ -330,7 +330,7 @@
 #slide-over-fondo {
   position: fixed;
   inset: 0;
-  background-color: rgba(15, 23, 42, 0.4);
+  background-color: oklch(20.77% 0.0398 265.75 / 0.4);
   backdrop-filter: blur(4px);
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
@@ -345,7 +345,7 @@
   width: 100%;
   max-width: 28rem;
   background-color: white;
-  box-shadow: -10px 0 15px -3px rgba(0, 0, 0, 0.1);
+  box-shadow: -10px 0 15px -3px oklch(0.00% 0.0000 0.00 / 0.1);
   display: flex;
   flex-direction: column;
   transform: translateX(100%);
@@ -364,7 +364,7 @@
 /* Encabezado del Panel */
 .panel-cabecera {
   padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid oklch(0.00% 0.0000 0.00 / 0.05);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -381,7 +381,7 @@
 }
 
 .icono-contenedor {
-  background-color: rgba(75, 99, 45, 0.1);
+  background-color: oklch(46.68% 0.0844 129.02 / 0.1);
   color: var(--brand-olive);
   width: 40px;
   height: 40px;
@@ -420,7 +420,7 @@
 }
 
 .boton-cerrar-panel:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: oklch(0.00% 0.0000 0.00 / 0.05);
   color: var(--slate-600);
 }
 
@@ -457,7 +457,7 @@
   font-size: 0.875rem;
   color: var(--slate-900);
   outline: none;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px oklch(0.00% 0.0000 0.00 / 0.05);
   font-family: inherit;
   transition: all 0.2s;
 }
@@ -488,7 +488,7 @@
 /* VALIDACIONES PERSONALIZADAS */
 .mensaje-error {
   display: none;
-  color: #dc2626;
+  color: oklch(57.71% 0.2152 27.33);
   font-size: 0.75rem;
   margin-top: 0.25rem;
   font-weight: 500;
@@ -502,11 +502,11 @@
 
 /* Cuando el input es inválido y no está vacío */
 .campo-formulario input:invalid:not(:placeholder-shown) {
-  border-color: #dc2626 !important;
+  border-color: oklch(57.71% 0.2152 27.33) !important;
 }
 
 .campo-formulario input:invalid:not(:placeholder-shown):focus {
-  box-shadow: 0 0 0 1px #dc2626 !important;
+  box-shadow: 0 0 0 1px oklch(57.71% 0.2152 27.33) !important;
 }
 
 /* Mensajes de error */
@@ -517,11 +517,11 @@
 
 /* Si tiene prefijo (como el símbolo $ en el precio) */
 .contenedor-input-prefijo input:invalid:not(:placeholder-shown) {
-  border-color: #dc2626 !important;
+  border-color: oklch(57.71% 0.2152 27.33) !important;
 }
 
 .contenedor-input-prefijo input:invalid:not(:placeholder-shown):focus {
-  box-shadow: 0 0 0 1px #dc2626 !important;
+  box-shadow: 0 0 0 1px oklch(57.71% 0.2152 27.33) !important;
 }
 
 .campo-formulario:has(.contenedor-input-prefijo input:invalid:not(:placeholder-shown)) .mensaje-error {
@@ -532,7 +532,7 @@
 .panel-pie {
   padding: 1rem 1.5rem;
   border-top: 1px solid var(--stone-200);
-  background-color: #f8fafc;
+  background-color: oklch(98.42% 0.0034 247.86);
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
@@ -552,7 +552,7 @@
 }
 
 .boton-secundario:hover {
-  background-color: #f1f5f9;
+  background-color: oklch(96.83% 0.0069 247.90);
 }
 
 .boton-primario {
@@ -566,12 +566,12 @@
   cursor: pointer;
   transition: all 0.2s;
   font-family: inherit;
-  box-shadow: 0 4px 6px -1px rgba(85, 107, 47, 0.2);
+  box-shadow: 0 4px 6px -1px oklch(49.55% 0.0896 126.19 / 0.2);
 }
 
 .boton-primario:hover {
-  background-color: #3f5022;
-  box-shadow: 0 10px 15px -3px rgba(85, 107, 47, 0.3);
+  background-color: oklch(40.51% 0.0725 126.25);
+  box-shadow: 0 10px 15px -3px oklch(49.55% 0.0896 126.19 / 0.3);
 }
 
 /* Panel de eliminacion */
@@ -594,7 +594,7 @@
 #contenedor-panel-fondo {
   position: absolute;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: oklch(0.00% 0.0000 0.00 / 0.4);
   backdrop-filter: blur(4px); 
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
@@ -608,11 +608,11 @@
   position: relative;
   background-color: white;
   border-radius: 12px;
-  border: 1px solid #4b632d1a;
+  border: 1px solid oklch(46.68% 0.0844 129.02 / 0.101961);
   padding: 2rem 2rem;
   width: 90%;
   max-width: 450px;
-  box-shadow: 0 20px 25px -5px #0000001a;
+  box-shadow: 0 20px 25px -5px oklch(0.00% 0.0000 0.00 / 0.101961);
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -646,7 +646,7 @@
 }
 
 #icono-cerrar-panel-eliminar:hover {
-  background-color: #f1f5f9;
+  background-color: oklch(96.83% 0.0069 247.90);
   color: var(--slate-600);
 }
 
@@ -711,7 +711,7 @@
   left: 0;
   height: 100%;
   width: 0%;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: oklch(0.00% 0.0000 0.00 / 0.3);
   transition: width 0.2s ease-out;
   z-index: 1;
 }
@@ -758,7 +758,7 @@
 #fondo-modal-stock {
   position: absolute;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: oklch(0.00% 0.0000 0.00 / 0.4);
   backdrop-filter: blur(4px);
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
@@ -772,11 +772,11 @@
   position: relative;
   background-color: white;
   border-radius: 12px;
-  border: 1px solid #4b632d1a;
+  border: 1px solid oklch(46.68% 0.0844 129.02 / 0.101961);
   padding: 2rem 2rem;
   width: 90%;
   max-width: 450px;
-  box-shadow: 0 20px 25px -5px #0000001a;
+  box-shadow: 0 20px 25px -5px oklch(0.00% 0.0000 0.00 / 0.101961);
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -826,7 +826,7 @@
 }
 
 .info-stock-actual span {
-  background-color: #f1f5f9;
+  background-color: oklch(96.83% 0.0069 247.90);
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
   font-weight: 700;
@@ -856,10 +856,10 @@
   position: relative;
   display: flex;
   width: 100%;
-  background-color: #f1f5f9; /* Slate 100 */
+  background-color: oklch(96.83% 0.0069 247.90); /* Slate 100 */
   border-radius: 9999px;
   padding: 0.25rem;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 2px oklch(0.00% 0.0000 0.00 / 0.05);
 }
 
 .segmented-control input[type="radio"] {
@@ -897,7 +897,7 @@
   width: calc(50% - 0.25rem);
   background-color: white;
   border-radius: 9999px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px oklch(0.00% 0.0000 0.00 / 0.1);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1;
 }
@@ -966,5 +966,5 @@
 }
 
 .boton-verde-oliva:hover {
-  background-color: #3f5022;
+  background-color: oklch(40.51% 0.0725 126.25);
 }

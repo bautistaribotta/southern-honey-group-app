@@ -1,14 +1,14 @@
 :root {
-  --brand-olive: #556b2f;
-  --brand-cream: #fdfcf8;
-  --stone-900: #0C0A09;
-  --slate-900: #0f172a;
-  --slate-700: #334155;
-  --slate-600: #475569;
-  --slate-500: #64748b;
-  --slate-400: #94a3b8;
-  --stone-300: #d6d3d1;
-  --stone-200: #e7e5e4;
+  --brand-olive: oklch(49.55% 0.0896 126.19);
+  --brand-cream: oklch(99.07% 0.0054 95.10);
+  --stone-900: oklch(14.69% 0.0041 49.25);
+  --slate-900: oklch(20.77% 0.0398 265.75);
+  --slate-700: oklch(37.17% 0.0392 257.29);
+  --slate-600: oklch(44.55% 0.0374 257.28);
+  --slate-500: oklch(55.44% 0.0407 257.42);
+  --slate-400: oklch(71.07% 0.0351 256.79);
+  --stone-300: oklch(86.87% 0.0043 56.37);
+  --stone-200: oklch(92.32% 0.0026 48.72);
   --font-main: 'Plus Jakarta Sans', sans-serif;
 }
 
@@ -53,7 +53,7 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: #fdfcf81a;
+  background-color: oklch(99.07% 0.0054 95.10 / 0.101961);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -127,8 +127,8 @@ body {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
+  background-color: oklch(97.05% 0.0129 17.38);
+  border: 1px solid oklch(88.45% 0.0593 18.33);
   padding: 0.6rem 1rem; 
   border-radius: 0.5rem;
   margin-top: 1rem;
@@ -138,7 +138,7 @@ body {
 
 .icono-error {
   font-size: 24px;
-  color: #dc2626;
+  color: oklch(57.71% 0.2152 27.33);
 }
 
 .texto-error {
@@ -150,13 +150,13 @@ body {
 .error-titulo {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #b91c1c;
+  color: oklch(50.54% 0.1905 27.52);
 }
 
 .error-subtitulo {
   font-size: 0.8rem;
   font-weight: 400;
-  color: #dc2626;
+  color: oklch(57.71% 0.2152 27.33);
 }
 
 #formulario-login {

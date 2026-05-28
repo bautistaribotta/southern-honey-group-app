@@ -49,14 +49,14 @@ html {
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    background-color: #556b2f1a;
+    background-color: oklch(49.55% 0.0896 126.19 / 0.101961);
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--brand-olive);
     font-size: 1.5rem;
     font-weight: 700;
-    border: 1px solid #556b2f33;
+    border: 1px solid oklch(49.55% 0.0896 126.19 / 0.2);
 }
 
 .nombre-cliente-titulo {
@@ -93,16 +93,16 @@ html {
 }
 
 .boton-accion:hover {
-    background-color: #f9fafb;
+    background-color: oklch(98.46% 0.0017 247.84);
 }
 
 .boton-accion.eliminar {
-    color: #dc2626;
-    border-color: #fecaca;
+    color: oklch(57.71% 0.2152 27.33);
+    border-color: oklch(88.45% 0.0593 18.33);
 }
 
 .boton-accion.eliminar:hover {
-    background-color: #fef2f2;
+    background-color: oklch(97.05% 0.0129 17.38);
 }
 
 /* --- TARJETA ÚNICA DE INFORMACIÓN --- */
@@ -112,14 +112,14 @@ html {
     border: 1px solid var(--stone-200);
     border-radius: 0.75rem;
     padding: 2rem;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 2px oklch(0.00% 0.0000 0.00 / 0.05);
     margin-bottom: 2.5rem;
     transition: border-color 0.3s;
 }
 
 .tarjeta-info-unica.editando {
     border-color: var(--brand-olive);
-    box-shadow: 0 0 0 1px var(--brand-olive), 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 0 0 1px var(--brand-olive), 0 1px 2px oklch(0.00% 0.0000 0.00 / 0.05);
 }
 
 /* --- EDICIÓN INLINE --- */
@@ -155,7 +155,7 @@ html {
 /* --- VALIDACIONES DE EDICIÓN --- */
 .mensaje-error {
     display: none;
-    color: #dc2626;
+    color: oklch(57.71% 0.2152 27.33);
     font-size: 0.75rem;
     margin-top: 0.35rem;
     font-weight: 500;
@@ -173,11 +173,11 @@ html {
 }
 
 .campo-info .input-edicion:invalid:not(:placeholder-shown) {
-    border-color: #dc2626 !important;
+    border-color: oklch(57.71% 0.2152 27.33) !important;
 }
 
 .campo-info .input-edicion:invalid:not(:placeholder-shown):focus {
-    box-shadow: 0 0 0 1px #dc2626 !important;
+    box-shadow: 0 0 0 1px oklch(57.71% 0.2152 27.33) !important;
 }
 
 .campo-info .input-edicion:invalid:not(:placeholder-shown) ~ .mensaje-error,
@@ -214,11 +214,11 @@ html {
     cursor: pointer;
     transition: all 0.2s;
     font-family: inherit;
-    box-shadow: 0 4px 6px -1px rgba(85, 107, 47, 0.2);
+    box-shadow: 0 4px 6px -1px oklch(49.55% 0.0896 126.19 / 0.2);
 }
 
 .boton-guardar-edicion:hover {
-    background-color: #3f5022;
+    background-color: oklch(40.51% 0.0725 126.25);
 }
 
 .boton-cancelar-edicion {
@@ -238,7 +238,7 @@ html {
 }
 
 .boton-cancelar-edicion:hover {
-    background-color: #f1f5f9;
+    background-color: oklch(96.83% 0.0069 247.90);
 }
 
 /* --- SWITCH TOGGLE (Factura) --- */
@@ -376,7 +376,7 @@ html {
     font-size: 0.875rem;
     font-weight: 600;
     border: none;
-    box-shadow: 0 4px 6px -1px rgba(85, 107, 47, 0.2);
+    box-shadow: 0 4px 6px -1px oklch(49.55% 0.0896 126.19 / 0.2);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -387,7 +387,7 @@ html {
 }
 
 .boton-nuevo:hover {
-    background-color: #3f5022;
+    background-color: oklch(40.51% 0.0725 126.25);
 }
 
 .boton-nuevo:active {
@@ -399,7 +399,7 @@ html {
     border: 1px solid var(--stone-200);
     border-radius: 0.75rem;
     overflow: hidden;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 2px oklch(0.00% 0.0000 0.00 / 0.05);
 }
 
 .tabla-operaciones {
@@ -409,7 +409,7 @@ html {
 }
 
 .tabla-operaciones th {
-    background-color: #f9fafb;
+    background-color: oklch(98.46% 0.0017 247.84);
     padding: 1rem 2rem;
     font-size: 0.7rem;
     font-weight: 700;
@@ -430,7 +430,7 @@ html {
 }
 
 .tabla-operaciones tr:hover {
-    background-color: #f9fafb;
+    background-color: oklch(98.46% 0.0017 247.84);
 }
 
 .fecha-operacion {
@@ -488,12 +488,12 @@ html {
 
 .boton-icono-tabla.pagos:hover {
   color: var(--brand-olive);
-  background-color: #556b2f1a;
+  background-color: oklch(49.55% 0.0896 126.19 / 0.101961);
 }
 
 .boton-icono-tabla.cancelar:hover {
-  color: #dc2626;
-  background-color: #fef2f2;
+  color: oklch(57.71% 0.2152 27.33);
+  background-color: oklch(97.05% 0.0129 17.38);
 }
 
 .pildora-estado {
@@ -509,30 +509,30 @@ html {
 
 /* Pagada: Estilo Verde Oliva (similar a Alimento) */
 .pildora-estado.pagada { 
-  background-color: #f7fee7; 
-  color: #4d7c0f; 
-  border: 1px solid #d9f99d; 
+  background-color: oklch(98.57% 0.0310 120.76); 
+  color: oklch(53.22% 0.1405 131.59); 
+  border: 1px solid oklch(93.82% 0.1217 124.32); 
 }
 
 /* Pago Parcial: Estilo Amarillo (similar a Miel) */
 .pildora-estado.parcial { 
-  background-color: #fffbeb; 
-  color: #b45309; 
-  border: 1px solid #fde68a; 
+  background-color: oklch(98.69% 0.0214 95.28); 
+  color: oklch(55.53% 0.1455 49.00); 
+  border: 1px solid oklch(92.43% 0.1151 95.75); 
 }
 
 /* Debe: Estilo Rojo (similar a Medicamentos) */
 .pildora-estado.debe { 
-  background-color: #ffe4e6; 
-  color: #991b1b; 
-  border: 1px solid #fecdd3; 
+  background-color: oklch(94.14% 0.0298 12.58); 
+  color: oklch(44.37% 0.1613 26.90); 
+  border: 1px solid oklch(89.24% 0.0559 10.00); 
 }
 
 /* Cancelada: Estilo Gris Oscuro/Gris (similar a Otros/Estampa) */
 .pildora-estado.cancelada { 
-  background-color: #f5f5f4; 
-  color: #57534e; 
-  border: 1px solid #d6d3d1; 
+  background-color: oklch(96.99% 0.0013 106.42); 
+  color: oklch(44.44% 0.0096 73.64); 
+  border: 1px solid oklch(86.87% 0.0043 56.37); 
 }
 
 @media (max-width: 1024px) {
@@ -544,7 +544,7 @@ html {
 
 /* Panel de eliminacion */
 :root {
-  --color-rojo-eliminacion: #dc2626;
+  --color-rojo-eliminacion: oklch(57.71% 0.2152 27.33);
 }
 
 #contenedor-panel-eliminar, #contenedor-modal-cancelar, #contenedor-modal-pago {
@@ -566,7 +566,7 @@ html {
 #contenedor-panel-fondo, #contenedor-modal-fondo-cancelar, #contenedor-modal-fondo-pago {
   position: absolute;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: oklch(0.00% 0.0000 0.00 / 0.4);
   backdrop-filter: blur(4px); 
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
@@ -582,11 +582,11 @@ html {
   position: relative;
   background-color: white;
   border-radius: 12px;
-  border: 1px solid #4b632d1a;
+  border: 1px solid oklch(46.68% 0.0844 129.02 / 0.101961);
   padding: 2.5rem 2rem 2rem 2rem;
   width: 90%;
   max-width: 450px;
-  box-shadow: 0 20px 25px -5px #0000001a;
+  box-shadow: 0 20px 25px -5px oklch(0.00% 0.0000 0.00 / 0.101961);
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -622,7 +622,7 @@ html {
 }
 
 .boton-cerrar:hover {
-  background-color: #f1f5f9;
+  background-color: oklch(96.83% 0.0069 247.90);
   color: var(--slate-600);
 }
 
@@ -680,7 +680,7 @@ html {
 }
 
 .boton-secundario:hover { 
-  background-color: #f8fafc; 
+  background-color: oklch(98.42% 0.0034 247.86); 
 }
 
 #boton-confirmar-eliminar, #boton-confirmar-cancelar {
@@ -712,7 +712,7 @@ html {
   left: 0;
   height: 100%;
   width: 0%;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: oklch(0.00% 0.0000 0.00 / 0.3);
   transition: width 0.2s ease-out;
   z-index: 1;
 }
@@ -783,11 +783,11 @@ html {
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 4px 6px -1px rgba(85, 107, 47, 0.2);
+  box-shadow: 0 4px 6px -1px oklch(49.55% 0.0896 126.19 / 0.2);
 }
 
 #boton-confirmar-pago:hover {
-  background-color: #3f5022;
+  background-color: oklch(40.51% 0.0725 126.25);
 }
 
 #boton-confirmar-pago:disabled {
@@ -812,7 +812,7 @@ html {
 .btn-saldar-total {
   background: none;
   border: none;
-  color: #3B82F6;
+  color: oklch(62.31% 0.1880 259.81);
   cursor: pointer;
   padding: 0.2rem 0.4rem;
   font-size: 0.85rem;
@@ -823,7 +823,7 @@ html {
 }
 
 .btn-saldar-total:hover {
-  background-color: #EFF6FF;
-  color: #2563EB;
+  background-color: oklch(97.05% 0.0142 254.60);
+  color: oklch(54.61% 0.2152 262.88);
 }
 

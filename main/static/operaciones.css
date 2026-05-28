@@ -99,7 +99,7 @@ html {
   border-radius: 0.75rem; 
   border: 1px solid var(--stone-200); 
   margin-bottom: 1.5rem; 
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px oklch(0.00% 0.0000 0.00 / 0.05);
 }
 
 .contenedor-input-busqueda { 
@@ -120,7 +120,7 @@ html {
   width: 100%; 
   box-sizing: border-box;
   padding: 0.625rem 1rem 0.625rem 2.5rem; 
-  background-color: #f8fafc; 
+  background-color: oklch(98.42% 0.0034 247.86); 
   border: 1px solid var(--stone-200); 
   border-radius: 0.5rem; 
   font-size: 0.875rem; 
@@ -142,7 +142,7 @@ html {
 }
 
 .shadow-sm {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px oklch(0.00% 0.0000 0.00 / 0.05);
 }
 
 /* --- TABLA DE PRODUCTOS (Izquierda) --- */
@@ -167,7 +167,7 @@ html {
   color: var(--slate-500); 
   text-transform: uppercase; 
   letter-spacing: 0.05em; 
-  background-color: #f8fafc; 
+  background-color: oklch(98.42% 0.0034 247.86); 
   border-bottom: 1px solid var(--stone-200); 
 }
 
@@ -189,21 +189,21 @@ html {
 
 /* Etiquetas de Categorías */
 .etiqueta { display: inline-flex; align-items: center; padding: 0.125rem 0.625rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; }
-.etiqueta-miel { background-color: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
-.etiqueta-alimento { background-color: #f7fee7; color: #4d7c0f; border: 1px solid #d9f99d; }
-.etiqueta-estampa { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
-.etiqueta-cera { background-color: #fefce8; color: #a16207; border: 1px solid #fef08a; }
-.etiqueta-madera { background-color: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
-.etiqueta-insumos { background-color: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
-.etiqueta-medicamentos { background-color: #ffe4e6; color: #991b1b; border: 1px solid #fecdd3; }
-.etiqueta-otros { background-color: #f5f5f4; color: #57534e; border: 1px solid #d6d3d1; }
+.etiqueta-miel { background-color: oklch(98.69% 0.0214 95.28); color: oklch(55.53% 0.1455 49.00); border: 1px solid oklch(92.43% 0.1151 95.75); }
+.etiqueta-alimento { background-color: oklch(98.57% 0.0310 120.76); color: oklch(53.22% 0.1405 131.59); border: 1px solid oklch(93.82% 0.1217 124.32); }
+.etiqueta-estampa { background-color: oklch(96.83% 0.0069 247.90); color: oklch(44.55% 0.0374 257.28); border: 1px solid oklch(86.90% 0.0198 252.89); }
+.etiqueta-cera { background-color: oklch(98.73% 0.0262 102.21); color: oklch(55.38% 0.1207 66.44); border: 1px solid oklch(94.51% 0.1243 101.54); }
+.etiqueta-madera { background-color: oklch(97.96% 0.0158 73.68); color: oklch(55.34% 0.1739 38.40); border: 1px solid oklch(95.42% 0.0372 75.16); }
+.etiqueta-insumos { background-color: oklch(92.99% 0.0334 272.79); color: oklch(39.84% 0.1773 277.37); border: 1px solid oklch(86.99% 0.0622 274.04); }
+.etiqueta-medicamentos { background-color: oklch(94.14% 0.0298 12.58); color: oklch(44.37% 0.1613 26.90); border: 1px solid oklch(89.24% 0.0559 10.00); }
+.etiqueta-otros { background-color: oklch(96.99% 0.0013 106.42); color: oklch(44.44% 0.0096 73.64); border: 1px solid oklch(86.87% 0.0043 56.37); }
 
 .font-bold {
   font-weight: 700;
 }
 
 .fila-hover:hover {
-  background-color: #f8fafc;
+  background-color: oklch(98.42% 0.0034 247.86);
 }
 
 .stock-valor {
@@ -216,7 +216,7 @@ html {
 }
 
 .boton-agregar-producto { 
-  background-color: rgba(85, 107, 47, 0.1); 
+  background-color: oklch(49.55% 0.0896 126.19 / 0.1); 
   color: var(--brand-olive); 
   border: none; 
   border-radius: 0.5rem; 
@@ -235,20 +235,20 @@ html {
 }
 
 .boton-agregar-producto.boton-sin-stock {
-  background-color: rgba(148, 163, 184, 0.1);
+  background-color: oklch(71.07% 0.0351 256.79 / 0.1);
   color: var(--slate-400);
   cursor: not-allowed;
   opacity: 0.5;
 }
 
 .boton-agregar-producto.boton-sin-stock:hover {
-  background-color: rgba(148, 163, 184, 0.1);
+  background-color: oklch(71.07% 0.0351 256.79 / 0.1);
   color: var(--slate-400);
 }
 
 .paginacion-compacta {
   padding: 1rem 1.5rem;
-  background-color: #f8fafc;
+  background-color: oklch(98.42% 0.0034 247.86);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -296,12 +296,12 @@ html {
   border-radius: 1rem; 
   border: 1px solid var(--stone-200); 
   overflow: hidden; 
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+  box-shadow: 0 20px 25px -5px oklch(0.00% 0.0000 0.00 / 0.05), 0 8px 10px -6px oklch(0.00% 0.0000 0.00 / 0.01);
 }
 
 .cabecera-resumen { 
   padding: 1.5rem; 
-  background-color: rgba(248, 250, 252, 0.5); 
+  background-color: oklch(98.42% 0.0034 247.86 / 0.5); 
   border-bottom: 1px solid var(--stone-200); 
 }
 
@@ -338,7 +338,7 @@ html {
   color: var(--slate-500);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  background-color: #f8fafc;
+  background-color: oklch(98.42% 0.0034 247.86);
   border-bottom: 1px solid var(--stone-200);
   position: sticky;
   top: 0;
@@ -401,7 +401,7 @@ input[type=number] {
 .input-cantidad { 
   width: 3.5rem; 
   height: 2.25rem;
-  background-color: #f8fafc;
+  background-color: oklch(98.42% 0.0034 247.86);
   border: 1px solid var(--stone-200);
   border-radius: 0.5rem; 
   text-align: center; 
@@ -414,7 +414,7 @@ input[type=number] {
 }
 
 .input-cantidad:focus {
-  box-shadow: 0 0 0 2px rgba(85, 107, 47, 0.2);
+  box-shadow: 0 0 0 2px oklch(49.55% 0.0896 126.19 / 0.2);
 }
 
 .input-cantidad::-webkit-inner-spin-button {
@@ -422,8 +422,8 @@ input[type=number] {
 }
 
 .boton-eliminar-item { 
-  background-color: rgba(220, 38, 38, 0.1); 
-  color: #dc2626; 
+  background-color: oklch(57.71% 0.2152 27.33 / 0.1); 
+  color: oklch(57.71% 0.2152 27.33); 
   border: none; 
   border-radius: 0.375rem; 
   padding: 0.375rem; 
@@ -439,7 +439,7 @@ input[type=number] {
 }
 
 .boton-eliminar-item:hover {
-  background-color: #dc2626;
+  background-color: oklch(57.71% 0.2152 27.33);
   color: white;
 }
 
@@ -472,7 +472,7 @@ input[type=number] {
   padding: 0.75rem; 
   border-radius: 0.75rem; 
   border: 2px solid transparent; 
-  background-color: #f8fafc; 
+  background-color: oklch(98.42% 0.0034 247.86); 
   cursor: pointer; 
   transition: all 0.2s;
 }
@@ -503,7 +503,7 @@ input[type=number] {
 
 .metodo-pago.seleccionado { 
   border-color: var(--brand-olive); 
-  background-color: rgba(85, 107, 47, 0.05); 
+  background-color: oklch(49.55% 0.0896 126.19 / 0.05); 
 }
 
 .metodo-pago.seleccionado .icono-pago,
@@ -514,7 +514,7 @@ input[type=number] {
 /* --- Totales y Confirmar --- */
 .seccion-totales { 
   padding: 1.5rem; 
-  background-color: rgba(248, 250, 252, 0.5); 
+  background-color: oklch(98.42% 0.0034 247.86 / 0.5); 
   border-top: 1px solid var(--stone-200); 
   display: flex;
   flex-direction: column;
@@ -542,7 +542,7 @@ input[type=number] {
 
 .boton-confirmar-operacion { 
   width: 100%; 
-  background-image: linear-gradient(to bottom right, var(--brand-olive), #3f5022); 
+  background-image: linear-gradient(to bottom right, var(--brand-olive), oklch(40.51% 0.0725 126.25)); 
   color: white; 
   border: none; 
   padding: 1rem; 
@@ -556,12 +556,12 @@ input[type=number] {
   justify-content: center; 
   align-items: center;
   gap: 0.5rem; 
-  box-shadow: 0 10px 15px -3px rgba(85, 107, 47, 0.3);
+  box-shadow: 0 10px 15px -3px oklch(49.55% 0.0896 126.19 / 0.3);
   transition: all 0.2s;
 }
 
 .boton-confirmar-operacion:hover {
-  box-shadow: 0 10px 15px -3px rgba(85, 107, 47, 0.4);
+  box-shadow: 0 10px 15px -3px oklch(49.55% 0.0896 126.19 / 0.4);
   transform: translateY(-1px) scale(1.01);
 }
 
