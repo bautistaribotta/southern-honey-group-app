@@ -5,7 +5,7 @@ from django.db import transaction
 from django.db.models import Sum, F, Value
 from django.db.models.functions import Coalesce
 from django.core.cache import cache
-from .models import Producto, Cliente, Operacion, DetalleOperacion, Pago, Cotizaciones, Chofer, Vehiculo, Viaje
+from .models import Producto, Cliente, Operacion, DetalleOperacion, Pago, Cotizaciones, Chofer, Vehiculo, Viaje, DetalleViaje
 
 
 def nuevo_producto(nombre, categoria=None, precio=None, cantidad=None):
@@ -414,7 +414,7 @@ def crear_viaje(id_chofer, id_vehiculo, destinos, inicio_caja, fecha_inicio, fec
                     destino=nombre_limpio
                 )
 
-    # Si todo sale bien, la transacción se guarda ('commit'). Si algo falla, se deshace todo ('rollback').
+    # Si sale bien, la transacción se guarda ('commit'). Si algo falla, se deshace ('rollback').
     return nuevo_viaje
 
 

@@ -12,29 +12,11 @@ from django.db import transaction
 
 from .models import Cliente, Producto, Operacion, DetalleOperacion, Pago, Cotizaciones, Chofer, Vehiculo, Viaje
 from .pdf_services import Remito
-from .services import (
-    nuevo_producto,
-    editar_producto,
-    eliminar_producto,
-    nuevo_cliente,
-    editar_cliente,
-    eliminar_cliente,
-    get_cotizacion_oficial,
-    get_cotizaciones,
-    actualizar_cotizacion,
-    obtener_datos_cliente,
-    obtener_datos_producto,
-    modificar_stock,
-    crear_operacion,
-    servicio_cancelar_operacion,
-    obtener_listado_deudores,
-    crear_chofer,
-    crear_vehiculo,
-    crear_viaje,
-    obtener_choferes_activos,
-    obtener_vehiculos_activos,
-    obtener_viajes,
-)
+from .services import (nuevo_producto, editar_producto, eliminar_producto, nuevo_cliente, editar_cliente,
+    eliminar_cliente, get_cotizacion_oficial, get_cotizaciones, actualizar_cotizacion, obtener_datos_cliente,
+    obtener_datos_producto, modificar_stock, crear_operacion, servicio_cancelar_operacion,
+    obtener_listado_deudores, crear_chofer, crear_vehiculo, crear_viaje, obtener_choferes_activos,
+    obtener_vehiculos_activos, obtener_viajes)
 
 
 def login(request):
@@ -551,6 +533,12 @@ def viajes(request):
     }
 
     return render(request, "viajes.html", contexto)
+
+
+@login_required
+def informacion_viaje(request):
+    # TODO para crear una vista de informacion del cliente
+    pass
 
 
 # Verifico que solo un administrador pueda ver la vista, tambien verifica que el usuario este logueado
