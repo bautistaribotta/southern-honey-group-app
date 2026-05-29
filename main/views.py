@@ -13,10 +13,10 @@ from django.db import transaction
 from .models import Cliente, Producto, Operacion, DetalleOperacion, Pago, Cotizaciones, Chofer, Vehiculo, Viaje
 from .pdf_services import Remito
 from .services import (nuevo_producto, editar_producto, eliminar_producto, nuevo_cliente, editar_cliente,
-    eliminar_cliente, get_cotizacion_oficial, get_cotizaciones, actualizar_cotizacion, obtener_datos_cliente,
-    obtener_datos_producto, modificar_stock, crear_operacion, servicio_cancelar_operacion,
-    obtener_listado_deudores, crear_chofer, crear_vehiculo, crear_viaje, obtener_choferes_activos,
-    obtener_vehiculos_activos, obtener_viajes)
+                       eliminar_cliente, get_cotizacion_dolar_oficial, get_cotizaciones, actualizar_cotizacion, obtener_datos_cliente,
+                       obtener_datos_producto, modificar_stock, crear_operacion, servicio_cancelar_operacion,
+                       obtener_listado_deudores, crear_chofer, crear_vehiculo, crear_viaje, obtener_choferes_activos,
+                       obtener_vehiculos_activos, obtener_viajes)
 
 
 def login(request):
@@ -47,7 +47,7 @@ para que se loguee. Todo esto implementado usando el wrapped @login_required
 
 @login_required
 def inicio(request):
-    dolar_oficial = get_cotizacion_oficial()
+    dolar_oficial = get_cotizacion_dolar_oficial()
     cotizaciones = get_cotizaciones()
     contexto = {"oficial": dolar_oficial, "cotizaciones": cotizaciones}
     return render(request, "inicio.html", contexto)

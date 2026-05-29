@@ -1,5 +1,5 @@
 import requests
-from bs4 import BeautifulSoup
+
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.db.models import Sum, F, Value
@@ -137,13 +137,13 @@ def eliminar_cliente(id_cliente):
 
 def crear_operacion(cliente, items, metodo_pago):
     # Obtenemos las cotizaciones actuales antes de la transacción
-    cotizacion_dolar = get_cotizacion_oficial()
+    cotizacion_dolar = get_cotizacion_dolar_oficial()
     if cotizacion_dolar:
         valor_dolar = cotizacion_dolar.get("venta")
     else:
         valor_dolar = None
 
-    valor_miel = get_cotizacion_miel()
+    valor_miel = get_cotizacion_miel_50mm()
 
     with transaction.atomic():
         # Creo la operación con las cotizaciones actuales
@@ -218,10 +218,10 @@ def servicio_cancelar_operacion(id_operacion):
 
 
 def obtener_listado_deudores(q=""):
-    dolar_actual_data = get_cotizacion_oficial()
+    dolar_actual_data = get_cotizacion_dolar_oficial()
     dolar_actual = float(dolar_actual_data.get("venta") or 1) # Prevención división por 0 si falla la API
     
-    miel_actual_data = get_cotizacion_miel()
+    miel_actual_data = get_cotizacion_miel_50mm()
     try:
         miel_actual = float(miel_actual_data) if miel_actual_data else None
     except ValueError:
@@ -278,7 +278,7 @@ def obtener_listado_deudores(q=""):
     return lista_deudores
 
 
-def get_cotizacion_oficial():
+def get_cotizacion_dolar_oficial():
     cotizacion = cache.get("cotizacion_oficial")
     if cotizacion:
         return cotizacion
@@ -323,7 +323,7 @@ def actualizar_cotizacion(articulo, monto):
     return cotizacion
 
 
-def get_cotizacion_miel():
+def get_cotizacion_miel_50mm():
     """
     Obtiene la cotización de la miel. Se toma 'Miel 50mm' como referencia por defecto.
     """
