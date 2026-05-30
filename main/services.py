@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 import requests
 from decimal import Decimal
 
@@ -8,6 +9,12 @@ from django.db.models import Sum, F, Value
 from django.db.models.functions import Coalesce
 from django.core.cache import cache
 from .models import Producto, Cliente, Operacion, DetalleOperacion, Pago, Cotizaciones, Chofer, Vehiculo, Viaje, DetalleViaje
+
+
+# --- Validadores REGEX ---
+REGEX_TEXTO_BASICO = re.compile(r"^[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]+$")
+REGEX_TEXTO_NUMEROS = re.compile(r"^[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]+$")
+REGEX_PATENTE = re.compile(r"^[A-Z0-9]{6,7}$")
 
 
 def nuevo_producto(nombre, categoria=None, precio=None, cantidad=None):
@@ -336,12 +343,6 @@ def get_cotizacion_miel_50mm():
         return 1.00
 
 
-# --- Validadores Regex Compilados ---
-REGEX_TEXTO_BASICO = re.compile(r"^[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]+$")
-REGEX_TEXTO_NUMEROS = re.compile(r"^[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]+$")
-REGEX_PATENTE = re.compile(r"^[A-Z0-9]{6,7}$")
-
-
 def crear_chofer(nombre, apellido):
     # Aplico limpieza de espacios
     nombre = nombre.strip()
@@ -477,6 +478,16 @@ def crear_viaje(id_chofer, id_vehiculo, destinos, inicio_caja, fecha_inicio, fec
                 viaje=nuevo_viaje,
                 destino=destino_nombre
             )
+            
+        # Incremento el contador de viajes del Chofer sumando la cantidad de destinos
+        chofer = Chofer.objects.get(id=id_chofer)
+        chofer.total_viajes += len(destinos_limpios)
+        chofer.save()
+
+        # Incremento el contador de viajes del Vehículo sumando la cantidad de destinos
+        vehiculo = Vehiculo.objects.get(id=id_vehiculo)
+        vehiculo.total_viajes += len(destinos_limpios)
+        vehiculo.save()
 
     return nuevo_viaje
 
