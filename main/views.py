@@ -534,7 +534,19 @@ def viajes(request):
 
         return redirect("viajes")
 
+    # Obtenemos todos los viajes por defecto
     lista_viajes = obtener_viajes()
+
+    # Parámetros de filtrado
+    vehiculo_id = request.GET.get("vehiculo", "")
+    chofer_id = request.GET.get("chofer", "")
+
+    # Aplicamos los filtros si existen
+    if vehiculo_id:
+        lista_viajes = lista_viajes.filter(vehiculo_id=vehiculo_id)
+    if chofer_id:
+        lista_viajes = lista_viajes.filter(chofer_id=chofer_id)
+
     paginator = Paginator(lista_viajes, 5)
     pagina_numero = request.GET.get("page")
     page_obj = paginator.get_page(pagina_numero)
@@ -542,8 +554,14 @@ def viajes(request):
     contexto = {
         "page_obj": page_obj,
         "choferes": obtener_choferes_activos(),
-        "vehiculos": obtener_vehiculos_activos()
+        "vehiculos": obtener_vehiculos_activos(),
+        "vehiculo_actual": vehiculo_id,
+        "chofer_actual": chofer_id
     }
+
+    # Si es una petición AJAX, devuelvo solo la tabla (útil si hay recarga parcial en JS)
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return render(request, "viajes.html", contexto)  # Debería apuntar a una tabla parcial, pero mantenemos simple por ahora o podemos renderizar la página completa.
 
     return render(request, "viajes.html", contexto)
 

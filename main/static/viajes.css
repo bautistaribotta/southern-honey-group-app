@@ -12,6 +12,43 @@
   flex: 1;
 }
 
+/* --- ESTILOS PARA LOS FILTROS SELECT --- */
+.contenedor-filtro {
+  position: relative;
+}
+
+.select-filtro {
+  appearance: none;
+  padding: 0.625rem 2.5rem 0.625rem 1rem;
+  background-color: white;
+  border: 1px solid var(--stone-200);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--slate-700);
+  outline: none;
+  box-shadow: 0 1px 2px oklch(0.00% 0.0000 0.00 / 0.05);
+  cursor: pointer;
+  min-width: 160px;
+  height: 100%;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.select-filtro:focus {
+  border-color: var(--brand-olive);
+  box-shadow: 0 0 0 1px var(--brand-olive);
+}
+
+.icono-filtro {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--slate-400);
+  pointer-events: none;
+  font-size: 20px;
+}
+
 .boton-nuevo {
   background-color: var(--brand-olive);
   color: white;

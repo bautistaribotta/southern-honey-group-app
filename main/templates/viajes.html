@@ -47,9 +47,27 @@
     
     <!-- Controles Superiores -->
     <div class="barra-herramientas">
-      <div class="grupo-busqueda">
-        <!-- Espacio reservado para mantener la alineación de flexbox -->
-      </div>
+      <form class="grupo-busqueda" method="GET" action="{% url 'viajes' %}" id="form-filtros">
+        <div class="contenedor-filtro">
+          <select name="vehiculo" id="filtro-vehiculo" class="select-filtro" onchange="document.getElementById('form-filtros').submit();">
+            <option value="" {% if not vehiculo_actual %}selected{% endif %}>Todos los vehículos</option>
+            {% for v in vehiculos %}
+              <option value="{{ v.id }}" {% if vehiculo_actual == v.id|stringformat:"s" %}selected{% endif %}>{{ v.nombre }}</option>
+            {% endfor %}
+          </select>
+          <span class="material-symbols-outlined icono-filtro">filter_list</span>
+        </div>
+
+        <div class="contenedor-filtro">
+          <select name="chofer" id="filtro-chofer" class="select-filtro" onchange="document.getElementById('form-filtros').submit();">
+            <option value="" {% if not chofer_actual %}selected{% endif %}>Todos los choferes</option>
+            {% for c in choferes %}
+              <option value="{{ c.id }}" {% if chofer_actual == c.id|stringformat:"s" %}selected{% endif %}>{{ c.nombre }} {{ c.apellido }}</option>
+            {% endfor %}
+          </select>
+          <span class="material-symbols-outlined icono-filtro">filter_list</span>
+        </div>
+      </form>
       
       <div style="display: flex; gap: 1rem;">
         <button class="boton-nuevo" id="btn-nuevo-viaje" onclick="abrirSlideOver('slide-over-viaje')">
