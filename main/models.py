@@ -53,7 +53,7 @@ class Cliente(models.Model):
 
 
 class Operacion(models.Model):
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, db_column="id_cliente")
+    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, db_column="id_cliente")
     fecha = models.DateTimeField(auto_now_add=True)
     activa = models.BooleanField(default=True)
     observaciones = models.CharField(max_length=200, null=True, blank=True)

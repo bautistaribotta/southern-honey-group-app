@@ -1,4 +1,5 @@
 import requests
+from decimal import Decimal
 
 from django.shortcuts import get_object_or_404
 from django.db import transaction
@@ -219,11 +220,11 @@ def servicio_cancelar_operacion(id_operacion):
 
 def obtener_listado_deudores(q=""):
     dolar_actual_data = get_cotizacion_dolar_oficial()
-    dolar_actual = float(dolar_actual_data.get("venta") or 1) # Prevención división por 0 si falla la API
+    dolar_actual = Decimal(str(dolar_actual_data.get("venta") or 1))  # Prevención división por 0 si falla la API
     
     miel_actual_data = get_cotizacion_miel_50mm()
     try:
-        miel_actual = float(miel_actual_data) if miel_actual_data else None
+        miel_actual = Decimal(str(miel_actual_data)) if miel_actual_data else None
     except ValueError:
         miel_actual = None
 
@@ -249,17 +250,17 @@ def obtener_listado_deudores(q=""):
     lista_deudores = []
     for operacion in operaciones_adeudadas:
         # La deuda es igual al monto total - los pagos registrados en esa operacion
-        deuda_pesos = float(operacion.monto_total) - float(operacion.pagado)
+        deuda_pesos = operacion.monto_total - operacion.pagado
         
         # Cálculos del dólar
-        valor_dolar_historico = float(operacion.valor_dolar) if operacion.valor_dolar else None
+        valor_dolar_historico = operacion.valor_dolar if operacion.valor_dolar else None
         
         # Usamos división porque el total está en pesos (Pesos / Valor Dólar = Dólares)
         deuda_dolar_historico = (deuda_pesos / valor_dolar_historico) if valor_dolar_historico else None
         deuda_dolar_actual = (deuda_pesos / dolar_actual) if dolar_actual else None
 
         # Cálculos de la Miel
-        valor_miel_historico = float(operacion.valor_kilo_miel) if operacion.valor_kilo_miel else None
+        valor_miel_historico = operacion.valor_kilo_miel if operacion.valor_kilo_miel else None
         
         kg_miel_historico = (deuda_pesos / valor_miel_historico) if valor_miel_historico else None
         kg_miel_actual = (deuda_pesos / miel_actual) if miel_actual else None
@@ -414,7 +415,6 @@ def crear_viaje(id_chofer, id_vehiculo, destinos, inicio_caja, fecha_inicio, fec
                     destino=nombre_limpio
                 )
 
-    # Si sale bien, la transacción se guarda ('commit'). Si algo falla, se deshace ('rollback').
     return nuevo_viaje
 
 
@@ -428,6 +428,7 @@ def obtener_vehiculos_activos():
 
 def obtener_viajes():
     return Viaje.objects.select_related('chofer', 'vehiculo').prefetch_related('destinos').order_by('-fecha_inicio')
+
 
 def editar_viaje(id_viaje):
     # TODO: Funcion para editar
