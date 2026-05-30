@@ -1,3 +1,4 @@
+import re
 import requests
 from decimal import Decimal
 
@@ -335,7 +336,25 @@ def get_cotizacion_miel_50mm():
         return 1.00
 
 
+# --- Validadores Regex Compilados ---
+REGEX_TEXTO_BASICO = re.compile(r"^[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]+$")
+REGEX_TEXTO_NUMEROS = re.compile(r"^[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]+$")
+REGEX_PATENTE = re.compile(r"^[A-Z0-9]{6,7}$")
+
+
 def crear_chofer(nombre, apellido):
+    # Aplico limpieza de espacios
+    nombre = nombre.strip()
+    apellido = apellido.strip()
+
+    # Valido la longitud y formato del nombre
+    if not (3 <= len(nombre) <= 25) or not REGEX_TEXTO_BASICO.match(nombre):
+        raise ValueError("El nombre debe tener entre 3 y 25 letras, sin números ni símbolos.")
+
+    # Valido la longitud y formato del apellido
+    if not (3 <= len(apellido) <= 25) or not REGEX_TEXTO_BASICO.match(apellido):
+        raise ValueError("El apellido debe tener entre 3 y 25 letras, sin números ni símbolos.")
+
     nuevo_chofer = Chofer.objects.create(
         nombre=nombre,
         apellido=apellido
@@ -348,7 +367,7 @@ def editar_chofer(id_chofer, nombre, apellido, activo):
     chofer.nombre = nombre
     chofer.apellido = apellido
     chofer.activo = activo
-    
+
     chofer.save()
     return chofer
 
@@ -357,12 +376,24 @@ def eliminar_chofer(id_chofer):
     chofer = get_object_or_404(Chofer, id=id_chofer)
     # Borrado lógico
     chofer.activo = False
-    
+
     chofer.save()
     return chofer
 
 
 def crear_vehiculo(nombre, patente):
+    # Aplico limpieza de espacios y fuerzo la patente a mayúsculas
+    nombre = nombre.strip()
+    patente = patente.strip().upper()
+
+    # Valido la longitud y formato del nombre del vehículo
+    if not (3 <= len(nombre) <= 25) or not REGEX_TEXTO_NUMEROS.match(nombre):
+        raise ValueError("El nombre del vehículo debe tener entre 3 y 25 caracteres (solo letras y números).")
+
+    # Valido la longitud y formato de la patente
+    if not patente or not REGEX_PATENTE.match(patente):
+        raise ValueError("La patente debe tener 6 o 7 caracteres alfanuméricos sin espacios.")
+
     nuevo_vehiculo = Vehiculo.objects.create(
         nombre=nombre,
         patente=patente
@@ -375,7 +406,7 @@ def editar_vehiculo(id_vehiculo, nombre, patente, activo):
     vehiculo.nombre = nombre
     vehiculo.patente = patente
     vehiculo.activo = activo
-    
+
     vehiculo.save()
     return vehiculo
 
@@ -384,7 +415,7 @@ def eliminar_vehiculo(id_vehiculo):
     vehiculo = get_object_or_404(Vehiculo, id=id_vehiculo)
     # Borrado lógico
     vehiculo.activo = False
-    
+
     vehiculo.save()
     return vehiculo
 
@@ -394,8 +425,43 @@ def crear_viaje(id_chofer, id_vehiculo, destinos, inicio_caja, fecha_inicio, fec
     Crea un viaje (maestro) y sus destinos asociados (detalle) usando una transacción atómica.
     'destinos' debe ser una lista de strings. Ejemplo: ["Buenos Aires", "Rosario"].
     """
+    # 1. Valido que el chofer exista en la base de datos
+    if not Chofer.objects.filter(id=id_chofer).exists():
+        raise ValueError("El chofer seleccionado no existe en el sistema.")
+
+    # 2. Valido que el vehículo exista en la base de datos
+    if not Vehiculo.objects.filter(id=id_vehiculo).exists():
+        raise ValueError("El vehículo seleccionado no existe en el sistema.")
+
+    # 3. Valido los destinos
+    if not destinos:
+        raise ValueError("Debe ingresar al menos un destino.")
+
+    destinos_limpios = []
+    for d in destinos:
+        d_limpio = d.strip()
+        if not (3 <= len(d_limpio) <= 30) or not REGEX_TEXTO_NUMEROS.match(d_limpio):
+            raise ValueError(f"El destino '{d}' es inválido (debe tener entre 3 y 30 caracteres alfanuméricos).")
+        destinos_limpios.append(d_limpio)
+
+    # 4. Valido el inicio de caja
+    try:
+        caja_val = float(inicio_caja)
+        if caja_val < 0 or caja_val > 99999999.99:
+            raise ValueError()
+    except (ValueError, TypeError):
+        raise ValueError("El monto de inicio de caja debe ser un número positivo y no superar el límite permitido de la BD.")
+
+    # 5. Valido estrictamente el formato de las fechas para la BD
+    try:
+        datetime.strptime(fecha_inicio, "%Y-%m-%d")
+        if fecha_vuelta: # La fecha de vuelta es opcional
+            datetime.strptime(fecha_vuelta, "%Y-%m-%d")
+    except (ValueError, TypeError):
+        raise ValueError("Las fechas deben tener el formato válido YYYY-MM-DD.")
+
     with transaction.atomic():
-        # 1. Creamos el viaje (Tabla Maestra)
+        # Creamos el viaje (Tabla Maestra)
         nuevo_viaje = Viaje.objects.create(
             chofer_id=id_chofer,
             vehiculo_id=id_vehiculo,
@@ -405,15 +471,12 @@ def crear_viaje(id_chofer, id_vehiculo, destinos, inicio_caja, fecha_inicio, fec
             gastos=0
         )
 
-        # 2. Iteramos sobre la lista de destinos para crear el Detalle
-        for destino_nombre in destinos:
-            # Quitamos espacios extra en blanco por seguridad
-            nombre_limpio = destino_nombre.strip()
-            if nombre_limpio:
-                DetalleViaje.objects.create(
-                    viaje=nuevo_viaje,
-                    destino=nombre_limpio
-                )
+        # Iteramos sobre la lista de destinos limpios para crear el Detalle
+        for destino_nombre in destinos_limpios:
+            DetalleViaje.objects.create(
+                viaje=nuevo_viaje,
+                destino=destino_nombre
+            )
 
     return nuevo_viaje
 

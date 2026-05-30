@@ -490,45 +490,47 @@ def viajes(request):
     if request.method == "POST":
         accion = request.POST.get("accion")
 
-        if accion == "nuevo_viaje":
-            id_chofer = request.POST.get("id_chofer")
-            if not id_chofer:
-                messages.error(request, "Debe seleccionar un chofer")
-                return redirect("viajes")
-
-            try:
+        try:
+            if accion == "nuevo_viaje":
+                # 1. Extracción de datos
+                id_chofer = request.POST.get("id_chofer")
                 id_vehiculo = request.POST.get("id_vehiculo")
-                # Obtengo el destino como una lista
-                # getlist() captura todos los <input name="destino"> si hubiera varios
                 destinos = request.POST.getlist("destino")
                 inicio_caja = request.POST.get("inicio_caja")
                 fecha_inicio_viaje = request.POST.get("fecha_inicio_viaje")
-                fecha_regreso_viaje = request.POST.get("fecha_regreso_viaje")
-                if not fecha_regreso_viaje:
-                    fecha_regreso_viaje = None
+                fecha_regreso_viaje = request.POST.get("fecha_regreso_viaje") or None
 
+                # 2. Validación de presencia requerida por el backend (lo esencial)
+                if not all([id_chofer, id_vehiculo, fecha_inicio_viaje]) or not destinos:
+                    messages.error(request, "Faltan datos obligatorios para crear el viaje.")
+                    return redirect("viajes")
+
+                # 3. Delegación al servicio (donde apliqué las reglas del negocio)
                 crear_viaje(id_chofer, id_vehiculo, destinos, inicio_caja, fecha_inicio_viaje, fecha_regreso_viaje)
-
                 messages.success(request, "Viaje registrado exitosamente.")
-                return redirect("viajes")
 
-            except Exception as e:
-                messages.error(request, f"Error: {e}, vuelva a intentarlo")
-                return redirect("viajes")
+            elif accion == "nuevo_chofer":
+                nombre_chofer = request.POST.get("nombre_chofer", "")
+                apellido_chofer = request.POST.get("apellido_chofer", "")
+                
+                # Delegación al servicio
+                crear_chofer(nombre_chofer, apellido_chofer)
+                messages.success(request, "Chofer registrado exitosamente.")
 
-        elif accion == "nuevo_chofer":
-            nombre_chofer = request.POST.get("nombre_chofer")
-            apellido_chofer = request.POST.get("apellido_chofer")
+            elif accion == "nuevo_vehiculo":
+                nombre_vehiculo = request.POST.get("nombre_vehiculo", "")
+                patente_vehiculo = request.POST.get("patente_vehiculo", "")
 
-            crear_chofer(nombre_chofer, apellido_chofer)
-            messages.success(request, "Chofer registrado exitosamente.")
+                # Delegación al servicio
+                crear_vehiculo(nombre_vehiculo, patente_vehiculo)
+                messages.success(request, "Vehículo registrado exitosamente.")
 
-        elif accion == "nuevo_vehiculo":
-            nombre_vehiculo = request.POST.get("nombre_vehiculo")
-            patente_vehiculo = request.POST.get("patente_vehiculo")
-
-            crear_vehiculo(nombre_vehiculo, patente_vehiculo)
-            messages.success(request, "Vehículo registrado exitosamente.")
+        except ValueError as e:
+            # Capturo cualquier error de validación proveniente de services.py
+            messages.error(request, str(e))
+        except Exception as e:
+            # Capturo errores inesperados (ej: base de datos)
+            messages.error(request, f"Ocurrió un error inesperado: {e}")
 
         return redirect("viajes")
 
