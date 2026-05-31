@@ -9,15 +9,17 @@
 <link rel="stylesheet" href="{% static 'informacion_viaje.css' %}">
 {% endblock %}
 
-{% block cabecera %}
-<div id="titulos-cabecera">
-  <h2>Viajes</h2>
-  <p>Información detallada del viaje seleccionado</p>
-</div>
+{% block top-header %}
+<!-- Bloque vacío: Oculto todo el header (títulos, perfil de usuario y la barra divisoria) -->
 {% endblock %}
 
 {% block area-trabajo %}
 <section id="area-trabajo">
+  
+  <a href="{% url 'viajes' %}" class="boton-volver">
+    <span class="material-symbols-outlined">arrow_back</span>
+    Volver a Viajes
+  </a>
 
   <!-- CABECERA DE ACCIONES -->
   <div class="header-acciones">
@@ -27,7 +29,6 @@
       </div>
       <div class="texto-titulo">
         <h2>Viaje #{{ viaje.id|default:"000" }}</h2>
-        <p>Registrado el {{ viaje.fecha_inicio|date:"d/m/Y"|default:"--" }}</p>
       </div>
     </div>
     
@@ -84,18 +85,19 @@
           </div>
 
           <div class="dato-item">
-            <span class="dato-label">Destinos</span>
-            <span class="dato-valor">
-              {% if viaje %}
+            <span class="dato-label">Ruta de Destinos</span>
+            {% if viaje and viaje.destinos.all %}
+              <div class="journey-map">
                 {% for d in viaje.destinos.all %}
-                  {{ d.destino }}{% if not forloop.last %}, {% endif %}
-                {% empty %}
-                  Sin destinos registrados
+                  <div class="journey-stop">
+                    <div class="journey-dot"></div>
+                    <div class="journey-text">{{ d.destino }}</div>
+                  </div>
                 {% endfor %}
-              {% else %}
-                -
-              {% endif %}
-            </span>
+              </div>
+            {% else %}
+              <span class="dato-valor">Sin destinos registrados</span>
+            {% endif %}
           </div>
 
           <div class="dato-item doble">
@@ -139,13 +141,9 @@
         <div class="cabecera-tarjeta">
           <h3 class="titulo-tarjeta">
             <span class="material-symbols-outlined">receipt_long</span>
-            Operaciones y Gastos
+            Operaciones
           </h3>
           <div class="acciones-secundarias">
-            <button class="boton-nuevo-item gasto">
-              <span class="material-symbols-outlined">receipt</span>
-              Añadir Gasto
-            </button>
             <button class="boton-nuevo-item">
               <span class="material-symbols-outlined">add</span>
               Nueva Operación

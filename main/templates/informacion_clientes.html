@@ -48,12 +48,14 @@
                 <p class="id-cliente-subtitulo">ID: {{ cliente.id }}</p>
             </div>
         </div>
-        <div class="acciones-cliente">
-            <button class="boton-accion" id="btn-editar-cliente">
+        <div class="acciones-cliente" style="display: flex; gap: 0.75rem;">
+            <button type="button" class="boton-accion boton-editar" id="btn-editar-cliente">
                 <span class="material-symbols-outlined">edit</span>
+                Editar Cliente
             </button>
-            <button class="boton-accion eliminar" onclick="abrirPanelEliminarDesdePerfil('{{cliente.id}}', '{{cliente.nombre}} {{cliente.apellido}}')">
+            <button type="button" class="boton-accion boton-cancelar" onclick="abrirPanelEliminarDesdePerfil('{{cliente.id}}', '{{cliente.nombre}} {{cliente.apellido}}')">
                 <span class="material-symbols-outlined">delete</span>
+                Eliminar Cliente
             </button>
         </div>
     </div>

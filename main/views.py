@@ -570,7 +570,8 @@ def viajes(request):
 def informacion_viaje(request, id_viaje):
     viaje = get_object_or_404(Viaje, id=id_viaje)
     contexto = {
-        'viaje': viaje
+        'viaje': viaje,
+        'pestaña': 'viajes'
     }
     return render(request, "informacion_viaje.html", contexto)
 

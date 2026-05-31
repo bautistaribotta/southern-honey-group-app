@@ -100,7 +100,7 @@
         <tbody>
           <!-- FILAS -->
           {% for viaje in page_obj %}
-          <tr class="fila-viaje" ondblclick="window.location.href='{% url 'informacion_viaje' viaje.id %}'" style="cursor: pointer;">
+          <tr class="fila-viaje" onclick="window.location.href='{% url 'informacion_viaje' viaje.id %}'" style="cursor: pointer;">
             <td class="td-enlace"> 
               <a class="enlace-fila"> 
                 <div class="vehiculo-nombre">{{ viaje.vehiculo.nombre }}</div>

@@ -1,4 +1,31 @@
 /* --- VARIABLES COMPARTIDAS Y BASE --- */
+html {
+    scroll-behavior: smooth;
+}
+
+#contenido-principal {
+    padding-top: 1.5rem !important; /* Reduzco el padding superior del contenedor base */
+}
+
+.boton-volver { 
+  display: inline-flex; 
+  align-items: center; 
+  gap: 0.5rem; 
+  color: var(--slate-500); 
+  font-size: 0.75rem; 
+  font-weight: 700; 
+  text-transform: uppercase; 
+  text-decoration: none; 
+  margin-bottom: 2rem; 
+  letter-spacing: 0.05em;
+  transition: color 0.2s;
+  font-family: inherit;
+}
+
+.boton-volver:hover { 
+  color: var(--brand-olive); 
+}
+
 .header-acciones {
   display: flex;
   justify-content: space-between;
@@ -187,6 +214,61 @@
   font-weight: 600;
   background-color: oklch(46.68% 0.0844 129.02 / 0.1);
   color: var(--brand-olive);
+}
+
+/* --- JOURNEY MAP (DESTINOS) --- */
+.journey-map {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.5rem;
+}
+
+.journey-stop {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  position: relative;
+  padding-bottom: 1.25rem;
+}
+
+.journey-stop:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 14px;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--stone-200);
+}
+
+.journey-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--brand-olive);
+  margin-top: 5px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* El ultimo punto lo hacemos tipo anillo (outline) para indicar fin de ruta */
+.journey-stop:last-child .journey-dot {
+  background-color: transparent;
+  border: 2px solid var(--brand-olive);
+  width: 4px;
+  height: 4px;
+}
+
+.journey-text {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--slate-900);
+  line-height: 1.2;
+}
+
+.journey-stop:last-child {
+  padding-bottom: 0;
 }
 
 /* --- SECCION OPERACIONES Y GASTOS --- */

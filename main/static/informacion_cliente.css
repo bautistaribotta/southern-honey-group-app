@@ -78,31 +78,39 @@ html {
 }
 
 .boton-accion {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: 1px solid var(--stone-200);
-    background: white;
-    color: var(--slate-700);
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: 1px solid var(--stone-200);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  font-family: inherit;
 }
 
-.boton-accion:hover {
-    background-color: oklch(98.46% 0.0017 247.84);
+.boton-editar {
+  background-color: white;
+  color: var(--slate-700);
+  box-shadow: 0 1px 2px 0 oklch(0.00% 0.0000 0.00 / 0.05);
 }
 
-.boton-accion.eliminar {
-    color: oklch(57.71% 0.2152 27.33);
-    border-color: oklch(88.45% 0.0593 18.33);
+.boton-editar:hover {
+  background-color: oklch(98.42% 0.0034 247.86);
+  border-color: var(--slate-400);
 }
 
-.boton-accion.eliminar:hover {
-    background-color: oklch(97.05% 0.0129 17.38);
+.boton-cancelar {
+  background-color: white;
+  color: oklch(57.71% 0.2152 27.33); /* Rojo */
+  border-color: oklch(57.71% 0.2152 27.33 / 0.3);
+}
+
+.boton-cancelar:hover {
+  background-color: oklch(97.10% 0.0435 27.33); /* Fondo rojo muy claro */
+  border-color: oklch(57.71% 0.2152 27.33);
 }
 
 /* --- TARJETA ÚNICA DE INFORMACIÓN --- */
