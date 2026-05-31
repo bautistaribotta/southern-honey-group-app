@@ -28,7 +28,7 @@ body {
 
 #barra-lateral {
   width: 280px;
-  background: linear-gradient(to bottom, var(--stone-900), var(--brand-olive));
+  background-color: #212A1F;
   color: var(--brand-cream);
   display: flex;
   flex-direction: column;
