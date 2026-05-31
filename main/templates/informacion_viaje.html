@@ -47,10 +47,9 @@
   <!-- CONTENIDO PRINCIPAL (GRID) -->
   <div class="grid-informacion">
     
-    <!-- COLUMNA IZQUIERDA (INFO DEL VIAJE) -->
-    <div class="columna-info">
-      
-      <div class="tarjeta-info">
+    <!-- FILA SUPERIOR: DATOS GENERALES -->
+    <div class="columna-datos">
+      <div class="tarjeta-info" style="height: 100%;">
         <div class="cabecera-tarjeta">
           <h3 class="titulo-tarjeta">
             <span class="material-symbols-outlined">info</span>
@@ -112,8 +111,11 @@
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="tarjeta-info">
+    <!-- FILA SUPERIOR: RESUMEN DE CAJA -->
+    <div class="columna-caja">
+      <div class="tarjeta-info" style="height: 100%;">
         <div class="cabecera-tarjeta">
           <h3 class="titulo-tarjeta">
             <span class="material-symbols-outlined">payments</span>
@@ -131,13 +133,11 @@
           </div>
         </div>
       </div>
-
     </div>
 
-    <!-- COLUMNA DERECHA (OPERACIONES Y GASTOS) -->
+    <!-- FILA INFERIOR: OPERACIONES Y GASTOS (ANCHO COMPLETO) -->
     <div class="columna-operaciones">
-      
-      <div class="tarjeta-info" style="height: 100%; display: flex; flex-direction: column;">
+      <div class="tarjeta-info" style="display: flex; flex-direction: column; margin-bottom: 0;">
         <div class="cabecera-tarjeta">
           <h3 class="titulo-tarjeta">
             <span class="material-symbols-outlined">receipt_long</span>
@@ -162,7 +162,6 @@
         </div>
 
       </div>
-
     </div>
 
   </div>
