@@ -375,7 +375,6 @@ def editar_chofer(id_chofer, nombre, apellido, activo):
 
 def eliminar_chofer(id_chofer):
     chofer = get_object_or_404(Chofer, id=id_chofer)
-    # Borrado lógico
     chofer.activo = False
 
     chofer.save()
