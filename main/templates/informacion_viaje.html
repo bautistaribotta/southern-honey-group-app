@@ -56,7 +56,7 @@
             Datos Generales
           </h3>
           <div class="etiqueta-estado">
-            {% if viaje.fecha_vuelta %}Finalizado{% else %}En Curso{% endif %}
+            {{ viaje.estado }}
           </div>
         </div>
         
@@ -121,6 +121,12 @@
             <span class="material-symbols-outlined">payments</span>
             Resumen de Caja
           </h3>
+          <div class="acciones-secundarias">
+            <button class="boton-nuevo-item gasto">
+              <span class="material-symbols-outlined">paid</span>
+              Añadir Gasto
+            </button>
+          </div>
         </div>
         <div class="lista-datos">
           <div class="dato-item doble">
@@ -157,7 +163,7 @@
           <div class="estado-vacio">
             <span class="material-symbols-outlined">history_toggle_off</span>
             <h4>No hay movimientos</h4>
-            <p>Aún no se han registrado gastos ni operaciones en este viaje.</p>
+            <p>Aún no se han registrado operaciones en este viaje.</p>
           </div>
         </div>
 

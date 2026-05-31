@@ -177,6 +177,15 @@ class Viaje(models.Model):
     def final_caja(self):
         return self.inicio_caja - self.gastos
 
+    @property
+    def estado(self):
+        from django.utils import timezone
+        if self.fecha_vuelta:
+            hoy = timezone.localdate()
+            if hoy > self.fecha_vuelta:
+                return "Finalizado"
+        return "En curso"
+
     class Meta:
         db_table = "viajes"
 
