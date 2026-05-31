@@ -1,0 +1,259 @@
+/* --- VARIABLES COMPARTIDAS Y BASE --- */
+.header-acciones {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.titulo-seccion {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.icono-viaje-principal {
+  background-color: oklch(46.68% 0.0844 129.02 / 0.1);
+  color: var(--brand-olive);
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icono-viaje-principal span {
+  font-size: 28px;
+}
+
+.texto-titulo h2 {
+  color: var(--slate-900);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.texto-titulo p {
+  color: var(--slate-500);
+  font-size: 0.875rem;
+  margin: 0;
+  margin-top: 0.25rem;
+}
+
+.grupo-botones-principales {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.boton-accion {
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: 1px solid var(--stone-200);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.boton-editar {
+  background-color: white;
+  color: var(--slate-700);
+  box-shadow: 0 1px 2px 0 oklch(0.00% 0.0000 0.00 / 0.05);
+}
+
+.boton-editar:hover {
+  background-color: oklch(98.42% 0.0034 247.86);
+  border-color: var(--slate-400);
+}
+
+.boton-cancelar {
+  background-color: white;
+  color: oklch(57.71% 0.2152 27.33); /* Rojo */
+  border-color: oklch(57.71% 0.2152 27.33 / 0.3);
+}
+
+.boton-cancelar:hover {
+  background-color: oklch(97.10% 0.0435 27.33); /* Fondo rojo muy claro */
+  border-color: oklch(57.71% 0.2152 27.33);
+}
+
+/* --- GRID PRINCIPAL --- */
+.grid-informacion {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .grid-informacion {
+    grid-template-columns: 1fr;
+  }
+  
+  .header-acciones {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
+
+/* --- TARJETAS (CARDS) --- */
+.tarjeta-info {
+  background-color: white;
+  border: 1px solid var(--stone-200);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px oklch(0.00% 0.0000 0.00 / 0.0509804);
+  margin-bottom: 1.5rem;
+}
+
+.cabecera-tarjeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid oklch(0.00% 0.0000 0.00 / 0.05);
+}
+
+.titulo-tarjeta {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--slate-900);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.titulo-tarjeta span {
+  color: var(--brand-olive);
+  font-size: 20px;
+}
+
+/* --- LISTA DE DATOS --- */
+.lista-datos {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.dato-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.dato-item.doble {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: oklch(98.42% 0.0034 247.86);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+}
+
+.dato-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--slate-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dato-valor {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--slate-900);
+}
+
+.dato-valor.resaltado {
+  color: var(--brand-olive);
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+.etiqueta-estado {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: oklch(46.68% 0.0844 129.02 / 0.1);
+  color: var(--brand-olive);
+}
+
+/* --- SECCION OPERACIONES Y GASTOS --- */
+.acciones-secundarias {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.boton-nuevo-item {
+  background-color: var(--brand-olive);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px oklch(49.55% 0.0896 126.19 / 0.2);
+}
+
+.boton-nuevo-item:hover {
+  background-color: oklch(40.51% 0.0725 126.25);
+}
+
+.boton-nuevo-item.gasto {
+  background-color: white;
+  color: var(--slate-700);
+  border: 1px solid var(--stone-200);
+  box-shadow: 0 1px 2px 0 oklch(0.00% 0.0000 0.00 / 0.05);
+}
+
+.boton-nuevo-item.gasto:hover {
+  background-color: oklch(98.42% 0.0034 247.86);
+}
+
+/* --- TABLA VACIA MOCKUP --- */
+.estado-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--slate-500);
+  background-color: oklch(98.42% 0.0034 247.86);
+  border-radius: 0.5rem;
+  border: 1px dashed var(--stone-200);
+}
+
+.estado-vacio span {
+  font-size: 3rem;
+  color: var(--stone-300);
+  margin-bottom: 0.5rem;
+}
+
+.estado-vacio h4 {
+  color: var(--slate-700);
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+}
+
+.estado-vacio p {
+  font-size: 0.875rem;
+  margin: 0;
+  max-width: 300px;
+}

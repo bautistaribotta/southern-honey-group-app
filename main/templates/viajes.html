@@ -100,16 +100,16 @@
         <tbody>
           <!-- FILAS -->
           {% for viaje in page_obj %}
-          <tr class="fila-viaje">
+          <tr class="fila-viaje" ondblclick="window.location.href='{% url 'informacion_viaje' viaje.id %}'" style="cursor: pointer;">
             <td class="td-enlace"> 
-              <a href="#" class="enlace-fila"> 
+              <a class="enlace-fila"> 
                 <div class="vehiculo-nombre">{{ viaje.vehiculo.nombre }}</div>
                 <div class="vehiculo-patente">{{ viaje.vehiculo.patente }}</div>
               </a> 
             </td>
-            <td class="td-enlace"> <a href="#" class="enlace-fila"> {{ viaje.chofer.nombre }} {{ viaje.chofer.apellido }} </a> </td>
+            <td class="td-enlace"> <a class="enlace-fila"> {{ viaje.chofer.nombre }} {{ viaje.chofer.apellido }} </a> </td>
             <td class="td-enlace"> 
-              <a href="#" class="enlace-fila" title="{% for d in viaje.destinos.all %}{{ d.destino }}{% if not forloop.last %}, {% endif %}{% endfor %}"> 
+              <a class="enlace-fila" title="{% for d in viaje.destinos.all %}{{ d.destino }}{% if not forloop.last %}, {% endif %}{% endfor %}"> 
                 {% if viaje.destinos.all %}
                   {{ viaje.destinos.first.destino }}{% if viaje.destinos.all|length > 1 %}...{% endif %}
                 {% else %}
@@ -117,8 +117,8 @@
                 {% endif %}
               </a> 
             </td>
-            <td class="td-enlace alineado-centro"> <a href="#" class="enlace-fila"> {{ viaje.fecha_inicio|date:"d/m/y" }} </a> </td>
-            <td class="td-enlace alineado-centro"> <a href="#" class="enlace-fila"> {{ viaje.fecha_vuelta|date:"d/m/y"|default:"En curso" }} </a> </td>
+            <td class="td-enlace alineado-centro"> <a class="enlace-fila"> {{ viaje.fecha_inicio|date:"d/m/y" }} </a> </td>
+            <td class="td-enlace alineado-centro"> <a class="enlace-fila"> {{ viaje.fecha_vuelta|date:"d/m/y"|default:"En curso" }} </a> </td>
           </tr>
           {% empty %}
           <tr>

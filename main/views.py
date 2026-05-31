@@ -567,9 +567,12 @@ def viajes(request):
 
 
 @login_required
-def informacion_viaje(request):
-    # TODO para crear una vista de informacion del cliente
-    pass
+def informacion_viaje(request, id_viaje):
+    viaje = get_object_or_404(Viaje, id=id_viaje)
+    contexto = {
+        'viaje': viaje
+    }
+    return render(request, "informacion_viaje.html", contexto)
 
 
 # Verifico que solo un administrador pueda ver la vista, tambien verifica que el usuario este logueado

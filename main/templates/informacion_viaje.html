@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block nombre-pestaña %}
+<title>Detalles del Viaje</title>
+{% endblock %}
+
+{% block links %}
+<link rel="stylesheet" href="{% static 'informacion_viaje.css' %}">
+{% endblock %}
+
+{% block cabecera %}
+<div id="titulos-cabecera">
+  <h2>Viajes</h2>
+  <p>Información detallada del viaje seleccionado</p>
+</div>
+{% endblock %}
+
+{% block area-trabajo %}
+<section id="area-trabajo">
+
+  <!-- CABECERA DE ACCIONES -->
+  <div class="header-acciones">
+    <div class="titulo-seccion">
+      <div class="icono-viaje-principal">
+        <span class="material-symbols-outlined">map</span>
+      </div>
+      <div class="texto-titulo">
+        <h2>Viaje #{{ viaje.id|default:"000" }}</h2>
+        <p>Registrado el {{ viaje.fecha_inicio|date:"d/m/Y"|default:"--" }}</p>
+      </div>
+    </div>
+    
+    <div class="grupo-botones-principales">
+      <button class="boton-accion boton-editar">
+        <span class="material-symbols-outlined">edit</span>
+        Editar Viaje
+      </button>
+      <button class="boton-accion boton-cancelar">
+        <span class="material-symbols-outlined">cancel</span>
+        Cancelar Viaje
+      </button>
+    </div>
+  </div>
+
+  <!-- CONTENIDO PRINCIPAL (GRID) -->
+  <div class="grid-informacion">
+    
+    <!-- COLUMNA IZQUIERDA (INFO DEL VIAJE) -->
+    <div class="columna-info">
+      
+      <div class="tarjeta-info">
+        <div class="cabecera-tarjeta">
+          <h3 class="titulo-tarjeta">
+            <span class="material-symbols-outlined">info</span>
+            Datos Generales
+          </h3>
+          <div class="etiqueta-estado">
+            {% if viaje.fecha_vuelta %}Finalizado{% else %}En Curso{% endif %}
+          </div>
+        </div>
+        
+        <div class="lista-datos">
+          <div class="dato-item">
+            <span class="dato-label">Chofer Designado</span>
+            <span class="dato-valor">
+              {% if viaje.chofer %}
+                {{ viaje.chofer.nombre }} {{ viaje.chofer.apellido }}
+              {% else %}
+                Chofer no especificado
+              {% endif %}
+            </span>
+          </div>
+          
+          <div class="dato-item">
+            <span class="dato-label">Vehículo</span>
+            <span class="dato-valor">
+              {% if viaje.vehiculo %}
+                {{ viaje.vehiculo.nombre }} ({{ viaje.vehiculo.patente }})
+              {% else %}
+                Vehículo no especificado
+              {% endif %}
+            </span>
+          </div>
+
+          <div class="dato-item">
+            <span class="dato-label">Destinos</span>
+            <span class="dato-valor">
+              {% if viaje %}
+                {% for d in viaje.destinos.all %}
+                  {{ d.destino }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                  Sin destinos registrados
+                {% endfor %}
+              {% else %}
+                -
+              {% endif %}
+            </span>
+          </div>
+
+          <div class="dato-item doble">
+            <div class="dato-item">
+              <span class="dato-label">Fecha Salida</span>
+              <span class="dato-valor">{{ viaje.fecha_inicio|date:"d/m/Y"|default:"--" }}</span>
+            </div>
+            <div class="dato-item" style="text-align: right;">
+              <span class="dato-label">Fecha Regreso</span>
+              <span class="dato-valor">{{ viaje.fecha_vuelta|date:"d/m/Y"|default:"--" }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tarjeta-info">
+        <div class="cabecera-tarjeta">
+          <h3 class="titulo-tarjeta">
+            <span class="material-symbols-outlined">payments</span>
+            Resumen de Caja
+          </h3>
+        </div>
+        <div class="lista-datos">
+          <div class="dato-item doble">
+            <span class="dato-label">Inicio de Caja</span>
+            <span class="dato-valor resaltado">${{ viaje.inicio_caja|default:"0.00" }}</span>
+          </div>
+          <div class="dato-item doble" style="background-color: transparent; border-top: 1px dashed var(--stone-200); border-radius: 0;">
+            <span class="dato-label">Comisión Estimada</span>
+            <span class="dato-valor" style="color: var(--slate-500);">$0.00</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- COLUMNA DERECHA (OPERACIONES Y GASTOS) -->
+    <div class="columna-operaciones">
+      
+      <div class="tarjeta-info" style="height: 100%; display: flex; flex-direction: column;">
+        <div class="cabecera-tarjeta">
+          <h3 class="titulo-tarjeta">
+            <span class="material-symbols-outlined">receipt_long</span>
+            Operaciones y Gastos
+          </h3>
+          <div class="acciones-secundarias">
+            <button class="boton-nuevo-item gasto">
+              <span class="material-symbols-outlined">receipt</span>
+              Añadir Gasto
+            </button>
+            <button class="boton-nuevo-item">
+              <span class="material-symbols-outlined">add</span>
+              Nueva Operación
+            </button>
+          </div>
+        </div>
+        
+        <!-- AREA DE LISTADO -->
+        <div style="flex: 1; display: flex; flex-direction: column;">
+          <!-- Aquí irá la tabla de operaciones en el futuro, por ahora un Empty State de diseño -->
+          <div class="estado-vacio">
+            <span class="material-symbols-outlined">history_toggle_off</span>
+            <h4>No hay movimientos</h4>
+            <p>Aún no se han registrado gastos ni operaciones en este viaje.</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+{% endblock %}

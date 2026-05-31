@@ -2,7 +2,7 @@ from django.urls import path
 from main.views import (login, inicio, actualizar_cotizacion_ajax,
                         productos, clientes, informacion_clientes, informacion_operaciones,
                         operaciones, cancelar_operacion, registrar_pago, obtener_cliente_json,
-                        obtener_producto_json, viajes, deudores, mercado_libre, cerrar_sesion)
+                        obtener_producto_json, viajes, informacion_viaje, deudores, mercado_libre, cerrar_sesion)
 
 """
 La sentencia name="nombre_del_archivo" se usa 
@@ -22,6 +22,7 @@ urlpatterns = [
     path('api/clientes/<int:id_cliente>/', obtener_cliente_json, name="obtener_cliente_json"),
     path('api/productos/<int:id_producto>/', obtener_producto_json, name="obtener_producto_json"),
     path('viajes/', viajes, name="viajes"),
+    path('informacion_viaje/<int:id_viaje>/', informacion_viaje, name="informacion_viaje"),
     path('deudores/', deudores, name="deudores"),
     path('mercado_libre/', mercado_libre, name="mercado_libre"),
     path('cerrar_sesion', cerrar_sesion, name="cerrar_sesion")
