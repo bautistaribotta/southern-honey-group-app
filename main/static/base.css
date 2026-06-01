@@ -1,5 +1,5 @@
 :root {
-  --brand-olive: oklch(49.55% 0.0896 126.19);
+  --brand-olive: oklch(27.255% 0.02357 140.024);
   --brand-cream: oklch(99.07% 0.0054 95.10);
   --stone-900: oklch(14.69% 0.0041 49.25);
   --slate-900: oklch(20.77% 0.0398 265.75);
@@ -9,6 +9,73 @@
   --slate-400: oklch(71.07% 0.0351 256.79);
   --stone-300: oklch(86.87% 0.0043 56.37);
   --stone-200: oklch(92.32% 0.0026 48.72);
+  --color-blanco: oklch(100% 0 0);
+  --color-crema-transparente: oklch(99.07% 0.0054 95.10 / 0.101961);
+  --color-sombra-5: oklch(0.00% 0.0000 0.00 / 0.05);
+  --color-sombra-10: oklch(0.00% 0.0000 0.00 / 0.1);
+  --color-rojo-error: oklch(63.68% 0.2078 25.33);
+  --color-gris-claro-hover: oklch(96.83% 0.0069 247.90);
+  --color-rojo-eliminacion: oklch(57.71% 0.2152 27.33);
+  --color-verde-transparente-20: oklch(49.55% 0.0896 126.19 / 0.2);
+  --color-verde-oscuro: oklch(40.51% 0.0725 126.25);
+  --color-gris-fondo-input: oklch(98.42% 0.0034 247.86);
+  --color-verde-transparente-20-alt: oklch(49.55% 0.0896 126.19 / 0.203922);
+  --color-rosa-claro: oklch(97.05% 0.0129 17.38);
+  --color-slate-900-transparente-40: oklch(20.77% 0.0398 265.75 / 0.4);
+  --color-verde-medio-transparente-10: oklch(46.68% 0.0844 129.02 / 0.1);
+  --color-sombra-8: oklch(0.00% 0.0000 0.00 / 0.0784314);
+  --color-sombra-8-alt: oklch(0.00% 0.0000 0.00 / 0.0823529);
+  --color-sombra-2: oklch(0.00% 0.0000 0.00 / 0.02);
+  --color-rojo-eliminacion-transparente-30: oklch(57.71% 0.2152 27.33 / 0.3);
+  --color-azul-claro: oklch(92.88% 0.0126 255.51);
+  --color-sombra-40: oklch(0.00% 0.0000 0.00 / 0.4);
+  --color-verde-medio-transparente-10-alt: oklch(46.68% 0.0844 129.02 / 0.101961);
+  --color-sombra-10-alt: oklch(0.00% 0.0000 0.00 / 0.101961);
+  --color-sombra-30: oklch(0.00% 0.0000 0.00 / 0.3);
+  --color-verde-transparente-10: oklch(49.55% 0.0896 126.19 / 0.101961);
+  --color-rojo-muy-claro: oklch(97.10% 0.0435 27.33);
+  --color-gris-fondo-input-alt: oklch(98.46% 0.0017 247.84);
+  --color-verde-claro-etiqueta: oklch(98.57% 0.0310 120.76);
+  --color-verde-texto-etiqueta: oklch(53.22% 0.1405 131.59);
+  --color-verde-borde-etiqueta: oklch(93.82% 0.1217 124.32);
+  --color-amarillo-claro-etiqueta: oklch(98.69% 0.0214 95.28);
+  --color-amarillo-texto-etiqueta: oklch(55.53% 0.1455 49.00);
+  --color-amarillo-borde-etiqueta: oklch(92.43% 0.1151 95.75);
+  --color-rojo-claro-etiqueta: oklch(94.14% 0.0298 12.58);
+  --color-rojo-texto-etiqueta: oklch(44.37% 0.1613 26.90);
+  --color-rojo-borde-etiqueta: oklch(89.24% 0.0559 10.00);
+  --color-gris-claro-etiqueta: oklch(96.99% 0.0013 106.42);
+  --color-gris-texto-etiqueta: oklch(44.44% 0.0096 73.64);
+    --color-morado-texto: oklch(62.31% 0.1880 259.81);
+  --color-morado-claro-fondo: oklch(97.05% 0.0142 254.60);
+  --color-morado-oscuro-texto: oklch(54.61% 0.2152 262.88);
+  --color-sombra-5-alt: oklch(0.00% 0.0000 0.00 / 0.0509804);
+  --color-sombra-2-alt: oklch(0.00% 0.0000 0.00 / 0.0196078);
+  --color-sombra-3: oklch(0.00% 0.0000 0.00 / 0.031);
+  --color-sombra-3-alt: oklch(0.00% 0.0000 0.00 / 0.0313725);
+  --color-sombra-7: oklch(0.00% 0.0000 0.00 / 0.0705882);
+  --color-verde-principal: oklch(49.55% 0.0896 126.19);
+  --color-borde-login: oklch(88.45% 0.0593 18.33);
+  --color-texto-error-login: oklch(50.54% 0.1905 27.52);
+  --color-gris-borde-etiqueta: oklch(86.90% 0.0198 252.89);
+  --color-cera-fondo-etiqueta: oklch(98.73% 0.0262 102.21);
+  --color-cera-texto-etiqueta: oklch(55.38% 0.1207 66.44);
+  --color-cera-borde-etiqueta: oklch(94.51% 0.1243 101.54);
+  --color-madera-fondo-etiqueta: oklch(97.96% 0.0158 73.68);
+  --color-madera-texto-etiqueta: oklch(55.34% 0.1739 38.40);
+  --color-madera-borde-etiqueta: oklch(95.42% 0.0372 75.16);
+  --color-insumos-fondo-etiqueta: oklch(92.99% 0.0334 272.79);
+  --color-insumos-texto-etiqueta: oklch(39.84% 0.1773 277.37);
+  --color-insumos-borde-etiqueta: oklch(86.99% 0.0622 274.04);
+  --color-verde-transparente-10-alt: oklch(49.55% 0.0896 126.19 / 0.1);
+  --color-slate-400-transparente-10: oklch(71.07% 0.0351 256.79 / 0.1);
+  --color-sombra-1: oklch(0.00% 0.0000 0.00 / 0.01);
+  --color-gris-fondo-input-transparente-50: oklch(98.42% 0.0034 247.86 / 0.5);
+  --color-rojo-eliminacion-transparente-10: oklch(57.71% 0.2152 27.33 / 0.1);
+  --color-verde-transparente-5: oklch(49.55% 0.0896 126.19 / 0.05);
+  --color-verde-transparente-30: oklch(49.55% 0.0896 126.19 / 0.3);
+  --color-verde-transparente-40: oklch(49.55% 0.0896 126.19 / 0.4);
+  --color-verde-medio-transparente-20: oklch(46.68% 0.0844 129.02 / 0.2);
   --font-main: 'Plus Jakarta Sans', sans-serif;
 }
 
@@ -28,7 +95,7 @@ body {
 
 #barra-lateral {
   width: 280px;
-  background-color: #212A1F;
+  background-color: var(--brand-olive);
   color: var(--brand-cream);
   display: flex;
   flex-direction: column;
@@ -85,7 +152,7 @@ body {
 }
 
 .item-menu:hover, .item-menu.activo {
-  background-color: oklch(99.07% 0.0054 95.10 / 0.101961);
+  background-color: var(--color-crema-transparente);
   color: var(--brand-cream);
 }
 
@@ -130,11 +197,11 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  background-color: white;
+  background-color: var(--color-blanco);
   padding: 0.6rem 1.4rem;
   border-radius: 2rem;
   border: 1px solid var(--stone-200);
-  box-shadow: 0 4px 6px -1px oklch(0.00% 0.0000 0.00 / 0.05);
+  box-shadow: 0 4px 6px -1px var(--color-sombra-5);
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -145,7 +212,7 @@ body {
 
 #perfil-usuario:hover {
   border-color: var(--brand-olive);
-  box-shadow: 0 10px 15px -3px oklch(0.00% 0.0000 0.00 / 0.05);
+  box-shadow: 0 10px 15px -3px var(--color-sombra-5);
 }
 
 #perfil-usuario span {
@@ -174,10 +241,10 @@ body {
   right: 0;
   width: 180px;
   height: 60px;
-  background-color: white;
+  background-color: var(--color-blanco);
   border-radius: 1rem;
   border: 1px solid var(--stone-200);
-  box-shadow: 0 20px 25px -5px oklch(0.00% 0.0000 0.00 / 0.1);
+  box-shadow: 0 20px 25px -5px var(--color-sombra-10);
   padding: 0.5rem;
   z-index: 100;
 }
@@ -197,7 +264,7 @@ body {
 }
 
 #opcion-logout:hover {
-  background-color: oklch(99.07% 0.0054 95.10);
+  background-color: var(--brand-cream);
   color: var(--brand-olive);
   text-decoration: none !important;
 }
@@ -224,10 +291,10 @@ body {
   pointer-events: auto;
   min-width: 320px;
   max-width: 450px;
-  background-color: white;
+  background-color: var(--color-blanco);
   padding: 1rem 1.25rem;
   border-radius: 0.75rem;
-  box-shadow: 0 10px 25px -5px oklch(0.00% 0.0000 0.00 / 0.1), 0 8px 10px -6px oklch(0.00% 0.0000 0.00 / 0.1);
+  box-shadow: 0 10px 25px -5px var(--color-sombra-10), 0 8px 10px -6px var(--color-sombra-10);
   display: flex;
   align-items: center;
   gap: 0.875rem;
@@ -238,7 +305,7 @@ body {
 }
 
 .toast.success { border-left-color: var(--brand-olive); }
-.toast.error { border-left-color: oklch(63.68% 0.2078 25.33); }
+.toast.error { border-left-color: var(--color-rojo-error); }
 .toast.info { border-left-color: var(--slate-400); }
 
 .toast span.material-symbols-outlined {
@@ -246,7 +313,7 @@ body {
 }
 
 .toast.success span.material-symbols-outlined { color: var(--brand-olive); }
-.toast.error span.material-symbols-outlined { color: oklch(63.68% 0.2078 25.33); }
+.toast.error span.material-symbols-outlined { color: var(--color-rojo-error); }
 .toast.info span.material-symbols-outlined { color: var(--slate-400); }
 
 .toast-contenido {
@@ -274,7 +341,7 @@ body {
 }
 
 .btn-cerrar-toast:hover {
-  background-color: oklch(96.83% 0.0069 247.90);
+  background-color: var(--color-gris-claro-hover);
   color: var(--slate-600);
 }
 

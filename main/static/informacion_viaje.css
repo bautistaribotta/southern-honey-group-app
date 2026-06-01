@@ -40,7 +40,7 @@ html {
 }
 
 .icono-viaje-principal {
-  background-color: oklch(46.68% 0.0844 129.02 / 0.1);
+  background-color: var(--color-verde-medio-transparente-10);
   color: var(--brand-olive);
   width: 48px;
   height: 48px;
@@ -88,25 +88,25 @@ html {
 }
 
 .boton-editar {
-  background-color: white;
+  background-color: var(--color-blanco);
   color: var(--slate-700);
-  box-shadow: 0 1px 2px 0 oklch(0.00% 0.0000 0.00 / 0.05);
+  box-shadow: 0 1px 2px 0 var(--color-sombra-5);
 }
 
 .boton-editar:hover {
-  background-color: oklch(98.42% 0.0034 247.86);
+  background-color: var(--color-gris-fondo-input);
   border-color: var(--slate-400);
 }
 
 .boton-cancelar {
-  background-color: white;
-  color: oklch(57.71% 0.2152 27.33); /* Rojo */
-  border-color: oklch(57.71% 0.2152 27.33 / 0.3);
+  background-color: var(--color-blanco);
+  color: var(--color-rojo-eliminacion); /* Rojo */
+  border-color: var(--color-rojo-eliminacion-transparente-30);
 }
 
 .boton-cancelar:hover {
-  background-color: oklch(97.10% 0.0435 27.33); /* Fondo rojo muy claro */
-  border-color: oklch(57.71% 0.2152 27.33);
+  background-color: var(--color-rojo-muy-claro); /* Fondo rojo muy claro */
+  border-color: var(--color-rojo-eliminacion);
 }
 
 /* --- GRID PRINCIPAL --- */
@@ -135,11 +135,11 @@ html {
 
 /* --- TARJETAS (CARDS) --- */
 .tarjeta-info {
-  background-color: white;
+  background-color: var(--color-blanco);
   border: 1px solid var(--stone-200);
   border-radius: 0.75rem;
   padding: 1.5rem;
-  box-shadow: 0 1px 3px oklch(0.00% 0.0000 0.00 / 0.0509804);
+  box-shadow: 0 1px 3px var(--color-sombra-5-alt);
   margin-bottom: 1.5rem;
 }
 
@@ -149,7 +149,7 @@ html {
   justify-content: space-between;
   margin-bottom: 1.25rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid oklch(0.00% 0.0000 0.00 / 0.05);
+  border-bottom: 1px solid var(--color-sombra-5);
 }
 
 .titulo-tarjeta {
@@ -184,7 +184,7 @@ html {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  background-color: oklch(98.42% 0.0034 247.86);
+  background-color: var(--color-gris-fondo-input);
   padding: 0.75rem;
   border-radius: 0.5rem;
 }
@@ -216,7 +216,7 @@ html {
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 600;
-  background-color: oklch(46.68% 0.0844 129.02 / 0.1);
+  background-color: var(--color-verde-medio-transparente-10);
   color: var(--brand-olive);
 }
 
@@ -283,7 +283,7 @@ html {
 
 .boton-nuevo-item {
   background-color: var(--brand-olive);
-  color: white;
+  color: var(--color-blanco);
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
   font-size: 0.8125rem;
@@ -294,22 +294,22 @@ html {
   align-items: center;
   gap: 0.375rem;
   transition: all 0.2s;
-  box-shadow: 0 2px 4px oklch(49.55% 0.0896 126.19 / 0.2);
+  box-shadow: 0 2px 4px var(--color-verde-transparente-20);
 }
 
 .boton-nuevo-item:hover {
-  background-color: oklch(40.51% 0.0725 126.25);
+  background-color: var(--color-verde-oscuro);
 }
 
 .boton-nuevo-item.gasto {
-  background-color: white;
+  background-color: var(--color-blanco);
   color: var(--slate-700);
   border: 1px solid var(--stone-200);
-  box-shadow: 0 1px 2px 0 oklch(0.00% 0.0000 0.00 / 0.05);
+  box-shadow: 0 1px 2px 0 var(--color-sombra-5);
 }
 
 .boton-nuevo-item.gasto:hover {
-  background-color: oklch(98.42% 0.0034 247.86);
+  background-color: var(--color-gris-fondo-input);
 }
 
 /* --- TABLA VACIA MOCKUP --- */
@@ -321,7 +321,7 @@ html {
   padding: 3rem 1rem;
   text-align: center;
   color: var(--slate-500);
-  background-color: oklch(98.42% 0.0034 247.86);
+  background-color: var(--color-gris-fondo-input);
   border-radius: 0.5rem;
   border: 1px dashed var(--stone-200);
 }

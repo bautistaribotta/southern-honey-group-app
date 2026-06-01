@@ -33,13 +33,13 @@
 .input-busqueda {
   width: 100%;
   padding: 0.625rem 1rem 0.625rem 2.5rem;
-  background-color: white;
+  background-color: var(--color-blanco);
   border: 1px solid var(--stone-200);
   border-radius: 0.5rem;
   font-size: 0.875rem;
   color: var(--slate-700);
   outline: none;
-  box-shadow: 0 1px 2px oklch(0.00% 0.0000 0.00 / 0.05);
+  box-shadow: 0 1px 2px var(--color-sombra-5);
   transition: all 0.2s;
   font-family: inherit;
 }
@@ -59,10 +59,10 @@
 
 /* --- CONTENEDOR PRINCIPAL TABLA --- */
 .contenedor-tabla {
-  background-color: white;
+  background-color: var(--color-blanco);
   border: 1px solid var(--stone-200);
   border-radius: 0.75rem;
-  box-shadow: 0 1px 3px oklch(0.00% 0.0000 0.00 / 0.05);
+  box-shadow: 0 1px 3px var(--color-sombra-5);
   display: flex;
   flex-direction: column;
   overflow: hidden; /* Esto asegura que el contenido no tape las esquinas redondeadas */
@@ -82,7 +82,7 @@
   color: var(--slate-500);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  background-color: oklch(98.42% 0.0034 247.86);
+  background-color: var(--color-gris-fondo-input);
   border-bottom: 1px solid var(--stone-200);
   position: sticky;
   top: 0;
@@ -136,9 +136,9 @@
 }
 
 .tabla-deudores tbody tr:hover {
-  background-color: oklch(96.83% 0.0069 247.90);
+  background-color: var(--color-gris-claro-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px oklch(0.00% 0.0000 0.00 / 0.05);
+  box-shadow: 0 4px 6px -1px var(--color-sombra-5);
 }
 
 /* Para cuando la tabla esta vacia, quito los efectos hover */
@@ -159,7 +159,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: white;
+  background-color: var(--color-blanco);
 }
 
 .paginacion-info {
@@ -184,7 +184,7 @@
   font-size: 0.75rem;
   font-weight: 500;
   color: var(--slate-600);
-  background-color: white;
+  background-color: var(--color-blanco);
   cursor: pointer;
   transition: all 0.2s;
 }

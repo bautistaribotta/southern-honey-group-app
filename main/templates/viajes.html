@@ -191,7 +191,7 @@
             <div class="sub-panel-datos">
               <div class="grupo-input">
                 <label for="chofer-viaje">Chofer</label>
-                <select id="chofer-viaje" name="id_chofer" required style="padding: 0.75rem 0.875rem; background-color: oklch(98.42% 0.0034 247.86); border: 1px solid var(--stone-200); border-radius: 0.75rem; font-size: 0.875rem; font-family: inherit; outline: none;">
+                <select id="chofer-viaje" name="id_chofer" required style="padding: 0.75rem 0.875rem; background-color: var(--color-gris-fondo-input); border: 1px solid var(--stone-200); border-radius: 0.75rem; font-size: 0.875rem; font-family: inherit; outline: none;">
                   <option value="" disabled selected>Seleccione un chofer</option>
                   {% for chofer in choferes %}
                   <option value="{{ chofer.id }}">{{ chofer.nombre }} {{ chofer.apellido }}</option>
@@ -202,7 +202,7 @@
 
               <div class="grupo-input">
                 <label for="vehiculo-viaje">Vehículo</label>
-                <select id="vehiculo-viaje" name="id_vehiculo" required style="padding: 0.75rem 0.875rem; background-color: oklch(98.42% 0.0034 247.86); border: 1px solid var(--stone-200); border-radius: 0.75rem; font-size: 0.875rem; font-family: inherit; outline: none;">
+                <select id="vehiculo-viaje" name="id_vehiculo" required style="padding: 0.75rem 0.875rem; background-color: var(--color-gris-fondo-input); border: 1px solid var(--stone-200); border-radius: 0.75rem; font-size: 0.875rem; font-family: inherit; outline: none;">
                   <option value="" disabled selected>Seleccione un vehículo</option>
                   {% for vehiculo in vehiculos %}
                   <option value="{{ vehiculo.id }}">{{ vehiculo.nombre }} ({{ vehiculo.patente }})</option>
@@ -227,7 +227,7 @@
                     <span class="material-symbols-outlined" style="font-size: 18px;">add_circle</span>
                     Añadir un destino
                   </button>
-                  <button type="button" id="btn-quitar-destino" style="background: none; border: none; color: oklch(57.71% 0.2152 27.33); font-weight: 600; text-align: right; cursor: pointer; padding: 0.25rem 0; font-size: 0.875rem; display: none; align-items: center; gap: 0.25rem; width: fit-content;">
+                  <button type="button" id="btn-quitar-destino" style="background: none; border: none; color: var(--color-rojo-eliminacion); font-weight: 600; text-align: right; cursor: pointer; padding: 0.25rem 0; font-size: 0.875rem; display: none; align-items: center; gap: 0.25rem; width: fit-content;">
                     <span class="material-symbols-outlined" style="font-size: 18px;">do_not_disturb_on</span>
                     Quitar destino
                   </button>

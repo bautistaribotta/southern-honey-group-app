@@ -33,13 +33,13 @@
 .input-busqueda {
   width: 100%;
   padding: 0.625rem 1rem 0.625rem 2.5rem;
-  background-color: white;
+  background-color: var(--color-blanco);
   border: 1px solid var(--stone-200);
   border-radius: 0.5rem;
   font-size: 0.875rem;
   color: var(--slate-700);
   outline: none;
-  box-shadow: 0 1px 2px oklch(0.00% 0.0000 0.00 / 0.05);
+  box-shadow: 0 1px 2px var(--color-sombra-5);
   transition: all 0.2s;
   font-family: inherit;
 }
@@ -59,13 +59,13 @@
 
 .boton-nuevo {
   background-color: var(--brand-olive);
-  color: white;
+  color: var(--color-blanco);
   padding: 0.625rem 1.25rem;
   border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
   border: none;
-  box-shadow: 0 4px 6px -1px oklch(49.55% 0.0896 126.19 / 0.2);
+  box-shadow: 0 4px 6px -1px var(--color-verde-transparente-20);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -75,7 +75,7 @@
 }
 
 .boton-nuevo:hover {
-  background-color: oklch(40.51% 0.0725 126.25);
+  background-color: var(--color-verde-oscuro);
 }
 
 .boton-nuevo:active {
@@ -84,10 +84,10 @@
 
 /* --- CONTENEDOR PRINCIPAL TABLA --- */
 .contenedor-tabla {
-  background-color: white;
+  background-color: var(--color-blanco);
   border: 1px solid var(--stone-200);
   border-radius: 0.75rem;
-  box-shadow: 0 1px 3px oklch(0.00% 0.0000 0.00 / 0.05);
+  box-shadow: 0 1px 3px var(--color-sombra-5);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -108,7 +108,7 @@
   color: var(--slate-500);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  background-color: oklch(98.42% 0.0034 247.86);
+  background-color: var(--color-gris-fondo-input);
   border-bottom: 1px solid var(--stone-200);
   position: sticky;
   top: 0;
@@ -179,9 +179,9 @@
 }
 
 .fila-cliente:hover {
-  background-color: oklch(96.83% 0.0069 247.90);
+  background-color: var(--color-gris-claro-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px oklch(0.00% 0.0000 0.00 / 0.05);
+  box-shadow: 0 4px 6px -1px var(--color-sombra-5);
 }
 
 /* --- ACCIONES --- */
@@ -211,12 +211,12 @@
 
 .boton-icono.editar:hover {
   color: var(--brand-olive);
-  background-color: oklch(49.55% 0.0896 126.19 / 0.203922);
+  background-color: var(--color-verde-transparente-20-alt);
 }
 
 .boton-icono.eliminar:hover {
   color: var(--color-rojo-eliminacion);
-  background-color: oklch(97.05% 0.0129 17.38);
+  background-color: var(--color-rosa-claro);
 }
 
 /* --- PAGINACIÓN --- */
@@ -226,7 +226,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: white;
+  background-color: var(--color-blanco);
 }
 
 .paginacion-info {
@@ -251,7 +251,7 @@
   font-size: 0.75rem;
   font-weight: 500;
   color: var(--slate-600);
-  background-color: white;
+  background-color: var(--color-blanco);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -286,7 +286,7 @@
 #slide-over-fondo {
   position: absolute;
   inset: 0;
-  background-color: oklch(20.77% 0.0398 265.75 / 0.4);
+  background-color: var(--color-slate-900-transparente-40);
   backdrop-filter: blur(4px);
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
@@ -300,11 +300,11 @@
   position: relative;
   width: 100%;
   max-width: 500px;
-  background-color: white;
+  background-color: var(--color-blanco);
   height: 100%;
   display: flex;
   flex-direction: column;
-  box-shadow: -10px 0 25px oklch(0.00% 0.0000 0.00 / 0.1);
+  box-shadow: -10px 0 25px var(--color-sombra-10);
   transform: translateX(100%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   
@@ -327,11 +327,11 @@
 /* CABECERA */
 .panel-cabecera {
   padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid oklch(0.00% 0.0000 0.00 / 0.05);
+  border-bottom: 1px solid var(--color-sombra-5);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: white;
+  background-color: var(--color-blanco);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -344,7 +344,7 @@
 }
 
 .icono-contenedor {
-  background-color: oklch(46.68% 0.0844 129.02 / 0.1);
+  background-color: var(--color-verde-medio-transparente-10);
   color: var(--brand-olive);
   width: 40px;
   height: 40px;
@@ -377,7 +377,7 @@
   transition: background 0.2s;
 }
 
-.boton-cerrar:hover { background-color: oklch(0.00% 0.0000 0.00 / 0.05); }
+.boton-cerrar:hover { background-color: var(--color-sombra-5); }
 
 /* CUERPO Y SCROLL */
 .panel-cuerpo {
@@ -420,11 +420,11 @@
 }
 
 .sub-panel-datos {
-  background-color: white;
+  background-color: var(--color-blanco);
   padding: 1.25rem;
   border-radius: 1rem;
-  border: 1px solid oklch(0.00% 0.0000 0.00 / 0.0784314);
-  box-shadow: 0 4px 12px oklch(0.00% 0.0000 0.00 / 0.0823529), 0 2px 4px oklch(0.00% 0.0000 0.00 / 0.02);
+  border: 1px solid var(--color-sombra-8);
+  box-shadow: 0 4px 12px var(--color-sombra-8-alt), 0 2px 4px var(--color-sombra-2);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -445,7 +445,7 @@
 
 .grupo-input input {
   padding: 0.75rem 0.875rem;
-  background-color: oklch(98.42% 0.0034 247.86);
+  background-color: var(--color-gris-fondo-input);
   border: 1px solid var(--stone-200);
   border-radius: 0.75rem;
   font-size: 0.875rem;
@@ -456,7 +456,7 @@
 
 .grupo-input input:focus {
   border-color: var(--brand-olive);
-  background-color: white;
+  background-color: var(--color-blanco);
   box-shadow: 0 0 0 1px var(--brand-olive);
 }
 
@@ -474,7 +474,7 @@
 /* VALIDACIONES PERSONALIZADAS */
 .mensaje-error {
   display: none;
-  color: oklch(57.71% 0.2152 27.33); /* Rojo de error */
+  color: var(--color-rojo-eliminacion); /* Rojo de error */
   font-size: 0.75rem;
   margin-top: 0.25rem;
   font-weight: 500;
@@ -489,20 +489,20 @@
 /* Cuando el input es requerido/inválido (todos se muestran rojos por defecto) */
 /* Se quita el rojo temporalmente cuando el usuario hace focus/click para rellenarlos */
 .grupo-input input:invalid:not(:placeholder-shown) {
-  border-color: oklch(57.71% 0.2152 27.33) !important;
+  border-color: var(--color-rojo-eliminacion) !important;
 }
 
 .grupo-input input:invalid:not(:placeholder-shown):focus {
-  box-shadow: 0 0 0 1px oklch(57.71% 0.2152 27.33) !important;
+  box-shadow: 0 0 0 1px var(--color-rojo-eliminacion) !important;
 }
 
 /* Para los inputs con icono (como Inicio de caja) */
 .input-con-icono input:invalid:not(:placeholder-shown) {
-  border-color: oklch(57.71% 0.2152 27.33) !important;
+  border-color: var(--color-rojo-eliminacion) !important;
 }
 
 .input-con-icono input:invalid:not(:placeholder-shown):focus {
-  box-shadow: 0 0 0 1px oklch(57.71% 0.2152 27.33) !important;
+  box-shadow: 0 0 0 1px var(--color-rojo-eliminacion) !important;
 }
 
 /* Mensajes de error en texto: se muestran solo si el usuario ya escribió algo incorrecto */
@@ -539,7 +539,7 @@
   position: absolute;
   cursor: pointer;
   top: 0; left: 0; right: 0; bottom: 0;
-  background-color: oklch(92.88% 0.0126 255.51);
+  background-color: var(--color-azul-claro);
   transition: .4s;
   border-radius: 24px;
 }
@@ -549,7 +549,7 @@
   content: "";
   height: 18px; width: 18px;
   left: 3px; bottom: 3px;
-  background-color: white;
+  background-color: var(--color-blanco);
   transition: .4s;
   border-radius: 50%;
 }
@@ -560,7 +560,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 /* PIE */
 .panel-pie {
   padding: 1.5rem;
-  border-top: 1px solid oklch(46.68% 0.0844 129.02 / 0.1);
+  border-top: 1px solid var(--color-verde-medio-transparente-10);
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
@@ -571,14 +571,14 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 .boton-primario {
   background-color: var(--brand-olive);
-  color: white;
+  color: var(--color-blanco);
   border: none;
   padding: 0.875rem;
   border-radius: 0.75rem;
   font-weight: 700;
   font-size: 0.875rem;
   cursor: pointer;
-  box-shadow: 0 10px 15px -3px oklch(46.68% 0.0844 129.02 / 0.2);
+  box-shadow: 0 10px 15px -3px var(--color-verde-medio-transparente-20);
   transition: all 0.2s;
 }
 
@@ -591,7 +591,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 
 .boton-secundario {
-  background-color: white;
+  background-color: var(--color-blanco);
   color: var(--slate-700);
   border: 1px solid var(--stone-200);
   padding: 0.875rem;
@@ -603,7 +603,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 
 .boton-secundario:hover { 
-  background-color: oklch(98.42% 0.0034 247.86); 
+  background-color: var(--color-gris-fondo-input); 
 }
 
 /* Panel de eliminacion */
@@ -626,7 +626,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 #contenedor-panel-fondo {
   position: absolute;
   inset: 0;
-  background-color: oklch(0.00% 0.0000 0.00 / 0.4);
+  background-color: var(--color-sombra-40);
   backdrop-filter: blur(4px); 
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
@@ -638,13 +638,13 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 #panel-eliminar {
   position: relative;
-  background-color: white;
+  background-color: var(--color-blanco);
   border-radius: 12px;
-  border: 1px solid oklch(46.68% 0.0844 129.02 / 0.101961);
+  border: 1px solid var(--color-verde-medio-transparente-10-alt);
   padding: 2rem 2rem;
   width: 90%;
   max-width: 450px;
-  box-shadow: 0 20px 25px -5px oklch(0.00% 0.0000 0.00 / 0.101961);
+  box-shadow: 0 20px 25px -5px var(--color-sombra-10-alt);
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -678,7 +678,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 
 #icono-cerrar-panel-eliminar:hover {
-  background-color: oklch(96.83% 0.0069 247.90);
+  background-color: var(--color-gris-claro-hover);
   color: var(--slate-600);
 }
 
@@ -717,7 +717,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 #boton-confirmar-eliminar {
   background-color: var(--color-rojo-eliminacion);
-  color: white;
+  color: var(--color-blanco);
   border: none;
   padding: 0.75rem;
   border-radius: 0.5rem;
@@ -743,7 +743,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   left: 0;
   height: 100%;
   width: 0%;
-  background-color: oklch(0.00% 0.0000 0.00 / 0.3);
+  background-color: var(--color-sombra-30);
   transition: width 0.2s ease-out;
   z-index: 1;
 }

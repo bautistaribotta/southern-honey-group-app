@@ -4,11 +4,11 @@
 }
 
 .tarjeta-info {
-  background-color: white;
+  background-color: var(--color-blanco);
   padding: 2rem;
   border-radius: 1rem;
   border: 1px solid var(--stone-200);
-  box-shadow: 0 10px 15px -3px oklch(0.00% 0.0000 0.00 / 0.0196078);
+  box-shadow: 0 10px 15px -3px var(--color-sombra-2-alt);
   display: flex;
   flex-direction: row;
 }
@@ -40,11 +40,11 @@
 
 /* Estilo GENERAL para todas las tarjetas */
 #contenedor-cotizaciones .tarjeta-info {
-  background-color: white;
+  background-color: var(--color-blanco);
   padding: 2rem 2rem;
   border-radius: 1rem;
   border: 1px solid var(--stone-200);
-  box-shadow: 0 4px 6px -1px oklch(0.00% 0.0000 0.00 / 0.031), 0 2px 4px -2px oklch(0.00% 0.0000 0.00 / 0.0313725);
+  box-shadow: 0 4px 6px -1px var(--color-sombra-3), 0 2px 4px -2px var(--color-sombra-3-alt);
   
   display: flex;
   flex-direction: column; 
@@ -59,7 +59,7 @@
 
 #contenedor-cotizaciones .tarjeta-info:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 15px -3px oklch(0.00% 0.0000 0.00 / 0.0705882), 0 4px 6px -4px oklch(0.00% 0.0000 0.00 / 0.0705882);
+    box-shadow: 0 10px 15px -3px var(--color-sombra-7), 0 4px 6px -4px var(--color-sombra-7);
 }
 
 /* Ancho específico para las 2 tarjetas de arriba */

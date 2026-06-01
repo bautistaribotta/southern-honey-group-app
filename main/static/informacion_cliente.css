@@ -49,14 +49,14 @@ html {
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    background-color: oklch(49.55% 0.0896 126.19 / 0.101961);
+    background-color: var(--color-verde-transparente-10);
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--brand-olive);
     font-size: 1.5rem;
     font-weight: 700;
-    border: 1px solid oklch(49.55% 0.0896 126.19 / 0.2);
+    border: 1px solid var(--color-verde-transparente-20);
 }
 
 .nombre-cliente-titulo {
@@ -92,42 +92,42 @@ html {
 }
 
 .boton-editar {
-  background-color: white;
+  background-color: var(--color-blanco);
   color: var(--slate-700);
-  box-shadow: 0 1px 2px 0 oklch(0.00% 0.0000 0.00 / 0.05);
+  box-shadow: 0 1px 2px 0 var(--color-sombra-5);
 }
 
 .boton-editar:hover {
-  background-color: oklch(98.42% 0.0034 247.86);
+  background-color: var(--color-gris-fondo-input);
   border-color: var(--slate-400);
 }
 
 .boton-cancelar {
-  background-color: white;
-  color: oklch(57.71% 0.2152 27.33); /* Rojo */
-  border-color: oklch(57.71% 0.2152 27.33 / 0.3);
+  background-color: var(--color-blanco);
+  color: var(--color-rojo-eliminacion); /* Rojo */
+  border-color: var(--color-rojo-eliminacion-transparente-30);
 }
 
 .boton-cancelar:hover {
-  background-color: oklch(97.10% 0.0435 27.33); /* Fondo rojo muy claro */
-  border-color: oklch(57.71% 0.2152 27.33);
+  background-color: var(--color-rojo-muy-claro); /* Fondo rojo muy claro */
+  border-color: var(--color-rojo-eliminacion);
 }
 
 /* --- TARJETA ÚNICA DE INFORMACIÓN --- */
 
 .tarjeta-info-unica {
-    background: white;
+    background: var(--color-blanco);
     border: 1px solid var(--stone-200);
     border-radius: 0.75rem;
     padding: 2rem;
-    box-shadow: 0 1px 2px oklch(0.00% 0.0000 0.00 / 0.05);
+    box-shadow: 0 1px 2px var(--color-sombra-5);
     margin-bottom: 2.5rem;
     transition: border-color 0.3s;
 }
 
 .tarjeta-info-unica.editando {
     border-color: var(--brand-olive);
-    box-shadow: 0 0 0 1px var(--brand-olive), 0 1px 2px oklch(0.00% 0.0000 0.00 / 0.05);
+    box-shadow: 0 0 0 1px var(--brand-olive), 0 1px 2px var(--color-sombra-5);
 }
 
 /* --- EDICIÓN INLINE --- */
@@ -163,7 +163,7 @@ html {
 /* --- VALIDACIONES DE EDICIÓN --- */
 .mensaje-error {
     display: none;
-    color: oklch(57.71% 0.2152 27.33);
+    color: var(--color-rojo-eliminacion);
     font-size: 0.75rem;
     margin-top: 0.35rem;
     font-weight: 500;
@@ -181,11 +181,11 @@ html {
 }
 
 .campo-info .input-edicion:invalid:not(:placeholder-shown) {
-    border-color: oklch(57.71% 0.2152 27.33) !important;
+    border-color: var(--color-rojo-eliminacion) !important;
 }
 
 .campo-info .input-edicion:invalid:not(:placeholder-shown):focus {
-    box-shadow: 0 0 0 1px oklch(57.71% 0.2152 27.33) !important;
+    box-shadow: 0 0 0 1px var(--color-rojo-eliminacion) !important;
 }
 
 .campo-info .input-edicion:invalid:not(:placeholder-shown) ~ .mensaje-error,
@@ -195,7 +195,7 @@ html {
 
 .boton-accion.activo {
     background-color: var(--brand-olive);
-    color: white;
+    color: var(--color-blanco);
     border-color: var(--brand-olive);
 }
 
@@ -214,7 +214,7 @@ html {
     gap: 0.5rem;
     padding: 0.625rem 1.25rem;
     background-color: var(--brand-olive);
-    color: white;
+    color: var(--color-blanco);
     border: none;
     border-radius: 0.5rem;
     font-size: 0.875rem;
@@ -222,11 +222,11 @@ html {
     cursor: pointer;
     transition: all 0.2s;
     font-family: inherit;
-    box-shadow: 0 4px 6px -1px oklch(49.55% 0.0896 126.19 / 0.2);
+    box-shadow: 0 4px 6px -1px var(--color-verde-transparente-20);
 }
 
 .boton-guardar-edicion:hover {
-    background-color: oklch(40.51% 0.0725 126.25);
+    background-color: var(--color-verde-oscuro);
 }
 
 .boton-cancelar-edicion {
@@ -234,7 +234,7 @@ html {
     align-items: center;
     gap: 0.5rem;
     padding: 0.625rem 1.25rem;
-    background-color: white;
+    background-color: var(--color-blanco);
     color: var(--slate-700);
     border: 1px solid var(--stone-200);
     border-radius: 0.5rem;
@@ -246,7 +246,7 @@ html {
 }
 
 .boton-cancelar-edicion:hover {
-    background-color: oklch(96.83% 0.0069 247.90);
+    background-color: var(--color-gris-claro-hover);
 }
 
 /* --- SWITCH TOGGLE (Factura) --- */
@@ -282,7 +282,7 @@ html {
     width: 18px;
     left: 3px;
     bottom: 3px;
-    background-color: white;
+    background-color: var(--color-blanco);
     transition: all 0.3s;
     border-radius: 50%;
 }
@@ -378,13 +378,13 @@ html {
 
 .boton-nuevo {
     background-color: var(--brand-olive);
-    color: white;
+    color: var(--color-blanco);
     padding: 0.625rem 1.25rem;
     border-radius: 0.5rem;
     font-size: 0.875rem;
     font-weight: 600;
     border: none;
-    box-shadow: 0 4px 6px -1px oklch(49.55% 0.0896 126.19 / 0.2);
+    box-shadow: 0 4px 6px -1px var(--color-verde-transparente-20);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -395,7 +395,7 @@ html {
 }
 
 .boton-nuevo:hover {
-    background-color: oklch(40.51% 0.0725 126.25);
+    background-color: var(--color-verde-oscuro);
 }
 
 .boton-nuevo:active {
@@ -403,11 +403,11 @@ html {
 }
 
 .tabla-operaciones-container {
-    background: white;
+    background: var(--color-blanco);
     border: 1px solid var(--stone-200);
     border-radius: 0.75rem;
     overflow: hidden;
-    box-shadow: 0 1px 2px oklch(0.00% 0.0000 0.00 / 0.05);
+    box-shadow: 0 1px 2px var(--color-sombra-5);
 }
 
 .tabla-operaciones {
@@ -417,7 +417,7 @@ html {
 }
 
 .tabla-operaciones th {
-    background-color: oklch(98.46% 0.0017 247.84);
+    background-color: var(--color-gris-fondo-input-alt);
     padding: 1rem 2rem;
     font-size: 0.7rem;
     font-weight: 700;
@@ -438,7 +438,7 @@ html {
 }
 
 .tabla-operaciones tr:hover {
-    background-color: oklch(98.46% 0.0017 247.84);
+    background-color: var(--color-gris-fondo-input-alt);
 }
 
 .fecha-operacion {
@@ -496,12 +496,12 @@ html {
 
 .boton-icono-tabla.pagos:hover {
   color: var(--brand-olive);
-  background-color: oklch(49.55% 0.0896 126.19 / 0.101961);
+  background-color: var(--color-verde-transparente-10);
 }
 
 .boton-icono-tabla.cancelar:hover {
-  color: oklch(57.71% 0.2152 27.33);
-  background-color: oklch(97.05% 0.0129 17.38);
+  color: var(--color-rojo-eliminacion);
+  background-color: var(--color-rosa-claro);
 }
 
 .pildora-estado {
@@ -517,30 +517,30 @@ html {
 
 /* Pagada: Estilo Verde Oliva (similar a Alimento) */
 .pildora-estado.pagada { 
-  background-color: oklch(98.57% 0.0310 120.76); 
-  color: oklch(53.22% 0.1405 131.59); 
-  border: 1px solid oklch(93.82% 0.1217 124.32); 
+  background-color: var(--color-verde-claro-etiqueta); 
+  color: var(--color-verde-texto-etiqueta); 
+  border: 1px solid var(--color-verde-borde-etiqueta); 
 }
 
 /* Pago Parcial: Estilo Amarillo (similar a Miel) */
 .pildora-estado.parcial { 
-  background-color: oklch(98.69% 0.0214 95.28); 
-  color: oklch(55.53% 0.1455 49.00); 
-  border: 1px solid oklch(92.43% 0.1151 95.75); 
+  background-color: var(--color-amarillo-claro-etiqueta); 
+  color: var(--color-amarillo-texto-etiqueta); 
+  border: 1px solid var(--color-amarillo-borde-etiqueta); 
 }
 
 /* Debe: Estilo Rojo (similar a Medicamentos) */
 .pildora-estado.debe { 
-  background-color: oklch(94.14% 0.0298 12.58); 
-  color: oklch(44.37% 0.1613 26.90); 
-  border: 1px solid oklch(89.24% 0.0559 10.00); 
+  background-color: var(--color-rojo-claro-etiqueta); 
+  color: var(--color-rojo-texto-etiqueta); 
+  border: 1px solid var(--color-rojo-borde-etiqueta); 
 }
 
 /* Cancelada: Estilo Gris Oscuro/Gris (similar a Otros/Estampa) */
 .pildora-estado.cancelada { 
-  background-color: oklch(96.99% 0.0013 106.42); 
-  color: oklch(44.44% 0.0096 73.64); 
-  border: 1px solid oklch(86.87% 0.0043 56.37); 
+  background-color: var(--color-gris-claro-etiqueta); 
+  color: var(--color-gris-texto-etiqueta); 
+  border: 1px solid var(--stone-300); 
 }
 
 @media (max-width: 1024px) {
@@ -574,7 +574,7 @@ html {
 #contenedor-panel-fondo, #contenedor-modal-fondo-cancelar, #contenedor-modal-fondo-pago {
   position: absolute;
   inset: 0;
-  background-color: oklch(0.00% 0.0000 0.00 / 0.4);
+  background-color: var(--color-sombra-40);
   backdrop-filter: blur(4px); 
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
@@ -588,13 +588,13 @@ html {
 
 #panel-eliminar, #panel-cancelar-operacion, #panel-pago {
   position: relative;
-  background-color: white;
+  background-color: var(--color-blanco);
   border-radius: 12px;
-  border: 1px solid oklch(46.68% 0.0844 129.02 / 0.101961);
+  border: 1px solid var(--color-verde-medio-transparente-10-alt);
   padding: 2.5rem 2rem 2rem 2rem;
   width: 90%;
   max-width: 450px;
-  box-shadow: 0 20px 25px -5px oklch(0.00% 0.0000 0.00 / 0.101961);
+  box-shadow: 0 20px 25px -5px var(--color-sombra-10-alt);
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -630,7 +630,7 @@ html {
 }
 
 .boton-cerrar:hover {
-  background-color: oklch(96.83% 0.0069 247.90);
+  background-color: var(--color-gris-claro-hover);
   color: var(--slate-600);
 }
 
@@ -676,7 +676,7 @@ html {
 }
 
 .boton-secundario {
-  background-color: white;
+  background-color: var(--color-blanco);
   color: var(--slate-700);
   border: 1px solid var(--stone-200);
   padding: 0.75rem;
@@ -688,12 +688,12 @@ html {
 }
 
 .boton-secundario:hover { 
-  background-color: oklch(98.42% 0.0034 247.86); 
+  background-color: var(--color-gris-fondo-input); 
 }
 
 #boton-confirmar-eliminar, #boton-confirmar-cancelar {
   background-color: var(--color-rojo-eliminacion);
-  color: white;
+  color: var(--color-blanco);
   border: none;
   padding: 0.75rem;
   border-radius: 0.5rem;
@@ -720,7 +720,7 @@ html {
   left: 0;
   height: 100%;
   width: 0%;
-  background-color: oklch(0.00% 0.0000 0.00 / 0.3);
+  background-color: var(--color-sombra-30);
   transition: width 0.2s ease-out;
   z-index: 1;
 }
@@ -741,7 +741,7 @@ html {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: white;
+  background-color: var(--color-blanco);
 }
 
 .paginacion-info {
@@ -766,7 +766,7 @@ html {
   font-size: 0.75rem;
   font-weight: 500;
   color: var(--slate-600);
-  background-color: white;
+  background-color: var(--color-blanco);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -783,7 +783,7 @@ html {
 /* Botón Registrar Pago */
 #boton-confirmar-pago {
   background-color: var(--brand-olive);
-  color: white;
+  color: var(--color-blanco);
   border: none;
   padding: 0.75rem;
   border-radius: 0.5rem;
@@ -791,11 +791,11 @@ html {
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 4px 6px -1px oklch(49.55% 0.0896 126.19 / 0.2);
+  box-shadow: 0 4px 6px -1px var(--color-verde-transparente-20);
 }
 
 #boton-confirmar-pago:hover {
-  background-color: oklch(40.51% 0.0725 126.25);
+  background-color: var(--color-verde-oscuro);
 }
 
 #boton-confirmar-pago:disabled {
@@ -820,7 +820,7 @@ html {
 .btn-saldar-total {
   background: none;
   border: none;
-  color: oklch(62.31% 0.1880 259.81);
+  color: var(--color-morado-texto);
   cursor: pointer;
   padding: 0.2rem 0.4rem;
   font-size: 0.85rem;
@@ -831,7 +831,7 @@ html {
 }
 
 .btn-saldar-total:hover {
-  background-color: oklch(97.05% 0.0142 254.60);
-  color: oklch(54.61% 0.2152 262.88);
+  background-color: var(--color-morado-claro-fondo);
+  color: var(--color-morado-oscuro-texto);
 }
 
