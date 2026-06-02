@@ -148,7 +148,7 @@ class Chofer(models.Model):
         ]
 
     def __str__(self):
-        return f"Chofer: {self.nombre}"
+        return f"Chofer: {self.nombre} {self.apellido}"
 
 
 class Vehiculo(models.Model):
