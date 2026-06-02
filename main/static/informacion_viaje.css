@@ -256,14 +256,6 @@ html {
   z-index: 1;
 }
 
-/* El ultimo punto lo hacemos tipo anillo (outline) para indicar fin de ruta */
-.journey-stop:last-child .journey-dot {
-  background-color: transparent;
-  border: 2px solid var(--brand-olive);
-  width: 4px;
-  height: 4px;
-}
-
 .journey-text {
   font-size: 0.9375rem;
   font-weight: 500;
