@@ -172,6 +172,7 @@ class Viaje(models.Model):
     fecha_inicio = models.DateField()
     fecha_vuelta = models.DateField(null=True, blank=True)
     gastos = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    activo = models.BooleanField(default=True)
 
     @property
     def final_caja(self):

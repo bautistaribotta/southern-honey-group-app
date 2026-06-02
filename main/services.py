@@ -508,6 +508,8 @@ def editar_viaje(id_viaje):
     pass
 
 
-def cancelar_viaje(id_viaje):
-    # TODO: ¿Funcion para eliminar y/o cancelar viajes?
-    pass
+def eliminar_viaje(id_viaje):
+    viaje = get_object_or_404(id_viaje)
+    viaje.activo = False
+    viaje.save()
+    return viaje
