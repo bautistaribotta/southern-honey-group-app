@@ -78,7 +78,7 @@
           const valorActual = montoSpan.textContent;
           const input = document.createElement('input');
           input.type = 'number';
-          input.step = '0.01';
+          input.step = '1';
           input.value = valorActual;
           input.className = 'input-edicion';
           input.style.width = '100px';
@@ -89,13 +89,19 @@
           montoSpan.parentNode.appendChild(input);
           input.focus();
 
+          let guardando = false;
+
           const guardar = () => {
+            if (guardando) return;
+            guardando = true;
+
             const nuevoValor = input.value;
             const articulo = this.dataset.articulo;
 
             if (nuevoValor === valorActual) {
               input.remove();
               montoSpan.style.display = 'inline';
+              guardando = false;
               return;
             }
 

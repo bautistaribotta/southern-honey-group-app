@@ -26,6 +26,7 @@ function crearToast(mensaje, tipo = 'success') {
         <button class="btn-cerrar-toast" onclick="cerrarToast(this.parentElement)">
             <span class="material-symbols-outlined">close</span>
         </button>
+        <div class="toast-progress"></div>
     `;
 
     // Lo inserto en el contenedor

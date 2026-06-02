@@ -123,7 +123,7 @@ class Pago(models.Model):
 
 class Cotizaciones(models.Model):
     articulo = models.CharField(max_length=25, unique=True)
-    monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    monto = models.IntegerField(default=1)
 
     class Meta:
         db_table = "cotizaciones"

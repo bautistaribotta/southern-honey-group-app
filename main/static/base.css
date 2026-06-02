@@ -316,6 +316,25 @@ body {
 .toast.error span.material-symbols-outlined { color: var(--color-rojo-error); }
 .toast.info span.material-symbols-outlined { color: var(--slate-400); }
 
+.toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  width: 100%;
+  background-color: var(--slate-400);
+  animation: progressShrink 4s linear forwards;
+}
+
+.toast.success .toast-progress { background-color: var(--brand-olive); }
+.toast.error .toast-progress { background-color: var(--color-rojo-error); }
+.toast.info .toast-progress { background-color: var(--slate-400); }
+
+@keyframes progressShrink {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
 .toast-contenido {
   flex: 1;
 }
