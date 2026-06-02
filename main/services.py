@@ -376,7 +376,6 @@ def editar_chofer(id_chofer, nombre, apellido, activo):
 def eliminar_chofer(id_chofer):
     chofer = get_object_or_404(Chofer, id=id_chofer)
     chofer.activo = False
-
     chofer.save()
     return chofer
 
@@ -413,9 +412,7 @@ def editar_vehiculo(id_vehiculo, nombre, patente, activo):
 
 def eliminar_vehiculo(id_vehiculo):
     vehiculo = get_object_or_404(Vehiculo, id=id_vehiculo)
-    # Borrado lógico
     vehiculo.activo = False
-
     vehiculo.save()
     return vehiculo
 
@@ -500,7 +497,7 @@ def obtener_vehiculos_activos():
 
 
 def obtener_viajes():
-    return Viaje.objects.select_related('chofer', 'vehiculo').prefetch_related('destinos').order_by('-fecha_inicio')
+    return Viaje.objects.filter(activo=True).select_related('chofer', 'vehiculo').prefetch_related('destinos').order_by('-fecha_inicio')
 
 
 def editar_viaje(id_viaje):
@@ -509,7 +506,20 @@ def editar_viaje(id_viaje):
 
 
 def eliminar_viaje(id_viaje):
-    viaje = get_object_or_404(id_viaje)
+    viaje = get_object_or_404(Viaje, id=id_viaje)
     viaje.activo = False
     viaje.save()
+
+    # Decrementar total de viajes de chofer y vehiculo
+    # Agrego una capa de redundancia
+    chofer = viaje.chofer
+    if chofer.total_viajes > 0:
+        chofer.total_viajes -= 1
+        chofer.save()
+
+    vehiculo = viaje.vehiculo
+    if vehiculo.total_viajes > 0:
+        vehiculo.total_viajes -= 1
+        vehiculo.save()
+
     return viaje

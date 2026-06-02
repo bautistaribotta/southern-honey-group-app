@@ -17,27 +17,6 @@
 {% endblock %}
 
 {% block area-trabajo %}
-  <!-- Contenedor de Notificaciones Toast -->
-  <div id="contenedor-toast" class="contenedor-toast">
-    {% if messages %}
-      {% for message in messages %}
-        <div class="toast {{ message.tags }}">
-          <span class="material-symbols-outlined">
-            {% if message.tags == 'success' %}check_circle
-            {% elif message.tags == 'error' %}error
-            {% else %}info{% endif %}
-          </span>
-          <div class="toast-contenido">
-            <p>{{ message }}</p>
-          </div>
-          <button class="btn-cerrar-toast" onclick="cerrarToast(this.parentElement)">
-            <span class="material-symbols-outlined">close</span>
-          </button>
-        </div>
-      {% endfor %}
-    {% endif %}
-  </div>
-
   <!-- ÁREA DE TRABAJO -->
   <section id="area-trabajo">
     

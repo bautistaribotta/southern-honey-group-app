@@ -16,7 +16,7 @@ from .services import (nuevo_producto, editar_producto, eliminar_producto, nuevo
                        eliminar_cliente, get_cotizacion_dolar_oficial, get_cotizaciones, actualizar_cotizacion, obtener_datos_cliente,
                        obtener_datos_producto, modificar_stock, crear_operacion, servicio_cancelar_operacion,
                        obtener_listado_deudores, crear_chofer, crear_vehiculo, crear_viaje, obtener_choferes_activos,
-                       obtener_vehiculos_activos, obtener_viajes)
+                       obtener_vehiculos_activos, obtener_viajes, eliminar_viaje)
 
 
 def login(request):
@@ -569,6 +569,18 @@ def viajes(request):
 @login_required
 def informacion_viaje(request, id_viaje):
     viaje = get_object_or_404(Viaje, id=id_viaje)
+
+    if request.method == "POST":
+        accion = request.POST.get("accion")
+        if accion == "eliminar_viaje":
+            try:
+                eliminar_viaje(id_viaje)
+                messages.success(request, "Viaje eliminado correctamente")
+                return redirect("viajes")
+            except Exception as e:
+                messages.error(request, f"{e}")
+                return redirect("informacion_viaje", id_viaje=id_viaje)
+
     contexto = {
         'viaje': viaje,
         'pestaña': 'viajes'

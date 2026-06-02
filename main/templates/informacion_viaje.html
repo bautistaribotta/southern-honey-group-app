@@ -37,9 +37,9 @@
         <span class="material-symbols-outlined">edit</span>
         Editar Viaje
       </button>
-      <button class="boton-accion boton-cancelar">
+      <button class="boton-accion boton-cancelar" onclick="abrirModalEliminarViaje()">
         <span class="material-symbols-outlined">cancel</span>
-        Cancelar Viaje
+        Eliminar Viaje
       </button>
     </div>
   </div>
@@ -173,4 +173,38 @@
   </div>
 
 </section>
+
+<!-- Panel de eliminacion y Fondo -->
+<form id="formulario-eliminar" method="POST">
+  {% csrf_token %}
+  <div id="contenedor-panel-eliminar">
+    <div id="contenedor-panel-fondo" onclick="cerrarModalEliminarViaje()"> </div>
+
+    <!-- Panel -->
+    <div id="panel-eliminar">
+      <input type="hidden" name="accion" value="eliminar_viaje"> 
+
+      <button type="button" class="boton-cerrar" id="icono-cerrar-panel-eliminar" onclick="cerrarModalEliminarViaje()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+
+      <div id="icono-advertencia">
+        <span class="material-symbols-outlined">warning</span>
+      </div>
+
+      <h3>Confirmar eliminación</h3>
+      <p id="texto-confirmacion-eliminar">¿Está seguro que quiere eliminar este viaje?</p>
+
+      <div class="acciones-modal">
+        <button type="button" class="boton-secundario" onclick="cerrarModalEliminarViaje()">No, mantener</button>
+        <button type="button" class="boton-primario" id="boton-confirmar-eliminar"><span>Sí, eliminar</span></button>
+      </div>
+    </div>
+  </div>
+</form>
+
+{% endblock %}
+
+{% block codigo-javascript %}
+  <script src="{% static 'js/informacion_viaje.js' %}"></script>
 {% endblock %}
