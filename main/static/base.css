@@ -1,5 +1,6 @@
 :root {
   --brand-olive: oklch(27.255% 0.02357 140.024);
+  --color-toast-success: oklch(62.994% 0.19617 143.465);
   --brand-cream: oklch(99.07% 0.0054 95.10);
   --stone-900: oklch(14.69% 0.0041 49.25);
   --slate-900: oklch(20.77% 0.0398 265.75);
@@ -304,7 +305,7 @@ body {
   overflow: hidden;
 }
 
-.toast.success { border-left-color: var(--brand-olive); }
+.toast.success { border-left-color: var(--color-toast-success); }
 .toast.error { border-left-color: var(--color-rojo-error); }
 .toast.info { border-left-color: var(--slate-400); }
 
@@ -312,7 +313,7 @@ body {
   font-size: 24px;
 }
 
-.toast.success span.material-symbols-outlined { color: var(--brand-olive); }
+.toast.success span.material-symbols-outlined { color: var(--color-toast-success); }
 .toast.error span.material-symbols-outlined { color: var(--color-rojo-error); }
 .toast.info span.material-symbols-outlined { color: var(--slate-400); }
 
@@ -326,7 +327,7 @@ body {
   animation: progressShrink 4s linear forwards;
 }
 
-.toast.success .toast-progress { background-color: var(--brand-olive); }
+.toast.success .toast-progress { background-color: var(--color-toast-success); }
 .toast.error .toast-progress { background-color: var(--color-rojo-error); }
 .toast.info .toast-progress { background-color: var(--slate-400); }
 

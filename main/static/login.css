@@ -223,7 +223,7 @@ body {
 }
 
 #boton-ingreso:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 20px 25px -5px var(--brand-olive);
   background-color: var(--brand-olive);
 }

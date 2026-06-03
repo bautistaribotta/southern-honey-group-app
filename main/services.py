@@ -500,9 +500,93 @@ def obtener_viajes():
     return Viaje.objects.filter(activo=True).select_related('chofer', 'vehiculo').prefetch_related('destinos').order_by('-fecha_inicio')
 
 
-def editar_viaje(id_viaje):
-    # TODO: Funcion para editar
-    pass
+def editar_viaje(id_viaje, id_chofer, id_vehiculo, destinos, inicio_caja, fecha_inicio, fecha_vuelta):
+    # 1. Valido que el chofer exista en la base de datos
+    if not Chofer.objects.filter(id=id_chofer).exists():
+        raise ValueError("El chofer seleccionado no existe en el sistema.")
+
+    # 2. Valido que el vehículo exista en la base de datos
+    if not Vehiculo.objects.filter(id=id_vehiculo).exists():
+        raise ValueError("El vehículo seleccionado no existe en el sistema.")
+
+    # 3. Valido los destinos
+    if not destinos:
+        raise ValueError("Debe ingresar al menos un destino.")
+
+    destinos_limpios = []
+    for d in destinos:
+        d_limpio = d.strip()
+        if not (3 <= len(d_limpio) <= 30) or not REGEX_TEXTO_NUMEROS.match(d_limpio):
+            raise ValueError(f"El destino '{d}' es inválido (debe tener entre 3 y 30 caracteres alfanuméricos).")
+        destinos_limpios.append(d_limpio)
+
+    # 4. Valido el inicio de caja
+    try:
+        caja_val = float(inicio_caja)
+        if caja_val < 0 or caja_val > 99999999.99:
+            raise ValueError()
+    except (ValueError, TypeError):
+        raise ValueError("El monto de inicio de caja debe ser un número positivo y no superar el límite permitido de la BD.")
+
+    # 5. Valido estrictamente el formato de las fechas para la BD
+    try:
+        datetime.strptime(fecha_inicio, "%Y-%m-%d")
+        if fecha_vuelta: # La fecha de vuelta es opcional
+            datetime.strptime(fecha_vuelta, "%Y-%m-%d")
+    except (ValueError, TypeError):
+        raise ValueError("Las fechas deben tener el formato válido YYYY-MM-DD.")
+
+    with transaction.atomic():
+        viaje = get_object_or_404(Viaje, id=id_viaje)
+        
+        chofer_anterior_id = viaje.chofer_id
+        vehiculo_anterior_id = viaje.vehiculo_id
+        cantidad_destinos_anterior = viaje.destinos.count()
+        
+        viaje.chofer_id = id_chofer
+        viaje.vehiculo_id = id_vehiculo
+        viaje.inicio_caja = inicio_caja
+        viaje.fecha_inicio = fecha_inicio
+        viaje.fecha_vuelta = fecha_vuelta if fecha_vuelta else None
+        viaje.save()
+        
+        # Eliminar destinos anteriores y crear nuevos
+        viaje.destinos.all().delete()
+        for destino_nombre in destinos_limpios:
+            DetalleViaje.objects.create(
+                viaje=viaje,
+                destino=destino_nombre
+            )
+            
+        # Actualizar contador de chofer
+        if chofer_anterior_id == int(id_chofer):
+            chofer = Chofer.objects.get(id=id_chofer)
+            chofer.total_viajes = chofer.total_viajes - cantidad_destinos_anterior + len(destinos_limpios)
+            chofer.save()
+        else:
+            chofer_anterior = Chofer.objects.get(id=chofer_anterior_id)
+            if chofer_anterior.total_viajes >= cantidad_destinos_anterior:
+                chofer_anterior.total_viajes -= cantidad_destinos_anterior
+                chofer_anterior.save()
+            chofer_nuevo = Chofer.objects.get(id=id_chofer)
+            chofer_nuevo.total_viajes += len(destinos_limpios)
+            chofer_nuevo.save()
+            
+        # Actualizar contador de vehiculo
+        if vehiculo_anterior_id == int(id_vehiculo):
+            vehiculo = Vehiculo.objects.get(id=id_vehiculo)
+            vehiculo.total_viajes = vehiculo.total_viajes - cantidad_destinos_anterior + len(destinos_limpios)
+            vehiculo.save()
+        else:
+            vehiculo_anterior = Vehiculo.objects.get(id=vehiculo_anterior_id)
+            if vehiculo_anterior.total_viajes >= cantidad_destinos_anterior:
+                vehiculo_anterior.total_viajes -= cantidad_destinos_anterior
+                vehiculo_anterior.save()
+            vehiculo_nuevo = Vehiculo.objects.get(id=id_vehiculo)
+            vehiculo_nuevo.total_viajes += len(destinos_limpios)
+            vehiculo_nuevo.save()
+            
+    return viaje
 
 
 def eliminar_viaje(id_viaje):

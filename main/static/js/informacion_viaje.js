@@ -56,4 +56,46 @@ document.addEventListener('DOMContentLoaded', () => {
         btnEliminar.addEventListener('touchend', stopHold);
         btnEliminar.addEventListener('touchcancel', stopHold);
     }
+
+    // Lógica para añadir y quitar dinámicamente múltiples destinos en el slide-over
+    const btnAgregarDestino = document.getElementById('btn-agregar-destino');
+    const btnQuitarDestino = document.getElementById('btn-quitar-destino');
+    const contenedorDestinos = document.getElementById('contenedor-destinos');
+
+    if (btnAgregarDestino && btnQuitarDestino && contenedorDestinos) {
+        const contenedorBotones = btnAgregarDestino.parentElement;
+
+        // Evento Agregar
+        btnAgregarDestino.addEventListener('click', () => {
+            const nuevoInput = document.createElement('input');
+            nuevoInput.type = 'text';
+            nuevoInput.name = 'destino';
+            nuevoInput.placeholder = 'Siguiente destino...';
+            nuevoInput.required = true;
+            nuevoInput.maxLength = 30;
+            nuevoInput.pattern = '[a-zA-ZÁÉÍÓÚáéíóúñÑ\\s\\d]{3,}';
+            nuevoInput.style.marginTop = '0.5rem';
+
+            // Insertamos el nuevo input antes de los botones
+            contenedorDestinos.insertBefore(nuevoInput, contenedorBotones);
+
+            // Mostrar el botón de quitar porque ahora hay más de un input
+            btnQuitarDestino.style.display = 'flex';
+        });
+
+        // Evento Quitar
+        btnQuitarDestino.addEventListener('click', () => {
+            const inputs = contenedorDestinos.querySelectorAll('input[name="destino"]');
+            
+            if (inputs.length > 1) {
+                // Elimina el último input
+                contenedorDestinos.removeChild(inputs[inputs.length - 1]);
+            }
+
+            // Si después de eliminar queda solo 1, oculto el botón "Quitar"
+            if (inputs.length - 1 <= 1) {
+                btnQuitarDestino.style.display = 'none';
+            }
+        });
+    }
 });

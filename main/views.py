@@ -16,7 +16,7 @@ from .services import (nuevo_producto, editar_producto, eliminar_producto, nuevo
                        eliminar_cliente, get_cotizacion_dolar_oficial, get_cotizaciones, actualizar_cotizacion, obtener_datos_cliente,
                        obtener_datos_producto, modificar_stock, crear_operacion, servicio_cancelar_operacion,
                        obtener_listado_deudores, crear_chofer, crear_vehiculo, crear_viaje, obtener_choferes_activos,
-                       obtener_vehiculos_activos, obtener_viajes, eliminar_viaje)
+                       obtener_vehiculos_activos, obtener_viajes, eliminar_viaje, editar_viaje)
 
 
 def login(request):
@@ -580,10 +580,38 @@ def informacion_viaje(request, id_viaje):
             except Exception as e:
                 messages.error(request, f"{e}")
                 return redirect("informacion_viaje", id_viaje=id_viaje)
+        
+        elif accion == "editar_viaje":
+            id_chofer = request.POST.get("id_chofer")
+            id_vehiculo = request.POST.get("id_vehiculo")
+            inicio_caja = request.POST.get("inicio_caja", 0)
+            fecha_inicio = request.POST.get("fecha_inicio_viaje")
+            fecha_vuelta = request.POST.get("fecha_regreso_viaje")
+            destinos = request.POST.getlist("destino")
+
+            try:
+                editar_viaje(
+                    id_viaje=id_viaje,
+                    id_chofer=id_chofer,
+                    id_vehiculo=id_vehiculo,
+                    destinos=destinos,
+                    inicio_caja=inicio_caja,
+                    fecha_inicio=fecha_inicio,
+                    fecha_vuelta=fecha_vuelta,
+                )
+                messages.success(request, "Viaje modificado exitosamente.")
+            except ValueError as e:
+                messages.error(request, str(e))
+            except Exception as e:
+                messages.error(request, f"Ocurrió un error inesperado: {e}")
+
+            return redirect("informacion_viaje", id_viaje=id_viaje)
 
     contexto = {
         'viaje': viaje,
-        'pestaña': 'viajes'
+        'pestaña': 'viajes',
+        'choferes': obtener_choferes_activos(),
+        'vehiculos': obtener_vehiculos_activos(),
     }
     return render(request, "informacion_viaje.html", contexto)
 
