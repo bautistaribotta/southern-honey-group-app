@@ -171,12 +171,22 @@ class Viaje(models.Model):
     inicio_caja = models.IntegerField(default=0)
     fecha_inicio = models.DateField()
     fecha_vuelta = models.DateField(null=True, blank=True)
-    gastos = models.IntegerField(default=0)
     activo = models.BooleanField(default=True)
 
     @property
-    def final_caja(self):
-        return self.inicio_caja - self.gastos
+    def total_gastos(self) -> int:
+        from django.db.models import Sum
+
+        # Suma todos los montos de la tabla Gasto asociados a este viaje
+        resultado = self.detalle_gastos.aggregate(total=Sum('monto'))['total']
+        if resultado is not None:
+            return resultado
+        else:
+            return 0
+
+    @property
+    def final_caja(self) -> int:
+        return int(self.inicio_caja) - self.total_gastos
 
     @property
     def estado(self):
@@ -203,3 +213,20 @@ class DetalleViaje(models.Model):
 
     def __str__(self):
         return f"Destino {self.destino} (Viaje {self.viaje_id})"
+
+
+class Gasto(models.Model):
+    TIPO_GASTOS = [
+        ("Comida", "Comida"),
+        ("Combustible", "Combustible"),
+        ("Estacionamiento", "Estacionamiento")
+    ]
+    viaje = models.ForeignKey(Viaje, on_delete=models.CASCADE, related_name="detalle_gastos", db_column="id_viaje")
+    gasto = models.CharField(choices=TIPO_GASTOS, max_length=25)
+    monto = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = "gastos"
+
+    def __str__(self):
+        return f"Gasto {self.gasto} de {self.monto} pesos (Viaje: {self.viaje})"
