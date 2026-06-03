@@ -123,7 +123,7 @@
             Resumen de Caja
           </h3>
           <div class="acciones-secundarias">
-            <button class="boton-nuevo-item gasto">
+            <button class="boton-nuevo-item gasto" onclick="abrirModalGasto()">
               <span class="material-symbols-outlined">paid</span>
               Añadir Gasto
             </button>
@@ -136,7 +136,7 @@
           </div>
           <div class="dato-item doble" style="background-color: transparent; border-top: 1px dashed var(--stone-200); border-radius: 0;">
             <span class="dato-label">Gastos</span>
-            <span class="dato-valor" style="color: var(--slate-500);">$0</span>
+            <span class="dato-valor" style="color: var(--slate-500);">${{ viaje.total_gastos|default:"0" }}</span>
           </div>
         </div>
       </div>
@@ -174,6 +174,66 @@
   </div>
 
 </section>
+
+<!-- Panel de Nuevo Gasto -->
+<form id="formulario-gasto" method="POST">
+  {% csrf_token %}
+  <div id="contenedor-modal-gasto">
+    <div id="contenedor-modal-fondo-gasto" onclick="cerrarModalGasto()"> </div>
+
+    <!-- Panel -->
+    <div id="panel-gasto">
+      <input type="hidden" name="accion" value="nuevo_gasto"> 
+
+      <button type="button" class="boton-cerrar" onclick="cerrarModalGasto()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+
+      <div id="icono-gasto">
+        <span class="material-symbols-outlined">payments</span>
+      </div>
+
+      <h3>Registrar Gasto</h3>
+      <p>Seleccione el tipo de gasto e ingrese el monto correspondiente.</p>
+
+      <div class="grupo-input">
+        <label for="tipo-gasto">Tipo de Gasto</label>
+        <select id="tipo-gasto" name="tipo_gasto" required style="width: 100%; padding: 0.75rem 0.875rem; background-color: var(--color-gris-fondo-input); border: 1px solid var(--stone-200); border-radius: 0.75rem; font-size: 0.875rem; font-family: inherit; outline: none;">
+          <option value="" disabled selected>Seleccione un tipo</option>
+          <option value="Comida">Comida</option>
+          <option value="Combustible">Combustible</option>
+          <option value="Playa">Playa</option>
+          <option value="Peaje">Peaje</option>
+          <option value="Hotel">Hotel</option>
+          <option value="Viaticos personales">Viaticos personales</option>
+          <option value="Extras">Extras</option>
+        </select>
+      </div>
+
+      <div class="grupo-input">
+        <label for="monto-gasto">Monto Total</label>
+        <div class="input-con-icono">
+          <span>$</span>
+          <input 
+            type="number" 
+            id="monto-gasto" 
+            name="monto_gasto" 
+            placeholder="0"
+            step="1"
+            min="1"
+            required
+            pattern="[0-9+]"
+            style="width: 100%;">
+        </div>
+      </div>
+
+      <div class="acciones-modal">
+        <button type="submit" class="boton-primario">Guardar</button>
+        <button type="button" class="boton-secundario" onclick="cerrarModalGasto()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</form>
 
 <!-- Panel de eliminacion y Fondo -->
 <form id="formulario-eliminar" method="POST">

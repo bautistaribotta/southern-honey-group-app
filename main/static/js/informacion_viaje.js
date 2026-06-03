@@ -17,6 +17,21 @@ function cerrarModalEliminarViaje() {
     }
 }
 
+function abrirModalGasto() {
+    document.getElementById('contenedor-modal-gasto').classList.add('abierto');
+    document.body.style.overflow = 'hidden';
+}
+
+function cerrarModalGasto() {
+    document.getElementById('contenedor-modal-gasto').classList.remove('abierto');
+    document.body.style.overflow = 'auto';
+    // Opcional: Resetear el formulario de gasto al cerrarlo
+    const formGasto = document.getElementById('formulario-gasto');
+    if (formGasto) {
+        formGasto.reset();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const btnEliminar = document.getElementById('boton-confirmar-eliminar');
     if (btnEliminar) {

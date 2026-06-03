@@ -464,8 +464,7 @@ def crear_viaje(id_chofer, id_vehiculo, destinos, inicio_caja, fecha_inicio, fec
             vehiculo_id=id_vehiculo,
             inicio_caja=inicio_caja,
             fecha_inicio=fecha_inicio,
-            fecha_vuelta=fecha_vuelta,
-            gastos=0
+            fecha_vuelta=fecha_vuelta
         )
 
         # Iteramos sobre la lista de destinos limpios para crear el Detalle

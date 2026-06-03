@@ -341,7 +341,7 @@ html {
   --color-rojo-eliminacion: oklch(57.71% 0.2152 27.33);
 }
 
-#contenedor-panel-eliminar {
+#contenedor-panel-eliminar, #contenedor-modal-gasto {
   position: fixed;
   inset: 0;
   z-index: 2000;
@@ -352,12 +352,12 @@ html {
   transition: visibility 0.3s;
 }
 
-#contenedor-panel-eliminar.abierto {
+#contenedor-panel-eliminar.abierto, #contenedor-modal-gasto.abierto {
   visibility: visible;
   transition: none;
 }
 
-#contenedor-panel-fondo {
+#contenedor-panel-fondo, #contenedor-modal-fondo-gasto {
   position: absolute;
   inset: 0;
   background-color: var(--color-sombra-40);
@@ -366,11 +366,12 @@ html {
   transition: opacity 0.3s ease-in-out;
 }
 
-#contenedor-panel-eliminar.abierto #contenedor-panel-fondo {
+#contenedor-panel-eliminar.abierto #contenedor-panel-fondo,
+#contenedor-modal-gasto.abierto #contenedor-modal-fondo-gasto {
   opacity: 1;
 }
 
-#panel-eliminar {
+#panel-eliminar, #panel-gasto {
   position: relative;
   background-color: var(--color-blanco);
   border-radius: 12px;
@@ -388,7 +389,8 @@ html {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-#contenedor-panel-eliminar.abierto #panel-eliminar {
+#contenedor-panel-eliminar.abierto #panel-eliminar,
+#contenedor-modal-gasto.abierto #panel-gasto {
   opacity: 1;
   transform: scale(1);
 }
@@ -441,6 +443,42 @@ html {
   color: var(--slate-500);
   margin-bottom: 1.5rem;
   line-height: 1.5;
+}
+
+#panel-gasto h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--slate-900);
+  margin-bottom: 0.5rem;
+}
+
+#panel-gasto p {
+  font-size: 0.875rem;
+  color: var(--slate-500);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+#icono-gasto {
+  color: var(--brand-olive);
+  align-self: center;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+#icono-gasto span {
+  font-size: 4rem;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+}
+
+#panel-gasto .grupo-input {
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+#panel-gasto .grupo-input:last-of-type {
+  margin-bottom: 1.5rem;
 }
 
 .acciones-modal {
