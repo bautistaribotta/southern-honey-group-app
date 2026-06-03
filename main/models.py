@@ -219,7 +219,11 @@ class Gasto(models.Model):
     TIPO_GASTOS = [
         ("Comida", "Comida"),
         ("Combustible", "Combustible"),
-        ("Estacionamiento", "Estacionamiento")
+        ("Playa", "Playa"),
+        ("Peaje", "Peaje"),
+        ("Hotel", "Hotel"),
+        ("Viaticos personales", "Viaticos personales"),
+        ("Extras", "Extras")
     ]
     viaje = models.ForeignKey(Viaje, on_delete=models.CASCADE, related_name="detalle_gastos", db_column="id_viaje")
     gasto = models.CharField(choices=TIPO_GASTOS, max_length=25)
