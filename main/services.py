@@ -8,7 +8,7 @@ from django.db import transaction
 from django.db.models import Sum, F, Value
 from django.db.models.functions import Coalesce
 from django.core.cache import cache
-from .models import Producto, Cliente, Operacion, DetalleOperacion, Pago, Cotizaciones, Chofer, Vehiculo, Viaje, DetalleViaje
+from .models import Producto, Cliente, Operacion, DetalleOperacion, Pago, Cotizaciones, Chofer, Vehiculo, Viaje, DetalleViaje, Gasto
 
 
 # --- Validadores REGEX ---
@@ -588,21 +588,25 @@ def editar_viaje(id_viaje, id_chofer, id_vehiculo, destinos, inicio_caja, fecha_
     return viaje
 
 
-def eliminar_viaje(id_viaje):
+def crear_gasto(id_viaje, tipo_gasto, monto):
     viaje = get_object_or_404(Viaje, id=id_viaje)
-    viaje.activo = False
-    viaje.save()
+    
+    # Validamos que el tipo de gasto sea correcto
+    tipos_validos = dict(Gasto.TIPO_GASTOS).keys()
+    if tipo_gasto not in tipos_validos:
+        raise ValueError(f"El tipo de gasto '{tipo_gasto}' no es válido.")
 
-    # Decrementar total de viajes de chofer y vehiculo
-    # Agrego una capa de redundancia
-    chofer = viaje.chofer
-    if chofer.total_viajes > 0:
-        chofer.total_viajes -= 1
-        chofer.save()
+    # Validamos el monto
+    try:
+        monto_val = int(monto)
+        if monto_val <= 0:
+            raise ValueError()
+    except (ValueError, TypeError):
+        raise ValueError("El monto debe ser un número entero positivo mayor a 0.")
 
-    vehiculo = viaje.vehiculo
-    if vehiculo.total_viajes > 0:
-        vehiculo.total_viajes -= 1
-        vehiculo.save()
-
-    return viaje
+    nuevo_gasto = Gasto.objects.create(
+        viaje=viaje,
+        gasto=tipo_gasto,
+        monto=monto_val
+    )
+    return nuevo_gasto
