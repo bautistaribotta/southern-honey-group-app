@@ -132,7 +132,7 @@
         <div class="lista-datos">
           <div class="dato-item doble">
             <span class="dato-label">Inicio de Caja</span>
-            <span class="dato-valor resaltado">${{ viaje.inicio_caja|default:"0.00" }}</span>
+            <span class="dato-valor resaltado">${{ viaje.inicio_caja|default:"0" }}</span>
           </div>
           <div class="dato-item doble" style="background-color: transparent; border-top: 1px dashed var(--stone-200); border-radius: 0;">
             <span class="dato-label">Comisión Estimada</span>
@@ -302,7 +302,7 @@
                     type="number" 
                     id="inicio-caja" 
                     name="inicio_caja" 
-                    placeholder="0.00"
+                    placeholder="0"
                     step="1"
                     min="0"
                     required

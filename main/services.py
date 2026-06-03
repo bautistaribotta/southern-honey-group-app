@@ -443,11 +443,11 @@ def crear_viaje(id_chofer, id_vehiculo, destinos, inicio_caja, fecha_inicio, fec
 
     # 4. Valido el inicio de caja
     try:
-        caja_val = float(inicio_caja)
-        if caja_val < 0 or caja_val > 99999999.99:
+        caja_val = int(inicio_caja)
+        if caja_val < 0 or caja_val > 2147483647:
             raise ValueError()
     except (ValueError, TypeError):
-        raise ValueError("El monto de inicio de caja debe ser un número positivo y no superar el límite permitido de la BD.")
+        raise ValueError("El monto de inicio de caja debe ser un número entero positivo y no superar el límite permitido de la BD.")
 
     # 5. Valido estrictamente el formato de las fechas para la BD
     try:
@@ -522,11 +522,11 @@ def editar_viaje(id_viaje, id_chofer, id_vehiculo, destinos, inicio_caja, fecha_
 
     # 4. Valido el inicio de caja
     try:
-        caja_val = float(inicio_caja)
-        if caja_val < 0 or caja_val > 99999999.99:
+        caja_val = int(inicio_caja)
+        if caja_val < 0 or caja_val > 2147483647:
             raise ValueError()
     except (ValueError, TypeError):
-        raise ValueError("El monto de inicio de caja debe ser un número positivo y no superar el límite permitido de la BD.")
+        raise ValueError("El monto de inicio de caja debe ser un número entero positivo y no superar el límite permitido de la BD.")
 
     # 5. Valido estrictamente el formato de las fechas para la BD
     try:
