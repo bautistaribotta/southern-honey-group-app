@@ -36,6 +36,8 @@
   --color-gris-fondo-input-transparente-50: oklch(98.42% 0.0034 247.86 / 0.5);
   --color-crema-transparente: oklch(99.07% 0.0054 95.10 / 0.101961);
   --color-sombra-1: oklch(0.00% 0.0000 0.00 / 0.01);
+  --color-sombra-5: oklch(0.00% 0.0000 0.00 / 0.05);
+  --color-sombra-10: oklch(0.00% 0.0000 0.00 / 0.10);
   --color-sombra-oscuro: oklch(0.00% 0.0000 0.00 / 0.3);
   --color-verde-transparente-20: oklch(49.55% 0.0896 126.19 / 0.2);
   --color-verde-oscuro: oklch(40.51% 0.0725 126.25);
