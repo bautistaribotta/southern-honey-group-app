@@ -720,7 +720,7 @@ html {
   left: 0;
   height: 100%;
   width: 0%;
-  background-color: var(--color-sombra-oscuro);
+  background-color: var(--color-slate-900-transparente-40);
   transition: width 0.2s ease-out;
   z-index: 1;
 }
