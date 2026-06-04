@@ -39,7 +39,7 @@
   font-size: 0.875rem;
   color: var(--slate-700);
   outline: none;
-  box-shadow: 0 1px 2px var(--color-sombra-5);
+  box-shadow: 0 1px 2px var(--color-sombra-1);
   transition: all 0.2s;
   font-family: inherit;
 }
@@ -62,7 +62,7 @@
   background-color: var(--color-blanco);
   border: 1px solid var(--stone-200);
   border-radius: 0.75rem;
-  box-shadow: 0 1px 3px var(--color-sombra-5);
+  box-shadow: 0 1px 3px var(--color-sombra-1);
   display: flex;
   flex-direction: column;
   overflow: hidden; /* Esto asegura que el contenido no tape las esquinas redondeadas */
@@ -138,7 +138,7 @@
 .tabla-deudores tbody tr:hover {
   background-color: var(--color-gris-claro-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px var(--color-sombra-5);
+  box-shadow: 0 4px 6px -1px var(--color-sombra-1);
 }
 
 /* Para cuando la tabla esta vacia, quito los efectos hover */

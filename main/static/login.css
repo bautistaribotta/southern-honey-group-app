@@ -136,7 +136,7 @@ body {
 .error-titulo {
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--color-texto-error-login);
+  color: var(--color-rojo-eliminacion);
 }
 
 .error-subtitulo {

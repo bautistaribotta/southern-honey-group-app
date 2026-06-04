@@ -8,7 +8,7 @@
   padding: 2rem;
   border-radius: 1rem;
   border: 1px solid var(--stone-200);
-  box-shadow: 0 10px 15px -3px var(--color-sombra-2-alt);
+  box-shadow: 0 10px 15px -3px var(--color-sombra-1);
   display: flex;
   flex-direction: row;
 }
@@ -44,7 +44,7 @@
   padding: 2rem 2rem;
   border-radius: 1rem;
   border: 1px solid var(--stone-200);
-  box-shadow: 0 4px 6px -1px var(--color-sombra-3), 0 2px 4px -2px var(--color-sombra-3-alt);
+  box-shadow: 0 4px 6px -1px var(--color-sombra-1), 0 2px 4px -2px var(--color-sombra-1);
   
   display: flex;
   flex-direction: column; 
@@ -59,7 +59,7 @@
 
 #contenedor-cotizaciones .tarjeta-info:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 15px -3px var(--color-sombra-7), 0 4px 6px -4px var(--color-sombra-7);
+    box-shadow: 0 10px 15px -3px var(--color-sombra-1), 0 4px 6px -4px var(--color-sombra-1);
 }
 
 /* Ancho específico para las 2 tarjetas de arriba */
