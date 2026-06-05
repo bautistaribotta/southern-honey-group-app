@@ -53,6 +53,9 @@ class Cliente(models.Model):
 
 
 class Operacion(models.Model):
+    # Como la tabla viaje esta definida mas abajo, coloco el nombre entre comillas para que Django la lea antes
+    viaje = models.ForeignKey("Viaje", on_delete=models.SET_NULL, null=True,
+                              blank=True, related_name="operaciones", db_column="id_viaje")
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, db_column="id_cliente")
     fecha = models.DateTimeField(auto_now_add=True)
     activa = models.BooleanField(default=True)
