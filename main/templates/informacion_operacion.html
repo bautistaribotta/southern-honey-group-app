@@ -28,7 +28,7 @@
             </div>
         </div>
         <div class="acciones-cliente" style="display: flex; gap: 0.75rem;">
-            <button class="boton-accion boton-editar" {% if operacion.estado_pago == 'Cancelada' or operacion.estado_pago == 'Pagada' %}disabled{% else %}onclick="abrirModalPago('{{ operacion.id }}', '{{ operacion.monto_total|default_if_none:0|stringformat:'f' }}', '{{ operacion.total_pagado|default_if_none:0|stringformat:'f' }}');"{% endif %}>
+            <button class="boton-accion boton-editar" {% if operacion.estado_pago == 'Cancelada' or operacion.estado_pago == 'Pagada' %}disabled style="opacity: 0.5; cursor: not-allowed;"{% else %}onclick="abrirModalPago('{{ operacion.id }}', '{{ operacion.monto_total|default_if_none:0|stringformat:'f' }}', '{{ operacion.total_pagado|default_if_none:0|stringformat:'f' }}');"{% endif %}>
                 <span class="material-symbols-outlined">payments</span>
                 Añadir Pago
             </button>
@@ -36,7 +36,7 @@
                 <span class="material-symbols-outlined">download</span>
                 Imprimir Remito
             </a>
-            <button class="boton-accion boton-cancelar" {% if operacion.estado_pago == 'Cancelada' %}disabled{% else %}onclick="abrirModalCancelarOperacion('{{ operacion.id }}');"{% endif %}>
+            <button class="boton-accion boton-cancelar" {% if operacion.estado_pago == 'Cancelada' %}disabled style="opacity: 0.5; cursor: not-allowed;"{% else %}onclick="abrirModalCancelarOperacion('{{ operacion.id }}');"{% endif %}>
                 <span class="material-symbols-outlined">delete</span>
                 Cancelar Operación
             </button>

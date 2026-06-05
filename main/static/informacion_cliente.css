@@ -97,9 +97,14 @@ html {
   box-shadow: 0 1px 2px 0 var(--color-sombra-1);
 }
 
-.boton-editar:hover {
+.boton-editar:hover:not(:disabled) {
   background-color: var(--color-gris-fondo-input);
   border-color: var(--slate-400);
+}
+
+.boton-editar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .boton-cancelar {
@@ -108,9 +113,14 @@ html {
   border-color: var(--color-rojo-eliminacion-transparente-30);
 }
 
-.boton-cancelar:hover {
+.boton-cancelar:hover:not(:disabled) {
   background-color: var(--color-rojo-muy-claro); /* Fondo rojo muy claro */
   border-color: var(--color-rojo-eliminacion);
+}
+
+.boton-cancelar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* --- TARJETA ÚNICA DE INFORMACIÓN --- */
