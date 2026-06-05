@@ -587,17 +587,17 @@ html {
 }
 
 #panel-eliminar, #panel-cancelar-operacion, #panel-pago {
-  position: relative;
-  background-color: var(--color-blanco);
-  border-radius: 12px;
-  border: 1px solid var(--color-verde-medio-transparente-10-alt);
-  padding: 2.5rem 2rem 2rem 2rem;
-  width: 90%;
-  max-width: 450px;
-  box-shadow: 0 20px 25px -5px var(--color-sombra-1);
-  display: flex;
-  flex-direction: column;
-  text-align: center;
+    position: relative;
+    background-color: var(--color-blanco);
+    border-radius: 12px;
+    border: 1px solid var(--color-verde-medio-transparente-10-alt);
+    padding: 2.5rem 2rem 2rem 2rem;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 20px 25px -5px var(--color-sombra-10);
+    display: flex;
+    flex-direction: column;
+    text-align: center;
   
   opacity: 0;
   transform: scale(0.95);

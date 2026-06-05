@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block nombre-pestaña %}
+<title> Detalles de Operación </title>
+{% endblock %}
+
+{% block links %}
+<link rel="stylesheet" href="{% static 'informacion_cliente.css' %}">
+<link rel="stylesheet" href="{% static 'informacion_operacion.css' %}">
+{% endblock %}
+
+{% block area-trabajo %}
+<div id="espacio-trabajo-cliente">
+    <a href="{% url 'informacion_clientes' operacion.cliente.id %}" class="boton-volver">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Volver al perfil de {{ operacion.cliente.nombre }} {{ operacion.cliente.apellido|default:"" }}
+    </a>
+
+    <div class="cabecera-detalle">
+        <div class="info-principal">
+            <div class="avatar-cliente" style="background-color: var(--brand-olive);">
+                <span class="material-symbols-outlined" style="color: var(--color-blanco); font-size: 28px;">receipt_long</span>
+            </div>
+            <div>
+                <h3 class="nombre-cliente-titulo">Operación #{{ operacion.id }}</h3>
+                <p class="id-cliente-subtitulo">Fecha: {{ operacion.fecha|date:"d/m/Y" }}</p>
+            </div>
+        </div>
+        <div class="acciones-cliente" style="display: flex; gap: 0.75rem;">
+            <button class="boton-accion boton-editar" {% if operacion.estado_pago == 'Cancelada' or operacion.estado_pago == 'Pagada' %}disabled{% else %}onclick="abrirModalPago('{{ operacion.id }}', '{{ operacion.monto_total|default_if_none:0|stringformat:'f' }}', '{{ operacion.total_pagado|default_if_none:0|stringformat:'f' }}');"{% endif %}>
+                <span class="material-symbols-outlined">payments</span>
+                Añadir Pago
+            </button>
+            <a href="{% url 'generar_remito' operacion.id %}" target="_blank" class="boton-accion boton-editar boton-descargar-remito">
+                <span class="material-symbols-outlined">download</span>
+                Imprimir Remito
+            </a>
+            <button class="boton-accion boton-cancelar" {% if operacion.estado_pago == 'Cancelada' %}disabled{% else %}onclick="abrirModalCancelarOperacion('{{ operacion.id }}');"{% endif %}>
+                <span class="material-symbols-outlined">delete</span>
+                Cancelar Operación
+            </button>
+        </div>
+    </div>
+
+    <div class="grid-operacion-detalles">
+        
+        <!-- Detalles de Productos -->
+        <section class="contenedor-operaciones contenedor-operaciones-detalle">
+            <div class="encabezado-operaciones">
+                <h4><span class="material-symbols-outlined">inventory_2</span> Productos Adquiridos</h4>
+            </div>
+            <div class="tabla-operaciones-container tabla-operaciones-container-detalle">
+                <table class="tabla-operaciones">
+                    <thead>
+                        <tr>
+                            <th class="th-producto">Producto</th>
+                            <th class="th-cantidad">Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for detalle in detalles %}
+                        <tr>
+                            <td class="celda-producto-nombre">
+                                {{ detalle.producto.nombre }}
+                            </td>
+                            <td class="celda-producto-cantidad">
+                                {{ detalle.cantidad|floatformat:0 }}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2" class="celda-vacia">
+                                No hay productos registrados.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Historial de Pagos -->
+        <section class="contenedor-operaciones contenedor-operaciones-detalle">
+            <div class="encabezado-operaciones">
+                <h4><span class="material-symbols-outlined">payments</span> Historial de Pagos</h4>
+            </div>
+            <div class="tabla-operaciones-container tabla-operaciones-container-detalle">
+                <table class="tabla-operaciones">
+                    <thead>
+                        <tr>
+                            <th class="th-fecha">Fecha</th>
+                            <th class="th-monto">Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pago in pagos %}
+                        <tr>
+                            <td class="celda-pago-fecha">
+                                {{ pago.fecha|date:"d/m/Y" }}
+                            </td>
+                            <td class="celda-pago-monto">
+                                +${{ pago.monto|floatformat:"-2" }}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2" class="celda-vacia">
+                                No hay pagos registrados.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot class="pie-tabla-operacion">
+                        <tr>
+                            <td class="celda-pie-titulo">Total Operación</td>
+                            <td class="celda-pie-monto">
+                                ${{ operacion.monto_total|floatformat:"-2" }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="celda-pie-titulo-secundario">Restante a Pagar</td>
+                            <td class="celda-pie-monto-secundario">
+                                ${{ restante|floatformat:"-2" }}
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+</div>
+
+<!-- Modal para Cancelar Operación -->
+<div id="contenedor-modal-cancelar">
+    <div id="contenedor-modal-fondo-cancelar" onclick="cerrarModalCancelarOperacion()"></div>
+    <div id="panel-cancelar-operacion">
+        <button type="button" class="boton-cerrar" onclick="cerrarModalCancelarOperacion()">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+
+        <div id="icono-advertencia-cancelar">
+            <span class="material-symbols-outlined">warning</span>
+        </div>
+
+        <h3>Confirmar cancelación</h3>
+        <p id="texto-confirmacion-cancelar">¿Está seguro que desea cancelar esta operación? El stock de los productos será devuelto al inventario automáticamente.</p>
+
+        <div class="acciones-modal">
+            <button type="button" class="boton-secundario" onclick="cerrarModalCancelarOperacion()">No, volver</button>
+            <button type="button" class="boton-primario" id="boton-confirmar-cancelar"><span>Sí, cancelar</span></button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Añadir Pago -->
+<div id="contenedor-modal-pago">
+    <div id="contenedor-modal-fondo-pago" onclick="cerrarModalPago()"></div>
+    <div id="panel-pago">
+        <button type="button" class="boton-cerrar" onclick="cerrarModalPago()">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+
+        <div id="icono-pago-modal">
+            <span class="material-symbols-outlined">payments</span>
+        </div>
+
+        <h3 id="titulo-modal-pago">Añadir pago</h3>
+        <p id="texto-info-pago">Monto restante a pagar: <strong id="monto-restante-pago">$0.00</strong></p>
+
+        <form id="form-registrar-pago" onsubmit="event.preventDefault(); procesarPago();">
+            <input type="hidden" id="id_operacion_pago" value="">
+            <div class="campo-info" style="text-align: left; margin-bottom: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <label for="input-monto-pago" style="color: var(--slate-700); font-weight: 500;">Monto a pagar</label>
+                    <button type="button" class="btn-saldar-total" onclick="completarPagoTotal()">
+                        Saldar 100%
+                    </button>
+                </div>
+                <div style="position: relative; display: block;">
+                    <span style="position: absolute; left: 0.75rem; top: 0.6rem; color: var(--slate-500); font-weight: 600; pointer-events: none;">$</span>
+                    <input type="number" id="input-monto-pago" class="input-edicion" style="padding-left: 1.75rem; width: 100%; box-sizing: border-box;" min="0.01" step="0.01" required placeholder=" ">
+                    <span class="mensaje-error" style="margin-top: 0.5rem;">Ingrese un monto válido y menor o igual al restante</span>
+                </div>
+            </div>
+
+            <div class="acciones-modal">
+                <button type="submit" id="boton-confirmar-pago">Registrar pago</button>
+                <button type="button" class="boton-secundario" onclick="cerrarModalPago()">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block codigo-javascript %}
+<script src="{% static 'js/informacion_operacion.js' %}"></script>
+{% endblock %}

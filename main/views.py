@@ -334,7 +334,31 @@ def obtener_cliente_json(request, id_cliente):
 
 
 @login_required
-def informacion_operaciones(request, id_operacion):
+@login_required
+@ensure_csrf_cookie
+def informacion_operacion(request, id_operacion):
+    operacion = get_object_or_404(Operacion, id=id_operacion)
+            
+    pagos = operacion.pago_set.all().order_by("-fecha")
+    detalles = DetalleOperacion.objects.filter(operacion=operacion)
+    
+    # Calculate rest
+    from decimal import Decimal
+    monto_total = operacion.monto_total or Decimal('0')
+    total_pagado = operacion.total_pagado or Decimal('0')
+    restante = monto_total - total_pagado
+    
+    contexto = {
+        'operacion': operacion,
+        'cliente': operacion.cliente,
+        'pagos': pagos,
+        'detalles': detalles,
+        'restante': restante,
+        'pestaña': 'clientes'
+    }
+    return render(request, "informacion_operacion.html", contexto)
+
+def generar_remito(request, id_operacion):
     operacion = get_object_or_404(Operacion, id=id_operacion)
     cliente = operacion.cliente
     detalles = DetalleOperacion.objects.filter(operacion=operacion)

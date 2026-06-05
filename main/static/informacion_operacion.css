@@ -1,0 +1,119 @@
+/* --- ESTILOS ESPECÍFICOS PARA INFORMACIÓN OPERACIÓN --- */
+
+.grid-operacion-detalles {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.tabla-operaciones-container-detalle .tabla-operaciones tr:hover {
+    background-color: transparent;
+}
+
+.contenedor-operaciones-detalle {
+    margin-top: 0;
+}
+
+.tabla-operaciones-container-detalle {
+    /* Eliminado max-height y overflow para que crezca hacia abajo */
+}
+
+.celda-producto-nombre {
+    padding-left: 1.5rem;
+    color: var(--slate-900);
+    font-weight: 500;
+}
+
+.celda-producto-cantidad {
+    text-align: center;
+    color: var(--slate-600);
+}
+
+.celda-pago-fecha {
+    padding-left: 1.5rem;
+    color: var(--slate-600);
+}
+
+.celda-pago-monto {
+    text-align: right;
+    padding-right: 1.5rem;
+    font-weight: 600;
+    color: var(--brand-olive);
+}
+
+.celda-vacia {
+    text-align: center;
+    padding: 2rem;
+    color: var(--slate-500);
+}
+
+.pie-tabla-operacion {
+    position: sticky;
+    bottom: 0;
+    background-color: var(--color-blanco);
+}
+
+.celda-pie-titulo {
+    padding-left: 1.5rem;
+    color: var(--slate-900);
+    font-weight: 700;
+    border-top: 1px solid var(--stone-200);
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.celda-pie-monto {
+    text-align: right;
+    padding-right: 1.5rem;
+    font-weight: 700;
+    color: var(--slate-900);
+    border-top: 1px solid var(--stone-200);
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.celda-pie-titulo-secundario {
+    padding-left: 1.5rem;
+    color: var(--slate-700);
+    font-weight: 600;
+    border-top: 1px solid var(--stone-200);
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.celda-pie-monto-secundario {
+    text-align: right;
+    padding-right: 1.5rem;
+    font-weight: 700;
+    color: var(--color-rojo-eliminacion);
+    border-top: 1px solid var(--stone-200);
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.th-producto, .th-fecha {
+    padding-left: 1.5rem !important;
+}
+
+.th-cantidad {
+    text-align: center !important;
+}
+
+.th-monto {
+    text-align: right !important;
+    padding-right: 1.5rem !important;
+}
+
+.boton-descargar-remito {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid var(--stone-200);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    background-color: var(--color-blanco);
+}
