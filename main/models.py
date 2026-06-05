@@ -167,7 +167,7 @@ class Vehiculo(models.Model):
 
 
 class Viaje(models.Model):
-    # TODO: LLAVES FORANEAS ¿Remitos?
+    # TODO: LLAVES FORANEAS ¿Remitos? YA DEFINIDA, VINCULAR
     chofer = models.ForeignKey(Chofer, on_delete=models.PROTECT, db_column="id_chofer")
     vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT, db_column="id_vehiculo")
     inicio_caja = models.IntegerField(default=0)

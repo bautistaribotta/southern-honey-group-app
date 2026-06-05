@@ -362,6 +362,81 @@ body {
   to { transform: translateX(120%); opacity: 0; }
 }
 
+/* --- ADAPTACIÓN PARA MÓVILES Y TABLETS --- */
+#mobile-top-bar {
+  display: none;
+}
+
+#overlay-sidebar {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  body {
+    flex-direction: column;
+  }
+  
+  #mobile-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    background-color: var(--brand-olive);
+    color: var(--brand-cream);
+    z-index: 1000;
+  }
+  
+  #btn-toggle-sidebar {
+    background: none;
+    border: none;
+    color: var(--brand-cream);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .logo-mobile {
+    height: 35px;
+    filter: brightness(0) invert(1);
+  }
+
+  #barra-lateral {
+    position: fixed;
+    top: 0;
+    left: -320px;
+    width: 280px;
+    height: 100%;
+    z-index: 2000;
+    transition: left 0.3s ease;
+  }
+  
+  #barra-lateral.abierto {
+    left: 0;
+  }
+
+  #overlay-sidebar {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: var(--color-sombra-oscuro);
+    backdrop-filter: blur(4px);
+    z-index: 1500;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  #overlay-sidebar.abierto {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  #contenido-principal {
+    padding: 1.5rem 1rem;
+  }
+}
+
 /* --- ADAPTACIÓN PARA PANTALLAS GRANDES --- */
 @media (min-width: 1440px) {
   html {
