@@ -264,3 +264,58 @@ body {
     font-size: 20px;
   }
 }
+
+/* --- ADAPTACIÓN RESPONSIVE (TABLETS Y MÓVILES) --- */
+@media (max-width: 1024px) {
+  body {
+    flex-direction: column;
+    overflow-y: auto; /* Permitir scroll si el contenido es muy largo en móvil */
+  }
+
+  #pantalla-izquierda, #pantalla-derecha {
+    width: 100%;
+  }
+
+  /* Rediseño del panel izquierdo para que actúe como cabecera superior */
+  #pantalla-izquierda {
+    padding: 2.5rem 2rem;
+    height: auto;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  #icono-nombre {
+    justify-content: center;
+  }
+
+  #titulo-texto {
+    display: none; /* Ocultamos completamente el texto "Staff portal" y la descripción en móviles */
+  }
+
+  #copyright {
+    display: none; /* Ocultamos el copyright arriba, ensucia el diseño móvil */
+  }
+
+  /* Ajustes del panel derecho (Formulario) */
+  #pantalla-derecha {
+    padding: 2.5rem 1.5rem;
+    align-items: flex-start; /* Que el form se quede arriba */
+  }
+
+  #encabezado-formulario h2 {
+    font-size: 1.5rem;
+  }
+  
+  #contenedor-formulario {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  #pantalla-izquierda {
+    padding: 1.5rem;
+  }
+}
