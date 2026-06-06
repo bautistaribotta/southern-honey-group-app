@@ -334,7 +334,6 @@ def obtener_cliente_json(request, id_cliente):
 
 
 @login_required
-@login_required
 @ensure_csrf_cookie
 def informacion_operacion(request, id_operacion):
     operacion = get_object_or_404(Operacion, id=id_operacion)
@@ -357,6 +356,7 @@ def informacion_operacion(request, id_operacion):
         'pestaña': 'clientes'
     }
     return render(request, "informacion_operacion.html", contexto)
+
 
 def generar_remito(request, id_operacion):
     operacion = get_object_or_404(Operacion, id=id_operacion)
