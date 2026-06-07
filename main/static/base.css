@@ -282,15 +282,16 @@ body {
   display: flex;
   align-items: center;
   gap: 0.875rem;
-  border-left: 4px solid var(--slate-400);
+  border: 1px solid var(--stone-200);
   animation: slideInToast 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   position: relative;
   overflow: hidden;
 }
 
-.toast.success { border-left-color: var(--color-toast-success); }
-.toast.error { border-left-color: var(--color-rojo-eliminacion); }
-.toast.info { border-left-color: var(--slate-400); }
+/* El color ya lo aporta el ícono y la barra de progreso, no necesitamos pintar el borde entero */
+.toast.success { }
+.toast.error { }
+.toast.info { }
 
 .toast span.material-symbols-outlined {
   font-size: 24px;
