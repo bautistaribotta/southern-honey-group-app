@@ -18,9 +18,10 @@ class Producto(models.Model):
     precio = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     cantidad = models.PositiveIntegerField(default=0)
     cantidad_vendida = models.PositiveIntegerField(default=0)
+    cantidad_comprada = models.PositiveIntegerField(default=0)
     activo = models.BooleanField(default=True)
     """
-        En sistemas comerciales, es mejor usar un campo 'activo' en lugar de borrar 
+        En sistemas comerciales, es mejor usar un campo 'activo' en lugar de borrar
         productos físicamente. Si borro un producto, podría perder el historial de ventas.
         Al usar 'activo=False', el producto deja de mostrarse en la interfaz pero los registros históricos
         en 'detalle_operaciones' permanecen intactos
@@ -53,13 +54,18 @@ class Cliente(models.Model):
 
 
 class Operacion(models.Model):
+    TIPO_OPERACION = [
+        ("compra", "Compra"),
+        ("venta", "Venta"),
+    ]
+
     # Como la tabla viaje esta definida mas abajo, coloco el nombre entre comillas para que Django la lea antes
     viaje = models.ForeignKey("Viaje", on_delete=models.SET_NULL, null=True,
                               blank=True, related_name="operaciones", db_column="id_viaje")
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, db_column="id_cliente")
     fecha = models.DateTimeField(auto_now_add=True)
     activa = models.BooleanField(default=True)
-    monto_total = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+    tipo_operacion = models.CharField(max_length=10, choices=TIPO_OPERACION)
     valor_dolar = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     valor_kilo_miel = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
@@ -67,6 +73,14 @@ class Operacion(models.Model):
     class Meta:
         db_table = "operaciones"
         verbose_name_plural = "Operaciones"
+
+    @property
+    def monto_total(self):
+        from django.db.models import Sum, F
+        resultado = self.detalleoperacion_set.aggregate(
+            total=Sum(F('cantidad') * F('precio_unitario'))
+        )['total']
+        return resultado if resultado is not None else 0
 
     @property
     def total_pagado(self):
@@ -77,12 +91,12 @@ class Operacion(models.Model):
     def estado_pago(self):
         if not self.activa:
             return "Cancelada"
-        
+
         pagado = self.total_pagado
-        
+
         if pagado == 0:
             return "Debe"
-        elif pagado >= (self.monto_total or 0):
+        elif pagado >= self.monto_total:
             return "Pagada"
         else:
             return "Pago Parcial"
@@ -95,6 +109,7 @@ class DetalleOperacion(models.Model):
     operacion = models.ForeignKey(Operacion, on_delete=models.CASCADE, db_column="id_operacion")
     producto = models.ForeignKey(Producto, on_delete=models.PROTECT, db_column="id_producto")
     cantidad = models.DecimalField(max_digits=10, decimal_places=2)
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
 
     # Obligo a Django a nombrar la tabla como "detalle_operaciones"
     class Meta:

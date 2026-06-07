@@ -144,7 +144,7 @@ def eliminar_cliente(id_cliente):
     return cliente
 
 
-def crear_operacion(cliente, items, metodo_pago):
+def crear_operacion(cliente, items, metodo_pago, tipo_operacion):
     # Obtenemos las cotizaciones actuales antes de la transacción
     cotizacion_dolar = get_cotizacion_dolar_oficial()
     if cotizacion_dolar:
@@ -158,11 +158,10 @@ def crear_operacion(cliente, items, metodo_pago):
         # Creo la operación con las cotizaciones actuales
         operacion = Operacion.objects.create(
             cliente=cliente,
+            tipo_operacion=tipo_operacion,
             valor_dolar=valor_dolar,
             valor_kilo_miel=valor_miel
         )
-
-        monto_total = 0
 
         for item in items:
             id_producto = item.get("id_producto")
@@ -170,30 +169,36 @@ def crear_operacion(cliente, items, metodo_pago):
 
             producto = get_object_or_404(Producto, id=id_producto, activo=True)
 
-            # Resto el stock y sumo a la cantidad vendida
-            modificar_stock(id_producto, -cantidad)
-            producto.refresh_from_db()
-            producto.cantidad_vendida += cantidad
-            producto.save()
+            if tipo_operacion == "venta":
+                # En una venta, el precio se toma del producto
+                precio_unitario = producto.precio
+                # Resto el stock y sumo a la cantidad vendida
+                modificar_stock(id_producto, -cantidad)
+                producto.refresh_from_db()
+                producto.cantidad_vendida += cantidad
+                producto.save()
+            else:
+                # En una compra, el precio viene en el ítem
+                precio_unitario = Decimal(item.get("precio_unitario"))
+                # Sumo el stock y sumo a la cantidad comprada
+                modificar_stock(id_producto, cantidad)
+                producto.refresh_from_db()
+                producto.cantidad_comprada += cantidad
+                producto.save()
 
             # Creo el detalle vinculado a la operación
             DetalleOperacion.objects.create(
                 operacion=operacion,
                 producto=producto,
                 cantidad=cantidad,
+                precio_unitario=precio_unitario,
             )
 
-            monto_total += producto.precio * cantidad
-
-        # Actualizo el monto total de la operación
-        operacion.monto_total = monto_total
-        operacion.save()
-
-        # Si el pago es "contado", generamos automáticamente un pago
+        # Si el pago es "contado", generamos automáticamente un pago usando el monto_total calculado
         if metodo_pago.lower() == "contado":
             Pago.objects.create(
                 operacion=operacion,
-                monto=monto_total
+                monto=operacion.monto_total
             )
 
     return operacion
@@ -209,15 +214,22 @@ def servicio_cancelar_operacion(id_operacion):
 
         detalles = DetalleOperacion.objects.filter(operacion=operacion)
 
-        # Restauramos el stock de cada producto en el detalle
+        # Revertimos el stock de cada producto en el detalle según el tipo de operación
         for detalle in detalles:
             producto = detalle.producto
-            modificar_stock(producto.id, detalle.cantidad)
 
-            # Restamos de la cantidad vendida históricamente
-            producto.refresh_from_db()
-            producto.cantidad_vendida -= detalle.cantidad
-            producto.save()
+            if operacion.tipo_operacion == "venta":
+                # Si era venta, devuelvo stock y resto de cantidad vendida
+                modificar_stock(producto.id, detalle.cantidad)
+                producto.refresh_from_db()
+                producto.cantidad_vendida -= detalle.cantidad
+                producto.save()
+            else:
+                # Si era compra, quito stock y resto de cantidad comprada
+                modificar_stock(producto.id, -detalle.cantidad)
+                producto.refresh_from_db()
+                producto.cantidad_comprada -= detalle.cantidad
+                producto.save()
 
         # Marcamos la operación como inactiva (cancelada)
         operacion.activa = False
@@ -229,19 +241,37 @@ def servicio_cancelar_operacion(id_operacion):
 def obtener_listado_deudores(q=""):
     dolar_actual_data = get_cotizacion_dolar_oficial()
     dolar_actual = Decimal(str(dolar_actual_data.get("venta") or 1))  # Prevención división por 0 si falla la API
-    
+
     miel_actual_data = get_cotizacion_miel_50mm()
     try:
         miel_actual = Decimal(str(miel_actual_data)) if miel_actual_data else None
     except ValueError:
         miel_actual = None
 
-    # Filtramos operaciones activas donde el total pagado es menor al monto total
-    from django.db.models import DecimalField
+    # Filtramos operaciones activas donde el total pagado es menor al monto total.
+    # Como 'monto_total' ahora es una @property (no un campo de BD), lo recreo en la query.
+    # Uso subqueries (no JOINs directos) para sumar detalles y pagos por separado y así
+    # evitar el "fan-out" que multiplicaría los montos al combinar dos agregaciones.
+    from django.db.models import DecimalField, OuterRef, Subquery
+    monto_detalles = (
+        DetalleOperacion.objects.filter(operacion=OuterRef('pk'))
+        .values('operacion')
+        .annotate(total=Sum(F('cantidad') * F('precio_unitario')))
+        .values('total')
+    )
+    monto_pagos = (
+        Pago.objects.filter(operacion=OuterRef('pk'))
+        .values('operacion')
+        .annotate(total=Sum('monto'))
+        .values('total')
+    )
     operaciones_adeudadas = (
         Operacion.objects.filter(activa=True)
-        .annotate(pagado=Coalesce(Sum('pago__monto'), Value(0), output_field=DecimalField()))
-        .filter(monto_total__gt=F('pagado'))
+        .annotate(
+            monto_calculado=Coalesce(Subquery(monto_detalles, output_field=DecimalField()), Value(0), output_field=DecimalField()),
+            pagado=Coalesce(Subquery(monto_pagos, output_field=DecimalField()), Value(0), output_field=DecimalField())
+        )
+        .filter(monto_calculado__gt=F('pagado'))
         .select_related('cliente')
         .order_by('-fecha')
     )
@@ -258,18 +288,18 @@ def obtener_listado_deudores(q=""):
     lista_deudores = []
     for operacion in operaciones_adeudadas:
         # La deuda es igual al monto total - los pagos registrados en esa operacion
-        deuda_pesos = operacion.monto_total - operacion.pagado
-        
+        deuda_pesos = operacion.monto_calculado - operacion.pagado
+
         # Cálculos del dólar
         valor_dolar_historico = operacion.valor_dolar if operacion.valor_dolar else None
-        
+
         # Usamos división porque el total está en pesos (Pesos / Valor Dólar = Dólares)
         deuda_dolar_historico = (deuda_pesos / valor_dolar_historico) if valor_dolar_historico else None
         deuda_dolar_actual = (deuda_pesos / dolar_actual) if dolar_actual else None
 
         # Cálculos de la Miel
         valor_miel_historico = operacion.valor_kilo_miel if operacion.valor_kilo_miel else None
-        
+
         kg_miel_historico = (deuda_pesos / valor_miel_historico) if valor_miel_historico else None
         kg_miel_actual = (deuda_pesos / miel_actual) if miel_actual else None
 
@@ -311,13 +341,13 @@ def get_cotizaciones():
     """
     articulos_esperados = ["Miel 34mm", "Miel 50mm", "Miel +50mm", "Cera Operculo", "Cera Recupero"]
     cotizaciones_db = {c.articulo: c.monto for c in Cotizaciones.objects.all()}
-    
+
     resultado = {}
     for art in articulos_esperados:
         # Sanitizar la clave para que sea un identificador válido en Django Templates
         clave = art.replace(" ", "_").replace("+", "plus")
         resultado[clave] = cotizaciones_db.get(art, 0)
-        
+
     return resultado
 
 
@@ -473,7 +503,7 @@ def crear_viaje(id_chofer, id_vehiculo, destinos, inicio_caja, fecha_inicio, fec
                 viaje=nuevo_viaje,
                 destino=destino_nombre
             )
-            
+
         # Incremento el contador de viajes del Chofer sumando la cantidad de destinos
         chofer = Chofer.objects.get(id=id_chofer)
         chofer.total_viajes += len(destinos_limpios)
@@ -537,18 +567,18 @@ def editar_viaje(id_viaje, id_chofer, id_vehiculo, destinos, inicio_caja, fecha_
 
     with transaction.atomic():
         viaje = get_object_or_404(Viaje, id=id_viaje)
-        
+
         chofer_anterior_id = viaje.chofer_id
         vehiculo_anterior_id = viaje.vehiculo_id
         cantidad_destinos_anterior = viaje.destinos.count()
-        
+
         viaje.chofer_id = id_chofer
         viaje.vehiculo_id = id_vehiculo
         viaje.inicio_caja = inicio_caja
         viaje.fecha_inicio = fecha_inicio
         viaje.fecha_vuelta = fecha_vuelta if fecha_vuelta else None
         viaje.save()
-        
+
         # Eliminar destinos anteriores y crear nuevos
         viaje.destinos.all().delete()
         for destino_nombre in destinos_limpios:
@@ -556,7 +586,7 @@ def editar_viaje(id_viaje, id_chofer, id_vehiculo, destinos, inicio_caja, fecha_
                 viaje=viaje,
                 destino=destino_nombre
             )
-            
+
         # Actualizar contador de chofer
         if chofer_anterior_id == int(id_chofer):
             chofer = Chofer.objects.get(id=id_chofer)
@@ -570,7 +600,7 @@ def editar_viaje(id_viaje, id_chofer, id_vehiculo, destinos, inicio_caja, fecha_
             chofer_nuevo = Chofer.objects.get(id=id_chofer)
             chofer_nuevo.total_viajes += len(destinos_limpios)
             chofer_nuevo.save()
-            
+
         # Actualizar contador de vehiculo
         if vehiculo_anterior_id == int(id_vehiculo):
             vehiculo = Vehiculo.objects.get(id=id_vehiculo)
@@ -584,13 +614,13 @@ def editar_viaje(id_viaje, id_chofer, id_vehiculo, destinos, inicio_caja, fecha_
             vehiculo_nuevo = Vehiculo.objects.get(id=id_vehiculo)
             vehiculo_nuevo.total_viajes += len(destinos_limpios)
             vehiculo_nuevo.save()
-            
+
     return viaje
 
 
 def crear_gasto(id_viaje, tipo_gasto, monto):
     viaje = get_object_or_404(Viaje, id=id_viaje)
-    
+
     # Validamos que el tipo de gasto sea correcto
     tipos_validos = dict(Gasto.TIPO_GASTOS).keys()
     if tipo_gasto not in tipos_validos:
