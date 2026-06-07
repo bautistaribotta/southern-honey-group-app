@@ -30,10 +30,7 @@
 
       <div class="contenedor-filtro">
         <select id="filtro-categoria" class="select-filtro">
-          <option value="" {% if not categoria %}selected{% endif %}>
-            <span class="texto-desktop">Todas las Categorías</span>
-            <span class="texto-mobile" style="display: none;">Categorías</span>
-          </option>
+          <option value="" {% if not categoria %}selected{% endif %}>Todas las Categorías</option>
           <option value="Miel" {% if categoria == "Miel" %}selected{% endif %}>Miel</option>
           <option value="Alimento" {% if categoria == "Alimento" %}selected{% endif %}>Alimento</option>
           <option value="Cera" {% if categoria == "Cera" %}selected{% endif %}>Cera</option>

@@ -971,6 +971,27 @@
 }
 
 /* --- ADAPTACIÓN PARA MÓVILES Y TABLETS --- */
+@media (max-width: 1250px) {
+  .texto-desktop {
+    display: none;
+  }
+
+  .texto-mobile {
+    display: inline !important;
+  }
+
+  .boton-nuevo .texto-boton {
+    display: none;
+  }
+
+  .boton-nuevo {
+    padding: 0.625rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    justify-content: center;
+  }
+}
+
 @media (max-width: 1024px) {
   .barra-herramientas {
     flex-direction: column;
@@ -988,20 +1009,13 @@
 
   .boton-nuevo {
     width: 100%;
+    height: auto;
     justify-content: center;
     padding: 0.75rem;
   }
 
-  .texto-desktop {
-    display: none;
-  }
-
-  .texto-mobile {
-    display: inline !important;
-  }
-
   .boton-nuevo .texto-boton {
-    display: none;
+    display: inline;
   }
 
   #panel-eliminar, #panel-actualizar-cotizacion, #panel-actualizar-stock {
