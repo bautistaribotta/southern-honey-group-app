@@ -970,25 +970,18 @@
   background-color: var(--color-verde-oscuro);
 }
 
-/* --- ADAPTACIÓN PARA MÓVILES Y TABLETS --- */
-@media (max-width: 1250px) {
-  .texto-desktop {
-    display: none;
-  }
-
-  .texto-mobile {
-    display: inline !important;
+@media (max-width: 1200px) {
+  .boton-nuevo {
+    padding: 0.625rem 1rem;
   }
 
   .boton-nuevo .texto-boton {
-    display: none;
+    font-size: 0;
   }
 
-  .boton-nuevo {
-    padding: 0.625rem;
-    width: 2.75rem;
-    height: 2.75rem;
-    justify-content: center;
+  .boton-nuevo .texto-boton::before {
+    content: "Nuevo";
+    font-size: 0.875rem;
   }
 }
 
