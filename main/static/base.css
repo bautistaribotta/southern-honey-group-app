@@ -458,3 +458,10 @@ body {
     width: 360px;
   }
 }
+
+/* --- ADAPTACIÓN PARA MÓVILES (600px) --- */
+@media (max-width: 600px) {
+  #titulos-cabecera p {
+    display: none;
+  }
+}

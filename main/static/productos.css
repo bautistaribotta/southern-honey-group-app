@@ -992,6 +992,18 @@
     padding: 0.75rem;
   }
 
+  .texto-desktop {
+    display: none;
+  }
+
+  .texto-mobile {
+    display: inline !important;
+  }
+
+  .boton-nuevo .texto-boton {
+    display: none;
+  }
+
   #panel-eliminar, #panel-actualizar-cotizacion, #panel-actualizar-stock {
     padding: 2rem 1.5rem;
     width: 95%;
