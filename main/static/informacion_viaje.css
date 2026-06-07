@@ -121,15 +121,60 @@ html {
   grid-column: 1 / -1; /* Obliga al contenedor de Operaciones a ocupar todo el ancho */
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .grid-informacion {
     grid-template-columns: 1fr;
   }
-  
+
   .header-acciones {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch; /* Hacemos que los hijos ocupen todo el ancho */
     gap: 1rem;
+  }
+
+  .grupo-botones-principales {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .boton-accion {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 600px) {
+  #slide-over-panel {
+    width: 100%;
+    border-radius: 0;
+  }
+
+  .panel-cabecera {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .panel-cuerpo {
+    padding: 1.5rem;
+  }
+
+  .panel-pie {
+    padding: 1.25rem 1.5rem;
+    flex-direction: column;
+  }
+
+  .panel-pie button {
+    width: 100%;
+  }
+
+  #panel-eliminar, #panel-gasto {
+    width: 95%;
+    padding: 2rem 1.5rem;
+  }
+
+  .acciones-modal {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -840,8 +840,62 @@ html {
   transition: all 0.2s ease-in-out;
 }
 
-.btn-saldar-total:hover {
-  background-color: var(--color-morado-claro-fondo);
-  color: var(--color-morado-oscuro-texto);
+/* --- ADAPTACIÓN PARA MÓVILES Y TABLETS --- */
+@media (max-width: 1024px) {
+  .cabecera-detalle {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+  
+  .acciones-cliente {
+    width: 100%;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .boton-accion {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .contenedor-tabla {
+    overflow-x: auto;
+  }
+  
+  .tabla-operaciones th, .tabla-operaciones td {
+    padding: 0.875rem 1rem;
+  }
+  
+  .acciones-modal {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  #panel-eliminar, #panel-cancelar-operacion, #panel-pago {
+    width: 95%;
+    padding: 1.5rem;
+  }
+  
+  .info-principal {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+  }
+  
+  .avatar-cliente {
+    margin-bottom: 0.5rem;
+  }
+  
+  .estadisticas-rapidas {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .separador-vertical {
+    display: none;
+  }
 }
 
