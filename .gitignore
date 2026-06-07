@@ -5,3 +5,5 @@ __pycache__/
 *.pyc
 db.sqlite3
 .agents/rules/explicaciones.md
+CLAUDE.md
+GEMINI.md
