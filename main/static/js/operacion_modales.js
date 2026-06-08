@@ -30,13 +30,31 @@ function getCookie(name) {
 //  MODAL CANCELAR OPERACIÓN
 // =============================================
 
-function abrirModalCancelarOperacion(id) {
+function abrirModalCancelarOperacion(id, tipo) {
     const modal = document.getElementById('contenedor-modal-cancelar');
     const btnConfirmar = document.getElementById('boton-confirmar-cancelar');
     const textoConfirmacion = document.getElementById('texto-confirmacion-cancelar');
+    const titulo = document.getElementById('titulo-modal-cancelar');
+    const spanBtn = btnConfirmar.querySelector('span');
 
-    // Inyectamos el ID de la operación en el texto
-    textoConfirmacion.innerHTML = `¿Seguro que quiere cancelar la operacion <b>#${id}</b>? Los productos seran devueltos al stock automaticamente`;
+    const esCompra = tipo === 'compra';
+
+    // Adaptamos textos segun el tipo: en compra se quita stock, en venta se devuelve
+    if (titulo) {
+        titulo.innerText = esCompra ? 'Confirmar eliminación' : 'Confirmar cancelación';
+    }
+
+    if (esCompra) {
+        textoConfirmacion.innerHTML = `¿Seguro que quiere eliminar la compra <b>#${id}</b>? El stock que agrego sera quitado del inventario automaticamente`;
+    } else {
+        textoConfirmacion.innerHTML = `¿Seguro que quiere cancelar la operacion <b>#${id}</b>? Los productos seran devueltos al stock automaticamente`;
+    }
+
+    if (spanBtn) {
+        spanBtn.innerText = esCompra ? 'Sí, eliminar' : 'Sí, cancelar';
+        // Reseteo el texto original para que el "mantener presionado" restaure el correcto
+        delete btnConfirmar.dataset.textoOriginal;
+    }
 
     // Guardamos el ID en el botón para saber qué operación cancelar
     btnConfirmar.setAttribute('data-id', id);

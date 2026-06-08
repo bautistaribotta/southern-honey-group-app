@@ -36,7 +36,7 @@
                 <span class="material-symbols-outlined">download</span>
                 Imprimir Remito
             </a>
-            <button class="boton-accion boton-cancelar" {% if operacion.estado_pago == 'Cancelada' %}disabled style="opacity: 0.5; cursor: not-allowed;"{% else %}onclick="abrirModalCancelarOperacion('{{ operacion.id }}');"{% endif %}>
+            <button class="boton-accion boton-cancelar" {% if operacion.estado_pago == 'Cancelada' %}disabled style="opacity: 0.5; cursor: not-allowed;"{% else %}onclick="abrirModalCancelarOperacion('{{ operacion.id }}', '{{ operacion.tipo_operacion }}');"{% endif %}>
                 <span class="material-symbols-outlined">delete</span>
                 Cancelar Operación
             </button>
@@ -161,7 +161,7 @@
             <span class="material-symbols-outlined">warning</span>
         </div>
 
-        <h3>Confirmar cancelación</h3>
+        <h3 id="titulo-modal-cancelar">Confirmar cancelación</h3>
         <p id="texto-confirmacion-cancelar">¿Está seguro que desea cancelar esta operación? El stock de los productos será devuelto al inventario automáticamente.</p>
 
         <div class="acciones-modal">

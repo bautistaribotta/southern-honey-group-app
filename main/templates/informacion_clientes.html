@@ -231,8 +231,8 @@
                                     {% if operacion.estado_pago == 'Cancelada' or operacion.estado_pago == 'Pagada' %}disabled{% else %}onclick="event.stopPropagation(); abrirModalPago('{{ operacion.id }}', '{{ operacion.monto_total|default_if_none:0|stringformat:"f" }}', '{{ operacion.total_pagado|default_if_none:0|stringformat:"f" }}');"{% endif %}>
                                     <span class="material-symbols-outlined">payments</span>
                                 </button>
-                                <button class="boton-icono-tabla cancelar" title="Cancelar Operación" data-id="{{ operacion.id }}" 
-                                    {% if operacion.estado_pago == 'Cancelada' %}disabled{% else %}onclick="event.stopPropagation(); abrirModalCancelarOperacion(this.dataset.id);"{% endif %}>
+                                <button class="boton-icono-tabla cancelar" title="{% if operacion.tipo_operacion == 'compra' %}Eliminar Compra{% else %}Cancelar Venta{% endif %}" data-id="{{ operacion.id }}" data-tipo="{{ operacion.tipo_operacion }}"
+                                    {% if operacion.estado_pago == 'Cancelada' %}disabled{% else %}onclick="event.stopPropagation(); abrirModalCancelarOperacion(this.dataset.id, this.dataset.tipo);"{% endif %}>
                                     <span class="material-symbols-outlined">delete</span>
                                 </button>
                             </div>
@@ -287,7 +287,7 @@
             <span class="material-symbols-outlined">warning</span>
         </div>
 
-        <h3>Confirmar cancelación</h3>
+        <h3 id="titulo-modal-cancelar">Confirmar cancelación</h3>
         <p id="texto-confirmacion-cancelar">¿Está seguro que desea cancelar esta operación? El stock de los productos será devuelto al inventario automáticamente.</p>
 
         <div class="acciones-modal">
