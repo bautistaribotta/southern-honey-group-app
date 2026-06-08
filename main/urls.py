@@ -1,7 +1,7 @@
 from django.urls import path
 from main.views import (login, inicio, actualizar_cotizacion_ajax,
                         productos, clientes, informacion_clientes, informacion_operacion, generar_remito,
-                        operaciones, cancelar_operacion, registrar_pago, obtener_cliente_json,
+                        operaciones, compras, cancelar_operacion, registrar_pago, obtener_cliente_json,
                         obtener_producto_json, viajes, informacion_viaje, deudores, mercado_libre, cerrar_sesion, flota)
 
 """
@@ -20,6 +20,7 @@ urlpatterns = [
     path('cancelar_operacion/<int:id_operacion>/', cancelar_operacion, name="cancelar_operacion"),
     path('registrar_pago/<int:id_operacion>/', registrar_pago, name="registrar_pago"),
     path('operaciones/<int:id_cliente>/', operaciones, name="operaciones"),
+    path('compras/<int:id_cliente>/', compras, name="compras"),
     path('api/clientes/<int:id_cliente>/', obtener_cliente_json, name="obtener_cliente_json"),
     path('api/productos/<int:id_producto>/', obtener_producto_json, name="obtener_producto_json"),
     path('viajes/', viajes, name="viajes"),

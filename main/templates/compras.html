@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block nombre-pestaña %}
+  <title> Nueva Compra </title>
+{% endblock %}
+
+{% block links %}
+  <link rel="stylesheet" href="{% static 'operaciones.css' %}">
+{% endblock %}
+
+{% block cabecera %}
+  <div id="titulos-cabecera" style="display: none;">
+    <!-- Oculto el cabezal por defecto de base.html porque compras tiene el suyo propio -->
+  </div>
+{% endblock %}
+{% block area-trabajo %}
+  <!-- ÁREA DE TRABAJO -->
+  <section id="area-trabajo" class="area-operacion">
+
+    <!-- Encabezado de la vista -->
+    <div class="cabecera-operacion">
+      <a href="{% url 'informacion_clientes' cliente.id %}" class="boton-volver">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Volver al perfil
+      </a>
+      <h2 class="titulo-operacion">Nueva Compra</h2>
+      <div class="info-cliente-actual">
+        <span class="texto-gris">Cliente actual:</span>
+        <div class="badge-cliente">
+          <span class="material-symbols-outlined">person</span>
+          {{cliente.nombre}} {{cliente.apellido}}
+        </div>
+        <span class="texto-gris" style="opacity: 0.6; font-size: 0.75rem;">ID: {{cliente.id}}</span>
+      </div>
+    </div>
+
+    <!-- Contenedor Principal a 2 Columnas -->
+    <div class="grid-operacion">
+
+      <!-- COLUMNA IZQUIERDA (PRODUCTOS) -->
+      <div class="columna-productos">
+
+        <!-- Buscador -->
+        <div class="panel-buscador">
+          <div class="contenedor-input-busqueda">
+            <span class="material-symbols-outlined icono-busqueda">search</span>
+            <input type="text" class="input-busqueda" placeholder="Buscar productos por nombre o id">
+          </div>
+        </div>
+
+        <!-- Tabla de Productos Disponibles -->
+        <div id="contenedor-tabla-compras" class="contenedor-tabla shadow-sm">
+          {% include "tabla_compras_productos.html" %}
+        </div>
+      </div>
+
+      <!-- COLUMNA DERECHA (RESUMEN/CARRITO) -->
+      <div class="columna-resumen">
+        <div class="panel-resumen">
+          <div class="cabecera-resumen">
+            <h3>
+              <span class="material-symbols-outlined">shopping_cart</span>
+              Resumen de Compra
+            </h3>
+          </div>
+
+          <!-- Items Seleccionados (CARRITO COMO TABLA) -->
+          <div class="contenedor-tabla-carrito">
+            <table class="tabla-carrito">
+              <thead>
+                <tr>
+                  <th class="texto-centrado">Cant</th>
+                  <th>Producto / Precio</th>
+                  <th class="texto-derecha"></th>
+                </tr>
+              </thead>
+              <tbody id="cuerpo-carrito">
+                <!-- Los items se agregarán aquí dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Métodos de Pago -->
+          <div class="seccion-pago">
+            <p class="titulo-seccion-pago">Método de Pago</p>
+            <div class="grid-metodos-pago">
+
+              <label class="metodo-pago">
+                <input type="radio" name="metodo_pago" value="cuenta_corriente" class="hidden-radio">
+                <span class="material-symbols-outlined icono-pago">auto_stories</span>
+                <span class="metodo-texto">Cta. Corriente</span>
+              </label>
+
+              <label class="metodo-pago">
+                <input type="radio" name="metodo_pago" value="contado" class="hidden-radio">
+                <span class="material-symbols-outlined icono-pago">payments</span>
+                <span class="metodo-texto">Contado</span>
+              </label>
+
+            </div>
+          </div>
+
+          <!-- Totales -->
+          <div class="seccion-totales">
+            <div class="fila-total">
+              <span>Total</span>
+              <span class="total-destacado">$ 0.00</span>
+            </div>
+          </div>
+
+          <!-- Confirmar -->
+          <div class="seccion-confirmar">
+            <button class="boton-confirmar-operacion">
+              <span class="material-symbols-outlined">check_circle</span>
+              Confirmar Compra
+            </button>
+            <p class="texto-ayuda-confirmar">Confirmar para sumar stock y registrar la compra.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Script de interacción de los radios de método de pago -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const metodosPago = document.querySelectorAll('.metodo-pago');
+      metodosPago.forEach(label => {
+        label.addEventListener('click', function() {
+          metodosPago.forEach(l => l.classList.remove('seleccionado'));
+          this.classList.add('seleccionado');
+        });
+      });
+    });
+  </script>
+
+  <!-- Script del Carrito y Lógica de Compras -->
+  <script src="{% static 'js/compras.js' %}"></script>
+{% endblock %}

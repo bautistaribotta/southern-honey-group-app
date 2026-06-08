@@ -311,12 +311,19 @@ def informacion_clientes(request, id_cliente):
 
     operaciones_cliente = Operacion.objects.filter(cliente=cliente).prefetch_related("detalleoperacion_set__producto", "pago_set").order_by("-fecha")
 
+    # Filtro por tipo de operacion segun la pestaña activa (todas / venta / compra)
+    tipo_actual = request.GET.get("tipo", "todas")
+    if tipo_actual in ("venta", "compra"):
+        operaciones_cliente = operaciones_cliente.filter(tipo_operacion=tipo_actual)
+    else:
+        tipo_actual = "todas"
+
     # Cargo de a 5 operaciones
     paginator_operaciones = Paginator(operaciones_cliente, 5)
     pagina_numero = request.GET.get("page")
     pagina_obj = paginator_operaciones.get_page(pagina_numero)
 
-    contexto = {"cliente": cliente, "operaciones": pagina_obj}
+    contexto = {"cliente": cliente, "operaciones": pagina_obj, "tipo_actual": tipo_actual}
 
     return render(request, "informacion_clientes.html", contexto)
 
@@ -461,6 +468,65 @@ def operaciones(request, id_cliente):
         return render(request, "tabla_operaciones_productos.html", contexto)
 
     return render(request, "operaciones.html", contexto)
+
+
+@login_required
+@ensure_csrf_cookie
+def compras(request, id_cliente):
+    cliente = get_object_or_404(Cliente, id=id_cliente)
+
+    if request.method == "POST":
+        try:
+            datos = json.loads(request.body)
+            items = datos.get("items", [])
+            metodo_pago = datos.get("metodo_pago", "cuenta_corriente")  # Fallback
+
+            if not items:
+                return JsonResponse({"error": "El carrito está vacío"}, status=400)
+
+            # El tipo se fuerza a "compra"; en compra el precio viene en cada item
+            operacion = crear_operacion(cliente, items, metodo_pago, "compra")
+
+            messages.success(request, "Compra creada correctamente")
+
+            return JsonResponse(
+                {
+                    "ok": True,
+                    "id_cliente": cliente.id,
+                    "id_operacion": operacion.id,
+                }
+            )
+
+        except ValueError as e:
+            return JsonResponse({"error": str(e)}, status=400)
+        except Exception as e:
+            return JsonResponse(
+                {"error": f"Error al procesar la compra: {e}"}, status=500
+            )
+
+    # Parámetro de búsqueda
+    q = request.GET.get("q", "")
+
+    productos = Producto.objects.filter(activo=True)
+
+    if q:
+        if q.isdigit():
+            productos = productos.filter(id__icontains=q)
+        else:
+            productos = productos.filter(nombre__icontains=q)
+
+    productos = productos.order_by("nombre")
+
+    paginator_productos = Paginator(productos, 6)
+    pagina_numero = request.GET.get("page")
+    pagina_obj = paginator_productos.get_page(pagina_numero)
+
+    contexto = {"cliente": cliente, "productos": pagina_obj, "q": q}
+
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return render(request, "tabla_compras_productos.html", contexto)
+
+    return render(request, "compras.html", contexto)
 
 
 @login_required
