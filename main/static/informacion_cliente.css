@@ -430,11 +430,20 @@ html {
     background-color: var(--color-gris-claro-hover);
 }
 
+/* --- Barra superior de la tabla: pestañas a la izquierda, botones a la derecha --- */
+.barra-operaciones {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
 /* --- Pestañas para filtrar operaciones (Todas / Ventas / Compras) --- */
 .tabs-operaciones {
     display: flex;
     gap: 0.25rem;
-    margin-bottom: 1rem;
     border-bottom: 1px solid var(--stone-200);
 }
 

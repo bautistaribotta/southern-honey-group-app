@@ -152,6 +152,13 @@
     <section id="seccion-operaciones" class="contenedor-operaciones">
         <div class="encabezado-operaciones">
             <h4><span class="material-symbols-outlined">history</span> Operaciones Realizadas</h4>
+        </div>
+        <div class="barra-operaciones">
+            <div class="tabs-operaciones">
+                <a href="?tipo=todas#seccion-operaciones" class="tab-operacion {% if tipo_actual == 'todas' %}activa{% endif %}">Todas</a>
+                <a href="?tipo=venta#seccion-operaciones" class="tab-operacion {% if tipo_actual == 'venta' %}activa{% endif %}">Ventas</a>
+                <a href="?tipo=compra#seccion-operaciones" class="tab-operacion {% if tipo_actual == 'compra' %}activa{% endif %}">Compras</a>
+            </div>
             <div class="grupo-botones-operacion">
                 <a href="{% url 'compras' cliente.id %}" class="boton-nuevo boton-nuevo-compra" data-id="{{ cliente.id }}">
                     <span class="material-symbols-outlined">shopping_bag</span>
@@ -162,11 +169,6 @@
                     Nueva Venta
                 </a>
             </div>
-        </div>
-        <div class="tabs-operaciones">
-            <a href="?tipo=todas#seccion-operaciones" class="tab-operacion {% if tipo_actual == 'todas' %}activa{% endif %}">Todas</a>
-            <a href="?tipo=venta#seccion-operaciones" class="tab-operacion {% if tipo_actual == 'venta' %}activa{% endif %}">Ventas</a>
-            <a href="?tipo=compra#seccion-operaciones" class="tab-operacion {% if tipo_actual == 'compra' %}activa{% endif %}">Compras</a>
         </div>
         <div class="tabla-operaciones-container">
             <table class="tabla-operaciones">
