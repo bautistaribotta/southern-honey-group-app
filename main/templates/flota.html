@@ -244,19 +244,24 @@
 <div id="modal-eliminar-flota">
   <div class="modal-eliminar-fondo" onclick="cerrarModalEliminarFlota()"></div>
   <div class="modal-eliminar-panel">
+    <button type="button" class="modal-eliminar-cerrar" onclick="cerrarModalEliminarFlota()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
     <div class="modal-eliminar-icono">
       <span class="material-symbols-outlined">warning</span>
     </div>
     <h3>Confirmar eliminación</h3>
     <p id="texto-eliminar-flota">¿Está seguro?</p>
-    <form id="form-eliminar-flota" method="post">
+    <form id="formulario-eliminar" method="post">
       {% csrf_token %}
       <input type="hidden" name="accion" id="accion-eliminar-flota" value="">
       <input type="hidden" name="id_chofer" id="id-eliminar-chofer" disabled>
       <input type="hidden" name="id_vehiculo" id="id-eliminar-vehiculo" disabled>
       <div class="modal-eliminar-acciones">
         <button type="button" class="boton-secundario" onclick="cerrarModalEliminarFlota()">No, volver</button>
-        <button type="submit" class="boton-eliminar-confirmar">Sí, eliminar</button>
+        <button type="button" id="boton-confirmar-eliminar" class="boton-eliminar-confirmar">
+          <span>Sí, eliminar</span>
+        </button>
       </div>
     </form>
   </div>

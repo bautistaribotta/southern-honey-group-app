@@ -79,4 +79,14 @@ function abrirEliminarFlota(tipo, boton) {
 function cerrarModalEliminarFlota() {
     document.getElementById('modal-eliminar-flota').classList.remove('abierto');
     document.body.style.overflow = 'auto';
+
+    // Reseteo el estado del boton de "mantener apretado" por si quedo a medias
+    const btn = document.getElementById('boton-confirmar-eliminar');
+    if (btn) {
+        btn.classList.remove('manteniendo');
+        const span = btn.querySelector('span');
+        if (span && btn.dataset.textoOriginal) {
+            span.innerText = btn.dataset.textoOriginal;
+        }
+    }
 }
