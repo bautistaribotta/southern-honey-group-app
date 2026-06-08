@@ -7,3 +7,5 @@ db.sqlite3
 .agents/rules/explicaciones.md
 CLAUDE.md
 GEMINI.md
+.agents/skills/
+skills-lock.json
