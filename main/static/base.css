@@ -477,6 +477,7 @@ body {
 .tabla-productos th,
 .tabla-carrito th,
 .tabla-viajes th,
+.tabla-flota th,
 .tabla-productos-disponibles th {
   background-color: var(--brand-olive);
   color: var(--color-blanco);

@@ -56,7 +56,7 @@
           </a>
         </li>
         <li>
-          <a href="{% url 'viajes' %}" class="item-menu {% if request.resolver_match.url_name == 'viajes' or request.resolver_match.url_name == 'informacion_viaje' %} activo {% endif %}">
+          <a href="{% url 'viajes' %}" class="item-menu {% if request.resolver_match.url_name == 'viajes' or request.resolver_match.url_name == 'informacion_viaje' or request.resolver_match.url_name == 'flota' %} activo {% endif %}">
             <span class="material-symbols-outlined">local_shipping</span>
             Viajes
           </a>

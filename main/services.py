@@ -395,6 +395,19 @@ def crear_chofer(nombre, apellido):
 
 def editar_chofer(id_chofer, nombre, apellido, activo):
     chofer = get_object_or_404(Chofer, id=id_chofer)
+
+    # Aplico limpieza de espacios
+    nombre = nombre.strip()
+    apellido = apellido.strip()
+
+    # Valido la longitud y formato del nombre
+    if not (3 <= len(nombre) <= 25) or not REGEX_TEXTO_BASICO.match(nombre):
+        raise ValueError("El nombre debe tener entre 3 y 25 letras, sin números ni símbolos.")
+
+    # Valido la longitud y formato del apellido
+    if not (3 <= len(apellido) <= 25) or not REGEX_TEXTO_BASICO.match(apellido):
+        raise ValueError("El apellido debe tener entre 3 y 25 letras, sin números ni símbolos.")
+
     chofer.nombre = nombre
     chofer.apellido = apellido
     chofer.activo = activo
@@ -432,6 +445,19 @@ def crear_vehiculo(nombre, patente):
 
 def editar_vehiculo(id_vehiculo, nombre, patente, activo):
     vehiculo = get_object_or_404(Vehiculo, id=id_vehiculo)
+
+    # Aplico limpieza de espacios y fuerzo la patente a mayúsculas
+    nombre = nombre.strip()
+    patente = patente.strip().upper()
+
+    # Valido la longitud y formato del nombre del vehículo
+    if not (3 <= len(nombre) <= 25) or not REGEX_TEXTO_NUMEROS.match(nombre):
+        raise ValueError("El nombre del vehículo debe tener entre 3 y 25 caracteres (solo letras y números).")
+
+    # Valido la longitud y formato de la patente
+    if not patente or not REGEX_PATENTE.match(patente):
+        raise ValueError("La patente debe tener 6 o 7 caracteres alfanuméricos sin espacios.")
+
     vehiculo.nombre = nombre
     vehiculo.patente = patente
     vehiculo.activo = activo

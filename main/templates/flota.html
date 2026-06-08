@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block nombre-pestaña %}
+  <title> Choferes y Vehículos </title>
+{% endblock %}
+
+{% block links %}
+  <link rel="stylesheet" href="{% static 'viajes.css' %}">
+  <link rel="stylesheet" href="{% static 'flota.css' %}">
+{% endblock %}
+
+{% block cabecera %}
+  <div id="titulos-cabecera">
+    <h2> Choferes y Vehículos </h2>
+    <p> Gestione los choferes y vehículos disponibles para los viajes </p>
+  </div>
+{% endblock %}
+
+{% block area-trabajo %}
+<section id="area-trabajo">
+
+  <a href="{% url 'viajes' %}" class="flota-volver">
+    <span class="material-symbols-outlined">arrow_back</span>
+    Volver a Viajes
+  </a>
+
+  <div class="flota-grid">
+
+    <!-- COLUMNA CHOFERES -->
+    <section class="flota-columna">
+      <div class="flota-columna-header">
+        <h3><span class="material-symbols-outlined">badge</span> Choferes</h3>
+        <button type="button" class="boton-nuevo-flota" onclick="abrirNuevoChofer()">
+          <span class="material-symbols-outlined">person_add</span>
+          Nuevo
+        </button>
+      </div>
+      <div class="flota-tabla-container">
+        <table class="tabla-flota">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th class="col-centrada">Viajes</th>
+              <th class="col-acciones">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for chofer in choferes %}
+            <tr>
+              <td class="celda-flota-nombre">{{ chofer.nombre }} {{ chofer.apellido }}</td>
+              <td class="col-centrada">{{ chofer.total_viajes|intcomma }}</td>
+              <td class="col-acciones">
+                <button type="button" class="boton-accion-flota editar"
+                        title="Editar chofer"
+                        data-id="{{ chofer.id }}"
+                        data-nombre="{{ chofer.nombre }}"
+                        data-apellido="{{ chofer.apellido }}"
+                        onclick="abrirEditarChofer(this)">
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+                <button type="button" class="boton-accion-flota eliminar"
+                        title="Eliminar chofer"
+                        data-id="{{ chofer.id }}"
+                        data-nombre="{{ chofer.nombre }} {{ chofer.apellido }}"
+                        onclick="abrirEliminarFlota('chofer', this)">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="3" class="celda-flota-vacia">No hay choferes registrados.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- COLUMNA VEHÍCULOS -->
+    <section class="flota-columna">
+      <div class="flota-columna-header">
+        <h3><span class="material-symbols-outlined">local_shipping</span> Vehículos</h3>
+        <button type="button" class="boton-nuevo-flota" onclick="abrirNuevoVehiculo()">
+          <span class="material-symbols-outlined">add</span>
+          Nuevo
+        </button>
+      </div>
+      <div class="flota-tabla-container">
+        <table class="tabla-flota">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Patente</th>
+              <th class="col-centrada">Viajes</th>
+              <th class="col-acciones">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for vehiculo in vehiculos %}
+            <tr>
+              <td class="celda-flota-nombre">{{ vehiculo.nombre }}</td>
+              <td class="celda-flota-patente">{{ vehiculo.patente }}</td>
+              <td class="col-centrada">{{ vehiculo.total_viajes|intcomma }}</td>
+              <td class="col-acciones">
+                <button type="button" class="boton-accion-flota editar"
+                        title="Editar vehículo"
+                        data-id="{{ vehiculo.id }}"
+                        data-nombre="{{ vehiculo.nombre }}"
+                        data-patente="{{ vehiculo.patente }}"
+                        onclick="abrirEditarVehiculo(this)">
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+                <button type="button" class="boton-accion-flota eliminar"
+                        title="Eliminar vehículo"
+                        data-id="{{ vehiculo.id }}"
+                        data-nombre="{{ vehiculo.nombre }}"
+                        onclick="abrirEliminarFlota('vehiculo', this)">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4" class="celda-flota-vacia">No hay vehículos registrados.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+</section>
+
+<!-- SLIDE-OVER CHOFER (alta y edición) -->
+<div id="slide-over-chofer">
+  <div id="slide-over-fondo" onclick="cerrarSlideOver('slide-over-chofer')"></div>
+  <div id="slide-over-panel">
+    <form id="form-chofer" method="post" autocomplete="off">
+      {% csrf_token %}
+      <input type="hidden" name="accion" id="accion-chofer" value="nuevo_chofer">
+      <input type="hidden" name="id_chofer" id="id-chofer-input">
+      <header class="panel-cabecera">
+        <div class="panel-titulo-fila">
+          <div class="icono-contenedor">
+            <span class="material-symbols-outlined">badge</span>
+          </div>
+          <div class="texto-cabecera">
+            <h3 id="titulo-chofer">Nuevo Chofer</h3>
+            <p>Ingrese los datos del chofer</p>
+          </div>
+        </div>
+        <button type="button" class="boton-cerrar" onclick="cerrarSlideOver('slide-over-chofer')">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </header>
+      <main class="panel-cuerpo">
+        <section class="seccion-bloque">
+          <div class="subtitulo-formulario">
+            <span class="material-symbols-outlined">badge</span>
+            <h4>Información del chofer</h4>
+          </div>
+          <div class="sub-panel-datos">
+            <div class="grupo-input">
+              <label for="nombre-chofer">Nombre</label>
+              <input type="text" id="nombre-chofer" name="nombre_chofer" placeholder="Ej: Juan"
+                     required minlength="3" maxlength="25" pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{3,}">
+              <span class="mensaje-error">Mínimo 3 letras, sin números ni símbolos</span>
+            </div>
+            <div class="grupo-input">
+              <label for="apellido-chofer">Apellido</label>
+              <input type="text" id="apellido-chofer" name="apellido_chofer" placeholder="Ej: Perez"
+                     required minlength="3" maxlength="25" pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{3,}">
+              <span class="mensaje-error">Mínimo 3 letras, sin números ni símbolos</span>
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer class="panel-pie">
+        <button type="submit" class="boton-primario">Guardar Chofer</button>
+        <button type="button" class="boton-secundario" onclick="cerrarSlideOver('slide-over-chofer')">Cancelar</button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<!-- SLIDE-OVER VEHÍCULO (alta y edición) -->
+<div id="slide-over-vehiculo">
+  <div id="slide-over-fondo" onclick="cerrarSlideOver('slide-over-vehiculo')"></div>
+  <div id="slide-over-panel">
+    <form id="form-vehiculo" method="post" autocomplete="off">
+      {% csrf_token %}
+      <input type="hidden" name="accion" id="accion-vehiculo" value="nuevo_vehiculo">
+      <input type="hidden" name="id_vehiculo" id="id-vehiculo-input">
+      <header class="panel-cabecera">
+        <div class="panel-titulo-fila">
+          <div class="icono-contenedor">
+            <span class="material-symbols-outlined">local_shipping</span>
+          </div>
+          <div class="texto-cabecera">
+            <h3 id="titulo-vehiculo">Nuevo Vehículo</h3>
+            <p>Ingrese los datos del vehículo</p>
+          </div>
+        </div>
+        <button type="button" class="boton-cerrar" onclick="cerrarSlideOver('slide-over-vehiculo')">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </header>
+      <main class="panel-cuerpo">
+        <section class="seccion-bloque">
+          <div class="subtitulo-formulario">
+            <span class="material-symbols-outlined">info</span>
+            <h4>Información del vehículo</h4>
+          </div>
+          <div class="sub-panel-datos">
+            <div class="grupo-input">
+              <label for="nombre-vehiculo">Nombre / Modelo</label>
+              <input type="text" id="nombre-vehiculo" name="nombre_vehiculo" placeholder="Ej: Traffic Peugeot"
+                     required minlength="3" maxlength="25" pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}">
+              <span class="mensaje-error">Mínimo 3 caracteres (solo letras y números)</span>
+            </div>
+            <div class="grupo-input">
+              <label for="patente-vehiculo">Patente</label>
+              <input oninput="this.value = this.value.toUpperCase()" type="text" id="patente-vehiculo"
+                     name="patente_vehiculo" placeholder="Ej: AB123CD"
+                     required minlength="6" maxlength="7" pattern="[a-zA-Z0-9]{6,7}">
+              <span class="mensaje-error">Debe tener 6 o 7 caracteres, sin espacios ni guiones</span>
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer class="panel-pie">
+        <button type="submit" class="boton-primario">Guardar Vehículo</button>
+        <button type="button" class="boton-secundario" onclick="cerrarSlideOver('slide-over-vehiculo')">Cancelar</button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR ELIMINACIÓN -->
+<div id="modal-eliminar-flota">
+  <div class="modal-eliminar-fondo" onclick="cerrarModalEliminarFlota()"></div>
+  <div class="modal-eliminar-panel">
+    <div class="modal-eliminar-icono">
+      <span class="material-symbols-outlined">warning</span>
+    </div>
+    <h3>Confirmar eliminación</h3>
+    <p id="texto-eliminar-flota">¿Está seguro?</p>
+    <form id="form-eliminar-flota" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="accion" id="accion-eliminar-flota" value="">
+      <input type="hidden" name="id_chofer" id="id-eliminar-chofer" disabled>
+      <input type="hidden" name="id_vehiculo" id="id-eliminar-vehiculo" disabled>
+      <div class="modal-eliminar-acciones">
+        <button type="button" class="boton-secundario" onclick="cerrarModalEliminarFlota()">No, volver</button>
+        <button type="submit" class="boton-eliminar-confirmar">Sí, eliminar</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block codigo-javascript %}
+  <script src="{% static 'js/flota.js' %}"></script>
+{% endblock %}

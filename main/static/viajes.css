@@ -77,6 +77,7 @@
   font-family: inherit;
   white-space: nowrap;
   width: 170px;
+  text-decoration: none;
 }
 
 .boton-nuevo:hover {
@@ -92,6 +93,13 @@
   color: var(--slate-700);
   border: 1px solid var(--stone-200);
   box-shadow: 0 1px 2px 0 var(--color-sombra-1);
+}
+
+/* El boton de gestion de flota tiene texto mas largo: que el ancho se ajuste al contenido */
+#btn-gestionar-flota {
+  width: auto;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
 }
 
 .boton-nuevo.secundario:hover {
@@ -118,7 +126,7 @@
   /* Fila 2: Botones */
   .grupo-botones {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 0.75rem;
     width: 100%;
   }

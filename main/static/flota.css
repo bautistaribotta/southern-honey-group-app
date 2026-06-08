@@ -1,0 +1,253 @@
+/* --- GESTIÓN DE CHOFERES Y VEHÍCULOS (FLOTA) --- */
+
+.flota-volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    color: var(--slate-600);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.flota-volver:hover {
+    color: var(--brand-olive);
+}
+
+.flota-volver .material-symbols-outlined {
+    font-size: 20px;
+}
+
+/* Dos columnas lado a lado: Choferes | Vehículos */
+.flota-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.flota-columna {
+    background-color: var(--color-blanco);
+    border: 1px solid var(--stone-200);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 1px 2px var(--color-sombra-1);
+    display: flex;
+    flex-direction: column;
+}
+
+.flota-columna-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--stone-200);
+}
+
+.flota-columna-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--slate-900);
+}
+
+.flota-columna-header h3 .material-symbols-outlined {
+    color: var(--brand-olive);
+    font-size: 20px;
+}
+
+.boton-nuevo-flota {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    background-color: var(--brand-olive);
+    color: var(--color-blanco);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.boton-nuevo-flota:hover {
+    background-color: var(--color-verde-oscuro);
+}
+
+.boton-nuevo-flota .material-symbols-outlined {
+    font-size: 18px;
+}
+
+/* Tabla */
+.tabla-flota {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.tabla-flota th {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.tabla-flota td {
+    padding: 0.875rem 1.25rem;
+    border-bottom: 1px solid var(--stone-200);
+    font-size: 0.875rem;
+    color: var(--slate-700);
+}
+
+.tabla-flota tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.tabla-flota tbody tr:hover {
+    background-color: var(--color-gris-claro-hover);
+}
+
+.celda-flota-nombre {
+    font-weight: 600;
+    color: var(--slate-900);
+}
+
+.celda-flota-patente {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.03em;
+}
+
+.col-centrada {
+    text-align: center;
+}
+
+.col-acciones {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.celda-flota-vacia {
+    text-align: center;
+    padding: 2rem;
+    color: var(--slate-500);
+}
+
+/* Botones de acción por fila */
+.boton-accion-flota {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.375rem;
+    border-radius: 0.375rem;
+    color: var(--slate-500);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+}
+
+.boton-accion-flota .material-symbols-outlined {
+    font-size: 19px;
+}
+
+.boton-accion-flota.editar:hover {
+    background-color: var(--color-gris-claro-hover);
+    color: var(--brand-olive);
+}
+
+.boton-accion-flota.eliminar:hover {
+    background-color: var(--color-rojo-muy-claro);
+    color: var(--color-rojo-eliminacion);
+}
+
+/* --- MODAL CONFIRMAR ELIMINACIÓN --- */
+#modal-eliminar-flota {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+#modal-eliminar-flota.abierto {
+    display: flex;
+}
+
+.modal-eliminar-fondo {
+    position: absolute;
+    inset: 0;
+    background-color: var(--color-sombra-oscuro);
+    backdrop-filter: blur(4px);
+}
+
+.modal-eliminar-panel {
+    position: relative;
+    background-color: var(--color-blanco);
+    border-radius: 0.75rem;
+    padding: 2rem;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 10px 25px var(--color-sombra-1);
+    z-index: 1;
+}
+
+.modal-eliminar-icono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    color: var(--color-rojo-eliminacion);
+}
+
+.modal-eliminar-icono .material-symbols-outlined {
+    font-size: 40px;
+}
+
+.modal-eliminar-panel h3 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--slate-900);
+    margin-bottom: 0.5rem;
+}
+
+.modal-eliminar-panel p {
+    font-size: 0.875rem;
+    color: var(--slate-600);
+    margin-bottom: 1.5rem;
+}
+
+.modal-eliminar-acciones {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.boton-eliminar-confirmar {
+    background-color: var(--color-rojo-eliminacion);
+    color: var(--color-blanco);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.boton-eliminar-confirmar:hover {
+    opacity: 0.9;
+}
+
+/* Responsive: apilar las columnas en pantallas chicas */
+@media (max-width: 900px) {
+    .flota-grid {
+        grid-template-columns: 1fr;
+    }
+}

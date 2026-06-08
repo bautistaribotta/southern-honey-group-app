@@ -16,7 +16,8 @@ from .services import (nuevo_producto, editar_producto, eliminar_producto, nuevo
                        eliminar_cliente, get_cotizacion_dolar_oficial, get_cotizaciones, actualizar_cotizacion, obtener_datos_cliente,
                        obtener_datos_producto, modificar_stock, crear_operacion, servicio_cancelar_operacion,
                        obtener_listado_deudores, crear_chofer, crear_vehiculo, crear_viaje, obtener_choferes_activos,
-                       obtener_vehiculos_activos, obtener_viajes, editar_viaje, crear_gasto)
+                       obtener_vehiculos_activos, obtener_viajes, editar_viaje, crear_gasto,
+                       editar_chofer, eliminar_chofer, editar_vehiculo, eliminar_vehiculo)
 
 
 def login(request):
@@ -593,6 +594,55 @@ def viajes(request):
         return render(request, "viajes.html", contexto)  # Debería apuntar a una tabla parcial, pero mantenemos simple por ahora o podemos renderizar la página completa.
 
     return render(request, "viajes.html", contexto)
+
+
+@login_required
+def flota(request):
+    if request.method == "POST":
+        accion = request.POST.get("accion")
+
+        try:
+            if accion == "nuevo_chofer":
+                crear_chofer(request.POST.get("nombre_chofer", ""), request.POST.get("apellido_chofer", ""))
+                messages.success(request, "Chofer registrado exitosamente.")
+
+            elif accion == "editar_chofer":
+                editar_chofer(request.POST.get("id_chofer"), request.POST.get("nombre_chofer", ""),
+                              request.POST.get("apellido_chofer", ""), True)
+                messages.success(request, "Chofer actualizado correctamente.")
+
+            elif accion == "eliminar_chofer":
+                eliminar_chofer(request.POST.get("id_chofer"))
+                messages.success(request, "Chofer eliminado correctamente.")
+
+            elif accion == "nuevo_vehiculo":
+                crear_vehiculo(request.POST.get("nombre_vehiculo", ""), request.POST.get("patente_vehiculo", ""))
+                messages.success(request, "Vehículo registrado exitosamente.")
+
+            elif accion == "editar_vehiculo":
+                editar_vehiculo(request.POST.get("id_vehiculo"), request.POST.get("nombre_vehiculo", ""),
+                                request.POST.get("patente_vehiculo", ""), True)
+                messages.success(request, "Vehículo actualizado correctamente.")
+
+            elif accion == "eliminar_vehiculo":
+                eliminar_vehiculo(request.POST.get("id_vehiculo"))
+                messages.success(request, "Vehículo eliminado correctamente.")
+
+        except ValueError as e:
+            # Capturo cualquier error de validación proveniente de services.py
+            messages.error(request, str(e))
+        except Exception as e:
+            # Capturo errores inesperados (ej: base de datos)
+            messages.error(request, f"Ocurrió un error inesperado: {e}")
+
+        return redirect("flota")
+
+    contexto = {
+        "choferes": obtener_choferes_activos(),
+        "vehiculos": obtener_vehiculos_activos(),
+        "pestaña": "viajes",
+    }
+    return render(request, "flota.html", contexto)
 
 
 @login_required
