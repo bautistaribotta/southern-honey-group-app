@@ -16,67 +16,26 @@ body {
   width: 50%;
 }
 
-/* Todo el contenido de la izquierda */
+/* Lado izquierdo: foto del apicultor con el logo de Southern centrado encima.
+   Un velo oscuro parejo asegura que el logo blanco se lea sobre la imagen. */
 #pantalla-izquierda {
-  background: var(--brand-olive);
-  color: var(--brand-cream);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 4rem;
-}
-
-#icono-nombre {
-  display: flex;
-  flex-direction: row;
-  justify-content: start;
-  align-items: center;
-  gap: 10px;
-}
-
-#icono-panal {
-  font-size: 24px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: var(--color-crema-transparente);
+  background-image:
+    linear-gradient(oklch(0% 0 0 / 0.35), oklch(0% 0 0 / 0.35)),
+    url("login_apicultor.jpg");
+  background-size: cover;
+  background-position: center;
   display: flex;
   justify-content: center;
   align-items: center;
-  backdrop-filter: blur(12px);
+  padding: 4rem;
 }
 
-#icono-nombre h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+#logo-login {
+  width: 70%;
+  max-width: 320px;
+  height: auto;
+  filter: drop-shadow(0 2px 8px oklch(0% 0 0 / 0.45));
 }
-
-#titulo-texto {
-  display: flex;
-  flex-direction: column;
-}
-
-#titulo-texto h1 {
-  font-size: 3rem;
-  font-weight: 700;
-  line-height: 1.25;
-  margin-bottom: 0.8rem;
-}
-
-#titulo-texto p {
-  font-size: 1.125rem;
-  font-weight: 300;
-  line-height: 1.625;
-  opacity: 0.8;
-}
-
-#copyright h4 {
-  font-size: 0.875rem;
-  font-weight: 500;
-  opacity: 0.4;
-}
-
 
 /* Todo el contenido de la derecha */
 #pantalla-derecha {
@@ -276,27 +235,17 @@ body {
     width: 100%;
   }
 
-  /* Rediseño del panel izquierdo para que actúe como cabecera superior */
+  /* En móvil el panel izquierdo actúa como cabecera superior con el logo centrado */
   #pantalla-izquierda {
     padding: 2.5rem 2rem;
     height: auto;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    text-align: center;
-    gap: 1.5rem;
   }
 
-  #icono-nombre {
-    justify-content: center;
-  }
-
-  #titulo-texto {
-    display: none; /* Ocultamos completamente el texto "Staff portal" y la descripción en móviles */
-  }
-
-  #copyright {
-    display: none; /* Ocultamos el copyright arriba, ensucia el diseño móvil */
+  #logo-login {
+    width: auto;
+    max-width: 200px;
   }
 
   /* Ajustes del panel derecho (Formulario) */
