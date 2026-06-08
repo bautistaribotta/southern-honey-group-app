@@ -81,7 +81,7 @@
 }
 
 .boton-nuevo:hover {
-  background-color: var(--color-verde-oscuro);
+  background-color: var(--color-hover-boton);
 }
 
 .boton-nuevo:active {

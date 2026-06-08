@@ -121,7 +121,7 @@
 }
 
 .boton-nuevo:hover {
-  background-color: var(--color-verde-oscuro); /* un tono más oscuro de oliva */
+  background-color: var(--color-hover-boton); /* un tono más oscuro de oliva */
 }
 
 .boton-nuevo:active {
@@ -571,7 +571,7 @@
 }
 
 .boton-primario:hover {
-  background-color: var(--color-verde-oscuro);
+  background-color: var(--color-hover-boton);
   box-shadow: 0 10px 15px -3px var(--color-verde-transparente-40);
 }
 
@@ -969,7 +969,7 @@
 }
 
 .boton-verde-oliva:hover {
-  background-color: var(--color-verde-oscuro);
+  background-color: var(--color-hover-boton);
 }
 
 @media (max-width: 1200px) {

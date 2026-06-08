@@ -41,6 +41,7 @@
   --color-sombra-oscuro: oklch(0.00% 0.0000 0.00 / 0.3);
   --color-verde-transparente-20: oklch(49.55% 0.0896 126.19 / 0.2);
   --color-verde-oscuro: oklch(40.51% 0.0725 126.25);
+  --color-hover-boton: oklch(47% 0.1 80);
   --color-verde-transparente-20-alt: oklch(49.55% 0.0896 126.19 / 0.203922);
   --color-slate-900-transparente-40: oklch(20.77% 0.0398 265.75 / 0.4);
   --color-verde-medio-transparente-10: oklch(46.68% 0.0844 129.02 / 0.1);
