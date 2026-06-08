@@ -1,3 +1,15 @@
+// =============================================
+//  LÓGICA COMPARTIDA DE MODALES DE OPERACIÓN
+//  Cancelar operación y registrar pago.
+//  Se usa tanto en informacion_operacion como en informacion_clientes.
+// =============================================
+
+// Formateador de moneda en formato argentino (ej: 1.234.567,50)
+const formatoMonedaOperacion = new Intl.NumberFormat('es-AR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+});
+
 // Función auxiliar para obtener el CSRF token
 function getCookie(name) {
     let cookieValue = null;
@@ -22,13 +34,13 @@ function abrirModalCancelarOperacion(id) {
     const modal = document.getElementById('contenedor-modal-cancelar');
     const btnConfirmar = document.getElementById('boton-confirmar-cancelar');
     const textoConfirmacion = document.getElementById('texto-confirmacion-cancelar');
-    
+
     // Inyectamos el ID de la operación en el texto
     textoConfirmacion.innerHTML = `¿Seguro que quiere cancelar la operacion <b>#${id}</b>? Los productos seran devueltos al stock automaticamente`;
-    
+
     // Guardamos el ID en el botón para saber qué operación cancelar
     btnConfirmar.setAttribute('data-id', id);
-    
+
     modal.classList.add('abierto');
     document.body.style.overflow = 'hidden';
 }
@@ -36,10 +48,10 @@ function abrirModalCancelarOperacion(id) {
 function cerrarModalCancelarOperacion() {
     const modal = document.getElementById('contenedor-modal-cancelar');
     const btnConfirmar = document.getElementById('boton-confirmar-cancelar');
-    
+
     modal.classList.remove('abierto');
     document.body.style.overflow = 'auto';
-    
+
     // Limpiamos el estado del botón
     btnConfirmar.classList.remove('manteniendo');
     const span = btnConfirmar.querySelector('span');
@@ -48,11 +60,12 @@ function cerrarModalCancelarOperacion() {
     }
 }
 
+// Lógica de "mantener presionado" para confirmar la cancelación
 document.addEventListener('DOMContentLoaded', () => {
     const btnConfirmarCancelar = document.getElementById('boton-confirmar-cancelar');
     if (btnConfirmarCancelar) {
         let timeoutId;
-        
+
         const startHold = (e) => {
             if (e.type === 'mousedown' && e.button !== 0) return;
             if (e.type === 'touchstart') e.preventDefault();
@@ -65,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 span.innerText = "Mantenga presionado...";
             }
-            
+
             timeoutId = setTimeout(() => {
                 const id = btnConfirmarCancelar.getAttribute('data-id');
                 ejecutarCancelacionOperacion(id);
@@ -131,23 +144,23 @@ function abrirModalPago(idOperacion, montoTotalStr, totalPagadoStr) {
     const montoTotal = parseFloat(montoTotalStr.replace(',', '.')) || 0;
     const totalPagado = parseFloat(totalPagadoStr.replace(',', '.')) || 0;
     const restante = montoTotal - totalPagado;
-    
+
     document.getElementById('id_operacion_pago').value = idOperacion;
-    
+
     document.getElementById('titulo-modal-pago').innerHTML = `Añadir pago a la operación <b>#${idOperacion}</b>`;
-    
-    // Formatear a 2 decimales para mostrar
-    document.getElementById('monto-restante-pago').textContent = `$${restante.toFixed(2)}`;
-    
+
+    // Mostramos el restante con separador de miles
+    document.getElementById('monto-restante-pago').textContent = `$${formatoMonedaOperacion.format(restante)}`;
+
     const inputMonto = document.getElementById('input-monto-pago');
     inputMonto.value = '';
-    // Guardamos el máximo permitido (se usa en la validación)
+    // Guardamos el máximo permitido (se usa en la validación). Queda sin formato porque es el value de un input numérico
     inputMonto.max = restante.toFixed(2);
-    
+
     const modal = document.getElementById('contenedor-modal-pago');
     modal.classList.add('abierto');
     document.body.style.overflow = 'hidden';
-    
+
     // Enfocar el input después de que se abra el modal
     setTimeout(() => {
         inputMonto.focus();
@@ -172,29 +185,29 @@ function procesarPago() {
     const idOperacion = document.getElementById('id_operacion_pago').value;
     const monto = document.getElementById('input-monto-pago').value;
     const maxPermitido = document.getElementById('input-monto-pago').max;
-    
+
     if (!monto || isNaN(monto) || parseFloat(monto) <= 0) {
         if (typeof notificarError === 'function') notificarError("Ingrese un monto válido.");
         else alert("Ingrese un monto válido.");
         return;
     }
-    
+
     // Redondeamos ambos a 2 decimales para evitar problemas de precisión float
     const montoNum = Math.round(parseFloat(monto) * 100) / 100;
     const maxNum = Math.round(parseFloat(maxPermitido) * 100) / 100;
-    
+
     if (montoNum > maxNum) {
-        const err = `El monto no puede superar el restante a pagar ($${maxNum.toFixed(2)}).`;
+        const err = `El monto no puede superar el restante a pagar ($${formatoMonedaOperacion.format(maxNum)}).`;
         if (typeof notificarError === 'function') notificarError(err);
         else alert(err);
         return;
     }
-    
+
     const btn = document.getElementById('boton-confirmar-pago');
     btn.disabled = true;
     const spanOriginal = btn.innerHTML;
     btn.innerHTML = '<span>Procesando...</span>';
-    
+
     fetch(`/registrar_pago/${idOperacion}/`, {
         method: 'POST',
         headers: {
@@ -207,7 +220,7 @@ function procesarPago() {
     .then(data => {
         if(data.ok) {
             cerrarModalPago();
-            window.location.reload(); 
+            window.location.reload();
         } else {
             const err = data.error || "Hubo un error al registrar el pago.";
             if (typeof notificarError === 'function') notificarError(err);
