@@ -178,7 +178,7 @@
                                 <ul style="list-style-type: none; padding: 0; margin: 0;">
                                     {% for detalle in operacion.detalleoperacion_set.all|slice:":2" %}
                                         <li style="font-size: 0.9em; color: var(--slate-600);">
-                                            {{ detalle.cantidad|floatformat:0 }}x {{ detalle.producto.nombre }}
+                                            {{ detalle.cantidad|floatformat:"0g" }}x {{ detalle.producto.nombre }}
                                         </li>
                                     {% empty %}
                                         <li style="font-size: 0.9em; color: var(--slate-400);">Sin productos</li>
@@ -203,7 +203,7 @@
                             {% endif %}
                         </td>
                         <td class="monto-total">
-                            ${{ operacion.monto_total|floatformat:"-2" }}
+                            ${{ operacion.monto_total|floatformat:"-2g" }}
                         </td>
                         <td class="acciones-operacion" style="text-align: center;">
                             <div style="display: flex; justify-content: center; gap: 0.5rem;">

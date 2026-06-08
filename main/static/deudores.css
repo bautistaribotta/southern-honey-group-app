@@ -135,6 +135,11 @@
   border-bottom: none;
 }
 
+/* La fila lleva a la vista de la operacion al hacer click */
+.fila-deudor {
+  cursor: pointer;
+}
+
 .tabla-deudores tbody tr:hover {
   background-color: var(--color-gris-claro-hover);
   transform: translateY(-1px);

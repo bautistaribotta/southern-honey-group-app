@@ -18,8 +18,8 @@
           </div>
         </div>
       </td>
-      <td class="stock-valor">{{ producto.cantidad|floatformat:0 }}</td>
-      <td class="precio-valor font-bold">$ {{ producto.precio|floatformat:"-2" }}</td>
+      <td class="stock-valor">{{ producto.cantidad|floatformat:"0g" }}</td>
+      <td class="precio-valor font-bold">$ {{ producto.precio|floatformat:"-2g" }}</td>
       <td class="texto-derecha">
         <button class="boton-agregar-producto{% if producto.cantidad <= 0 %} boton-sin-stock{% endif %}" 
                 title="{% if producto.cantidad <= 0 %}No hay stock disponible de este producto{% else %}Añadir a la operación{% endif %}" 

@@ -367,6 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
             body: JSON.stringify({
                 items: items,
                 metodo_pago: metodoPago,
+                tipo_operacion: 'venta',
             }),
         })
             .then(response => response.json().then(data => ({ ok: response.ok, data })))

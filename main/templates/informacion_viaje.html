@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load humanize %}
 
 {% block nombre-pestaña %}
 <title>Detalles del Viaje</title>
@@ -132,14 +133,14 @@
         <div class="lista-datos" style="gap: 0; background-color: var(--color-blanco); border: 1px solid var(--stone-200); border-radius: 0.5rem; overflow: hidden;">
           <div class="dato-item doble" style="background-color: var(--color-gris-fondo-input); border-radius: 0; border-bottom: 1px dashed var(--stone-200);">
             <span class="dato-label">Inicio de Caja</span>
-            <span class="dato-valor" style="font-weight: 600; font-size: 0.875rem;">${{ viaje.inicio_caja|default:"0" }}</span>
+            <span class="dato-valor" style="font-weight: 600; font-size: 0.875rem;">${{ viaje.inicio_caja|default:0|intcomma }}</span>
           </div>
           
           <div style="display: flex; flex-direction: column; padding: 0.5rem 0; max-height: 200px; overflow-y: auto;">
             {% for gasto in viaje.detalle_gastos.all %}
             <div class="dato-item doble" style="background-color: transparent; padding: 0.375rem 0.75rem; border-radius: 0;">
               <span class="dato-label" style="color: var(--slate-600); text-transform: none; font-size: 0.8125rem;">{{ gasto.gasto }}</span>
-              <span class="dato-valor" style="color: var(--color-rojo-eliminacion); font-weight: 600; font-size: 0.875rem;">-${{ gasto.monto }}</span>
+              <span class="dato-valor" style="color: var(--color-rojo-eliminacion); font-weight: 600; font-size: 0.875rem;">-${{ gasto.monto|intcomma }}</span>
             </div>
             {% empty %}
             <div class="dato-item doble" style="background-color: transparent; justify-content: center; padding: 1rem;">
@@ -150,7 +151,7 @@
 
           <div class="dato-item doble" style="background-color: var(--color-gris-fondo-input); border-top: 1px solid var(--stone-200); border-radius: 0;">
             <span class="dato-label" style="color: var(--slate-900);">Total Restante</span>
-            <span class="dato-valor" style="font-weight: 600; font-size: 0.875rem;">${{ viaje.final_caja }}</span>
+            <span class="dato-valor" style="font-weight: 600; font-size: 0.875rem;">${{ viaje.final_caja|intcomma }}</span>
           </div>
         </div>
       </div>

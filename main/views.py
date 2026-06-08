@@ -338,9 +338,13 @@ def obtener_cliente_json(request, id_cliente):
 def informacion_operacion(request, id_operacion):
     operacion = get_object_or_404(Operacion, id=id_operacion)
             
+    from django.db.models import F
     pagos = operacion.pago_set.all().order_by("-fecha")
-    detalles = DetalleOperacion.objects.filter(operacion=operacion)
-    
+    # Anoto el subtotal por linea (cantidad * precio fijado en la operacion) para la tabla de productos
+    detalles = DetalleOperacion.objects.filter(operacion=operacion).annotate(
+        subtotal=F("cantidad") * F("precio_unitario")
+    )
+
     # Calculate rest
     from decimal import Decimal
     monto_total = operacion.monto_total or Decimal('0')
@@ -405,12 +409,13 @@ def operaciones(request, id_cliente):
             datos = json.loads(request.body)
             items = datos.get("items", [])
             metodo_pago = datos.get("metodo_pago", "cuenta_corriente")  # Fallback
+            tipo_operacion = datos.get("tipo_operacion", "venta")  # Esta vista corresponde al flujo de ventas
 
             if not items:
                 return JsonResponse({"error": "El carrito está vacío"}, status=400)
 
             # Delegamos toda la lógica de creación a la capa de servicios
-            operacion = crear_operacion(cliente, items, metodo_pago)
+            operacion = crear_operacion(cliente, items, metodo_pago, tipo_operacion)
 
             # Enviar mensaje de éxito a través del framework de mensajes de Django
             messages.success(request, "Operación creada correctamente")

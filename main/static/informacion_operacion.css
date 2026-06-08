@@ -30,6 +30,19 @@
     color: var(--slate-600);
 }
 
+.celda-producto-precio {
+    text-align: right;
+    padding-right: 1.5rem;
+    color: var(--slate-600);
+}
+
+.celda-producto-subtotal {
+    text-align: right;
+    padding-right: 1.5rem;
+    font-weight: 600;
+    color: var(--slate-900);
+}
+
 .celda-pago-fecha {
     padding-left: 1.5rem;
     color: var(--slate-600);

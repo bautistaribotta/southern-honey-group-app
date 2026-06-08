@@ -20,8 +20,8 @@
             {{ producto.categoria }}
           </span>
         </td>
-        <td class="stock-valor"> {{ producto.cantidad|floatformat:0 }} </td>
-        <td class="precio-valor"> $ {{ producto.precio|floatformat:"-2" }} </td>
+        <td class="stock-valor"> {{ producto.cantidad|floatformat:"0g" }} </td>
+        <td class="precio-valor"> $ {{ producto.precio|floatformat:"-2g" }} </td>
         <td>
           <div class="acciones-tabla">
             <button class="boton-icono agregar-stock" title="Agregar Stock" data-id="{{ producto.id }}" data-nombre="{{ producto.nombre }}" data-stock="{{ producto.cantidad|floatformat:0 }}">
