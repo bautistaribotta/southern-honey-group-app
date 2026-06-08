@@ -59,6 +59,7 @@
   --color-insumos-texto-etiqueta: oklch(39.84% 0.1773 277.37);
   --color-slate-400-transparente-10: oklch(71.07% 0.0351 256.79 / 0.1);
   --color-verde-transparente-5: oklch(49.55% 0.0896 126.19 / 0.05);
+  --color-verde-transparente-30: oklch(49.55% 0.0896 126.19 / 0.3);
   --color-verde-transparente-40: oklch(49.55% 0.0896 126.19 / 0.4);
   --font-main: 'Plus Jakarta Sans', sans-serif;
 }
@@ -464,4 +465,19 @@ body {
   #titulos-cabecera p {
     display: none;
   }
+}
+
+/* --- CABECERA UNIFICADA PARA TODAS LAS TABLAS --- */
+/* Mismo estilo de "head" oscuro de marca con texto claro en todo el sistema.
+   base.css se carga despues de los CSS de cada pagina, por lo que esta regla
+   tiene prioridad sobre el color de cabecera definido en cada tabla. */
+.tabla-clientes th,
+.tabla-deudores th,
+.tabla-operaciones th,
+.tabla-productos th,
+.tabla-carrito th,
+.tabla-viajes th,
+.tabla-productos-disponibles th {
+  background-color: var(--brand-olive);
+  color: var(--color-blanco);
 }

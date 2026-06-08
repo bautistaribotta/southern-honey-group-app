@@ -88,9 +88,11 @@
 
 .celda-pie-titulo-secundario {
     padding-left: 1.5rem;
-    color: var(--slate-700);
-    font-weight: 600;
-    border-top: 1px solid var(--stone-200);
+    color: var(--slate-900);
+    font-weight: 700;
+    font-size: 1rem;
+    background-color: var(--color-rojo-muy-claro);
+    border-top: 1px solid var(--color-rojo-borde-etiqueta);
     padding-top: 1rem;
     padding-bottom: 1rem;
 }
@@ -99,8 +101,10 @@
     text-align: right;
     padding-right: 1.5rem;
     font-weight: 700;
+    font-size: 1.125rem;
     color: var(--color-rojo-eliminacion);
-    border-top: 1px solid var(--stone-200);
+    background-color: var(--color-rojo-muy-claro);
+    border-top: 1px solid var(--color-rojo-borde-etiqueta);
     padding-top: 1rem;
     padding-bottom: 1rem;
 }
