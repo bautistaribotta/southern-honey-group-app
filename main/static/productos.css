@@ -857,7 +857,8 @@
   position: relative;
   display: flex;
   width: 100%;
-  background-color: var(--color-gris-claro-hover); /* Slate 100 */
+  background-color: var(--stone-200);
+  border: 1px solid var(--stone-300);
   border-radius: 9999px;
   padding: 0.25rem;
   box-shadow: inset 0 1px 2px var(--color-sombra-1);
@@ -877,7 +878,7 @@
   padding: 0.75rem;
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--slate-500);
+  color: var(--slate-700);
   cursor: pointer;
   z-index: 2;
   transition: color 0.3s ease;
@@ -896,29 +897,30 @@
   left: 0.25rem;
   bottom: 0.25rem;
   width: calc(50% - 0.25rem);
-  background-color: var(--color-blanco);
   border-radius: 9999px;
   box-shadow: 0 1px 3px var(--color-sombra-1);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
   z-index: 1;
 }
 
 /* Estados cuando está seleccionado Añadir */
 #accion-añadir:checked ~ .segment-background {
   transform: translateX(0);
+  background-color: var(--brand-olive);
 }
 
 #accion-añadir:checked + .segment-label {
-  color: var(--brand-olive);
+  color: var(--color-blanco);
 }
 
 /* Estados cuando está seleccionado Quitar */
 #accion-quitar:checked ~ .segment-background {
   transform: translateX(100%);
+  background-color: var(--color-rojo-eliminacion);
 }
 
 #accion-quitar:checked + .segment-label {
-  color: var(--color-rojo-eliminacion);
+  color: var(--color-blanco);
 }
 
 /* --- Input de Cantidad con unidad --- */
