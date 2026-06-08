@@ -144,6 +144,7 @@ class Cotizaciones(models.Model):
 
     class Meta:
         db_table = "cotizaciones"
+        verbose_name_plural = "Cotizaciones"
 
     def __str__(self):
         return f"Cotizacion {self.articulo}: {self.monto}"
@@ -157,6 +158,7 @@ class Chofer(models.Model):
 
     class Meta:
         db_table = "choferes"
+        verbose_name_plural = "Choferes"
         constraints = [
             models.UniqueConstraint(
                 fields=["nombre", "apellido"],
@@ -182,7 +184,7 @@ class Vehiculo(models.Model):
 
 
 class Viaje(models.Model):
-    # TODO: LLAVES FORANEAS ¿Remitos? YA DEFINIDA, VINCULAR
+    # TODO: LLAVES FORANEAS ¿Remitos/Operaciones? YA DEFINIDA, VINCULAR
     chofer = models.ForeignKey(Chofer, on_delete=models.PROTECT, db_column="id_chofer")
     vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT, db_column="id_vehiculo")
     inicio_caja = models.IntegerField(default=0)
