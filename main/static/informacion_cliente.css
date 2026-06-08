@@ -49,14 +49,13 @@ html {
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    background-color: var(--color-verde-transparente-10);
+    background-color: var(--brand-olive);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--brand-olive);
+    color: var(--color-blanco);
     font-size: 1.5rem;
     font-weight: 700;
-    border: 1px solid var(--color-verde-transparente-20);
 }
 
 .nombre-cliente-titulo {
