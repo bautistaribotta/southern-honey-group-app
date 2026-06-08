@@ -4,6 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputBusqueda = document.querySelector('.input-busqueda');
     const contenedorTabla = document.getElementById('contenedor-tabla-operaciones');
 
+    // Formateadores en formato argentino (separador de miles con punto)
+    const formatoMoneda = new Intl.NumberFormat('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const formatoCantidad = new Intl.NumberFormat('es-AR');
+
     // Clave en sessionStorage para persistir el carrito
     const STORAGE_KEY = 'carrito_operacion';
 
@@ -86,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const producto = buscarProductoEnTabla(idProducto);
         if (!producto) return;
 
-        producto.stockCell.textContent = stockDisponible;
+        producto.stockCell.textContent = formatoCantidad.format(stockDisponible);
 
         if (stockDisponible <= 0) {
             producto.boton.disabled = true;
@@ -177,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </td>
             <td>
                 <div class="item-nombre" title="${nombre}">${nombre}</div>
-                <div class="item-precio">$ ${precio.toFixed(2)} c/u</div>
+                <div class="item-precio">$ ${formatoMoneda.format(precio)} c/u</div>
             </td>
             <td class="texto-derecha">
                 <button type="button" class="boton-eliminar-item"><span class="material-symbols-outlined">delete</span></button>
@@ -239,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
             total += precio * cantidad;
         });
 
-        elementoTotal.textContent = `$ ${total.toFixed(2)}`;
+        elementoTotal.textContent = `$ ${formatoMoneda.format(total)}`;
     }
 
     // =============================================
