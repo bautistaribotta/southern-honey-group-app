@@ -5,7 +5,7 @@
 Usuario: usuario <br>
 Clave: User1234!
 
-Portal interno de gestión administrativa, control de stock, clientes y facturación desarrollado para la empresa Southern Honey Group. Este sistema centraliza las operaciones diarias, digitalizando el seguimiento de inventarios y la información financiera en tiempo real.
+Portal interno de gestión administrativa, control de stock, clientes y facturación desarrollado para la empresa Southern Honey Group. Este sistema centraliza las operaciones diarias.
 
 El proyecto es desarrollado, diseñado y mantenido de manera independiente, abarcando tanto la arquitectura del backend como el diseño de la interfaz de usuario.
 
@@ -13,10 +13,10 @@ El proyecto es desarrollado, diseñado y mantenido de manera independiente, abar
 
 ## Características Principales
 
-* **Panel de Control (Dashboard):** Visualización en tiempo real de variables económicas clave mediante la integración de APIs externas y rutinas de extracción de datos.
+* **Panel de Control (Dashboard):** Visualización en tiempo real de variables económicas clave mediante la integración de APIs externas
 * **Gestión de Inventario:** Sistema CRUD para la administración de productos (miel, alimento, cera, madera, medicamentos, etc.). 
 * **Administración de Clientes:** Registro detallado de clientes con soporte para datos de facturación
-* **Gestión de Operaciones:** Seguimiento de deudores, remitos e historial de compras utilizando un diseño de base de datos relacional para vincular clientes, operaciones y detalle de productos.
+* **Gestión de Operaciones:** Seguimiento de deudores, remitos e historial de compras/ventas utilizando un diseño de base de datos relacional para vincular clientes, operaciones, detalle de productos, etc.
 * **Autenticación y Seguridad:** Sistema de login seguro con control de sesiones, implementando decoradores de Django para restringir el acceso únicamente al personal autorizado.
 
 ---
@@ -37,7 +37,6 @@ El proyecto es desarrollado, diseñado y mantenido de manera independiente, abar
 **Integraciones Externas**
 
 * **DolarAPI:** Consumo de API RESTful (`https://dolarapi.com/v1/dolares/oficial` y `blue`) para obtener la cotización actualizada del dólar oficial y paralelo.
-* **Web Scraping (Infomiel):** Rutina automatizada sobre el sitio `infomiel.com` para la extracción en tiempo real del valor del kilogramo de miel clara y oscura, filtrando el contenido del DOM para obtener únicamente los valores numéricos limpios.
 
 **Frontend**
 
@@ -129,4 +128,4 @@ El portal estará disponible de forma local ingresando a `http://127.0.0.1:8000/
 ## Datos personales
 
 **Bautista Ribotta**
-Desarrollador Full Stack a cargo del ciclo de vida completo del software: analisis de requerimientos, diseño UI/UX, modelado de la base de datos y programación integral del backend y frontend.
+Desarrollador Full Stack a cargo del ciclo de vida completo del software: analisis de requerimientos, diseño UI/UX, modelado de la base de datos y programación del backend y frontend.
