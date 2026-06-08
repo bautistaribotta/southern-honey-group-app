@@ -313,7 +313,7 @@
 #contenedor-slide-over {
   position: fixed;
   inset: 0;
-  z-index: 100;
+  z-index: 1100; /* Por encima de la barra superior mobile (#mobile-top-bar: 1000) */
   visibility: hidden;
   overflow: hidden;
   display: flex;
