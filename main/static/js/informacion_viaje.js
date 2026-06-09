@@ -35,8 +35,14 @@ function cerrarModalGasto() {
 // Tipo de operacion elegido al abrir el modal de seleccion de cliente ('venta' | 'compra')
 let tipoOperacionSeleccionada = 'venta';
 
+// Elemento que tenia el foco antes de abrir el modal, para restaurarlo al cerrar
+let elementoFocoPrevio = null;
+// Indice de la opcion resaltada dentro de las visibles (-1 = ninguna)
+let indiceClienteResaltado = -1;
+
 function abrirModalSeleccionCliente(tipo) {
     tipoOperacionSeleccionada = tipo;
+    elementoFocoPrevio = document.activeElement;
 
     const titulo = document.getElementById('titulo-modal-cliente');
     if (titulo) {
@@ -59,6 +65,42 @@ function abrirModalSeleccionCliente(tipo) {
 function cerrarModalSeleccionCliente() {
     document.getElementById('contenedor-modal-cliente').classList.remove('abierto');
     document.body.style.overflow = 'auto';
+
+    // Devuelvo el foco al boton que abrio el modal
+    if (elementoFocoPrevio && typeof elementoFocoPrevio.focus === 'function') {
+        elementoFocoPrevio.focus();
+    }
+    elementoFocoPrevio = null;
+}
+
+// Devuelve las opciones de cliente actualmente visibles
+function clientesVisiblesModal() {
+    return Array.from(document.querySelectorAll('#lista-clientes-modal .item-cliente-modal'))
+        .filter(item => !item.hidden);
+}
+
+// Resalta la opcion en el indice dado y la expone via aria-activedescendant
+function resaltarClienteModal(indice) {
+    const input = document.getElementById('input-buscar-cliente');
+    const visibles = clientesVisiblesModal();
+
+    document.querySelectorAll('#lista-clientes-modal .item-cliente-modal').forEach(item => {
+        item.classList.remove('resaltado');
+        item.setAttribute('aria-selected', 'false');
+    });
+
+    if (indice < 0 || indice >= visibles.length) {
+        indiceClienteResaltado = -1;
+        if (input) input.setAttribute('aria-activedescendant', '');
+        return;
+    }
+
+    const item = visibles[indice];
+    item.classList.add('resaltado');
+    item.setAttribute('aria-selected', 'true');
+    item.scrollIntoView({ block: 'nearest' });
+    if (input) input.setAttribute('aria-activedescendant', item.id);
+    indiceClienteResaltado = indice;
 }
 
 // Filtra la lista de clientes del modal por nombre o apellido
@@ -78,6 +120,18 @@ function filtrarClientesModal() {
     if (sinResultados) {
         sinResultados.hidden = visibles !== 0;
     }
+
+    // Al cambiar el filtro reseteo el resaltado
+    resaltarClienteModal(-1);
+}
+
+// Navega a la operacion del cliente elegido
+function elegirClienteModal(item) {
+    if (!item) return;
+    const idCliente = item.dataset.id;
+    const idViaje = obtenerIdViaje();
+    const base = tipoOperacionSeleccionada === 'compra' ? 'compras' : 'operaciones';
+    window.location.href = `/${base}/${idCliente}/?viaje=${idViaje}`;
 }
 
 // Extrae el id del viaje desde la URL /informacion_viaje/<id>/
@@ -178,14 +232,74 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputBuscarCliente = document.getElementById('input-buscar-cliente');
     if (inputBuscarCliente) {
         inputBuscarCliente.addEventListener('input', filtrarClientesModal);
+
+        // Navegacion por teclado de la lista desde el buscador (patron combobox)
+        inputBuscarCliente.addEventListener('keydown', (evento) => {
+            const visibles = clientesVisiblesModal();
+
+            if (evento.key === 'ArrowDown') {
+                evento.preventDefault();
+                if (visibles.length === 0) return;
+                resaltarClienteModal((indiceClienteResaltado + 1) % visibles.length);
+            } else if (evento.key === 'ArrowUp') {
+                evento.preventDefault();
+                if (visibles.length === 0) return;
+                resaltarClienteModal((indiceClienteResaltado - 1 + visibles.length) % visibles.length);
+            } else if (evento.key === 'Enter') {
+                evento.preventDefault();
+                if (indiceClienteResaltado >= 0) {
+                    elegirClienteModal(visibles[indiceClienteResaltado]);
+                } else if (visibles.length === 1) {
+                    // Un solo resultado: lo elijo directamente
+                    elegirClienteModal(visibles[0]);
+                }
+            }
+        });
     }
 
     document.querySelectorAll('#lista-clientes-modal .item-cliente-modal').forEach(item => {
-        item.addEventListener('click', () => {
-            const idCliente = item.dataset.id;
-            const idViaje = obtenerIdViaje();
-            const base = tipoOperacionSeleccionada === 'compra' ? 'compras' : 'operaciones';
-            window.location.href = `/${base}/${idCliente}/?viaje=${idViaje}`;
+        item.addEventListener('click', () => elegirClienteModal(item));
+        // Resalto al pasar el mouse para mantener sincronizado el estado visual
+        item.addEventListener('mousemove', () => {
+            const visibles = clientesVisiblesModal();
+            const indice = visibles.indexOf(item);
+            if (indice !== -1 && indice !== indiceClienteResaltado) {
+                resaltarClienteModal(indice);
+            }
         });
     });
+
+    // Cierro el modal con Escape y atrapo el foco con Tab mientras esta abierto
+    const contenedorModalCliente = document.getElementById('contenedor-modal-cliente');
+    if (contenedorModalCliente) {
+        contenedorModalCliente.addEventListener('keydown', (evento) => {
+            if (!contenedorModalCliente.classList.contains('abierto')) return;
+
+            if (evento.key === 'Escape') {
+                evento.preventDefault();
+                cerrarModalSeleccionCliente();
+                return;
+            }
+
+            if (evento.key === 'Tab') {
+                const panel = document.getElementById('panel-cliente');
+                const focusables = panel.querySelectorAll(
+                    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+                );
+                const visibles = Array.from(focusables).filter(el => !el.disabled && el.offsetParent !== null);
+                if (visibles.length === 0) return;
+
+                const primero = visibles[0];
+                const ultimo = visibles[visibles.length - 1];
+
+                if (evento.shiftKey && document.activeElement === primero) {
+                    evento.preventDefault();
+                    ultimo.focus();
+                } else if (!evento.shiftKey && document.activeElement === ultimo) {
+                    evento.preventDefault();
+                    primero.focus();
+                }
+            }
+        });
+    }
 });

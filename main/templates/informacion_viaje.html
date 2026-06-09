@@ -257,34 +257,36 @@
 <div id="contenedor-modal-cliente">
   <div id="contenedor-modal-fondo-cliente" onclick="cerrarModalSeleccionCliente()"></div>
 
-  <div id="panel-cliente">
-    <button type="button" class="boton-cerrar" onclick="cerrarModalSeleccionCliente()">
-      <span class="material-symbols-outlined">close</span>
+  <div id="panel-cliente" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-cliente" aria-describedby="descripcion-modal-cliente">
+    <button type="button" class="boton-cerrar" onclick="cerrarModalSeleccionCliente()" aria-label="Cerrar selección de cliente">
+      <span class="material-symbols-outlined" aria-hidden="true">close</span>
     </button>
 
-    <div id="icono-cliente">
+    <div id="icono-cliente" aria-hidden="true">
       <span class="material-symbols-outlined">person_search</span>
     </div>
 
     <h3 id="titulo-modal-cliente">Seleccionar cliente</h3>
-    <p>Elegí el cliente para la nueva operación de este viaje.</p>
+    <p id="descripcion-modal-cliente">Elegí el cliente para la nueva operación de este viaje.</p>
 
     <div class="buscador-cliente">
-      <span class="material-symbols-outlined">search</span>
-      <input type="text" id="input-buscar-cliente" placeholder="Buscar por nombre o apellido" autocomplete="off">
+      <span class="material-symbols-outlined" aria-hidden="true">search</span>
+      <input type="text" id="input-buscar-cliente" placeholder="Buscar por nombre o apellido" autocomplete="off"
+             role="combobox" aria-expanded="true" aria-controls="lista-clientes-modal"
+             aria-label="Buscar cliente por nombre o apellido" aria-activedescendant="">
     </div>
 
-    <ul id="lista-clientes-modal">
+    <ul id="lista-clientes-modal" role="listbox" aria-label="Lista de clientes">
       {% for cliente in clientes %}
-      <li class="item-cliente-modal" data-id="{{ cliente.id }}" data-nombre="{{ cliente.nombre|lower }} {{ cliente.apellido|lower }}">
-        <span class="material-symbols-outlined">person</span>
+      <li class="item-cliente-modal" id="cliente-modal-{{ cliente.id }}" role="option" tabindex="-1" aria-selected="false" data-id="{{ cliente.id }}" data-nombre="{{ cliente.nombre|lower }} {{ cliente.apellido|lower }}">
+        <span class="material-symbols-outlined" aria-hidden="true">person</span>
         <span class="nombre-cliente-modal">{{ cliente.nombre }} {{ cliente.apellido|default:"" }}</span>
       </li>
       {% empty %}
       <li class="sin-clientes-modal">No hay clientes registrados.</li>
       {% endfor %}
     </ul>
-    <p id="sin-resultados-cliente" class="sin-clientes-modal" hidden>No se encontraron clientes.</p>
+    <p id="sin-resultados-cliente" class="sin-clientes-modal" role="status" aria-live="polite" hidden>No se encontraron clientes.</p>
   </div>
 </div>
 

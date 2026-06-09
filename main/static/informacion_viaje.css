@@ -779,8 +779,14 @@ html {
   display: none;
 }
 
-.item-cliente-modal:hover {
+.item-cliente-modal:hover,
+.item-cliente-modal.resaltado {
   background-color: var(--color-gris-fondo-input);
+}
+
+.item-cliente-modal.resaltado {
+  outline: 2px solid var(--brand-olive);
+  outline-offset: -2px;
 }
 
 .item-cliente-modal span {
