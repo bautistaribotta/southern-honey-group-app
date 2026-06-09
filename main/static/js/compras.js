@@ -293,7 +293,12 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(({ ok, data }) => {
                 if (ok && data.ok) {
                     limpiarCarritoStorage();
-                    window.location.href = `/informacion_clientes/${data.id_cliente}/`;
+                    // Si la compra vino de un viaje, volvemos al viaje; si no, al perfil del cliente
+                    if (data.id_viaje) {
+                        window.location.href = `/informacion_viaje/${data.id_viaje}/`;
+                    } else {
+                        window.location.href = `/informacion_clientes/${data.id_cliente}/`;
+                    }
                 } else {
                     avisar(data.error || 'Algo salió mal. Por favor, volvé a intentarlo.');
                     botonConfirmar.disabled = false;

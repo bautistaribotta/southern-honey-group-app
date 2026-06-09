@@ -32,6 +32,60 @@ function cerrarModalGasto() {
     }
 }
 
+// Tipo de operacion elegido al abrir el modal de seleccion de cliente ('venta' | 'compra')
+let tipoOperacionSeleccionada = 'venta';
+
+function abrirModalSeleccionCliente(tipo) {
+    tipoOperacionSeleccionada = tipo;
+
+    const titulo = document.getElementById('titulo-modal-cliente');
+    if (titulo) {
+        titulo.innerText = tipo === 'compra'
+            ? 'Seleccionar cliente para la compra'
+            : 'Seleccionar cliente para la venta';
+    }
+
+    document.getElementById('contenedor-modal-cliente').classList.add('abierto');
+    document.body.style.overflow = 'hidden';
+
+    const input = document.getElementById('input-buscar-cliente');
+    if (input) {
+        input.value = '';
+        filtrarClientesModal();
+        input.focus();
+    }
+}
+
+function cerrarModalSeleccionCliente() {
+    document.getElementById('contenedor-modal-cliente').classList.remove('abierto');
+    document.body.style.overflow = 'auto';
+}
+
+// Filtra la lista de clientes del modal por nombre o apellido
+function filtrarClientesModal() {
+    const campo = document.getElementById('input-buscar-cliente');
+    const termino = (campo ? campo.value : '').trim().toLowerCase();
+    const items = document.querySelectorAll('#lista-clientes-modal .item-cliente-modal');
+
+    let visibles = 0;
+    items.forEach(item => {
+        const coincide = item.dataset.nombre.includes(termino);
+        item.hidden = !coincide;
+        if (coincide) visibles++;
+    });
+
+    const sinResultados = document.getElementById('sin-resultados-cliente');
+    if (sinResultados) {
+        sinResultados.hidden = visibles !== 0;
+    }
+}
+
+// Extrae el id del viaje desde la URL /informacion_viaje/<id>/
+function obtenerIdViaje() {
+    const coincidencia = window.location.pathname.match(/informacion_viaje\/(\d+)/);
+    return coincidencia ? coincidencia[1] : '';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const btnEliminar = document.getElementById('boton-confirmar-eliminar');
     if (btnEliminar) {
@@ -113,4 +167,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Modal de seleccion de cliente: buscador y navegacion al carrito
+    const inputBuscarCliente = document.getElementById('input-buscar-cliente');
+    if (inputBuscarCliente) {
+        inputBuscarCliente.addEventListener('input', filtrarClientesModal);
+    }
+
+    document.querySelectorAll('#lista-clientes-modal .item-cliente-modal').forEach(item => {
+        item.addEventListener('click', () => {
+            const idCliente = item.dataset.id;
+            const idViaje = obtenerIdViaje();
+            const base = tipoOperacionSeleccionada === 'compra' ? 'compras' : 'operaciones';
+            window.location.href = `/${base}/${idCliente}/?viaje=${idViaje}`;
+        });
+    });
 });

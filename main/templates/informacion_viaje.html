@@ -9,6 +9,7 @@
 {% block links %}
 <link rel="stylesheet" href="{% static 'informacion_viaje.css' %}">
 <link rel="stylesheet" href="{% static 'viajes.css' %}">
+<link rel="stylesheet" href="{% static 'informacion_cliente.css' %}">
 {% endblock %}
 
 {% block top-header %}
@@ -166,21 +167,82 @@
             Operaciones
           </h3>
           <div class="acciones-secundarias">
-            <button class="boton-nuevo-item">
+            <button class="boton-nuevo-item compra" onclick="abrirModalSeleccionCliente('compra')">
+              <span class="material-symbols-outlined">shopping_bag</span>
+              Nueva compra
+            </button>
+            <button class="boton-nuevo-item" onclick="abrirModalSeleccionCliente('venta')">
               <span class="material-symbols-outlined">add</span>
-              Nueva Operación
+              Nueva venta
             </button>
           </div>
         </div>
-        
+
         <!-- AREA DE LISTADO -->
-        <div style="flex: 1; display: flex; flex-direction: column;">
-          <!-- Aquí irá la tabla de operaciones en el futuro, por ahora un Empty State de diseño -->
+        <div class="contenedor-listado-operaciones">
+          {% if operaciones %}
+          <div class="tabla-operaciones-container">
+            <table class="tabla-operaciones">
+              <thead>
+                <tr>
+                  <th class="th-fecha">Fecha</th>
+                  <th>Cliente</th>
+                  <th>Detalle</th>
+                  <th class="th-centrado">Tipo</th>
+                  <th class="th-centrado">Estado</th>
+                  <th class="th-monto">Monto Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for operacion in operaciones %}
+                <tr data-url="{% url 'informacion_operacion' operacion.id %}" onclick="window.location.href=this.dataset.url" class="fila-operacion">
+                  <td class="fecha-operacion">{{ operacion.fecha|date:"d/m/Y" }}</td>
+                  <td>{{ operacion.cliente.nombre }} {{ operacion.cliente.apellido|default:"" }}</td>
+                  <td>
+                    <div class="detalle-principal">
+                      <ul class="lista-detalle-operacion">
+                        {% for detalle in operacion.detalleoperacion_set.all|slice:":2" %}
+                          <li>{{ detalle.cantidad|floatformat:"0g" }}x {{ detalle.producto.nombre }}</li>
+                        {% empty %}
+                          <li class="detalle-vacio">Sin productos</li>
+                        {% endfor %}
+                        {% if operacion.detalleoperacion_set.count > 2 %}
+                          <li class="detalle-extra">... y {{ operacion.detalleoperacion_set.count|add:"-2" }} más</li>
+                        {% endif %}
+                      </ul>
+                    </div>
+                  </td>
+                  <td class="celda-centrada">
+                    {% if operacion.tipo_operacion == 'compra' %}
+                      <span class="badge-tipo-operacion compra">Compra</span>
+                    {% else %}
+                      <span class="badge-tipo-operacion venta">Venta</span>
+                    {% endif %}
+                  </td>
+                  <td class="estado celda-centrada">
+                    {% if operacion.estado_pago == 'Pagada' %}
+                      <span class="pildora-estado pagada">Pagada</span>
+                    {% elif operacion.estado_pago == 'Pago Parcial' %}
+                      <span class="pildora-estado parcial">Pago Parcial</span>
+                    {% elif operacion.estado_pago == 'Debe' %}
+                      <span class="pildora-estado debe">Debe</span>
+                    {% elif operacion.estado_pago == 'Cancelada' %}
+                      <span class="pildora-estado cancelada">Cancelada</span>
+                    {% endif %}
+                  </td>
+                  <td class="monto-total">${{ operacion.monto_total|floatformat:"-2g" }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
           <div class="estado-vacio">
             <span class="material-symbols-outlined">history_toggle_off</span>
             <h4>No hay movimientos</h4>
             <p>Aún no se han registrado operaciones en este viaje.</p>
           </div>
+          {% endif %}
         </div>
 
       </div>
@@ -189,6 +251,41 @@
   </div>
 
 </section>
+
+<!-- Modal de Seleccion de Cliente (paso previo al carrito) -->
+<div id="contenedor-modal-cliente">
+  <div id="contenedor-modal-fondo-cliente" onclick="cerrarModalSeleccionCliente()"></div>
+
+  <div id="panel-cliente">
+    <button type="button" class="boton-cerrar" onclick="cerrarModalSeleccionCliente()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+
+    <div id="icono-cliente">
+      <span class="material-symbols-outlined">person_search</span>
+    </div>
+
+    <h3 id="titulo-modal-cliente">Seleccionar cliente</h3>
+    <p>Elegí el cliente para la nueva operación de este viaje.</p>
+
+    <div class="buscador-cliente">
+      <span class="material-symbols-outlined">search</span>
+      <input type="text" id="input-buscar-cliente" placeholder="Buscar por nombre o apellido" autocomplete="off">
+    </div>
+
+    <ul id="lista-clientes-modal">
+      {% for cliente in clientes %}
+      <li class="item-cliente-modal" data-id="{{ cliente.id }}" data-nombre="{{ cliente.nombre|lower }} {{ cliente.apellido|lower }}">
+        <span class="material-symbols-outlined">person</span>
+        <span class="nombre-cliente-modal">{{ cliente.nombre }} {{ cliente.apellido|default:"" }}</span>
+      </li>
+      {% empty %}
+      <li class="sin-clientes-modal">No hay clientes registrados.</li>
+      {% endfor %}
+    </ul>
+    <p id="sin-resultados-cliente" class="sin-clientes-modal" hidden>No se encontraron clientes.</p>
+  </div>
+</div>
 
 <!-- Panel de Nuevo Gasto -->
 <form id="formulario-gasto" method="POST">

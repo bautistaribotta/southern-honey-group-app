@@ -422,17 +422,22 @@ def operaciones(request, id_cliente):
             if not items:
                 return JsonResponse({"error": "El carrito está vacío"}, status=400)
 
+            # Si la operacion se crea desde un viaje, queda asociada a el
+            id_viaje = request.GET.get("viaje")
+            viaje = get_object_or_404(Viaje, id=id_viaje) if id_viaje else None
+
             # Delegamos toda la lógica de creación a la capa de servicios
-            operacion = crear_operacion(cliente, items, metodo_pago, tipo_operacion)
+            operacion = crear_operacion(cliente, items, metodo_pago, tipo_operacion, viaje)
 
             # Enviar mensaje de éxito a través del framework de mensajes de Django
             messages.success(request, "Operación creada correctamente")
-            
+
             return JsonResponse(
                 {
                     "ok": True,
                     "id_cliente": cliente.id,
                     "id_operacion": operacion.id,
+                    "id_viaje": viaje.id if viaje else None,
                 }
             )
 
@@ -484,8 +489,12 @@ def compras(request, id_cliente):
             if not items:
                 return JsonResponse({"error": "El carrito está vacío"}, status=400)
 
+            # Si la compra se crea desde un viaje, queda asociada a el
+            id_viaje = request.GET.get("viaje")
+            viaje = get_object_or_404(Viaje, id=id_viaje) if id_viaje else None
+
             # El tipo se fuerza a "compra"; en compra el precio viene en cada item
-            operacion = crear_operacion(cliente, items, metodo_pago, "compra")
+            operacion = crear_operacion(cliente, items, metodo_pago, "compra", viaje)
 
             messages.success(request, "Compra creada correctamente")
 
@@ -494,6 +503,7 @@ def compras(request, id_cliente):
                     "ok": True,
                     "id_cliente": cliente.id,
                     "id_operacion": operacion.id,
+                    "id_viaje": viaje.id if viaje else None,
                 }
             )
 
@@ -766,11 +776,21 @@ def informacion_viaje(request, id_viaje):
 
             return redirect("informacion_viaje", id_viaje=id_viaje)
 
+    # Operaciones asociadas al viaje, para el listado
+    operaciones_viaje = (
+        viaje.operaciones
+        .select_related("cliente")
+        .prefetch_related("detalleoperacion_set__producto", "pago_set")
+        .order_by("-fecha")
+    )
+
     contexto = {
         'viaje': viaje,
         'pestaña': 'viajes',
         'choferes': obtener_choferes_activos(),
         'vehiculos': obtener_vehiculos_activos(),
+        'operaciones': operaciones_viaje,
+        'clientes': Cliente.objects.filter(activo=True).order_by("nombre", "apellido"),
     }
     return render(request, "informacion_viaje.html", contexto)
 

@@ -144,7 +144,7 @@ def eliminar_cliente(id_cliente):
     return cliente
 
 
-def crear_operacion(cliente, items, metodo_pago, tipo_operacion):
+def crear_operacion(cliente, items, metodo_pago, tipo_operacion, viaje=None):
     # Obtenemos las cotizaciones actuales antes de la transacción
     cotizacion_dolar = get_cotizacion_dolar_oficial()
     if cotizacion_dolar:
@@ -158,6 +158,7 @@ def crear_operacion(cliente, items, metodo_pago, tipo_operacion):
         # Creo la operación con las cotizaciones actuales
         operacion = Operacion.objects.create(
             cliente=cliente,
+            viaje=viaje,
             tipo_operacion=tipo_operacion,
             valor_dolar=valor_dolar,
             valor_kilo_miel=valor_miel
