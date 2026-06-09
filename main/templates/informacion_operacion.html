@@ -12,10 +12,17 @@
 
 {% block area-trabajo %}
 <div id="espacio-trabajo-cliente">
+    {% if operacion.viaje %}
+    <a href="{% url 'informacion_viaje' operacion.viaje.id %}" class="boton-volver">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Volver al viaje #{{ operacion.viaje.id }}
+    </a>
+    {% else %}
     <a href="{% url 'informacion_clientes' operacion.cliente.id %}" class="boton-volver">
         <span class="material-symbols-outlined">arrow_back</span>
         Volver al perfil de {{ operacion.cliente.nombre }} {{ operacion.cliente.apellido|default:"" }}
     </a>
+    {% endif %}
 
     <div class="cabecera-detalle">
         <div class="info-principal">
