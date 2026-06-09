@@ -1,0 +1,31 @@
+/* Desplegable de sugerencias del autocompletado de ciudades */
+
+.contenedor-autocompletado-ciudades {
+  position: relative;
+}
+
+.lista-autocompletado-ciudades {
+  position: absolute;
+  z-index: 60;
+  margin: 0;
+  padding: 0.25rem;
+  list-style: none;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--stone-200);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px oklch(0% 0 0 / 0.1);
+  max-height: 13.5rem;
+  overflow-y: auto;
+}
+
+.lista-autocompletado-ciudades li {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.lista-autocompletado-ciudades li:hover,
+.lista-autocompletado-ciudades li.resaltada {
+  background-color: var(--color-gris-fondo-input);
+}

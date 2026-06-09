@@ -7,6 +7,7 @@
 
 {% block links %}
 <link rel="stylesheet" href="{% static 'informacion_cliente.css' %}">
+<link rel="stylesheet" href="{% static 'autocompletado_ciudades.css' %}">
 <script src="{% static 'js/operacion_modales.js' %}"></script>
 <script src="{% static 'js/informacion_cliente.js' %}"></script>
 {% endblock %}
@@ -62,7 +63,7 @@
                 <div class="campo-info">
                     <label>Localidad</label>
                     <p class="valor-vista">{{ cliente.localidad|default:"N/A" }}</p>
-                    <input type="text" name="localidad" class="input-edicion" value="{{ cliente.localidad|default:'' }}" style="display: none;" maxlength="30" pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{4,}">
+                    <input type="text" name="localidad" class="input-edicion" value="{{ cliente.localidad|default:'' }}" style="display: none;" maxlength="30" pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{4,}" data-autocompletar-ciudad>
                     <span class="mensaje-error">Mínimo 4 caracteres (Solo letras y numeros)</span>
                 </div>
                 <div class="campo-info">
@@ -379,4 +380,5 @@
 {% endblock %}
 
 {% block codigo-javascript %}
+<script src="{% static 'js/autocompletado_ciudades.js' %}"></script>
 {% endblock %}

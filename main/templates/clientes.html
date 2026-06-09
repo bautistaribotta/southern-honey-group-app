@@ -7,6 +7,7 @@
 
 {% block links %}
 <link rel="stylesheet" href="{% static 'clientes.css' %}">
+<link rel="stylesheet" href="{% static 'autocompletado_ciudades.css' %}">
 {% endblock %}
 
 {% block cabecera %}
@@ -129,13 +130,14 @@
             <div class="sub-panel-datos">
               <div class="grupo-input">
                 <label for="localidad">Localidad</label>
-                <input 
-                  type="text" 
-                  id="localidad" 
-                  name="localidad" 
+                <input
+                  type="text"
+                  id="localidad"
+                  name="localidad"
                   placeholder="Ej: Córdoba Capital"
                   maxlength="30"
-                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{4,}">
+                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{4,}"
+                  data-autocompletar-ciudad>
                 <span class="mensaje-error">Mínimo 4 caracteres (Solo letras y numeros)</span>
               </div>
 
@@ -234,4 +236,5 @@
 {% block codigo-javascript %}
   <script src="{% static 'js/paneles.js' %}"></script>
   <script src="{% static 'js/clientes.js' %}"></script>
+  <script src="{% static 'js/autocompletado_ciudades.js' %}"></script>
 {% endblock %}

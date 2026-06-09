@@ -7,6 +7,7 @@
 
 {% block links %}
 <link rel="stylesheet" href="{% static 'viajes.css' %}">
+<link rel="stylesheet" href="{% static 'autocompletado_ciudades.css' %}">
 {% endblock %}
 
 {% block cabecera %}
@@ -184,14 +185,15 @@
 
               <div class="grupo-input" id="contenedor-destinos">
                 <label for="destino-viaje">Destino</label>
-                <input 
-                  type="text" 
-                  id="destino-viaje" 
-                  name="destino" 
-                  placeholder="Ej: Buenos Aires" 
+                <input
+                  type="text"
+                  id="destino-viaje"
+                  name="destino"
+                  placeholder="Ej: Buenos Aires"
                   required
                   maxlength="30"
-                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}">
+                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}"
+                  data-autocompletar-ciudad>
                 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.125rem;">
                   <button type="button" id="btn-agregar-destino" style="background: none; border: none; color: var(--brand-olive); font-weight: 600; text-align: left; cursor: pointer; padding: 0.25rem 0; font-size: 0.875rem; display: flex; align-items: center; gap: 0.25rem; width: fit-content;">
@@ -404,6 +406,7 @@
   </div>
 {% endblock %}
 {% block codigo-javascript %}
+<script src="{% static 'js/autocompletado_ciudades.js' %}"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     // Autocompletar la fecha de inicio con la fecha actual al cargar la página
@@ -431,8 +434,9 @@
         nuevoInput.maxLength = 30;
         nuevoInput.pattern = '[a-zA-ZÁÉÍÓÚáéíóúñÑ\\s\\d]{3,}';
         nuevoInput.style.marginTop = '0.5rem';
-        
+
         contenedorDestinos.insertBefore(nuevoInput, contenedorBotones);
+        inicializarAutocompletadoCiudad(nuevoInput);
 
         // Mostrar botón de quitar si hay más de 1 input
         btnQuitarDestino.style.display = 'flex';
@@ -442,7 +446,13 @@
       btnQuitarDestino.addEventListener('click', () => {
         const inputs = contenedorDestinos.querySelectorAll('input[name="destino"]');
         if (inputs.length > 1) {
-          inputs[inputs.length - 1].remove(); // Borra el último input añadido
+          // Borra el último input añadido y su lista de sugerencias asociada
+          const ultimoInput = inputs[inputs.length - 1];
+          const listaSugerencias = ultimoInput.nextElementSibling;
+          if (listaSugerencias && listaSugerencias.classList.contains('lista-autocompletado-ciudades')) {
+            listaSugerencias.remove();
+          }
+          ultimoInput.remove();
         }
         
         // Ocultar el botón de quitar si solo queda el input original

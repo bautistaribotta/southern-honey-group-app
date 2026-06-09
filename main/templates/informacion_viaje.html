@@ -8,6 +8,7 @@
 
 {% block links %}
 <link rel="stylesheet" href="{% static 'informacion_viaje.css' %}">
+<link rel="stylesheet" href="{% static 'autocompletado_ciudades.css' %}">
 <link rel="stylesheet" href="{% static 'viajes.css' %}">
 <link rel="stylesheet" href="{% static 'informacion_cliente.css' %}">
 {% endblock %}
@@ -433,24 +434,26 @@
               <div class="grupo-input" id="contenedor-destinos">
                 <label for="destino-viaje">Destino</label>
                 {% for destino in viaje.destinos.all %}
-                <input 
-                  type="text" 
-                  name="destino" 
-                  placeholder="Ej: Buenos Aires" 
+                <input
+                  type="text"
+                  name="destino"
+                  placeholder="Ej: Buenos Aires"
                   required
                   maxlength="30"
                   pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}"
                   value="{{ destino.destino }}"
+                  data-autocompletar-ciudad
                   {% if not forloop.first %}style="margin-top: 0.5rem;"{% else %}id="destino-viaje"{% endif %}>
                 {% empty %}
-                <input 
-                  type="text" 
-                  id="destino-viaje" 
-                  name="destino" 
-                  placeholder="Ej: Buenos Aires" 
+                <input
+                  type="text"
+                  id="destino-viaje"
+                  name="destino"
+                  placeholder="Ej: Buenos Aires"
                   required
                   maxlength="30"
-                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}">
+                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}"
+                  data-autocompletar-ciudad>
                 {% endfor %}
                 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.125rem;">
@@ -522,5 +525,6 @@
 {% endblock %}
 
 {% block codigo-javascript %}
+  <script src="{% static 'js/autocompletado_ciudades.js' %}"></script>
   <script src="{% static 'js/informacion_viaje.js' %}"></script>
 {% endblock %}
