@@ -610,6 +610,10 @@ html {
   flex-direction: column;
 }
 
+.contenedor-listado-operaciones .fila-operacion {
+  cursor: pointer;
+}
+
 .contenedor-listado-operaciones .th-fecha {
   padding-left: 1.5rem;
 }
