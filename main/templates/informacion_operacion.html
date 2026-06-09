@@ -39,6 +39,12 @@
                     {% endif %}
                 </h3>
                 <p class="id-cliente-subtitulo">Fecha: {{ operacion.fecha|date:"d/m/Y" }}</p>
+                {% if operacion.viaje %}
+                <a href="{% url 'informacion_viaje' operacion.viaje.id %}" class="badge-origen-viaje">
+                    <span class="material-symbols-outlined">local_shipping</span>
+                    Operación realizada en el viaje #{{ operacion.viaje.id }}
+                </a>
+                {% endif %}
             </div>
         </div>
         <div class="acciones-cliente" style="display: flex; gap: 0.75rem;">
