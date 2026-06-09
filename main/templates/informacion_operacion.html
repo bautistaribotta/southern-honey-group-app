@@ -23,7 +23,14 @@
                 <span class="material-symbols-outlined" style="color: var(--color-blanco); font-size: 28px;">receipt_long</span>
             </div>
             <div>
-                <h3 class="nombre-cliente-titulo">Operación #{{ operacion.id }}</h3>
+                <h3 class="nombre-cliente-titulo">
+                    {% if operacion.tipo_operacion == 'compra' %}Compra{% else %}Venta{% endif %} #{{ operacion.id }}
+                    {% if operacion.tipo_operacion == 'compra' %}
+                        <span class="badge-tipo-operacion compra">Compra</span>
+                    {% else %}
+                        <span class="badge-tipo-operacion venta">Venta</span>
+                    {% endif %}
+                </h3>
                 <p class="id-cliente-subtitulo">Fecha: {{ operacion.fecha|date:"d/m/Y" }}</p>
             </div>
         </div>
@@ -38,7 +45,7 @@
             </a>
             <button class="boton-accion boton-cancelar" {% if operacion.estado_pago == 'Cancelada' %}disabled style="opacity: 0.5; cursor: not-allowed;"{% else %}onclick="abrirModalCancelarOperacion('{{ operacion.id }}', '{{ operacion.tipo_operacion }}');"{% endif %}>
                 <span class="material-symbols-outlined">delete</span>
-                Cancelar Operación
+                {% if operacion.tipo_operacion == 'compra' %}Eliminar Compra{% else %}Cancelar Venta{% endif %}
             </button>
         </div>
     </div>
@@ -48,7 +55,7 @@
         <!-- Detalles de Productos -->
         <section class="contenedor-operaciones contenedor-operaciones-detalle">
             <div class="encabezado-operaciones">
-                <h4><span class="material-symbols-outlined">inventory_2</span> Productos Adquiridos</h4>
+                <h4><span class="material-symbols-outlined">inventory_2</span> {% if operacion.tipo_operacion == 'compra' %}Productos Comprados{% else %}Productos Vendidos{% endif %}</h4>
             </div>
             <div class="tabla-operaciones-container tabla-operaciones-container-detalle">
                 <table class="tabla-operaciones">
