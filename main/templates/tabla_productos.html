@@ -20,7 +20,17 @@
             {{ producto.categoria }}
           </span>
         </td>
-        <td class="stock-valor"> {{ producto.cantidad|floatformat:"0g" }} </td>
+        <td class="stock-valor texto-centrado">
+          {% if producto.cantidad == 0 %}
+            <span class="badge-estado badge-estado--danger">
+              <span class="material-symbols-outlined">warning</span> Sin stock
+            </span>
+          {% else %}
+            <span class="prod-stock">
+              <strong>{{ producto.cantidad|floatformat:"0g" }}</strong> uds
+            </span>
+          {% endif %}
+        </td>
         <td class="precio-valor"> $ {{ producto.precio|floatformat:"-2g" }} </td>
         <td>
           <div class="acciones-tabla">

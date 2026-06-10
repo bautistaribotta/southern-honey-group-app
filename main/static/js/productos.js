@@ -59,9 +59,23 @@ const vincularPaginacion = () => {
   });
 };
 
-// Asigno los eventos iniciales a los inputs y selects
+// Asigno los eventos iniciales a la busqueda y a las pildoras de categoria
 if (inputBusqueda) inputBusqueda.addEventListener('input', () => buscar());
-if (filtroCategoria) filtroCategoria.addEventListener('change', () => buscar());
+
+const chipsCategoria = document.getElementById('chips-categoria');
+if (chipsCategoria) {
+  chipsCategoria.addEventListener('click', (e) => {
+    const chip = e.target.closest('.prod-chip');
+    if (!chip) return;
+
+    chipsCategoria.querySelectorAll('.prod-chip').forEach((c) => c.classList.remove('is-active'));
+    chip.classList.add('is-active');
+
+    if (filtroCategoria) filtroCategoria.value = chip.dataset.categoria;
+    buscar();
+  });
+}
+
 vincularPaginacion();
 
 /**

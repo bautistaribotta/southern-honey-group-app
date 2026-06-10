@@ -27,26 +27,41 @@
         <input type="text" id="buscar-producto" class="input-busqueda" placeholder="Buscar productos por nombre o id"
           value="{{ q|default:'' }}">
       </div>
-
-      <div class="contenedor-filtro">
-        <select id="filtro-categoria" class="select-filtro">
-          <option value="" {% if not categoria %}selected{% endif %}>Todas las Categorías</option>
-          <option value="Miel" {% if categoria == "Miel" %}selected{% endif %}>Miel</option>
-          <option value="Alimento" {% if categoria == "Alimento" %}selected{% endif %}>Alimento</option>
-          <option value="Cera" {% if categoria == "Cera" %}selected{% endif %}>Cera</option>
-          <option value="Madera" {% if categoria == "Madera" %}selected{% endif %}>Madera</option>
-          <option value="Estampado" {% if categoria == "Estampado" %}selected{% endif %}>Estampado</option>
-          <option value="Insumos" {% if categoria == "Insumos" %}selected{% endif %}>Insumos</option>
-          <option value="Medicamentos" {% if categoria == "Medicamentos" %}selected{% endif %}>Medicamentos</option>
-          <option value="Otros" {% if categoria == "Otros" %}selected{% endif %}>Otros</option>
-        </select>
-        <span class="material-symbols-outlined icono-filtro">filter_list</span>
-      </div>
     </div>
 
     <button class="boton-nuevo" onclick="prepararPanelNuevoProducto()">
       <span class="material-symbols-outlined">add</span>
       <span class="texto-boton">Nuevo Producto</span>
+    </button>
+  </div>
+
+  <!-- Filtros de categoria como pildoras -->
+  <input type="hidden" id="filtro-categoria" value="{{ categoria|default:'' }}">
+  <div class="prod-chips" id="chips-categoria">
+    <button type="button" class="prod-chip {% if not categoria %}is-active{% endif %}" data-categoria="">Todas</button>
+    <button type="button" class="prod-chip {% if categoria == 'Miel' %}is-active{% endif %}" data-categoria="Miel">
+      <span class="prod-chip__dot prod-chip__dot--miel"></span>Miel
+    </button>
+    <button type="button" class="prod-chip {% if categoria == 'Alimento' %}is-active{% endif %}" data-categoria="Alimento">
+      <span class="prod-chip__dot prod-chip__dot--alimento"></span>Alimento
+    </button>
+    <button type="button" class="prod-chip {% if categoria == 'Cera' %}is-active{% endif %}" data-categoria="Cera">
+      <span class="prod-chip__dot prod-chip__dot--cera"></span>Cera
+    </button>
+    <button type="button" class="prod-chip {% if categoria == 'Madera' %}is-active{% endif %}" data-categoria="Madera">
+      <span class="prod-chip__dot prod-chip__dot--madera"></span>Madera
+    </button>
+    <button type="button" class="prod-chip {% if categoria == 'Estampado' %}is-active{% endif %}" data-categoria="Estampado">
+      <span class="prod-chip__dot prod-chip__dot--estampado"></span>Estampado
+    </button>
+    <button type="button" class="prod-chip {% if categoria == 'Insumos' %}is-active{% endif %}" data-categoria="Insumos">
+      <span class="prod-chip__dot prod-chip__dot--insumos"></span>Insumos
+    </button>
+    <button type="button" class="prod-chip {% if categoria == 'Medicamentos' %}is-active{% endif %}" data-categoria="Medicamentos">
+      <span class="prod-chip__dot prod-chip__dot--medicamentos"></span>Medicamentos
+    </button>
+    <button type="button" class="prod-chip {% if categoria == 'Otros' %}is-active{% endif %}" data-categoria="Otros">
+      <span class="prod-chip__dot prod-chip__dot--otros"></span>Otros
     </button>
   </div>
 
