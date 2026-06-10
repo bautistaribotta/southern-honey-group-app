@@ -640,18 +640,41 @@ def viajes(request):
 
         return redirect("viajes")
 
-    # Obtenemos todos los viajes por defecto
-    lista_viajes = obtener_viajes()
+    from django.utils import timezone
+    from django.db.models import Q
 
-    # Parámetros de filtrado
-    vehiculo_id = request.GET.get("vehiculo", "")
-    chofer_id = request.GET.get("chofer", "")
+    # Base de viajes activos (sirve para los conteos y para filtrar)
+    base_viajes = obtener_viajes()
+    hoy = timezone.localdate()
 
-    # Aplicamos los filtros si existen
-    if vehiculo_id:
-        lista_viajes = lista_viajes.filter(vehiculo_id=vehiculo_id)
-    if chofer_id:
-        lista_viajes = lista_viajes.filter(chofer_id=chofer_id)
+    # Conteos por estado, calculados sobre el total (no dependen de la búsqueda ni del chip).
+    # Un viaje está "Finalizado" si tiene fecha de vuelta y ya pasó; en otro caso, "En curso".
+    count_finalizado = base_viajes.filter(fecha_vuelta__isnull=False, fecha_vuelta__lt=hoy).count()
+    count_total = base_viajes.count()
+    count_en_curso = count_total - count_finalizado
+
+    lista_viajes = base_viajes
+
+    # Búsqueda por vehículo, chofer, destino o ID
+    q = request.GET.get("q", "")
+    if q:
+        if q.isdigit():
+            lista_viajes = lista_viajes.filter(id__icontains=q)
+        else:
+            lista_viajes = lista_viajes.filter(
+                Q(vehiculo__nombre__icontains=q)
+                | Q(vehiculo__patente__icontains=q)
+                | Q(chofer__nombre__icontains=q)
+                | Q(chofer__apellido__icontains=q)
+                | Q(destinos__destino__icontains=q)
+            ).distinct()
+
+    # Filtro por estado (chips). Replico la lógica de la property Viaje.estado en la query.
+    estado = request.GET.get("estado", "")
+    if estado == "Finalizado":
+        lista_viajes = lista_viajes.filter(fecha_vuelta__isnull=False, fecha_vuelta__lt=hoy)
+    elif estado == "En curso":
+        lista_viajes = lista_viajes.filter(Q(fecha_vuelta__isnull=True) | Q(fecha_vuelta__gte=hoy))
 
     paginator = Paginator(lista_viajes, 5)
     pagina_numero = request.GET.get("page")
@@ -661,13 +684,16 @@ def viajes(request):
         "page_obj": page_obj,
         "choferes": obtener_choferes_activos(),
         "vehiculos": obtener_vehiculos_activos(),
-        "vehiculo_actual": vehiculo_id,
-        "chofer_actual": chofer_id
+        "q": q,
+        "estado": estado,
+        "count_total": count_total,
+        "count_en_curso": count_en_curso,
+        "count_finalizado": count_finalizado,
     }
 
-    # Si es una petición AJAX, devuelvo solo la tabla (útil si hay recarga parcial en JS)
+    # Si es una petición AJAX (buscador/chips/paginación), devuelvo solo la tabla parcial
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
-        return render(request, "viajes.html", contexto)  # Debería apuntar a una tabla parcial, pero mantenemos simple por ahora o podemos renderizar la página completa.
+        return render(request, "tabla_viajes.html", contexto)
 
     return render(request, "viajes.html", contexto)
 

@@ -13,117 +13,52 @@
 {% block cabecera %}
 <div id="titulos-cabecera">
   <h2>Viajes</h2>
-  <p>Seccion dedica a ver el estado de los viajes y sus choferes</p>
+  <p>Seguí el estado de los viajes, sus choferes y la flota disponible</p>
 </div>
 {% endblock %}
 
 {% block area-trabajo %}
   <!-- ÁREA DE TRABAJO -->
   <section id="area-trabajo">
-    
-    <!-- Controles Superiores -->
-    <div class="barra-herramientas">
-      <form class="grupo-busqueda" method="GET" action="{% url 'viajes' %}" id="form-filtros">
-        <div class="contenedor-filtro">
-          <select name="vehiculo" id="filtro-vehiculo" class="select-filtro" onchange="document.getElementById('form-filtros').submit();">
-            <option value="" {% if not vehiculo_actual %}selected{% endif %}>Todos los vehículos</option>
-            {% for v in vehiculos %}
-              <option value="{{ v.id }}" {% if vehiculo_actual == v.id|stringformat:"s" %}selected{% endif %}>{{ v.nombre }}</option>
-            {% endfor %}
-          </select>
-          <span class="material-symbols-outlined icono-filtro">filter_list</span>
-        </div>
 
-        <div class="contenedor-filtro">
-          <select name="chofer" id="filtro-chofer" class="select-filtro" onchange="document.getElementById('form-filtros').submit();">
-            <option value="" {% if not chofer_actual %}selected{% endif %}>Todos los choferes</option>
-            {% for c in choferes %}
-              <option value="{{ c.id }}" {% if chofer_actual == c.id|stringformat:"s" %}selected{% endif %}>{{ c.nombre }} {{ c.apellido }}</option>
-            {% endfor %}
-          </select>
-          <span class="material-symbols-outlined icono-filtro">filter_list</span>
+    <!-- Controles Superiores: Buscador y Botones -->
+    <div class="barra-herramientas">
+      <div class="grupo-busqueda">
+        <div class="contenedor-input-busqueda">
+          <span class="material-symbols-outlined icono-busqueda">search</span>
+          <input type="text" id="buscar-viaje" class="input-busqueda" placeholder="Buscar por chofer, vehículo o destino" value="{{ q|default:'' }}">
         </div>
-      </form>
-      
+      </div>
+
       <div class="grupo-botones">
-        <button class="boton-nuevo" id="btn-nuevo-viaje" onclick="abrirSlideOver('slide-over-viaje')">
-          <span class="material-symbols-outlined">add</span>
-          <span class="texto-boton">Nuevo Viaje</span>
-        </button>
         <a class="boton-nuevo secundario" id="btn-gestionar-flota" href="{% url 'flota' %}">
           <span class="material-symbols-outlined">groups</span>
           <span class="texto-boton">Choferes y Vehículos</span>
         </a>
+        <button class="boton-nuevo" id="btn-nuevo-viaje" onclick="abrirSlideOver('slide-over-viaje')">
+          <span class="material-symbols-outlined">add</span>
+          <span class="texto-boton">Nuevo Viaje</span>
+        </button>
       </div>
     </div>
 
+    <!-- Filtros de estado como pildoras -->
+    <input type="hidden" id="filtro-estado" value="{{ estado|default:'' }}">
+    <div class="prod-chips" id="chips-estado">
+      <button type="button" class="prod-chip {% if not estado %}is-active{% endif %}" data-estado="">
+        Todos <span class="vje-chipcount">{{ count_total }}</span>
+      </button>
+      <button type="button" class="prod-chip {% if estado == 'En curso' %}is-active{% endif %}" data-estado="En curso">
+        <span class="prod-chip__dot prod-chip__dot--encurso"></span>En curso <span class="vje-chipcount">{{ count_en_curso }}</span>
+      </button>
+      <button type="button" class="prod-chip {% if estado == 'Finalizado' %}is-active{% endif %}" data-estado="Finalizado">
+        <span class="prod-chip__dot prod-chip__dot--finalizado"></span>Finalizado <span class="vje-chipcount">{{ count_finalizado }}</span>
+      </button>
+    </div>
+
     <!-- Tabla de Viajes -->
-    <div class="contenedor-tabla" id="tabla-viajes-container"> 
-      <table class="tabla-viajes">
-        <thead>
-          <tr>
-            <th class="alineado-izq">Vehículo</th>
-            <th class="alineado-izq">Chofer</th>
-            <th class="alineado-izq">Destino</th>
-            <th class="alineado-centro">Fecha de Inicio</th>
-            <th class="alineado-centro">Fecha de Regreso</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- FILAS -->
-          {% for viaje in page_obj %}
-          <tr class="fila-viaje" onclick="window.location.href='{% url 'informacion_viaje' viaje.id %}'" style="cursor: pointer;">
-            <td class="td-enlace"> 
-              <a class="enlace-fila"> 
-                <div class="vehiculo-nombre">{{ viaje.vehiculo.nombre }}</div>
-                <div class="vehiculo-patente">{{ viaje.vehiculo.patente }}</div>
-              </a> 
-            </td>
-            <td class="td-enlace"> <a class="enlace-fila"> {{ viaje.chofer.nombre }} {{ viaje.chofer.apellido }} </a> </td>
-            <td class="td-enlace"> 
-              <a class="enlace-fila" title="{% for d in viaje.destinos.all %}{{ d.destino }}{% if not forloop.last %}, {% endif %}{% endfor %}"> 
-                {% if viaje.destinos.all %}
-                  {{ viaje.destinos.first.destino }}{% if viaje.destinos.all|length > 1 %}...{% endif %}
-                {% else %}
-                  Sin destinos
-                {% endif %}
-              </a> 
-            </td>
-            <td class="td-enlace alineado-centro"> <a class="enlace-fila"> {{ viaje.fecha_inicio|date:"d/m/y" }} </a> </td>
-            <td class="td-enlace alineado-centro"> <a class="enlace-fila"> {{ viaje.fecha_vuelta|date:"d/m/y"|default:"Sin definir" }} </a> </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="5" class="alineado-centro">No hay viajes registrados.</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      
-      <!-- PAGINACION -->
-      <div class="paginacion">
-        <div class="paginacion-info">
-          Mostrando <span>{{ page_obj.start_index|default:"0" }}-{{ page_obj.end_index|default:"0" }}</span>
-          de <span>{{ page_obj.paginator.count|default:"0" }}</span> viajes
-        </div>
-        <div class="paginacion-botones">
-          {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}{% if vehiculo_actual %}&vehiculo={{ vehiculo_actual }}{% endif %}{% if chofer_actual %}&chofer={{ chofer_actual }}{% endif %}">
-              <button class="boton-paginacion">Anterior</button>
-            </a>
-          {% else %}
-            <button class="boton-paginacion" disabled>Anterior</button>
-          {% endif %}
-          
-          {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}{% if vehiculo_actual %}&vehiculo={{ vehiculo_actual }}{% endif %}{% if chofer_actual %}&chofer={{ chofer_actual }}{% endif %}">
-              <button class="boton-paginacion">Siguiente</button>
-            </a>
-          {% else %}
-            <button class="boton-paginacion" disabled>Siguiente</button>
-          {% endif %}
-        </div>
-      </div>
+    <div class="contenedor-tabla" id="tabla-viajes-container">
+      {% include 'tabla_viajes.html' %}
     </div>
 
   </section>
@@ -154,94 +89,109 @@
 
         <!-- 2. Cuerpo con Scroll -->
         <main class="panel-cuerpo">
+          <!-- Sección 1: Asignación -->
           <section class="seccion-bloque">
             <div class="subtitulo-formulario">
-              <span class="material-symbols-outlined">info</span>
-              <h4>Detalles del Viaje</h4>
+              <span class="material-symbols-outlined">group</span>
+              <h4>Asignación</h4>
             </div>
 
-            <div class="sub-panel-datos">
-              <div class="grupo-input">
-                <label for="chofer-viaje">Chofer</label>
-                <select id="chofer-viaje" name="id_chofer" required style="padding: 0.75rem 0.875rem; background-color: var(--color-gris-fondo-input); border: 1px solid var(--stone-200); border-radius: 0.75rem; font-size: 0.875rem; font-family: inherit; outline: none;">
-                  <option value="" disabled selected>Seleccione un chofer</option>
-                  {% for chofer in choferes %}
-                  <option value="{{ chofer.id }}">{{ chofer.nombre }} {{ chofer.apellido }}</option>
-                  {% endfor %}
-                </select>
-                <span class="mensaje-error">Por favor, seleccione un chofer de la lista.</span>
-              </div>
+            <div class="grupo-input">
+              <label for="chofer-viaje">Chofer</label>
+              <select id="chofer-viaje" name="id_chofer" class="select-estandar" required>
+                <option value="" disabled selected>Seleccione un chofer</option>
+                {% for chofer in choferes %}
+                <option value="{{ chofer.id }}">{{ chofer.nombre }} {{ chofer.apellido }}</option>
+                {% endfor %}
+              </select>
+              <span class="mensaje-error">Por favor, seleccione un chofer de la lista.</span>
+            </div>
 
-              <div class="grupo-input">
-                <label for="vehiculo-viaje">Vehículo</label>
-                <select id="vehiculo-viaje" name="id_vehiculo" required style="padding: 0.75rem 0.875rem; background-color: var(--color-gris-fondo-input); border: 1px solid var(--stone-200); border-radius: 0.75rem; font-size: 0.875rem; font-family: inherit; outline: none;">
-                  <option value="" disabled selected>Seleccione un vehículo</option>
-                  {% for vehiculo in vehiculos %}
-                  <option value="{{ vehiculo.id }}">{{ vehiculo.nombre }} ({{ vehiculo.patente }})</option>
-                  {% endfor %}
-                </select>
-                <span class="mensaje-error">Por favor, seleccione un vehículo de la lista.</span>
-              </div>
+            <div class="grupo-input">
+              <label for="vehiculo-viaje">Vehículo</label>
+              <select id="vehiculo-viaje" name="id_vehiculo" class="select-estandar" required>
+                <option value="" disabled selected>Seleccione un vehículo</option>
+                {% for vehiculo in vehiculos %}
+                <option value="{{ vehiculo.id }}">{{ vehiculo.nombre }} ({{ vehiculo.patente }})</option>
+                {% endfor %}
+              </select>
+              <span class="mensaje-error">Por favor, seleccione un vehículo de la lista.</span>
+            </div>
+          </section>
 
-              <div class="grupo-input" id="contenedor-destinos">
-                <label for="destino-viaje">Destino</label>
+          <!-- Sección 2: Recorrido -->
+          <section class="seccion-bloque">
+            <div class="subtitulo-formulario">
+              <span class="material-symbols-outlined">location_on</span>
+              <h4>Recorrido</h4>
+            </div>
+
+            <div class="grupo-input" id="contenedor-destinos">
+              <label for="destino-viaje">Destinos</label>
+              <input
+                type="text"
+                id="destino-viaje"
+                name="destino"
+                placeholder="Ej: Buenos Aires"
+                required
+                maxlength="30"
+                pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}"
+                data-autocompletar-ciudad>
+
+              <div class="vje-destacciones">
+                <button type="button" id="btn-agregar-destino" class="vje-addbtn">
+                  <span class="material-symbols-outlined">add_circle</span>
+                  Añadir un destino
+                </button>
+                <button type="button" id="btn-quitar-destino" class="vje-removebtn">
+                  <span class="material-symbols-outlined">do_not_disturb_on</span>
+                  Quitar destino
+                </button>
+              </div>
+              <span class="mensaje-error">Mínimo 3 caracteres (Solo letras y números)</span>
+            </div>
+          </section>
+
+          <!-- Sección 3: Caja y fechas -->
+          <section class="seccion-bloque">
+            <div class="subtitulo-formulario">
+              <span class="material-symbols-outlined">event</span>
+              <h4>Caja y fechas</h4>
+            </div>
+
+            <div class="grupo-input">
+              <label for="inicio-caja">Inicio de Caja</label>
+              <div class="input-con-icono">
+                <span>$</span>
                 <input
-                  type="text"
-                  id="destino-viaje"
-                  name="destino"
-                  placeholder="Ej: Buenos Aires"
+                  type="number"
+                  id="inicio-caja"
+                  name="inicio_caja"
+                  placeholder="0"
+                  step="1"
+                  min="0"
                   required
-                  maxlength="30"
-                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}"
-                  data-autocompletar-ciudad>
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.125rem;">
-                  <button type="button" id="btn-agregar-destino" style="background: none; border: none; color: var(--brand-olive); font-weight: 600; text-align: left; cursor: pointer; padding: 0.25rem 0; font-size: 0.875rem; display: flex; align-items: center; gap: 0.25rem; width: fit-content;">
-                    <span class="material-symbols-outlined" style="font-size: 18px;">add_circle</span>
-                    Añadir un destino
-                  </button>
-                  <button type="button" id="btn-quitar-destino" style="background: none; border: none; color: var(--color-rojo-eliminacion); font-weight: 600; text-align: right; cursor: pointer; padding: 0.25rem 0; font-size: 0.875rem; display: none; align-items: center; gap: 0.25rem; width: fit-content;">
-                    <span class="material-symbols-outlined" style="font-size: 18px;">do_not_disturb_on</span>
-                    Quitar destino
-                  </button>
-                </div>
-                <span class="mensaje-error">Mínimo 3 caracteres (Solo letras y números)</span>
+                  pattern="[0-9+]">
               </div>
+              <span class="mensaje-error">Por favor, ingrese un monto válido.</span>
+            </div>
 
-              <div class="grupo-input">
-                <label for="inicio-caja-viaje">Inicio de Caja</label>
-                <div class="input-con-icono">
-                  <span>$</span>
-                  <input 
-                    type="number" 
-                    id="inicio-caja" 
-                    name="inicio_caja" 
-                    placeholder="0"
-                    step="1"
-                    min="0"
-                    required
-                    pattern="[0-9+]">
-                </div>
-                <span class="mensaje-error">Por favor, ingrese un monto válido.</span>
-              </div>
-
+            <div class="vje-grid2">
               <div class="grupo-input">
                 <label for="fecha-inicio-viaje">Fecha de Inicio</label>
-                <input 
-                  type="date" 
-                  id="fecha-inicio-viaje" 
-                  name="fecha_inicio_viaje" 
+                <input
+                  type="date"
+                  id="fecha-inicio-viaje"
+                  name="fecha_inicio_viaje"
                   required>
                 <span class="mensaje-error">Por favor, seleccione una fecha válida.</span>
               </div>
 
               <div class="grupo-input">
-                <div style="display: flex; justify-content: start;">
-                  <label for="fecha-regreso-viaje">Fecha de Regreso (Opcional)</label>
-                </div>
-                <input 
-                  type="date" 
-                  id="fecha-regreso-viaje" 
+                <label for="fecha-regreso-viaje">Regreso (opcional)</label>
+                <input
+                  type="date"
+                  id="fecha-regreso-viaje"
                   name="fecha_regreso_viaje">
                 <span class="mensaje-error">La fecha ingresada no es válida.</span>
               </div>
@@ -257,156 +207,10 @@
       </form>
     </div>
   </div>
-
-  <!-- PANEL LATERAL NUEVO CHOFER (SLIDE-OVER) -->
-  <div id="slide-over-chofer">
-    <div id="slide-over-fondo" onclick="cerrarSlideOver('slide-over-chofer')"></div>
-
-    <div id="slide-over-panel">
-      <form id="form-chofer" method="post" autocomplete="off">
-        {% csrf_token %}
-        <input type="hidden" name="accion" value="nuevo_chofer">
-        <!-- 1. Cabecera -->
-        <header class="panel-cabecera">
-          <div class="panel-titulo-fila">
-            <div class="icono-contenedor">
-              <span class="material-symbols-outlined">person_add</span>
-            </div>
-            <div class="texto-cabecera">
-              <h3>Nuevo Chofer</h3>
-              <p>Ingrese los datos para el registro</p>
-            </div>
-          </div>
-          <button type="button" class="boton-cerrar" onclick="cerrarSlideOver('slide-over-chofer')">
-            <span class="material-symbols-outlined">close</span>
-          </button>
-        </header>
-
-        <!-- 2. Cuerpo con Scroll -->
-        <main class="panel-cuerpo">
-          <section class="seccion-bloque">
-            <div class="subtitulo-formulario">
-              <span class="material-symbols-outlined">badge</span>
-              <h4>Información del chofer</h4>
-            </div>
-
-            <div class="sub-panel-datos">
-              <div class="grupo-input">
-                <label for="nombre-chofer">Nombre</label>
-                <input 
-                  type="text"
-                  id="nombre-chofer" 
-                  name="nombre_chofer" 
-                  placeholder="Ej: Juan" 
-                  required
-                  minlength="3"
-                  maxlength="25"
-                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{3,}">
-                <span class="mensaje-error">Mínimo 3 letras, sin números ni símbolos</span>
-              </div>
-
-              <div class="grupo-input">
-                <label for="apellido-chofer">Apellido</label>
-                <input 
-                  type="text" 
-                  id="apellido-chofer" 
-                  name="apellido_chofer" 
-                  placeholder="Ej: Perez"
-                  required
-                  minlength="3"
-                  maxlength="25"
-                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{3,}">
-                <span class="mensaje-error">Mínimo 3 letras, sin números ni símbolos</span>
-              </div>
-            </div>
-          </section>
-        </main>
-
-        <!-- 3. Pie del Panel -->
-        <footer class="panel-pie">
-          <button type="submit" class="boton-primario">Guardar Chofer</button>
-          <button type="button" class="boton-secundario" onclick="cerrarSlideOver('slide-over-chofer')">Cancelar</button>
-        </footer>
-      </form>
-    </div>
-  </div>
-
-  <!-- PANEL LATERAL NUEVO VEHÍCULO (SLIDE-OVER) -->
-  <div id="slide-over-vehiculo">
-    <div id="slide-over-fondo" onclick="cerrarSlideOver('slide-over-vehiculo')"></div>
-
-    <div id="slide-over-panel">
-      <form id="form-vehiculo" method="post" autocomplete="off">
-        {% csrf_token %}
-        <input type="hidden" name="accion" value="nuevo_vehiculo">
-        <!-- 1. Cabecera -->
-        <header class="panel-cabecera">
-          <div class="panel-titulo-fila">
-            <div class="icono-contenedor">
-              <span class="material-symbols-outlined">local_shipping</span>
-            </div>
-            <div class="texto-cabecera">
-              <h3>Nuevo Vehículo</h3>
-              <p>Ingrese los datos para el registro</p>
-            </div>
-          </div>
-          <button type="button" class="boton-cerrar" onclick="cerrarSlideOver('slide-over-vehiculo')">
-            <span class="material-symbols-outlined">close</span>
-          </button>
-        </header>
-
-        <!-- 2. Cuerpo con Scroll -->
-        <main class="panel-cuerpo">
-          <section class="seccion-bloque">
-            <div class="subtitulo-formulario">
-              <span class="material-symbols-outlined">info</span>
-              <h4>Información del vehículo</h4>
-            </div>
-
-            <div class="sub-panel-datos">
-              <div class="grupo-input">
-                <label for="nombre-vehiculo">Nombre / Modelo</label>
-                <input 
-                  type="text" 
-                  id="nombre-vehiculo" 
-                  name="nombre_vehiculo" 
-                  placeholder="Ej: Traffic Peugeot" 
-                  required
-                  minlength="3"
-                  maxlength="30"
-                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}">
-                <span class="mensaje-error">Mínimo 3 caracteres (Solo letras y números)</span>
-              </div>
-
-              <div class="grupo-input">
-                <label for="patente-vehiculo">Patente</label>
-                <input 
-                  oninput="this.value = this.value.toUpperCase()"
-                  type="text" 
-                  id="patente-vehiculo" 
-                  name="patente_vehiculo" 
-                  placeholder="Ej: AB123CD"
-                  required
-                  minlength="6"
-                  maxlength="7"
-                  pattern="[a-zA-Z0-9]{6,7}">
-                <span class="mensaje-error">Debe tener 6 o 7 caracteres, sin espacios ni guiones</span>
-              </div>
-            </div>
-          </section>
-        </main>
-
-        <!-- 3. Pie del Panel -->
-        <footer class="panel-pie">
-          <button type="submit" class="boton-primario">Guardar Vehículo</button>
-          <button type="button" class="boton-secundario" onclick="cerrarSlideOver('slide-over-vehiculo')">Cancelar</button>
-        </footer>
-      </form>
-    </div>
-  </div>
 {% endblock %}
 {% block codigo-javascript %}
 <script src="{% static 'js/autocompletado_ciudades.js' %}"></script>
+<script src="{% static 'js/viajes.js' %}"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     // Autocompletar la fecha de inicio con la fecha actual al cargar la página
@@ -420,7 +224,7 @@
     const btnAgregarDestino = document.getElementById('btn-agregar-destino');
     const btnQuitarDestino = document.getElementById('btn-quitar-destino');
     const contenedorDestinos = document.getElementById('contenedor-destinos');
-    
+
     if (btnAgregarDestino && btnQuitarDestino && contenedorDestinos) {
       const contenedorBotones = btnAgregarDestino.parentElement;
 
@@ -454,7 +258,7 @@
           }
           ultimoInput.remove();
         }
-        
+
         // Ocultar el botón de quitar si solo queda el input original
         if (inputs.length - 1 <= 1) {
           btnQuitarDestino.style.display = 'none';

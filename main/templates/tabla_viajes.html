@@ -1,0 +1,91 @@
+<table class="tabla-viajes">
+  <thead>
+    <tr>
+      <th class="alineado-izq">Vehículo</th>
+      <th class="alineado-izq">Chofer</th>
+      <th class="alineado-izq">Destinos</th>
+      <th class="alineado-izq">Período</th>
+      <th class="alineado-centro">Estado</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for viaje in page_obj %}
+    <tr class="fila-viaje" onclick="window.location.href='{% url 'informacion_viaje' viaje.id %}'">
+      <td>
+        <div class="vje-veh">
+          <span class="vje-veh__tile"><span class="material-symbols-outlined">local_shipping</span></span>
+          <div>
+            <div class="vehiculo-nombre">{{ viaje.vehiculo.nombre }}</div>
+            <span class="vje-veh__pat">{{ viaje.vehiculo.patente }}</span>
+          </div>
+        </div>
+      </td>
+      <td>
+        <div class="vje-chofer">
+          <span class="vje-avatar">{{ viaje.chofer.nombre|first|upper }}{{ viaje.chofer.apellido|first|upper }}</span>
+          <span class="vje-chofer__name">{{ viaje.chofer.nombre }} {{ viaje.chofer.apellido }}</span>
+        </div>
+      </td>
+      <td>
+        <div class="vje-dest" title="{% for d in viaje.destinos.all %}{{ d.destino }}{% if not forloop.last %}, {% endif %}{% endfor %}">
+          <span class="material-symbols-outlined vje-dest__pin">location_on</span>
+          {% if viaje.destinos.all %}
+            <span class="vje-dest__first">{{ viaje.destinos.first.destino }}</span>
+            {% if viaje.destinos.all|length > 1 %}
+              <span class="vje-dest__more">+{{ viaje.destinos.all|length|add:"-1" }}</span>
+            {% endif %}
+          {% else %}
+            <span class="vje-dest__first">Sin destino</span>
+          {% endif %}
+        </div>
+      </td>
+      <td>
+        <span class="vje-fechas">
+          {{ viaje.fecha_inicio|date:"d/m/y" }}
+          <span class="material-symbols-outlined">arrow_forward</span>
+          {% if viaje.fecha_vuelta %}{{ viaje.fecha_vuelta|date:"d/m/y" }}{% else %}<span class="vje-fechas__open">en curso</span>{% endif %}
+        </span>
+      </td>
+      <td class="alineado-centro">
+        {% if viaje.estado == "Finalizado" %}
+          <span class="vje-badge vje-badge--neutral"><span class="vje-badge__dot"></span>Finalizado</span>
+        {% else %}
+          <span class="vje-badge vje-badge--info"><span class="vje-badge__dot"></span>En curso</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="5" class="celda-vacia">
+        <span class="material-symbols-outlined">explore_off</span>
+        No se encontraron viajes con esos filtros.
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- PAGINACION -->
+<div class="paginacion">
+  <div class="paginacion-info">
+    Mostrando <span>{{ page_obj.start_index|default:"0" }}-{{ page_obj.end_index|default:"0" }}</span>
+    de <span>{{ page_obj.paginator.count|default:"0" }}</span> viajes
+  </div>
+  <div class="paginacion-botones">
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if estado %}&estado={{ estado }}{% endif %}">
+        <button class="boton-paginacion">Anterior</button>
+      </a>
+    {% else %}
+      <button class="boton-paginacion" disabled>Anterior</button>
+    {% endif %}
+
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if estado %}&estado={{ estado }}{% endif %}">
+        <button class="boton-paginacion">Siguiente</button>
+      </a>
+    {% else %}
+      <button class="boton-paginacion" disabled>Siguiente</button>
+    {% endif %}
+  </div>
+</div>
