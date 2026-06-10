@@ -19,77 +19,162 @@
 {% block area-trabajo %}
   <!-- Área de Trabajo -->
   <section id="area-trabajo">
-    <div id="contenedor-cotizaciones">
-      
-      <div id="superior">
-        <article class="tarjeta-info">
-          <h3>Dolar oficial compra</h3>
-          <p>$ {{oficial.compra}}</p>
-        </article>
+    <div class="ini-board-wrap">
 
-        <article class="tarjeta-info">
-          <h3>Dolar oficial venta</h3>
-          <p>$ {{oficial.venta}}</p>
-        </article>
-      </div>
-
-      <div id="inferior">
-        <article class="tarjeta-info" data-articulo="Miel 34mm">
-          <h3>Miel 34mm</h3>
-          <p>$ <span class="monto">{{ cotizaciones.Miel_34mm }}</span></p>
-        </article>
-
-        <article class="tarjeta-info" data-articulo="Miel 50mm"> 
-          <h3>Miel 50mm</h3>
-          <p>$ <span class="monto">{{ cotizaciones.Miel_50mm }}</span></p>
-        </article>
-
-        <article class="tarjeta-info" data-articulo="Miel +50mm"> 
-          <h3>Miel +50mm</h3>
-          <p>$ <span class="monto">{{ cotizaciones.Miel_plus50mm }}</span></p>
-        </article>
-
-        <article class="tarjeta-info" data-articulo="Cera Operculo"> 
-          <h3>Cera Operculo</h3>
-          <p>$ <span class="monto">{{ cotizaciones.Cera_Operculo }}</span></p>
-        </article>
-
-        <article class="tarjeta-info" data-articulo="Cera Recupero"> 
-          <h3>Cera Recupero</h3>
-          <p>$ <span class="monto">{{ cotizaciones.Cera_Recupero }}</span></p>
-        </article>
-      </div>
-
-      </div>
+      <!-- Panel de referencia del dolar oficial -->
+      <section class="ini-dolar ini-dolar--pino">
+        <div class="ini-dolar__id">
+          <span class="ini-dolar__eyebrow">Referencia</span>
+          <h3 class="ini-dolar__title">Dolar oficial</h3>
+          <span class="ini-dolar__src">
+            <span class="material-symbols-outlined">account_balance</span>
+            Banco Nacion - BNA
+          </span>
+        </div>
+        <div class="ini-dolar__quotes">
+          <div class="ini-dolar__q">
+            <span class="ini-dolar__qlabel">Compra</span>
+            <span class="ini-dolar__qval"><i>$</i>{{ oficial.compra }}</span>
+          </div>
+          <div class="ini-dolar__divider"></div>
+          <div class="ini-dolar__q">
+            <span class="ini-dolar__qlabel">Venta</span>
+            <span class="ini-dolar__qval"><i>$</i>{{ oficial.venta }}</span>
+          </div>
+        </div>
       </section>
+
+      <!-- Grupo: Miel -->
+      <div class="ini-group">
+        <div class="ini-group__head">
+          <span class="ini-group__glyph material-symbols-outlined">water_drop</span>
+          <h3>Miel</h3>
+          <span class="ini-group__count">3 articulos - por kilogramo</span>
+        </div>
+        <div class="ini-board">
+          <article class="ini-tile" data-articulo="Miel 34mm">
+            <div class="ini-tile__head">
+              <span class="ini-tile__glyph"><span class="material-symbols-outlined">water_drop</span></span>
+              <div class="ini-tile__id"><h4>Miel 34mm</h4></div>
+              <span class="ini-tile__edit material-symbols-outlined">edit</span>
+            </div>
+            <div class="ini-tile__pricewrap">
+              <div class="ini-tile__price">
+                <span class="ini-tile__prefix">$</span>
+                <span class="ini-tile__amount monto">{{ cotizaciones.Miel_34mm }}</span>
+                <span class="ini-tile__unit">/kg</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="ini-tile" data-articulo="Miel 50mm">
+            <div class="ini-tile__head">
+              <span class="ini-tile__glyph"><span class="material-symbols-outlined">water_drop</span></span>
+              <div class="ini-tile__id"><h4>Miel 50mm</h4></div>
+              <span class="ini-tile__edit material-symbols-outlined">edit</span>
+            </div>
+            <div class="ini-tile__pricewrap">
+              <div class="ini-tile__price">
+                <span class="ini-tile__prefix">$</span>
+                <span class="ini-tile__amount monto">{{ cotizaciones.Miel_50mm }}</span>
+                <span class="ini-tile__unit">/kg</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="ini-tile" data-articulo="Miel +50mm">
+            <div class="ini-tile__head">
+              <span class="ini-tile__glyph"><span class="material-symbols-outlined">water_drop</span></span>
+              <div class="ini-tile__id"><h4>Miel +50mm</h4></div>
+              <span class="ini-tile__edit material-symbols-outlined">edit</span>
+            </div>
+            <div class="ini-tile__pricewrap">
+              <div class="ini-tile__price">
+                <span class="ini-tile__prefix">$</span>
+                <span class="ini-tile__amount monto">{{ cotizaciones.Miel_plus50mm }}</span>
+                <span class="ini-tile__unit">/kg</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <!-- Grupo: Cera -->
+      <div class="ini-group">
+        <div class="ini-group__head">
+          <span class="ini-group__glyph material-symbols-outlined">hexagon</span>
+          <h3>Cera</h3>
+          <span class="ini-group__count">2 articulos - por kilogramo</span>
+        </div>
+        <div class="ini-board">
+          <article class="ini-tile" data-articulo="Cera Operculo">
+            <div class="ini-tile__head">
+              <span class="ini-tile__glyph"><span class="material-symbols-outlined">hexagon</span></span>
+              <div class="ini-tile__id"><h4>Cera Operculo</h4></div>
+              <span class="ini-tile__edit material-symbols-outlined">edit</span>
+            </div>
+            <div class="ini-tile__pricewrap">
+              <div class="ini-tile__price">
+                <span class="ini-tile__prefix">$</span>
+                <span class="ini-tile__amount monto">{{ cotizaciones.Cera_Operculo }}</span>
+                <span class="ini-tile__unit">/kg</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="ini-tile" data-articulo="Cera Recupero">
+            <div class="ini-tile__head">
+              <span class="ini-tile__glyph"><span class="material-symbols-outlined">hexagon</span></span>
+              <div class="ini-tile__id"><h4>Cera Recupero</h4></div>
+              <span class="ini-tile__edit material-symbols-outlined">edit</span>
+            </div>
+            <div class="ini-tile__pricewrap">
+              <div class="ini-tile__price">
+                <span class="ini-tile__prefix">$</span>
+                <span class="ini-tile__amount monto">{{ cotizaciones.Cera_Recupero }}</span>
+                <span class="ini-tile__unit">/kg</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <p class="ini-foot">Valores expresados en pesos argentinos por kilogramo.</p>
+
+    </div>
+  </section>
 
       <script src="{% static 'js/notifications.js' %}"></script>
       <script>
       document.addEventListener('DOMContentLoaded', function() {
-      const tarjetas = document.querySelectorAll('.tarjeta-info[data-articulo]');
+      const tarjetas = document.querySelectorAll('.ini-tile[data-articulo]');
 
       tarjetas.forEach(tarjeta => {
-        tarjeta.style.cursor = 'pointer';
 
         tarjeta.addEventListener('click', function(e) {
           const montoSpan = this.querySelector('.monto');
           if (this.querySelector('input')) return; // Evitar múltiples inputs
 
-          const valorActual = montoSpan.textContent;
+          const valorActual = montoSpan.textContent.trim();
           const input = document.createElement('input');
           input.type = 'number';
           input.step = '1';
           input.value = valorActual;
           input.className = 'input-edicion';
-          input.style.width = '100px';
-          input.style.fontSize = 'inherit';
-          input.style.textAlign = 'center';
 
           montoSpan.style.display = 'none';
-          montoSpan.parentNode.appendChild(input);
+          montoSpan.parentNode.insertBefore(input, montoSpan);
+          this.classList.add('is-editing');
           input.focus();
+          input.select();
 
           let guardando = false;
+
+          const restaurar = () => {
+            input.remove();
+            montoSpan.style.display = 'inline';
+            this.classList.remove('is-editing');
+          };
 
           const guardar = () => {
             if (guardando) return;
@@ -99,8 +184,7 @@
             const articulo = this.dataset.articulo;
 
             if (nuevoValor === valorActual) {
-              input.remove();
-              montoSpan.style.display = 'inline';
+              restaurar();
               guardando = false;
               return;
             }
@@ -124,20 +208,21 @@
               } else {
                 notificarError('Error al actualizar: ' + data.error);
               }
-              input.remove();
-              montoSpan.style.display = 'inline';
+              restaurar();
             })
             .catch(error => {
               console.error('Error:', error);
               notificarError('Error de conexión');
-              input.remove();
-              montoSpan.style.display = 'inline';
+              restaurar();
             });
           };
 
-          input.addEventListener('keypress', function(e) {
+          input.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
               guardar();
+            } else if (e.key === 'Escape') {
+              guardando = true; // Evitar que el blur dispare un guardado
+              restaurar();
             }
           });
 
