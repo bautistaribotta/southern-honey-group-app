@@ -7,24 +7,18 @@
 {% endblock %}
 
 {% block links %}
-  <link rel="stylesheet" href="{% static 'viajes.css' %}">
   <link rel="stylesheet" href="{% static 'flota.css' %}">
 {% endblock %}
 
 {% block cabecera %}
-  <div id="titulos-cabecera">
-    <h2> Choferes y Vehículos </h2>
-    <p> Gestione los choferes y vehículos disponibles para los viajes </p>
-  </div>
-{% endblock %}
-
-{% block area-trabajo %}
-<section id="area-trabajo">
-
   <a href="{% url 'viajes' %}" class="flota-volver">
     <span class="material-symbols-outlined">arrow_back</span>
     Volver a Viajes
   </a>
+{% endblock %}
+
+{% block area-trabajo %}
+<section id="area-trabajo">
 
   <div class="flota-grid">
 
@@ -163,19 +157,17 @@
             <span class="material-symbols-outlined">badge</span>
             <h4>Información del chofer</h4>
           </div>
-          <div class="sub-panel-datos">
-            <div class="grupo-input">
-              <label for="nombre-chofer">Nombre</label>
-              <input type="text" id="nombre-chofer" name="nombre_chofer" placeholder="Ej: Juan"
-                     required minlength="3" maxlength="25" pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{3,}">
-              <span class="mensaje-error">Mínimo 3 letras, sin números ni símbolos</span>
-            </div>
-            <div class="grupo-input">
-              <label for="apellido-chofer">Apellido</label>
-              <input type="text" id="apellido-chofer" name="apellido_chofer" placeholder="Ej: Perez"
-                     required minlength="3" maxlength="25" pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{3,}">
-              <span class="mensaje-error">Mínimo 3 letras, sin números ni símbolos</span>
-            </div>
+          <div class="grupo-input">
+            <label for="nombre-chofer">Nombre</label>
+            <input type="text" id="nombre-chofer" name="nombre_chofer" placeholder="Ej: Juan"
+                   required minlength="3" maxlength="25" pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{3,}">
+            <span class="mensaje-error">Mínimo 3 letras, sin números ni símbolos</span>
+          </div>
+          <div class="grupo-input">
+            <label for="apellido-chofer">Apellido</label>
+            <input type="text" id="apellido-chofer" name="apellido_chofer" placeholder="Ej: Perez"
+                   required minlength="3" maxlength="25" pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{3,}">
+            <span class="mensaje-error">Mínimo 3 letras, sin números ni símbolos</span>
           </div>
         </section>
       </main>
@@ -215,20 +207,18 @@
             <span class="material-symbols-outlined">info</span>
             <h4>Información del vehículo</h4>
           </div>
-          <div class="sub-panel-datos">
-            <div class="grupo-input">
-              <label for="nombre-vehiculo">Nombre / Modelo</label>
-              <input type="text" id="nombre-vehiculo" name="nombre_vehiculo" placeholder="Ej: Traffic Peugeot"
-                     required minlength="3" maxlength="25" pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}">
-              <span class="mensaje-error">Mínimo 3 caracteres (solo letras y números)</span>
-            </div>
-            <div class="grupo-input">
-              <label for="patente-vehiculo">Patente</label>
-              <input oninput="this.value = this.value.toUpperCase()" type="text" id="patente-vehiculo"
-                     name="patente_vehiculo" placeholder="Ej: AB123CD"
-                     required minlength="6" maxlength="7" pattern="[a-zA-Z0-9]{6,7}">
-              <span class="mensaje-error">Debe tener 6 o 7 caracteres, sin espacios ni guiones</span>
-            </div>
+          <div class="grupo-input">
+            <label for="nombre-vehiculo">Nombre / Modelo</label>
+            <input type="text" id="nombre-vehiculo" name="nombre_vehiculo" placeholder="Ej: Traffic Peugeot"
+                   required minlength="3" maxlength="25" pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}">
+            <span class="mensaje-error">Mínimo 3 caracteres (solo letras y números)</span>
+          </div>
+          <div class="grupo-input">
+            <label for="patente-vehiculo">Patente</label>
+            <input oninput="this.value = this.value.toUpperCase()" type="text" id="patente-vehiculo"
+                   name="patente_vehiculo" placeholder="Ej: AB123CD"
+                   required minlength="6" maxlength="7" pattern="[a-zA-Z0-9]{6,7}">
+            <span class="mensaje-error">Debe tener 6 o 7 caracteres, sin espacios ni guiones</span>
           </div>
         </section>
       </main>
