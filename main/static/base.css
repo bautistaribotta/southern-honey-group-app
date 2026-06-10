@@ -71,7 +71,13 @@
   --honey-600: oklch(73.643% 0.1545 76.330);   /* dorado hover */
   --sand-50: oklch(98.223% 0.0110 89.721);     /* crema, texto sobre pino */
   --sand-300: oklch(86.287% 0.0316 86.465);    /* texto item inactivo */
+  --sand-200: oklch(92.283% 0.0239 88.239);    /* bordes muy sutiles */
+  --sand-500: oklch(62.987% 0.0425 87.546);    /* texto tenue / placeholder */
+  --sand-600: oklch(50.855% 0.0434 90.707);    /* texto secundario */
+  --sand-700: oklch(39.222% 0.0362 90.381);    /* texto de labels */
+  --sand-800: oklch(29.504% 0.0268 88.715);    /* texto fuerte */
   --honey-tint-10: oklch(82.165% 0.1702 78.880 / 0.12); /* fondo item activo */
+  --honey-tint-20: oklch(82.165% 0.1702 78.880 / 0.22); /* anillo de foco */
   --blanco-transparente-6: oklch(100% 0 0 / 0.06);      /* hover item */
 }
 
