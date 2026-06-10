@@ -12,15 +12,20 @@ body {
   display: flex;
 }
 
-#pantalla-izquierda, #pantalla-derecha {
-  width: 50%;
+/* La imagen ocupa mas espacio que el formulario para que sea protagonista */
+#pantalla-izquierda {
+  width: 58%;
+}
+
+#pantalla-derecha {
+  width: 42%;
 }
 
 /* Lado izquierdo: foto del apicultor con el logo de Southern centrado encima.
    Un velo con tinte pino parejo asegura que el logo blanco se lea sobre la imagen. */
 #pantalla-izquierda {
   background-image:
-    linear-gradient(oklch(20.493% 0.0261 168.787 / 0.42), oklch(20.493% 0.0261 168.787 / 0.42)),
+    linear-gradient(oklch(20.493% 0.0261 168.787 / 0.28), oklch(20.493% 0.0261 168.787 / 0.28)),
     url("login_apicultor.webp");
   background-size: cover;
   background-position: center;
@@ -46,9 +51,11 @@ body {
   padding: 2rem;
 }
 
+/* max-width en rem para que el formulario crezca junto con el tamano de
+   fuente base en pantallas grandes (1440px y 1920px) y no se vea chico */
 #contenedor-formulario {
   width: 100%;
-  max-width: 440px;
+  max-width: 27.5rem;
 }
 
 #encabezado-formulario {
@@ -185,6 +192,13 @@ body {
   transform: translateY(-1px);
   box-shadow: 0 20px 25px -5px oklch(20.493% 0.0261 168.787 / 0.22);
   background-color: var(--pine-950);
+}
+
+/* Efecto de "apretado": el boton baja y achica al hacer click */
+#boton-ingreso:active {
+  transform: translateY(1px) scale(0.97);
+  box-shadow: 0 3px 6px -2px oklch(20.493% 0.0261 168.787 / 0.25);
+  transition-duration: 0.08s;
 }
 
 #pie-formulario {
