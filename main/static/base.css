@@ -63,6 +63,16 @@
   --color-verde-transparente-30: oklch(49.55% 0.0896 126.19 / 0.3);
   --color-verde-transparente-40: oklch(49.55% 0.0896 126.19 / 0.4);
   --font-main: 'Plus Jakarta Sans', sans-serif;
+
+  /* ---- Marca corregida (isologo): pino + miel + arena ---- */
+  --pine-900: oklch(25.391% 0.0349 170.220);   /* verde pino estructural (sidebar) */
+  --pine-950: oklch(20.493% 0.0261 168.787);   /* texto sobre dorado */
+  --honey-500: oklch(82.165% 0.1702 78.880);   /* dorado miel (accion/activo) */
+  --honey-600: oklch(73.643% 0.1545 76.330);   /* dorado hover */
+  --sand-50: oklch(98.223% 0.0110 89.721);     /* crema, texto sobre pino */
+  --sand-300: oklch(86.287% 0.0316 86.465);    /* texto item inactivo */
+  --honey-tint-10: oklch(82.165% 0.1702 78.880 / 0.12); /* fondo item activo */
+  --blanco-transparente-6: oklch(100% 0 0 / 0.06);      /* hover item */
 }
 
 * {
@@ -81,8 +91,8 @@ body {
 
 #barra-lateral {
   width: 280px;
-  background-color: var(--brand-olive);
-  color: var(--brand-cream);
+  background-color: var(--pine-900);
+  color: var(--sand-50);
   display: flex;
   flex-direction: column;
   padding: 2.5rem 1.5rem;
@@ -125,21 +135,48 @@ body {
 }
 
 .item-menu {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 1rem 1.25rem;
-  color: var(--stone-300);
+  padding: 0.8rem 1.1rem;
+  color: var(--sand-300);
   text-decoration: none;
   font-size: 1rem;
   font-weight: 500;
   border-radius: 0.75rem;
-  transition: all 0.2s;
+  transition: background-color 0.2s, color 0.2s;
 }
 
-.item-menu:hover, .item-menu.activo {
-  background-color: var(--color-crema-transparente);
+.item-menu .material-symbols-outlined {
+  font-size: 1.4rem;
+}
+
+.item-menu:hover {
+  background-color: var(--blanco-transparente-6);
+  color: var(--sand-50);
+}
+
+.item-menu.activo {
+  background-color: var(--honey-tint-10);
   color: var(--brand-cream);
+  font-weight: 600;
+}
+
+.item-menu.activo .material-symbols-outlined {
+  color: var(--honey-500);
+}
+
+.item-menu.activo::before {
+  content: "";
+  position: absolute;
+  left: -1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 1.4rem;
+  border-radius: 0 9999px 9999px 0;
+  background-color: var(--honey-500);
 }
 
 #contenido-principal {
@@ -384,7 +421,7 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 1rem 1.5rem;
-    background-color: var(--brand-olive);
+    background-color: var(--pine-900);
     color: var(--brand-cream);
     z-index: 1000;
   }
