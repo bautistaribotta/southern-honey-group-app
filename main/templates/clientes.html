@@ -31,8 +31,8 @@
       </div>
       
       <button class="boton-nuevo" onclick="prepararPanelNuevoCliente()">
-        <span class="material-symbols-outlined">add</span>
-        Nuevo Cliente
+        <span class="material-symbols-outlined">person_add</span>
+        <span class="texto-boton">Nuevo Cliente</span>
       </button>
     </div>
 
@@ -76,47 +76,45 @@
               <h4>Información Personal</h4>
             </div>
 
-            <div class="sub-panel-datos">
-              <div class="grupo-input">
-                <label for="nombre">Nombre</label>
-                <input 
-                  type="text" 
-                  id="nombre" 
-                  name="nombre" 
-                  placeholder="Ej: Antonio" 
+            <div class="grupo-input">
+              <label for="nombre">Nombre</label>
+              <input
+                type="text"
+                id="nombre"
+                name="nombre"
+                placeholder="Ej: Antonio"
+                required
+                maxlength="26"
+                pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{3,26}">
+              <span class="mensaje-error">Mínimo 3 letras, máximo 26, sin números ni símbolos</span>
+            </div>
+
+            <div class="grupo-input">
+              <label for="apellido">Apellido</label>
+              <input
+                type="text"
+                id="apellido"
+                name="apellido"
+                placeholder="Ej: Garcia"
+                maxlength="26"
+                pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{2,26}">
+              <span class="mensaje-error">Mínimo 2 letras, máximo 26, sin números ni símbolos</span>
+            </div>
+
+            <div class="grupo-input">
+              <label for="telefono">Teléfono</label>
+              <div class="input-con-icono">
+                <span class="material-symbols-outlined">call</span>
+                <input
+                  type="number"
+                  id="telefono"
+                  name="telefono"
+                  placeholder="Ej: 02302..."
                   required
-                  maxlength="26"
-                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{3,26}">
-                <span class="mensaje-error">Mínimo 3 letras, máximo 26, sin números ni símbolos</span>
+                  maxlength="16"
+                  pattern="[\d]{6,}">
               </div>
-
-              <div class="grupo-input">
-                <label for="apellido">Apellido</label>
-                <input 
-                  type="text" 
-                  id="apellido" 
-                  name="apellido" 
-                  placeholder="Ej: Garcia"
-                  maxlength="26"
-                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]{2,26}">
-                <span class="mensaje-error">Mínimo 2 letras, máximo 26, sin números ni símbolos</span>
-              </div>
-
-              <div class="grupo-input">
-                <label for="telefono">Teléfono</label>
-                <div class="input-con-icono">
-                  <span class="material-symbols-outlined">call</span>
-                  <input 
-                    type="number" 
-                    id="telefono" 
-                    name="telefono" 
-                    placeholder="Ej: 02302..." 
-                    required
-                    maxlength="16"
-                    pattern="[\d]{6,}">
-                </div>
-                <span class="mensaje-error">Mínimo 6 números, sin letras ni símbolos</span>
-              </div>
+              <span class="mensaje-error">Mínimo 6 números, sin letras ni símbolos</span>
             </div>
           </section>
 
@@ -127,31 +125,29 @@
               <h4>Ubicación</h4>
             </div>
 
-            <div class="sub-panel-datos">
-              <div class="grupo-input">
-                <label for="localidad">Localidad</label>
-                <input
-                  type="text"
-                  id="localidad"
-                  name="localidad"
-                  placeholder="Ej: Córdoba Capital"
-                  maxlength="30"
-                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{4,}"
-                  data-autocompletar-ciudad>
-                <span class="mensaje-error">Mínimo 4 caracteres (Solo letras y numeros)</span>
-              </div>
+            <div class="grupo-input">
+              <label for="localidad">Localidad</label>
+              <input
+                type="text"
+                id="localidad"
+                name="localidad"
+                placeholder="Ej: Córdoba Capital"
+                maxlength="30"
+                pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{4,}"
+                data-autocompletar-ciudad>
+              <span class="mensaje-error">Mínimo 4 caracteres (Solo letras y numeros)</span>
+            </div>
 
-              <div class="grupo-input">
-                <label for="direccion">Dirección</label>
-                <input 
-                  type="text" 
-                  id="direccion" 
-                  name="direccion" 
-                  placeholder="Calle y número"
-                  maxlength="30"
-                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}">
-                <span class="mensaje-error">Mínimo 3 caracteres (Solo letras y numeros)</span>
-              </div>
+            <div class="grupo-input">
+              <label for="direccion">Dirección</label>
+              <input
+                type="text"
+                id="direccion"
+                name="direccion"
+                placeholder="Calle y número"
+                maxlength="30"
+                pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}">
+              <span class="mensaje-error">Mínimo 3 caracteres (Solo letras y numeros)</span>
             </div>
           </section>
 
@@ -162,29 +158,27 @@
               <h4>Facturación</h4>
             </div>
 
-            <div class="sub-panel-datos">
-              <div class="fila-toggle">
-                <div class="texto-toggle">
-                  <span class="titulo-toggle">Factura la producción</span>
-                  <span class="subtitulo-toggle">Activa para ingresar el cuit</span>
-                </div>
-                <label class="switch">
-                  <input type="checkbox" id="factura" name="factura">
-                  <span class="slider"></span>
-                </label>
+            <div class="fila-toggle">
+              <div class="texto-toggle">
+                <span class="titulo-toggle">Factura la producción</span>
+                <span class="subtitulo-toggle">Activa para ingresar el cuit</span>
               </div>
+              <label class="switch">
+                <input type="checkbox" id="factura" name="factura">
+                <span class="slider"></span>
+              </label>
+            </div>
 
-              <div class="grupo-input" id="campo-cuit">
-                <label for="cuit">CUIT</label>
-                <input 
-                  type="text" 
-                  id="cuit" 
-                  name="cuit" 
-                  placeholder="Ej: 20123456780"
-                  maxlength="11"
-                  pattern="[\d]{10,11}">
-                <span class="mensaje-error">Debe ingresar exactamente de 10 a 11 números, sin guiones</span>
-              </div>
+            <div class="grupo-input" id="campo-cuit">
+              <label for="cuit">CUIT</label>
+              <input
+                type="text"
+                id="cuit"
+                name="cuit"
+                placeholder="Ej: 20123456780"
+                maxlength="11"
+                pattern="[\d]{10,11}">
+              <span class="mensaje-error">Debe ingresar exactamente de 10 a 11 números, sin guiones</span>
             </div>
           </section>
 

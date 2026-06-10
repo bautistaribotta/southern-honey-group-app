@@ -13,8 +13,13 @@
       <tr class="fila-cliente" data-id="{{ cliente.id }}">
         <td class="td-enlace">
           <a href="{% url 'informacion_clientes' cliente.id %}" class="enlace-fila">
-            <div class="cliente-nombre"> {{ cliente.nombre }} {% if cliente.apellido and cliente.apellido != 'None' %}{{ cliente.apellido }}{% endif %} </div>
-            <div class="cliente-id"> ID: {{ cliente.id }} </div>
+            <div class="cli-cliente">
+              <span class="cli-avatar">{{ cliente.nombre|first|upper }}{{ cliente.apellido|default:''|first|upper }}</span>
+              <div>
+                <div class="cliente-nombre"> {{ cliente.nombre }} {% if cliente.apellido and cliente.apellido != 'None' %}{{ cliente.apellido }}{% endif %} </div>
+                <div class="cliente-id"> ID: {{ cliente.id }}{% if cliente.cuit %} &middot; CUIT {{ cliente.cuit }}{% endif %} </div>
+              </div>
+            </div>
           </a>
         </td>
         <td class="td-enlace"> <a href="{% url 'informacion_clientes' cliente.id %}" class="enlace-fila">{{ cliente.localidad|default:"-" }}</a> </td>
