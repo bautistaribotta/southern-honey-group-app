@@ -119,8 +119,9 @@ html {
 }
 
 .boton-cancelar:hover:not(:disabled) {
-  background-color: var(--color-rosa-claro);
-  border-color: var(--color-rojo-eliminacion);
+  background-color: var(--danger-500);
+  border-color: var(--danger-500);
+  color: var(--text-on-inverse);
 }
 
 .boton-cancelar:disabled {
