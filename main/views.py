@@ -13,7 +13,7 @@ from django.db import transaction
 from .models import Cliente, Producto, Operacion, DetalleOperacion, Pago, Cotizaciones, Chofer, Vehiculo, Viaje
 from .pdf_services import Remito
 from .services import (nuevo_producto, editar_producto, eliminar_producto, nuevo_cliente, editar_cliente,
-                       eliminar_cliente, get_cotizacion_dolar_oficial, get_cotizaciones, actualizar_cotizacion, obtener_datos_cliente,
+                       eliminar_cliente, get_cotizacion_dolar_oficial, get_cotizacion_miel_50mm, get_cotizaciones, actualizar_cotizacion, obtener_datos_cliente,
                        obtener_datos_producto, modificar_stock, crear_operacion, servicio_cancelar_operacion,
                        obtener_listado_deudores, crear_chofer, crear_vehiculo, crear_viaje, obtener_choferes_activos,
                        obtener_vehiculos_activos, obtener_viajes, editar_viaje, crear_gasto,
@@ -358,13 +358,51 @@ def informacion_operacion(request, id_operacion):
     monto_total = operacion.monto_total or Decimal('0')
     total_pagado = operacion.total_pagado or Decimal('0')
     restante = monto_total - total_pagado
-    
+
+    # Porcentaje pagado para la barra de progreso
+    pct_pagado = float(total_pagado / monto_total * 100) if monto_total else 0
+    pct_pagado = max(0, min(100, pct_pagado))
+
+    # Erosion del saldo pendiente: cuanto vale el restante en dolares y en kilos
+    # de miel, comparando la cotizacion del dia de la operacion contra la de hoy.
+    erosion = None
+    if restante > 0:
+        dolar_origen = operacion.valor_dolar or None
+        miel_origen = operacion.valor_kilo_miel or None
+
+        dolar_hoy_data = get_cotizacion_dolar_oficial()
+        dolar_hoy = Decimal(str(dolar_hoy_data.get("venta"))) if dolar_hoy_data.get("venta") else None
+
+        miel_hoy_data = get_cotizacion_miel_50mm()
+        try:
+            miel_hoy = Decimal(str(miel_hoy_data)) if miel_hoy_data else None
+        except (ValueError, TypeError):
+            miel_hoy = None
+
+        from django.utils import timezone
+        from datetime import datetime as _dt
+        fecha_op = operacion.fecha
+        if isinstance(fecha_op, _dt):
+            fecha_op = fecha_op.date()
+        dias = (timezone.localdate() - fecha_op).days
+
+        erosion = {
+            "dias": dias,
+            "usd_origen": (restante / dolar_origen) if dolar_origen else None,
+            "usd_hoy": (restante / dolar_hoy) if dolar_hoy else None,
+            "kg_origen": (restante / miel_origen) if miel_origen else None,
+            "kg_hoy": (restante / miel_hoy) if miel_hoy else None,
+        }
+
     contexto = {
         'operacion': operacion,
         'cliente': operacion.cliente,
         'pagos': pagos,
         'detalles': detalles,
         'restante': restante,
+        'total_pagado': total_pagado,
+        'pct_pagado': pct_pagado,
+        'erosion': erosion,
         'pestaña': 'clientes'
     }
     return render(request, "informacion_operacion.html", contexto)

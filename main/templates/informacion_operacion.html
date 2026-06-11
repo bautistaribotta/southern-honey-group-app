@@ -11,7 +11,9 @@
 {% endblock %}
 
 {% block area-trabajo %}
-<div id="espacio-trabajo-cliente">
+<div id="espacio-trabajo-cliente" class="op-screen">
+
+    <!-- Volver -->
     {% if operacion.viaje %}
     <a href="{% url 'informacion_viaje' operacion.viaje.id %}" class="boton-volver">
         <span class="material-symbols-outlined">arrow_back</span>
@@ -24,146 +26,179 @@
     </a>
     {% endif %}
 
-    <div class="cabecera-detalle">
-        <div class="info-principal">
-            <div class="avatar-cliente" style="background-color: var(--brand-olive);">
-                <span class="material-symbols-outlined" style="color: var(--color-blanco); font-size: 28px;">receipt_long</span>
-            </div>
+    <!-- Cabecera -->
+    <div class="op-head">
+        <div class="op-head__left">
+            <span class="op-head__tile"><span class="material-symbols-outlined">receipt_long</span></span>
             <div>
-                <h3 class="nombre-cliente-titulo">
-                    {% if operacion.tipo_operacion == 'compra' %}Compra{% else %}Venta{% endif %} #{{ operacion.id }}
-                    {% if operacion.tipo_operacion == 'compra' %}
-                        <span class="badge-tipo-operacion compra">Compra</span>
-                    {% else %}
-                        <span class="badge-tipo-operacion venta">Venta</span>
+                <div class="op-head__titlerow">
+                    <h1 class="op-head__title">{% if operacion.tipo_operacion == 'compra' %}Compra{% else %}Venta{% endif %} #{{ operacion.id }}</h1>
+                </div>
+                <div class="op-head__meta">
+                    <span class="op-head__metaitem"><span class="material-symbols-outlined">event</span>{{ operacion.fecha|date:"d/m/Y" }}</span>
+                    <span class="op-head__metaitem"><span class="material-symbols-outlined">person</span>{{ operacion.cliente.nombre }} {{ operacion.cliente.apellido|default:"" }}</span>
+                    {% if operacion.viaje %}
+                    <a href="{% url 'informacion_viaje' operacion.viaje.id %}" class="op-viaje">
+                        <span class="material-symbols-outlined">local_shipping</span>
+                        Realizada en el viaje #{{ operacion.viaje.id }}
+                    </a>
                     {% endif %}
-                </h3>
-                <p class="id-cliente-subtitulo">Fecha: {{ operacion.fecha|date:"d/m/Y" }}</p>
-                {% if operacion.viaje %}
-                <a href="{% url 'informacion_viaje' operacion.viaje.id %}" class="badge-origen-viaje">
-                    <span class="material-symbols-outlined">local_shipping</span>
-                    Operación realizada en el viaje #{{ operacion.viaje.id }}
-                </a>
-                {% endif %}
+                </div>
             </div>
         </div>
-        <div class="acciones-cliente" style="display: flex; gap: 0.75rem;">
-            <button class="boton-accion boton-editar" {% if operacion.estado_pago == 'Cancelada' or operacion.estado_pago == 'Pagada' %}disabled style="opacity: 0.5; cursor: not-allowed;"{% else %}onclick="abrirModalPago('{{ operacion.id }}', '{{ operacion.monto_total|default_if_none:0|stringformat:'f' }}', '{{ operacion.total_pagado|default_if_none:0|stringformat:'f' }}');"{% endif %}>
+        <div class="op-head__actions">
+            <button class="op-btn op-btn--dark"
+                {% if operacion.estado_pago == 'Cancelada' or operacion.estado_pago == 'Pagada' %}disabled{% else %}onclick="abrirModalPago('{{ operacion.id }}', '{{ operacion.monto_total|default_if_none:0|stringformat:'f' }}', '{{ operacion.total_pagado|default_if_none:0|stringformat:'f' }}');"{% endif %}>
                 <span class="material-symbols-outlined">payments</span>
-                Añadir Pago
+                Añadir pago
             </button>
-            <a href="{% url 'generar_remito' operacion.id %}" target="_blank" class="boton-accion boton-editar boton-descargar-remito">
+            <a href="{% url 'generar_remito' operacion.id %}" target="_blank" class="op-btn op-btn--secondary">
                 <span class="material-symbols-outlined">download</span>
-                Imprimir Remito
+                Imprimir remito
             </a>
-            <button class="boton-accion boton-cancelar" {% if operacion.estado_pago == 'Cancelada' %}disabled style="opacity: 0.5; cursor: not-allowed;"{% else %}onclick="abrirModalCancelarOperacion('{{ operacion.id }}', '{{ operacion.tipo_operacion }}');"{% endif %}>
+            <button class="op-btn op-btn--danger"
+                {% if operacion.estado_pago == 'Cancelada' %}disabled{% else %}onclick="abrirModalCancelarOperacion('{{ operacion.id }}', '{{ operacion.tipo_operacion }}');"{% endif %}>
                 <span class="material-symbols-outlined">delete</span>
-                {% if operacion.tipo_operacion == 'compra' %}Eliminar Compra{% else %}Cancelar Venta{% endif %}
+                {% if operacion.tipo_operacion == 'compra' %}Eliminar compra{% else %}Cancelar venta{% endif %}
             </button>
         </div>
     </div>
 
-    <div class="grid-operacion-detalles">
-        
-        <!-- Detalles de Productos -->
-        <section class="contenedor-operaciones contenedor-operaciones-detalle">
-            <div class="encabezado-operaciones">
-                <h4><span class="material-symbols-outlined">inventory_2</span> {% if operacion.tipo_operacion == 'compra' %}Productos Comprados{% else %}Productos Vendidos{% endif %}</h4>
-            </div>
-            <div class="tabla-operaciones-container tabla-operaciones-container-detalle">
-                <table class="tabla-operaciones">
-                    <thead>
-                        <tr>
-                            <th class="th-producto">Producto</th>
-                            <th class="th-cantidad">Cantidad</th>
-                            <th class="th-monto">Precio Unit.</th>
-                            <th class="th-monto">Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for detalle in detalles %}
-                        <tr>
-                            <td class="celda-producto-nombre">
-                                {{ detalle.producto.nombre }}
-                            </td>
-                            <td class="celda-producto-cantidad">
-                                {{ detalle.cantidad|floatformat:"0g" }}
-                            </td>
-                            <td class="celda-producto-precio">
-                                ${{ detalle.precio_unitario|floatformat:"-2g" }}
-                            </td>
-                            <td class="celda-producto-subtotal">
-                                ${{ detalle.subtotal|floatformat:"-2g" }}
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="4" class="celda-vacia">
-                                No hay productos registrados.
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                    <tfoot class="pie-tabla-operacion">
-                        <tr>
-                            <td class="celda-pie-titulo" colspan="3">Total</td>
-                            <td class="celda-pie-monto">
-                                ${{ operacion.monto_total|floatformat:"-2g" }}
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </section>
+    <!-- Totales -->
+    <div class="op-totals">
+        <div class="op-total">
+            <span class="op-total__k"><span class="material-symbols-outlined">receipt</span>Total operación</span>
+            <span class="op-total__v">$ {{ operacion.monto_total|floatformat:"-2g" }}</span>
+        </div>
+        <div class="op-total op-total--paid">
+            <span class="op-total__k"><span class="material-symbols-outlined">paid</span>Pagado</span>
+            <span class="op-total__v">$ {{ total_pagado|floatformat:"-2g" }}</span>
+            <div class="op-total__bar"><div class="op-total__barfill" style="width: {{ pct_pagado|floatformat:0 }}%"></div></div>
+        </div>
+        <div class="op-total {% if restante > 0 %}op-total--rest{% else %}op-total--paid{% endif %}">
+            <span class="op-total__k"><span class="material-symbols-outlined">{% if restante > 0 %}schedule{% else %}check_circle{% endif %}</span>Restante a pagar</span>
+            <span class="op-total__v">$ {{ restante|floatformat:"-2g" }}</span>
+        </div>
+    </div>
 
-        <!-- Historial de Pagos -->
-        <section class="contenedor-operaciones contenedor-operaciones-detalle">
-            <div class="encabezado-operaciones">
-                <h4><span class="material-symbols-outlined">payments</span> Historial de Pagos</h4>
+    <!-- Valor de la deuda pendiente / nota de saldada -->
+    {% if operacion.estado_pago != 'Cancelada' %}
+        {% if erosion %}
+        <div class="op-erosion">
+            <div class="op-erosion__top">
+                <span class="op-erosion__label">Valor de la deuda pendiente</span>
+                <span class="op-erosion__amount">$ {{ restante|floatformat:"-2g" }}</span>
             </div>
-            <div class="tabla-operaciones-container tabla-operaciones-container-detalle">
-                <table class="tabla-operaciones">
-                    <thead>
-                        <tr>
-                            <th class="th-fecha">Fecha</th>
-                            <th class="th-monto">Monto</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for pago in pagos %}
-                        <tr>
-                            <td class="celda-pago-fecha">
-                                {{ pago.fecha|date:"d/m/Y" }}
-                            </td>
-                            <td class="celda-pago-monto">
-                                +${{ pago.monto|floatformat:"-2g" }}
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="2" class="celda-vacia">
-                                No hay pagos registrados.
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                    <tfoot class="pie-tabla-operacion">
-                        <tr>
-                            <td class="celda-pie-titulo">Total Operación</td>
-                            <td class="celda-pie-monto">
-                                ${{ operacion.monto_total|floatformat:"-2g" }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="celda-pie-titulo-secundario">Restante a Pagar</td>
-                            <td class="celda-pie-monto-secundario">
-                                ${{ restante|floatformat:"-2g" }}
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
+            <table class="op-erosion__table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Al originarse</th>
+                        <th>Hoy</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row"><span class="material-symbols-outlined">attach_money</span>En dólares</th>
+                        <td class="op-erosion__then">{% if erosion.usd_origen != None %}US$ {{ erosion.usd_origen|floatformat:"-2g" }}{% else %}-{% endif %}</td>
+                        <td class="op-erosion__now">{% if erosion.usd_hoy != None %}US$ {{ erosion.usd_hoy|floatformat:"-2g" }}{% else %}-{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><span class="material-symbols-outlined">water_drop</span>En kilos de miel</th>
+                        <td class="op-erosion__then">{% if erosion.kg_origen != None %}{{ erosion.kg_origen|floatformat:"-2g" }} kg{% else %}-{% endif %}</td>
+                        <td class="op-erosion__now">{% if erosion.kg_hoy != None %}{{ erosion.kg_hoy|floatformat:"-2g" }} kg{% else %}-{% endif %}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="op-erosion__foot">
+                <span class="material-symbols-outlined">info</span>
+                El saldo está fijado en pesos: hace {{ erosion.dias }} día{{ erosion.dias|pluralize }} valía más en dólares y en miel.
+            </p>
+        </div>
+        {% elif restante <= 0 %}
+        <div class="op-paidnote">
+            <span class="material-symbols-outlined">check_circle</span>
+            Operación saldada por completo — no queda deuda pendiente que medir.
+        </div>
+        {% endif %}
+    {% endif %}
+
+    <!-- Productos + Pagos -->
+    <div class="op-grid">
+
+        <!-- Productos -->
+        <div class="op-card">
+            <div class="op-card__head">
+                <span class="material-symbols-outlined">inventory_2</span>
+                <h4>{% if operacion.tipo_operacion == 'compra' %}Productos comprados{% else %}Productos vendidos{% endif %}</h4>
+                <span class="op-card__count">{{ detalles|length }} ítem{{ detalles|length|pluralize }}</span>
             </div>
-        </section>
+            <table class="op-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th class="c">Cantidad</th>
+                        <th class="r">Precio unit.</th>
+                        <th class="r">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for detalle in detalles %}
+                    <tr>
+                        <td><div class="op-prod__name">{{ detalle.producto.nombre }}</div></td>
+                        <td class="c">{{ detalle.cantidad|floatformat:"0g" }}</td>
+                        <td class="r">$ {{ detalle.precio_unitario|floatformat:"-2g" }}</td>
+                        <td class="r op-sub">$ {{ detalle.subtotal|floatformat:"-2g" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="op-empty">No hay productos registrados.</td></tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="op-table__foot">
+                    <tr>
+                        <td colspan="3">Total</td>
+                        <td class="r">$ {{ operacion.monto_total|floatformat:"-2g" }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- Historial de pagos -->
+        <div class="op-card">
+            <div class="op-card__head">
+                <span class="material-symbols-outlined">payments</span>
+                <h4>Historial de pagos</h4>
+                <span class="op-card__count">{{ pagos|length }} pago{{ pagos|length|pluralize }}</span>
+            </div>
+            <table class="op-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th class="r">Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pago in pagos %}
+                    <tr>
+                        <td>{{ pago.fecha|date:"d/m/Y" }}</td>
+                        <td class="r op-pago__amt">+$ {{ pago.monto|floatformat:"-2g" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="2" class="op-empty">Todavía no se registraron pagos.</td></tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="op-table__foot">
+                    <tr>
+                        <td>Total pagado</td>
+                        <td class="r">$ {{ total_pagado|floatformat:"-2g" }}</td>
+                    </tr>
+                    <tr class="op-foot-rest">
+                        <td>Restante a pagar</td>
+                        <td class="r">$ {{ restante|floatformat:"-2g" }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
 
     </div>
 
