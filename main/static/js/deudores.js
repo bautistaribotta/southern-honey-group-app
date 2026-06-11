@@ -2,6 +2,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Selecciono los elementos del DOM que voy a usar para la búsqueda
     const inputBusqueda = document.getElementById('buscar-deudor');
     const contenedorTabla = document.getElementById('tabla-deudores-container');
+    const pildoras = document.querySelectorAll('.deu-pill');
+
+    // Devuelve el orden actualmente seleccionado por las píldoras
+    const ordenActivo = () => {
+        const activa = document.querySelector('.deu-pill.is-active');
+        return activa ? activa.dataset.orden : 'monto';
+    };
 
     /**
      * Función para realizar las búsquedas de deudores mediante AJAX.
@@ -19,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (inputBusqueda) {
                 url.searchParams.set('q', inputBusqueda.value);
             }
+            url.searchParams.set('orden', ordenActivo());
             url.searchParams.delete('page');
         }
 
@@ -62,6 +70,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (inputBusqueda) {
         inputBusqueda.addEventListener('input', () => buscar());
     }
+
+    // Píldoras de orden: marco la activa y vuelvo a buscar manteniendo el filtro
+    pildoras.forEach((pildora) => {
+        pildora.addEventListener('click', () => {
+            if (pildora.classList.contains('is-active')) return;
+            pildoras.forEach((p) => p.classList.remove('is-active'));
+            pildora.classList.add('is-active');
+            buscar();
+        });
+    });
 
     vincularPaginacion();
 });

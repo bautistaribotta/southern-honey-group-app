@@ -834,6 +834,14 @@ def deudores(request):
     total_miel_hoy = sum((d["kg_miel_actual"] or 0) for d in lista_deudores)
     vencidos = sum(1 for d in lista_deudores if d["dias"] > UMBRAL_VENCIDA)
 
+    # Orden seleccionado por las píldoras: por monto adeudado o por antigüedad
+    orden = request.GET.get("orden", "monto")
+    if orden == "antiguedad":
+        lista_deudores.sort(key=lambda d: d["dias"], reverse=True)
+    else:
+        orden = "monto"
+        lista_deudores.sort(key=lambda d: d["deuda_pesos"] or 0, reverse=True)
+
     paginator_deudores = Paginator(lista_deudores, 8)
     pagina_numero = request.GET.get("page")
     pagina_obj = paginator_deudores.get_page(pagina_numero)
@@ -846,6 +854,7 @@ def deudores(request):
         "total_miel_hoy": total_miel_hoy,
         "vencidos": vencidos,
         "total_deudores": len(lista_deudores),
+        "orden": orden,
     }
     
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
