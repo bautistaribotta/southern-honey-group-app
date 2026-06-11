@@ -1,36 +1,42 @@
-<table class="tabla-productos">
+<table class="cart-table">
   <thead>
     <tr>
       <th>Producto</th>
-      <th class="texto-centrado">Stock actual</th>
-      <th></th>
+      <th class="c">Stock actual</th>
+      <th class="c" style="width: 56px;"></th>
     </tr>
   </thead>
   <tbody>
     {% for producto in productos %}
-    <tr class="fila-hover">
+    <tr>
       <td>
-        <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div class="cart-prod">
+          <span class="cart-prod__dot" style="background: var(--honey-500, #b07a00);"></span>
           <div>
-            <div class="producto-info">{{producto.nombre}}</div>
-            <div class="producto-id">ID: {{producto.id}}</div>
+            <div class="cart-prod__name">{{producto.nombre}}</div>
+            <div class="cart-prod__sub">ID: {{producto.id}}</div>
           </div>
         </div>
       </td>
-      <td class="stock-valor">{{ producto.cantidad|floatformat:"0g" }}</td>
-      <td class="texto-derecha">
-        <button class="boton-agregar-producto"
-                title="Añadir a la compra"
-                data-id="{{producto.id}}"
-                data-nombre="{{producto.nombre}}"
-                data-stock="{{ producto.cantidad|floatformat:0 }}">
-          <span class="material-symbols-outlined">add</span>
-        </button>
+      <td class="c">
+        <span class="cart-stock">{{ producto.cantidad|floatformat:"0g" }}</span>
+      </td>
+      <td class="c">
+        <div style="display: flex; align-items: center; justify-content: flex-end;">
+          <button class="cart-addbtn boton-agregar-producto"
+                  title="Añadir a la compra"
+                  data-id="{{producto.id}}"
+                  data-nombre="{{producto.nombre}}"
+                  data-stock="{{ producto.cantidad|floatformat:0 }}">
+            <span class="material-symbols-outlined">add</span>
+          </button>
+        </div>
       </td>
     </tr>
     {% empty %}
     <tr>
-      <td colspan="3" style="text-align: center; padding: 2rem; color: var(--slate-400);">
+      <td colspan="3" class="cart-table__empty">
+        <span class="material-symbols-outlined">search_off</span>
         No se encontraron productos.
       </td>
     </tr>
@@ -38,21 +44,20 @@
   </tbody>
 </table>
 
-<!-- Paginación Pequeña -->
-<div class="paginacion-compacta">
-  <span class="texto-gris" style="font-size: 0.75rem; font-weight: 500;">
-    Mostrando {{productos.start_index}}-{{productos.end_index}} de {{productos.paginator.count}} productos
-  </span>
-  <div class="paginacion-botones">
+<div class="cart-table__foot" style="display: flex; justify-content: flex-end; align-items: center;">
+  <div class="paginacion-compacta" style="display: flex; align-items: center; gap: 0.5rem;">
+    <span class="texto-gris paginacion-info" style="margin-right: 0.5rem;">
+      Mostrando {{productos.start_index}}-{{productos.end_index}} de {{productos.paginator.count}}
+    </span>
     {% if productos.has_previous %}
-    <a href="?page={{ productos.previous_page_number }}{% if q %}&q={{ q }}{% endif %}#contenedor-tabla-compras">
+    <a href="?page={{ productos.previous_page_number }}{% if q %}&q={{ q }}{% endif %}#contenedor-tabla-compras" style="text-decoration: none;">
       <button class="boton-paginacion">Anterior</button>
     </a>
     {% else %}
     <button class="boton-paginacion" disabled>Anterior</button>
     {% endif %}
     {% if productos.has_next %}
-    <a href="?page={{ productos.next_page_number }}{% if q %}&q={{ q }}{% endif %}#contenedor-tabla-compras">
+    <a href="?page={{ productos.next_page_number }}{% if q %}&q={{ q }}{% endif %}#contenedor-tabla-compras" style="text-decoration: none;">
       <button class="boton-paginacion">Siguiente</button>
     </a>
     {% else %}
@@ -60,3 +65,4 @@
     {% endif %}
   </div>
 </div>
+
