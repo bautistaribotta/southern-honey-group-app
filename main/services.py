@@ -239,6 +239,16 @@ def servicio_cancelar_operacion(id_operacion):
     return operacion
 
 
+def _iniciales(nombre, apellido=None):
+    # Siempre dos letras: inicial de nombre + inicial de apellido.
+    # Sin apellido, uso las dos primeras letras del nombre.
+    nombre = (nombre or "").strip()
+    apellido = (apellido or "").strip()
+    if apellido:
+        return (nombre[:1] + apellido[:1]).upper()
+    return nombre[:2].upper()
+
+
 def obtener_listado_deudores(q=""):
     dolar_actual_data = get_cotizacion_dolar_oficial()
     dolar_actual = Decimal(str(dolar_actual_data.get("venta") or 1))  # Prevención división por 0 si falla la API
@@ -286,10 +296,19 @@ def obtener_listado_deudores(q=""):
                 Q(cliente__nombre__icontains=q) | Q(cliente__apellido__icontains=q)
             )
 
+    from django.utils import timezone
+    hoy = timezone.localdate()
+
     lista_deudores = []
     for operacion in operaciones_adeudadas:
         # La deuda es igual al monto total - los pagos registrados en esa operacion
         deuda_pesos = operacion.monto_calculado - operacion.pagado
+
+        # Antigüedad de la deuda en días (la fecha puede ser date o datetime)
+        fecha_op = operacion.fecha
+        if isinstance(fecha_op, datetime):
+            fecha_op = fecha_op.date()
+        dias = (hoy - fecha_op).days
 
         # Cálculos del dólar
         valor_dolar_historico = operacion.valor_dolar if operacion.valor_dolar else None
@@ -307,7 +326,9 @@ def obtener_listado_deudores(q=""):
         lista_deudores.append({
             "id": operacion.id,
             "cliente": f"{operacion.cliente.nombre} {operacion.cliente.apellido or ''}".strip(),
+            "iniciales": _iniciales(operacion.cliente.nombre, operacion.cliente.apellido),
             "fecha": operacion.fecha,
+            "dias": dias,
             "deuda_pesos": deuda_pesos,
             "deuda_dolar_historico": round(deuda_dolar_historico, 2) if deuda_dolar_historico else None,
             "deuda_dolar_actual": round(deuda_dolar_actual, 2) if deuda_dolar_actual else None,

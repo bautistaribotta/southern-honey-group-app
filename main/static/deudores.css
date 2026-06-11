@@ -1,3 +1,74 @@
+/* ============================================================
+   Southern Honey Group - Deudores
+   Saldos pendientes: tarjetas de resumen, celdas de equivalencia
+   multimoneda (hoy + origen) y antiguedad de la deuda.
+   ============================================================ */
+
+/* --- TARJETAS DE RESUMEN --- */
+.deu-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.deu-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.25rem 1.4rem;
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.deu-stat__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.deu-stat__icon {
+  width: 1.85rem;
+  height: 1.85rem;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background-color: var(--honey-tint-10);
+  color: var(--brand-active);
+}
+
+.deu-stat__icon .material-symbols-outlined {
+  font-size: 1.1rem;
+}
+
+.deu-stat__label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--text-muted);
+  letter-spacing: var(--tracking-wide);
+  padding-top: 0.15rem;
+}
+
+.deu-stat__value {
+  font-size: 1.75rem;
+  line-height: 1.1;
+  font-weight: var(--weight-extra);
+  color: var(--text-strong);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.deu-stat__value small {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--text-muted);
+}
+
 /* --- BARRA DE HERRAMIENTAS (Buscador) --- */
 .barra-herramientas {
   display: flex;
@@ -54,6 +125,28 @@
   color: var(--brand-active);
 }
 
+.barra-herramientas__right {
+  flex: none;
+}
+
+.deu-vencidos {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-md);
+  background-color: var(--danger-50);
+  border: 1px solid var(--danger-50);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--danger-600);
+  white-space: nowrap;
+}
+
+.deu-vencidos .material-symbols-outlined {
+  font-size: 1.05rem;
+}
+
 /* --- CONTENEDOR PRINCIPAL TABLA --- */
 .contenedor-tabla {
   background-color: var(--surface-card);
@@ -86,15 +179,12 @@
   text-align: right;
 }
 
-/* Anchos de columnas para Deudores (8 columnas) */
-.tabla-deudores th:nth-child(1) { width: 5%; }  /* ID */
-.tabla-deudores th:nth-child(2) { width: 18%; } /* Nombre */
-.tabla-deudores th:nth-child(3) { width: 12%; } /* Fecha */
-.tabla-deudores th:nth-child(4) { width: 15%; } /* Pesos */
-.tabla-deudores th:nth-child(5) { width: 10%; } /* USD/Hist */
-.tabla-deudores th:nth-child(6) { width: 10%; } /* USD/Hoy */
-.tabla-deudores th:nth-child(7) { width: 15%; } /* Kg Miel/Hist */
-.tabla-deudores th:nth-child(8) { width: 15%; } /* Kg Miel/Hoy */
+/* Anchos de columnas para Deudores (5 columnas) */
+.tabla-deudores th:nth-child(1) { width: 30%; } /* Cliente */
+.tabla-deudores th:nth-child(2) { width: 16%; } /* Fecha */
+.tabla-deudores th:nth-child(3) { width: 18%; } /* Deuda */
+.tabla-deudores th:nth-child(4) { width: 18%; } /* En dolares */
+.tabla-deudores th:nth-child(5) { width: 18%; } /* En miel */
 
 .tabla-deudores td {
   padding: 1rem 1.5rem;
@@ -104,12 +194,31 @@
   vertical-align: middle;
 }
 
-/* Estilos de tipografía en celdas */
-.deudor-id {
-  font-size: var(--text-xs);
-  font-weight: var(--weight-bold);
-  color: var(--text-subtle);
-  font-variant-numeric: tabular-nums;
+.tabla-deudores td.texto-derecha {
+  text-align: right;
+}
+
+/* --- Celda Cliente (avatar + nombre + operacion) --- */
+.deu-cliente {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.deu-avatar {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: 50%;
+  background-color: var(--danger-50);
+  border: 1px solid var(--danger-50);
+  color: var(--danger-600);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: var(--weight-extra);
+  letter-spacing: 0.02em;
 }
 
 .deudor-nombre {
@@ -117,18 +226,66 @@
   color: var(--text-strong);
 }
 
-.valor-pesos {
-  font-weight: var(--weight-bold);
+.deudor-id {
+  font-size: var(--text-xs);
+  font-weight: 400;
+  color: var(--text-subtle);
+  margin-top: 0.125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Celda Fecha / antiguedad --- */
+.deu-fecha {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.deu-fecha__date {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-body);
+  font-weight: var(--weight-semibold);
+}
+
+.deu-fecha__age {
+  font-size: var(--text-xs);
+  color: var(--text-subtle);
+}
+
+.deu-fecha__age.is-old {
   color: var(--danger-600);
+  font-weight: var(--weight-semibold);
+}
+
+/* --- Celda Deuda en pesos --- */
+.valor-pesos {
+  font-size: var(--text-md);
+  font-weight: var(--weight-extra);
+  color: var(--text-strong);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-.valor-usd, .valor-miel {
-  font-weight: var(--weight-medium);
-  color: var(--text-body);
-  font-variant-numeric: tabular-nums;
+/* --- Celda equivalencia (hoy grande + origen tenue) --- */
+.deu-equiv {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  align-items: flex-end;
   white-space: nowrap;
+}
+
+.deu-equiv__now {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  color: var(--text-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.deu-equiv__then {
+  font-size: var(--text-xs);
+  color: var(--text-subtle);
+  font-variant-numeric: tabular-nums;
 }
 
 .tabla-deudores tbody tr {
@@ -148,6 +305,20 @@
   background-color: var(--surface-hover);
 }
 
+/* --- Estado vacio --- */
+.prod-table__empty {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: var(--text-subtle);
+}
+
+.prod-table__empty .material-symbols-outlined {
+  display: block;
+  margin: 0 auto 0.5rem;
+  font-size: 2rem;
+  color: var(--sand-400);
+}
+
 /* Para cuando la tabla esta vacia, quito los efectos hover */
 .tabla-deudores tbody tr.fila-vacia:hover,
 .tabla-deudores tbody tr.fila-vacia:active {
@@ -156,7 +327,7 @@
   cursor: default;
 }
 
-/* --- PAGINACIÓN --- */
+/* --- PAGINACION --- */
 .paginacion {
   padding: 0.9rem 1.5rem;
   border-top: 1px solid var(--border-subtle);
@@ -203,7 +374,7 @@
   cursor: not-allowed;
 }
 
-/* --- ADAPTACIÓN PARA PANTALLAS GRANDES --- */
+/* --- ADAPTACION PARA PANTALLAS GRANDES --- */
 @media (min-width: 1440px) {
   html {
     font-size: 18px;
@@ -216,8 +387,12 @@
   }
 }
 
-/* --- ADAPTACIÓN PARA MÓVILES Y TABLETS --- */
+/* --- ADAPTACION PARA MOVILES Y TABLETS --- */
 @media (max-width: 1024px) {
+  .deu-stats {
+    grid-template-columns: 1fr;
+  }
+
   .barra-herramientas {
     flex-direction: column;
     align-items: stretch;
@@ -237,14 +412,14 @@
     padding: 0.875rem 1rem;
   }
 
-  /* Permite que la tabla haga scroll horizontal en móviles */
+  /* Permite que la tabla haga scroll horizontal en moviles */
   .contenedor-tabla {
     overflow-x: auto;
   }
 }
 
 @media (max-width: 600px) {
-  /* Ocultar columnas menos importantes en móviles muy pequeños */
+  /* Ocultar columnas menos importantes en moviles muy pequenos */
   .columna-ocultable-movil {
     display: none;
   }

@@ -826,12 +826,27 @@ def informacion_viaje(request, id_viaje):
 def deudores(request):
     q = request.GET.get("q", "")
     lista_deudores = obtener_listado_deudores(q)
-    
+
+    # Totales sobre el listado completo (no solo la página) para las tarjetas de resumen
+    UMBRAL_VENCIDA = 90  # días para marcar una deuda como antigua
+    total_pesos = sum((d["deuda_pesos"] or 0) for d in lista_deudores)
+    total_usd_hoy = sum((d["deuda_dolar_actual"] or 0) for d in lista_deudores)
+    total_miel_hoy = sum((d["kg_miel_actual"] or 0) for d in lista_deudores)
+    vencidos = sum(1 for d in lista_deudores if d["dias"] > UMBRAL_VENCIDA)
+
     paginator_deudores = Paginator(lista_deudores, 8)
     pagina_numero = request.GET.get("page")
     pagina_obj = paginator_deudores.get_page(pagina_numero)
-    
-    contexto = {"deudores": pagina_obj, "q": q}
+
+    contexto = {
+        "deudores": pagina_obj,
+        "q": q,
+        "total_pesos": total_pesos,
+        "total_usd_hoy": total_usd_hoy,
+        "total_miel_hoy": total_miel_hoy,
+        "vencidos": vencidos,
+        "total_deudores": len(lista_deudores),
+    }
     
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
         return render(request, "tabla_deudores.html", contexto)
