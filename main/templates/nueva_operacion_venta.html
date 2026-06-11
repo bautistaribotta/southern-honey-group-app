@@ -2,135 +2,165 @@
 {% load static %}
 
 {% block nombre-pestaña %}
-  <title> Nueva Operación </title>
+  <title> Nueva Venta </title>
 {% endblock %}
 
 {% block links %}
-  <link rel="stylesheet" href="{% static 'operaciones.css' %}">
+  <link rel="stylesheet" href="{% static 'nueva_operacion.css' %}">
 {% endblock %}
 
-{% block cabecera %}
-  <div id="titulos-cabecera" style="display: none;">
-    <!-- Oculto el cabezal por defecto de base.html porque operaciones tiene el suyo propio -->
-  </div>
+{% block top-header %}
+  <!-- Ocultamos la cabecera principal por completo, incluyendo el menú de usuario y la línea divisoria -->
 {% endblock %}
+
 {% block area-trabajo %}
   <!-- ÁREA DE TRABAJO -->
-  <section id="area-trabajo" class="area-operacion">
-    
-    <!-- Encabezado de la vista -->
-    <div class="cabecera-operacion">
-      <a href="{% url 'informacion_clientes' cliente.id %}" class="boton-volver">
-        <span class="material-symbols-outlined">arrow_back</span>
-        Volver al perfil
-      </a>
-      <h2 class="titulo-operacion">Nueva Operación</h2>
-      <div class="info-cliente-actual">
-        <span class="texto-gris">Cliente actual:</span>
-        <div class="badge-cliente">
-          <span class="material-symbols-outlined">person</span>
-          {{cliente.nombre}} {{cliente.apellido}}
-        </div>
-        <span class="texto-gris" style="opacity: 0.6; font-size: 0.75rem;">ID: {{cliente.id}}</span>
+  <section id="area-trabajo" style="padding: 1.5rem;">
+    <div class="cart-screen">
+      <!-- Encabezado de la vista -->
+      <div style="margin-bottom: 0.5rem;">
+        <a href="{% url 'informacion_clientes' cliente.id %}" class="boton-volver-sistema">
+          <span class="material-symbols-outlined">arrow_back</span>
+          VOLVER AL PERFIL
+        </a>
       </div>
-    </div>
 
-    <!-- Contenedor Principal a 2 Columnas -->
-    <div class="grid-operacion">
-      
-      <!-- COLUMNA IZQUIERDA (PRODUCTOS) -->
-      <div class="columna-productos">
-        
-        <!-- Buscador -->
-        <div class="panel-buscador">
-          <div class="contenedor-input-busqueda">
-            <span class="material-symbols-outlined icono-busqueda">search</span>
-            <input type="text" class="input-busqueda" placeholder="Buscar productos por nombre o id">
+      <div class="cart-head">
+        <div class="cart-head__left">
+          <div class="cart-head__tile">
+            <span class="material-symbols-outlined">sell</span>
           </div>
-        </div>
-
-        <!-- Tabla de Productos Disponibles -->
-        <div id="contenedor-tabla-operaciones" class="contenedor-tabla shadow-sm">
-          {% include "tabla_operaciones_productos.html" %}
+          <div>
+            <h2 class="cart-head__title">Nueva Venta</h2>
+            <div class="cart-head__sub">
+              <span class="cart-head__cliente">
+                <span class="material-symbols-outlined">person</span>
+                {{cliente.nombre}} {{cliente.apellido}}
+              </span>
+              <span class="cart-head__cuit">ID: {{cliente.id}}</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- COLUMNA DERECHA (RESUMEN/CARRITO) -->
-      <div class="columna-resumen">
-        <div class="panel-resumen">
-          <div class="cabecera-resumen">
-            <h3>
-              <span class="material-symbols-outlined">shopping_cart</span>
-              Resumen de Venta
-            </h3>
-          </div>
+      <!-- Contenedor Principal a 2 Columnas -->
+      <div class="cart-grid">
 
-          <!-- Items Seleccionados (CARRITO COMO TABLA) -->
-          <div class="contenedor-tabla-carrito">
-            <table class="tabla-carrito">
-              <thead>
-                <tr>
-                  <th class="texto-centrado">Cant</th>
-                  <th>Producto</th>
-                  <th class="texto-derecha"></th>
-                </tr>
-              </thead>
-              <tbody id="cuerpo-carrito">
-                <!-- Los items se agregarán aquí dinámicamente -->
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Métodos de Pago -->
-          <div class="seccion-pago">
-            <p class="titulo-seccion-pago">Método de Pago</p>
-            <div class="grid-metodos-pago">
-              
-              <label class="metodo-pago">
-                <input type="radio" name="metodo_pago" value="cuenta_corriente" class="hidden-radio">
-                <span class="material-symbols-outlined icono-pago">auto_stories</span>
-                <span class="metodo-texto">Cta. Corriente</span>
-              </label>
-
-              <label class="metodo-pago">
-                <input type="radio" name="metodo_pago" value="contado" class="hidden-radio">
-                <span class="material-symbols-outlined icono-pago">payments</span>
-                <span class="metodo-texto">Contado</span>
-              </label>
-
+        <!-- COLUMNA IZQUIERDA (PRODUCTOS) -->
+        <div class="cart-catalog">
+          <div class="cart-catalog__tools">
+            <div class="cart-search">
+              <span class="material-symbols-outlined">search</span>
+              <input type="text" class="input-busqueda" placeholder="Buscar producto por nombre o ID">
+            </div>
+            
+            <div class="cart-chips">
+              <button type="button" class="cart-chip is-active">Todas</button>
+              <!-- Categorías opcionales aquí -->
             </div>
           </div>
 
-          <!-- Totales -->
-          <div class="seccion-totales">
-            <div class="fila-total">
-              <span>Total</span>
-              <span class="total-destacado">$ 0.00</span>
-            </div>
+          <!-- Tabla de Productos Disponibles -->
+          <div id="contenedor-tabla-operaciones" class="cart-tablecard">
+            {% include "tabla_operaciones_productos.html" %}
+          </div>
+        </div>
+
+        <!-- COLUMNA DERECHA (RESUMEN/CARRITO) -->
+        <aside class="cart-summary">
+          <div class="cart-summary__head">
+            <span class="material-symbols-outlined">shopping_cart</span>
+            <h3>Resumen de venta</h3>
+            <span class="cart-summary__count oculto" id="contador-carrito">0</span>
           </div>
 
-          <!-- Confirmar -->
-          <div class="seccion-confirmar">
-            <button class="boton-confirmar-operacion">
-              <span class="material-symbols-outlined">check_circle</span>
-              Confirmar Operación
+          <!-- Items Seleccionados -->
+          <div class="cart-items" id="cuerpo-carrito">
+            <!-- Los items se agregarán aquí dinámicamente -->
+          </div>
+
+          <!-- Estado vacío -->
+          <div class="cart-empty" id="carrito-vacio">
+            <span class="material-symbols-outlined">production_quantity_limits</span>
+            <span class="t">El carrito está vacío</span>
+            <span class="h">Añadí productos desde la lista para armar la venta.</span>
+          </div>
+
+          <!-- Pie del resumen -->
+          <div class="cart-foot">
+            <button type="button" class="cart-clear oculto" id="boton-vaciar-carrito" style="align-self: flex-end; margin-top: -0.2rem;">
+              <span class="material-symbols-outlined">delete_sweep</span>Vaciar carrito
             </button>
-            <p class="texto-ayuda-confirmar">Confirmar para generar el remito y restar stock.</p>
-          </div>
-        </div>
-      </div>
 
+            <!-- Método de Pago -->
+            <div>
+              <p class="cart-pay__label">Método de pago</p>
+              <div class="cart-pay__seg">
+                <div class="cart-payseg" id="segmento-pago" role="tablist" aria-label="Método de pago">
+                  <span class="cart-payseg__thumb oculto" id="segmento-pago-thumb"></span>
+                  <button type="button" role="tab" aria-selected="false" class="cart-payseg__opt" data-value="cuenta_corriente">
+                    <input type="radio" name="metodo_pago" value="cuenta_corriente" class="oculto">
+                    <span class="material-symbols-outlined">auto_stories</span>Cta. corriente
+                  </button>
+                  <button type="button" role="tab" aria-selected="false" class="cart-payseg__opt" data-value="contado">
+                    <input type="radio" name="metodo_pago" value="contado" class="oculto">
+                    <span class="material-symbols-outlined">payments</span>Contado
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Totales -->
+            <div class="cart-totals">
+              <div class="cart-totrow cart-totrow--grand">
+                <span class="cart-totrow__k">Total venta</span>
+                <span class="cart-totrow__v" id="total-destacado">$ 0,00</span>
+              </div>
+            </div>
+
+            <!-- Confirmar -->
+            <button class="cart-confirm boton-confirmar-operacion">
+              <span class="material-symbols-outlined">check_circle</span>
+              Confirmar venta
+            </button>
+            <p class="cart-foot__help">
+              <span class="material-symbols-outlined">receipt_long</span>
+              Al confirmar se descuenta stock.
+            </p>
+          </div>
+        </aside>
+
+      </div>
     </div>
   </section>
 
-  <!-- Script temporal para simular interacción de radio buttons -->
+  <!-- Script de interacción del método de pago segmentado -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const metodosPago = document.querySelectorAll('.metodo-pago');
-      metodosPago.forEach(label => {
-        label.addEventListener('click', function() {
-          metodosPago.forEach(l => l.classList.remove('seleccionado'));
-          this.classList.add('seleccionado');
+      const segmento = document.getElementById('segmento-pago');
+      const opciones = segmento.querySelectorAll('.cart-payseg__opt');
+      const thumb = document.getElementById('segmento-pago-thumb');
+      
+      opciones.forEach(opcion => {
+        opcion.addEventListener('click', function () {
+          const valor = this.dataset.value;
+          const radio = this.querySelector('input[type="radio"]');
+          radio.checked = true;
+          
+          opciones.forEach(o => {
+            o.setAttribute('aria-selected', 'false');
+            o.classList.remove('is-selected');
+          });
+          
+          this.setAttribute('aria-selected', 'true');
+          this.classList.add('is-selected');
+          thumb.classList.remove('oculto');
+          
+          if (valor === 'contado') {
+            segmento.classList.add('is-contado');
+          } else {
+            segmento.classList.remove('is-contado');
+          }
         });
       });
     });
