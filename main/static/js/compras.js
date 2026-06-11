@@ -1,8 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     const cuerpoCarrito = document.getElementById('cuerpo-carrito');
-    const elementoTotal = document.querySelector('.total-destacado');
+    const elementoTotal = document.getElementById('total-destacado');
     const inputBusqueda = document.querySelector('.input-busqueda');
     const contenedorTabla = document.getElementById('contenedor-tabla-compras');
+    const carritoVacio = document.getElementById('carrito-vacio');
+    const contadorCarrito = document.getElementById('contador-carrito');
+    const botonVaciar = document.getElementById('boton-vaciar-carrito');
 
     // Formateador en formato argentino (separador de miles con punto)
     const formatoMoneda = new Intl.NumberFormat('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -15,12 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // =============================================
 
     function guardarCarrito() {
-        const filas = cuerpoCarrito.querySelectorAll('tr');
+        const filas = cuerpoCarrito.querySelectorAll('.cart-item');
         const items = [];
         filas.forEach(fila => {
             items.push({
                 id: fila.dataset.id,
-                nombre: fila.querySelector('.item-nombre').textContent,
+                nombre: fila.querySelector('.cart-item__name').textContent,
                 cantidad: parseInt(fila.querySelector('.input-cantidad').value),
                 precio: fila.querySelector('.input-precio-item').value
             });
@@ -29,12 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function restaurarCarrito() {
-        // Detectar si la página fue recargada (F5) o es una navegación nueva
         const navegacion = performance.getEntriesByType('navigation')[0];
         const esRecarga = navegacion && navegacion.type === 'reload';
 
         if (!esRecarga) {
-            // Navegación nueva → limpiar cualquier carrito viejo
             sessionStorage.removeItem(STORAGE_KEY);
             return;
         }
@@ -47,21 +48,32 @@ document.addEventListener('DOMContentLoaded', () => {
             crearFilaCarrito(item.id, item.nombre, item.cantidad, item.precio);
         });
         actualizarTotal();
+        actualizarVistaResumen();
     }
 
-    /** Limpia el carrito del storage */
     function limpiarCarritoStorage() {
         sessionStorage.removeItem(STORAGE_KEY);
+    }
+
+    // =============================================
+    //  ESTADO DEL RESUMEN (vacío / contador)
+    // =============================================
+
+    function actualizarVistaResumen() {
+        const cantidadItems = cuerpoCarrito.querySelectorAll('.cart-item').length;
+        const hayItems = cantidadItems > 0;
+
+        carritoVacio.classList.toggle('oculto', hayItems);
+        cuerpoCarrito.classList.toggle('oculto', !hayItems);
+        botonVaciar.classList.toggle('oculto', !hayItems);
+        contadorCarrito.classList.toggle('oculto', !hayItems);
+        contadorCarrito.textContent = cantidadItems;
     }
 
     // =============================================
     //  LÓGICA DEL CARRITO
     // =============================================
 
-    /**
-     * Vincula los botones de "agregar al carrito" de la tabla de productos.
-     * Se debe llamar cada vez que se reemplaza el contenido de la tabla (AJAX).
-     */
     function vincularBotonesAgregar() {
         const botones = contenedorTabla.querySelectorAll('.boton-agregar-producto');
         botones.forEach(boton => {
@@ -72,14 +84,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function agregarAlCarrito(id, nombre) {
-        const filaExistente = cuerpoCarrito.querySelector(`tr[data-id="${id}"]`);
+        const filaExistente = cuerpoCarrito.querySelector(`.cart-item[data-id="${id}"]`);
 
         if (filaExistente) {
-            // En compra no hay tope de stock: sumar 1 sin límite
             const inputCantidad = filaExistente.querySelector('.input-cantidad');
             inputCantidad.value = parseInt(inputCantidad.value) + 1;
+            actualizarSubtotalFila(filaExistente);
         } else {
-            // Precio vacío: lo carga el usuario a mano
             crearFilaCarrito(id, nombre, 1, '');
         }
 
@@ -88,28 +99,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function crearFilaCarrito(id, nombre, cantidad, precio) {
-        const fila = document.createElement('tr');
+        const fila = document.createElement('div');
+        fila.className = 'cart-item';
         fila.dataset.id = id;
 
         fila.innerHTML = `
-            <td class="texto-centrado">
-                <input type="number" class="input-cantidad" value="${cantidad}" min="1">
-            </td>
-            <td>
-                <div class="item-nombre" title="${nombre}">${nombre}</div>
-                <div class="fila-precio-compra">
-                    <span class="prefijo-precio">$</span>
-                    <input type="number" class="input-precio-item" placeholder="0.00" min="0" step="0.01" value="${precio}">
-                    <span class="texto-cu">c/u</span>
+            <div class="cart-item__top">
+                <div>
+                    <div class="cart-item__name" title="${nombre}">${nombre}</div>
+                    <div class="cart-item__sub">ID: ${id}</div>
                 </div>
-                <div class="item-subtotal">Subtotal: $ 0.00</div>
-            </td>
-            <td class="texto-derecha">
-                <button type="button" class="boton-eliminar-item"><span class="material-symbols-outlined">delete</span></button>
-            </td>
+                <button type="button" class="cart-item__rm" title="Quitar">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="cart-item__ctrl">
+                <div class="cart-stepper">
+                    <button type="button" data-step="menos" title="Restar"><span class="material-symbols-outlined">remove</span></button>
+                    <input type="number" class="input-cantidad" value="${cantidad}" min="1">
+                    <button type="button" data-step="mas" title="Sumar"><span class="material-symbols-outlined">add</span></button>
+                </div>
+                <div class="cart-priceedit" style="margin-left: auto;">
+                    <span class="cart-priceedit__cur">$</span>
+                    <input type="number" class="input-precio-item" placeholder="0.00" min="0" step="0.01" value="${precio}">
+                </div>
+            </div>
+            <div class="cart-item__sub2">
+                <span class="cart-item__sublabel">Subtotal</span>
+                <span class="cart-item__subval">$ 0.00</span>
+            </div>
         `;
 
         const inputCantidad = fila.querySelector('.input-cantidad');
+        const botonMenos = fila.querySelector('[data-step="menos"]');
+        const botonMas = fila.querySelector('[data-step="mas"]');
         const inputPrecio = fila.querySelector('.input-precio-item');
 
         function alCambiar() {
@@ -118,6 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 cant = 1;
                 inputCantidad.value = 1;
             }
+            botonMenos.disabled = cant <= 1;
             actualizarSubtotalFila(fila);
             actualizarTotal();
             guardarCarrito();
@@ -126,33 +150,47 @@ document.addEventListener('DOMContentLoaded', () => {
         inputCantidad.addEventListener('input', alCambiar);
         inputPrecio.addEventListener('input', alCambiar);
 
-        const botonEliminar = fila.querySelector('.boton-eliminar-item');
-        botonEliminar.addEventListener('click', function () {
-            const cantidadActual = parseInt(inputCantidad.value);
-            if (cantidadActual > 1) {
-                inputCantidad.value = cantidadActual - 1;
-                actualizarSubtotalFila(fila);
-            } else {
-                fila.remove();
+        botonMenos.addEventListener('click', function () {
+            const actual = parseInt(inputCantidad.value);
+            if (actual > 1) {
+                inputCantidad.value = actual - 1;
+                alCambiar();
             }
+        });
+
+        botonMas.addEventListener('click', function () {
+            inputCantidad.value = parseInt(inputCantidad.value) + 1;
+            alCambiar();
+        });
+
+        const botonEliminar = fila.querySelector('.cart-item__rm');
+        botonEliminar.addEventListener('click', function () {
+            fila.remove();
             actualizarTotal();
+            actualizarVistaResumen();
             guardarCarrito();
+            const btnTabla = contenedorTabla.querySelector(`.boton-agregar-producto[data-id="${id}"]`);
+            if (btnTabla) btnTabla.classList.remove('is-incart');
         });
 
         cuerpoCarrito.appendChild(fila);
-        actualizarSubtotalFila(fila);
+        alCambiar();
+        actualizarVistaResumen();
+        
+        const btnTabla = contenedorTabla.querySelector(`.boton-agregar-producto[data-id="${id}"]`);
+        if(btnTabla) btnTabla.classList.add('is-incart');
     }
 
     function actualizarSubtotalFila(fila) {
         const cantidad = parseInt(fila.querySelector('.input-cantidad').value) || 0;
         const precio = parseFloat(fila.querySelector('.input-precio-item').value) || 0;
         const subtotal = cantidad * precio;
-        fila.querySelector('.item-subtotal').textContent = `Subtotal: $ ${formatoMoneda.format(subtotal)}`;
+        fila.querySelector('.cart-item__subval').textContent = `$ ${formatoMoneda.format(subtotal)}`;
     }
 
     function actualizarTotal() {
         let total = 0;
-        const filasCarrito = cuerpoCarrito.querySelectorAll('tr');
+        const filasCarrito = cuerpoCarrito.querySelectorAll('.cart-item');
 
         filasCarrito.forEach(fila => {
             const cantidad = parseInt(fila.querySelector('.input-cantidad').value) || 0;
@@ -162,6 +200,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         elementoTotal.textContent = `$ ${formatoMoneda.format(total)}`;
     }
+
+    botonVaciar.addEventListener('click', function () {
+        cuerpoCarrito.innerHTML = '';
+        actualizarTotal();
+        actualizarVistaResumen();
+        guardarCarrito();
+        contenedorTabla.querySelectorAll('.boton-agregar-producto').forEach(btn => btn.classList.remove('is-incart'));
+    });
 
     // =============================================
     //  BUSCADOR DE PRODUCTOS (AJAX)
@@ -180,16 +226,19 @@ document.addEventListener('DOMContentLoaded', () => {
             url.searchParams.delete('page');
         }
 
-        fetch(url, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-        })
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
             .then(response => response.text())
             .then(html => {
                 contenedorTabla.innerHTML = html;
                 vincularBotonesAgregar();
                 vincularPaginacion();
+                
+                // Highlight items already in cart
+                const idsCarrito = Array.from(cuerpoCarrito.querySelectorAll('.cart-item')).map(f => f.dataset.id);
+                idsCarrito.forEach(id => {
+                    const btn = contenedorTabla.querySelector(`.boton-agregar-producto[data-id="${id}"]`);
+                    if(btn) btn.classList.add('is-incart');
+                });
             })
             .catch(error => console.error('Error en la búsqueda:', error));
     }
@@ -232,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     botonConfirmar.addEventListener('click', function () {
-        const filas = cuerpoCarrito.querySelectorAll('tr');
+        const filas = cuerpoCarrito.querySelectorAll('.cart-item');
 
         if (filas.length === 0) {
             avisar('Agregá al menos un producto antes de confirmar.');
@@ -255,7 +304,6 @@ document.addEventListener('DOMContentLoaded', () => {
             items.push({
                 id_producto: fila.dataset.id,
                 cantidad: cantidad,
-                // Enviar como string para que Django lo convierta a Decimal sin ruido de float
                 precio_unitario: precioStr
             });
         });
@@ -275,7 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const metodoPago = metodoPagoSeleccionado.value;
 
         botonConfirmar.disabled = true;
-        botonConfirmar.textContent = 'Procesando...';
+        botonConfirmar.innerHTML = 'Procesando...';
 
         fetch(window.location.href, {
             method: 'POST',
@@ -293,7 +341,6 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(({ ok, data }) => {
                 if (ok && data.ok) {
                     limpiarCarritoStorage();
-                    // Si la compra vino de un viaje, volvemos al viaje; si no, al perfil del cliente
                     if (data.id_viaje) {
                         window.location.href = `/informacion_viaje/${data.id_viaje}/`;
                     } else {
@@ -302,30 +349,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     avisar(data.error || 'Algo salió mal. Por favor, volvé a intentarlo.');
                     botonConfirmar.disabled = false;
-                    botonConfirmar.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Confirmar Compra';
+                    botonConfirmar.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Confirmar compra';
                 }
             })
             .catch(error => {
                 console.error('Error en la petición:', error);
                 avisar('Algo salió mal. Por favor, volvé a intentarlo.');
                 botonConfirmar.disabled = false;
-                botonConfirmar.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Confirmar Compra';
+                botonConfirmar.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Confirmar compra';
             });
     });
 
-    // Guardar el carrito antes de que la página se cierre o recargue
     window.addEventListener('beforeunload', function () {
-        const filas = cuerpoCarrito.querySelectorAll('tr');
-        if (filas.length > 0) {
-            guardarCarrito();
-        }
+        if (cuerpoCarrito.querySelectorAll('.cart-item').length > 0) guardarCarrito();
     });
 
-    // =============================================
-    //  INICIALIZACIÓN
-    // =============================================
-
     restaurarCarrito();
+    actualizarVistaResumen();
     vincularBotonesAgregar();
     vincularPaginacion();
 });

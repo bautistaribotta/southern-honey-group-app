@@ -1,8 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     const cuerpoCarrito = document.getElementById('cuerpo-carrito');
-    const elementoTotal = document.querySelector('.total-destacado');
+    const elementoTotal = document.getElementById('total-destacado');
     const inputBusqueda = document.querySelector('.input-busqueda');
     const contenedorTabla = document.getElementById('contenedor-tabla-operaciones');
+    const carritoVacio = document.getElementById('carrito-vacio');
+    const contadorCarrito = document.getElementById('contador-carrito');
+    const botonVaciar = document.getElementById('boton-vaciar-carrito');
 
     // Formateadores en formato argentino (separador de miles con punto)
     const formatoMoneda = new Intl.NumberFormat('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -16,13 +19,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // =============================================
 
     function guardarCarrito() {
-        const filas = cuerpoCarrito.querySelectorAll('tr');
+        const filas = cuerpoCarrito.querySelectorAll('.cart-item');
         const items = [];
         filas.forEach(fila => {
             items.push({
                 id: fila.dataset.id,
                 precio: fila.dataset.precio,
-                nombre: fila.querySelector('.item-nombre').textContent,
+                nombre: fila.querySelector('.cart-item__name').textContent,
                 cantidad: parseInt(fila.querySelector('.input-cantidad').value),
                 stockOriginal: parseInt(fila.dataset.stockOriginal)
             });
@@ -31,13 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function restaurarCarrito() {
-        // Detectar si la página fue recargada (F5) o es una navegación nueva
         const navegacion = performance.getEntriesByType('navigation')[0];
         const esRecarga = navegacion && navegacion.type === 'reload';
 
         if (!esRecarga) {
-            // Es una navegación nueva (ej: volver al perfil y entrar de nuevo)
-            // → limpiar cualquier carrito viejo
             sessionStorage.removeItem(STORAGE_KEY);
             return;
         }
@@ -56,11 +56,9 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         });
         actualizarTotal();
-        // Ajustar el stock visual de los productos visibles en la tabla
         ajustarStockVisual();
     }
 
-    /** Limpia el carrito del storage */
     function limpiarCarritoStorage() {
         sessionStorage.removeItem(STORAGE_KEY);
     }
@@ -69,23 +67,15 @@ document.addEventListener('DOMContentLoaded', () => {
     //  CONTROL DE STOCK VISUAL
     // =============================================
 
-    /**
-     * Busca la fila del producto en la tabla de listado por su ID.
-     * Retorna { fila, stockCell, boton } o null si el producto no está en la página actual.
-     */
     function buscarProductoEnTabla(idProducto) {
         const boton = contenedorTabla.querySelector(`.boton-agregar-producto[data-id="${idProducto}"]`);
         if (!boton) return null;
 
         const fila = boton.closest('tr');
-        const stockCell = fila.querySelector('.stock-valor');
+        const stockCell = fila.querySelector('.cart-stock');
         return { fila, stockCell, boton };
     }
 
-    /**
-     * Actualiza el stock visual de un producto en la tabla de listado.
-     * Cambia el número mostrado y deshabilita el botón si el stock llega a 0.
-     */
     function actualizarStockProducto(idProducto, stockDisponible) {
         const producto = buscarProductoEnTabla(idProducto);
         if (!producto) return;
@@ -95,20 +85,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (stockDisponible <= 0) {
             producto.boton.disabled = true;
             producto.boton.classList.add('boton-sin-stock');
-            producto.boton.title = "No hay stock disponible de este producto";
+            producto.boton.title = "Sin stock disponible";
+            producto.stockCell.classList.add('cart-stock--zero');
         } else {
             producto.boton.disabled = false;
             producto.boton.classList.remove('boton-sin-stock');
-            producto.boton.title = "Añadir a la operación";
+            producto.boton.title = "Añadir a la venta";
+            producto.stockCell.classList.remove('cart-stock--zero');
         }
     }
 
-    /**
-     * Recorre los items del carrito y ajusta el stock visual de los productos
-     * que estén visibles en la tabla de listado.
-     */
     function ajustarStockVisual() {
-        const filasCarrito = cuerpoCarrito.querySelectorAll('tr');
+        const filasCarrito = cuerpoCarrito.querySelectorAll('.cart-item');
         filasCarrito.forEach(filaCarrito => {
             const idProducto = filaCarrito.dataset.id;
             const cantidadEnCarrito = parseInt(filaCarrito.querySelector('.input-cantidad').value);
@@ -120,13 +108,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =============================================
+    //  ESTADO DEL RESUMEN (vacío / contador)
+    // =============================================
+
+    function actualizarVistaResumen() {
+        const cantidadItems = cuerpoCarrito.querySelectorAll('.cart-item').length;
+        const hayItems = cantidadItems > 0;
+
+        carritoVacio.classList.toggle('oculto', hayItems);
+        cuerpoCarrito.classList.toggle('oculto', !hayItems);
+        botonVaciar.classList.toggle('oculto', !hayItems);
+        contadorCarrito.classList.toggle('oculto', !hayItems);
+        contadorCarrito.textContent = cantidadItems;
+    }
+
+    // =============================================
     //  LÓGICA DEL CARRITO
     // =============================================
 
-    /**
-     * Vincula los botones de "agregar al carrito" de la tabla de productos.
-     * Se debe llamar cada vez que se reemplaza el contenido de la tabla (AJAX).
-     */
     function vincularBotonesAgregar() {
         const botones = contenedorTabla.querySelectorAll('.boton-agregar-producto');
         botones.forEach(boton => {
@@ -143,26 +142,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function agregarAlCarrito(id, nombre, precio, stockOriginal) {
-        const filaExistente = cuerpoCarrito.querySelector(`tr[data-id="${id}"]`);
+        const filaExistente = cuerpoCarrito.querySelector(`.cart-item[data-id="${id}"]`);
 
         if (filaExistente) {
             const inputCantidad = filaExistente.querySelector('.input-cantidad');
             const cantidadActual = parseInt(inputCantidad.value);
 
-            // Validar que no supere el stock original
-            if (cantidadActual >= stockOriginal) {
-                return;
-            }
+            if (cantidadActual >= stockOriginal) return;
 
             inputCantidad.value = cantidadActual + 1;
-            actualizarStockProducto(id, stockOriginal - (cantidadActual + 1));
+            actualizarFila(filaExistente);
         } else {
-            if (stockOriginal <= 0) {
-                return;
-            }
-
+            if (stockOriginal <= 0) return;
             crearFilaCarrito(id, nombre, precio, 1, stockOriginal);
-            actualizarStockProducto(id, stockOriginal - 1);
         }
 
         actualizarTotal();
@@ -170,26 +162,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function crearFilaCarrito(id, nombre, precio, cantidad, stockOriginal) {
-        const fila = document.createElement('tr');
+        const fila = document.createElement('div');
+        fila.className = 'cart-item';
         fila.dataset.id = id;
         fila.dataset.precio = precio;
         fila.dataset.stockOriginal = stockOriginal;
 
         fila.innerHTML = `
-            <td class="texto-centrado">
-                <input type="number" class="input-cantidad" value="${cantidad}" min="1" max="${stockOriginal}">
-            </td>
-            <td>
-                <div class="item-nombre" title="${nombre}">${nombre}</div>
-                <div class="item-precio">$ ${formatoMoneda.format(precio)} c/u</div>
-            </td>
-            <td class="texto-derecha">
-                <button type="button" class="boton-eliminar-item"><span class="material-symbols-outlined">delete</span></button>
-            </td>
+            <div class="cart-item__top">
+                <div>
+                    <div class="cart-item__name" title="${nombre}">${nombre}</div>
+                    <div class="cart-item__sub">ID: ${id}</div>
+                </div>
+                <button type="button" class="cart-item__rm" title="Quitar">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="cart-item__ctrl">
+                <div class="cart-stepper">
+                    <button type="button" data-step="menos" title="Restar"><span class="material-symbols-outlined">remove</span></button>
+                    <input type="number" class="input-cantidad" value="${cantidad}" min="1" max="${stockOriginal}">
+                    <button type="button" data-step="mas" title="Sumar"><span class="material-symbols-outlined">add</span></button>
+                </div>
+                <span class="cart-pricestatic" style="margin-left: auto;">$ <strong>${formatoMoneda.format(precio)}</strong> c/u</span>
+            </div>
+            <div class="cart-item__sub2">
+                <span class="cart-item__sublabel">Subtotal</span>
+                <span class="cart-item__subval">$ ${formatoMoneda.format(precio * cantidad)}</span>
+            </div>
         `;
 
-        // Recalcular el total y validar stock cuando el usuario cambia la cantidad
         const inputCantidad = fila.querySelector('.input-cantidad');
+        const botonMenos = fila.querySelector('[data-step="menos"]');
+        const botonMas = fila.querySelector('[data-step="mas"]');
 
         inputCantidad.addEventListener('input', function () {
             let val = parseInt(this.value);
@@ -204,38 +209,64 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.value = stockOriginal;
             }
 
-            const stockDisponible = stockOriginal - val;
-            actualizarStockProducto(id, stockDisponible);
-
+            actualizarFila(fila);
             actualizarTotal();
             guardarCarrito();
         });
 
-        // Lógica para restar de a 1 y eliminar la fila si llega a 0
-        const botonEliminar = fila.querySelector('.boton-eliminar-item');
-        botonEliminar.addEventListener('click', function () {
-            const cantidadActual = parseInt(inputCantidad.value);
-
-            if (cantidadActual > 1) {
-                // Restar 1 a la cantidad
-                inputCantidad.value = cantidadActual - 1;
-                actualizarStockProducto(id, stockOriginal - (cantidadActual - 1));
-            } else {
-                // Cantidad es 1 → eliminar la fila y restaurar todo el stock
-                fila.remove();
-                actualizarStockProducto(id, stockOriginal);
+        botonMenos.addEventListener('click', function () {
+            const actual = parseInt(inputCantidad.value);
+            if (actual > 1) {
+                inputCantidad.value = actual - 1;
+                actualizarFila(fila);
+                actualizarTotal();
+                guardarCarrito();
             }
+        });
 
+        botonMas.addEventListener('click', function () {
+            const actual = parseInt(inputCantidad.value);
+            if (actual < stockOriginal) {
+                inputCantidad.value = actual + 1;
+                actualizarFila(fila);
+                actualizarTotal();
+                guardarCarrito();
+            }
+        });
+
+        const botonEliminar = fila.querySelector('.cart-item__rm');
+        botonEliminar.addEventListener('click', function () {
+            fila.remove();
+            actualizarStockProducto(id, stockOriginal);
             actualizarTotal();
+            actualizarVistaResumen();
             guardarCarrito();
         });
 
         cuerpoCarrito.appendChild(fila);
+        actualizarFila(fila);
+        actualizarVistaResumen();
+        
+        // Marcar en la tabla que está en carrito
+        const btnTabla = contenedorTabla.querySelector(`.boton-agregar-producto[data-id="${id}"]`);
+        if(btnTabla) btnTabla.classList.add('is-incart');
+    }
+
+    function actualizarFila(fila) {
+        const precio = parseFloat(fila.dataset.precio);
+        const stockOriginal = parseInt(fila.dataset.stockOriginal);
+        const cantidad = parseInt(fila.querySelector('.input-cantidad').value);
+
+        fila.querySelector('.cart-item__subval').textContent = `$ ${formatoMoneda.format(precio * cantidad)}`;
+        fila.querySelector('[data-step="menos"]').disabled = cantidad <= 1;
+        fila.querySelector('[data-step="mas"]').disabled = cantidad >= stockOriginal;
+
+        actualizarStockProducto(fila.dataset.id, stockOriginal - cantidad);
     }
 
     function actualizarTotal() {
         let total = 0;
-        const filasCarrito = cuerpoCarrito.querySelectorAll('tr');
+        const filasCarrito = cuerpoCarrito.querySelectorAll('.cart-item');
 
         filasCarrito.forEach(fila => {
             const precio = parseFloat(fila.dataset.precio);
@@ -246,16 +277,24 @@ document.addEventListener('DOMContentLoaded', () => {
         elementoTotal.textContent = `$ ${formatoMoneda.format(total)}`;
     }
 
+    botonVaciar.addEventListener('click', function () {
+        const filas = cuerpoCarrito.querySelectorAll('.cart-item');
+        filas.forEach(fila => actualizarStockProducto(fila.dataset.id, parseInt(fila.dataset.stockOriginal)));
+        cuerpoCarrito.innerHTML = '';
+        actualizarTotal();
+        actualizarVistaResumen();
+        guardarCarrito();
+        
+        // Remover el highlight
+        contenedorTabla.querySelectorAll('.boton-agregar-producto').forEach(btn => btn.classList.remove('is-incart'));
+    });
+
     // =============================================
     //  BUSCADOR DE PRODUCTOS (AJAX)
     // =============================================
 
     let timeoutBusqueda = null;
 
-    /**
-     * Realiza una búsqueda AJAX y reemplaza solo el contenido de la tabla.
-     * @param {string|null} urlString - URL opcional (ej: para paginación)
-     */
     function buscarProductos(urlString = null) {
         let url;
 
@@ -267,26 +306,17 @@ document.addEventListener('DOMContentLoaded', () => {
             url.searchParams.delete('page');
         }
 
-        fetch(url, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-        })
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
             .then(response => response.text())
             .then(html => {
                 contenedorTabla.innerHTML = html;
-                // Re-vincular los botones de agregar y paginación tras reemplazar el HTML
                 vincularBotonesAgregar();
                 vincularPaginacion();
-                // Ajustar stock visual según el carrito actual
                 ajustarStockVisual();
             })
             .catch(error => console.error('Error en la búsqueda:', error));
     }
 
-    /**
-     * Vincula los links de paginación para que funcionen via AJAX.
-     */
     function vincularPaginacion() {
         const linksPaginacion = contenedorTabla.querySelectorAll('.paginacion-botones a');
 
@@ -298,7 +328,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Escuchar el input de búsqueda con debounce
     inputBusqueda.addEventListener('input', function () {
         clearTimeout(timeoutBusqueda);
         timeoutBusqueda = setTimeout(() => {
@@ -312,29 +341,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const botonConfirmar = document.querySelector('.boton-confirmar-operacion');
 
-    /**
-     * Obtiene el token CSRF de las cookies de Django.
-     * Es necesario para que Django acepte peticiones POST via fetch.
-     */
     function obtenerCSRFToken() {
         const cookie = document.cookie.split('; ').find(c => c.startsWith('csrftoken='));
         return cookie ? cookie.split('=')[1] : '';
     }
 
     botonConfirmar.addEventListener('click', function () {
-        const filas = cuerpoCarrito.querySelectorAll('tr');
+        const filas = cuerpoCarrito.querySelectorAll('.cart-item');
 
-        // Validar que haya al menos un producto en el carrito
         if (filas.length === 0) {
-            if (typeof notificarError === 'function') {
-                notificarError('Agregá al menos un producto antes de confirmar.');
-            } else {
-                alert('Agregá al menos un producto antes de confirmar.');
-            }
+            alert('Agregá al menos un producto antes de confirmar.');
             return;
         }
 
-        // Recopilar los items del carrito
         const items = [];
         filas.forEach(fila => {
             items.push({
@@ -343,24 +362,17 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Obtener el método de pago seleccionado
         const metodoPagoSeleccionado = document.querySelector('input[name="metodo_pago"]:checked');
 
-        // Validar que se haya seleccionado un método de pago
         if (!metodoPagoSeleccionado) {
-            if (typeof notificarError === 'function') {
-                notificarError('Seleccioná un método de pago antes de continuar.');
-            } else {
-                alert('Seleccioná un método de pago antes de continuar.');
-            }
+            alert('Seleccioná un método de pago antes de continuar.');
             return;
         }
 
         const metodoPago = metodoPagoSeleccionado.value;
 
-        // Deshabilito el botón para evitar doble click
         botonConfirmar.disabled = true;
-        botonConfirmar.textContent = 'Procesando...';
+        botonConfirmar.innerHTML = 'Procesando...';
 
         fetch(window.location.href, {
             method: 'POST',
@@ -378,47 +390,31 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(({ ok, data }) => {
                 if (ok && data.ok) {
                     limpiarCarritoStorage();
-                    // Si la operacion vino de un viaje, volvemos al viaje; si no, al perfil del cliente
                     if (data.id_viaje) {
                         window.location.href = `/informacion_viaje/${data.id_viaje}/`;
                     } else {
                         window.location.href = `/informacion_clientes/${data.id_cliente}/`;
                     }
                 } else {
-                    if (typeof notificarError === 'function') {
-                        notificarError(data.error || 'Algo salió mal. Por favor, volvé a intentarlo.');
-                    } else {
-                        alert(data.error || 'Algo salió mal. Por favor, volvé a intentarlo.');
-                    }
+                    alert(data.error || 'Algo salió mal. Por favor, volvé a intentarlo.');
                     botonConfirmar.disabled = false;
-                    botonConfirmar.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Confirmar Operación';
+                    botonConfirmar.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Confirmar venta';
                 }
             })
             .catch(error => {
                 console.error('Error en la petición:', error);
-                if (typeof notificarError === 'function') {
-                    notificarError('Algo salió mal. Por favor, volvé a intentarlo.');
-                } else {
-                    alert('Algo salió mal. Por favor, volvé a intentarlo.');
-                }
+                alert('Algo salió mal. Por favor, volvé a intentarlo.');
                 botonConfirmar.disabled = false;
-                botonConfirmar.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Confirmar Operación';
+                botonConfirmar.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Confirmar venta';
             });
     });
 
-    // Guardar el carrito antes de que la página se cierre o recargue
     window.addEventListener('beforeunload', function () {
-        const filas = cuerpoCarrito.querySelectorAll('tr');
-        if (filas.length > 0) {
-            guardarCarrito();
-        }
+        if (cuerpoCarrito.querySelectorAll('.cart-item').length > 0) guardarCarrito();
     });
 
-    // =============================================
-    //  INICIALIZACIÓN
-    // =============================================
-
     restaurarCarrito();
+    actualizarVistaResumen();
     vincularBotonesAgregar();
     vincularPaginacion();
 });
