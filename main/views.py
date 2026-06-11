@@ -454,8 +454,9 @@ def nueva_operacion_venta(request, id_cliente):
                 {"error": f"Error al procesar la operación: {e}"}, status=500
             )
 
-    # Parámetro de búsqueda
+    # Parámetros de búsqueda y filtro por categoría
     q = request.GET.get("q", "")
+    categoria_filtrada = request.GET.get("categoria", "")
 
     productos = Producto.objects.filter(activo=True)
 
@@ -465,6 +466,9 @@ def nueva_operacion_venta(request, id_cliente):
         else:
             productos = productos.filter(nombre__icontains=q)
 
+    if categoria_filtrada:
+        productos = productos.filter(categoria=categoria_filtrada)
+
     productos = productos.order_by("nombre")
 
     # Cargo de a 6 productos para tener un alto de tabla acorde
@@ -472,7 +476,13 @@ def nueva_operacion_venta(request, id_cliente):
     pagina_numero = request.GET.get("page")
     pagina_obj = paginator_productos.get_page(pagina_numero)
 
-    contexto = {"cliente": cliente, "productos": pagina_obj, "q": q}
+    contexto = {
+        "cliente": cliente,
+        "productos": pagina_obj,
+        "q": q,
+        "categoria": categoria_filtrada,
+        "categorias": Producto.categorias,
+    }
 
     # Si es una petición AJAX, devuelvo solo la tabla parcial
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
@@ -520,8 +530,9 @@ def nueva_operacion_compra(request, id_cliente):
                 {"error": f"Error al procesar la compra: {e}"}, status=500
             )
 
-    # Parámetro de búsqueda
+    # Parámetros de búsqueda y filtro por categoría
     q = request.GET.get("q", "")
+    categoria_filtrada = request.GET.get("categoria", "")
 
     productos = Producto.objects.filter(activo=True)
 
@@ -531,13 +542,22 @@ def nueva_operacion_compra(request, id_cliente):
         else:
             productos = productos.filter(nombre__icontains=q)
 
+    if categoria_filtrada:
+        productos = productos.filter(categoria=categoria_filtrada)
+
     productos = productos.order_by("nombre")
 
     paginator_productos = Paginator(productos, 6)
     pagina_numero = request.GET.get("page")
     pagina_obj = paginator_productos.get_page(pagina_numero)
 
-    contexto = {"cliente": cliente, "productos": pagina_obj, "q": q}
+    contexto = {
+        "cliente": cliente,
+        "productos": pagina_obj,
+        "q": q,
+        "categoria": categoria_filtrada,
+        "categorias": Producto.categorias,
+    }
 
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
         return render(request, "tabla_compras_productos.html", contexto)

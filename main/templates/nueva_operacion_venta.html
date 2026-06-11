@@ -15,15 +15,13 @@
 
 {% block area-trabajo %}
   <!-- ÁREA DE TRABAJO -->
-  <section id="area-trabajo" style="padding: 1.5rem;">
+  <section id="area-trabajo" class="area-operacion">
     <div class="cart-screen">
       <!-- Encabezado de la vista -->
-      <div style="margin-bottom: 0.5rem;">
-        <a href="{% url 'informacion_clientes' cliente.id %}" class="boton-volver-sistema">
-          <span class="material-symbols-outlined">arrow_back</span>
-          VOLVER AL PERFIL
-        </a>
-      </div>
+      <a href="{% url 'informacion_clientes' cliente.id %}" class="cart-back">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Volver al perfil del cliente
+      </a>
 
       <div class="cart-head">
         <div class="cart-head__left">
@@ -55,8 +53,12 @@
             </div>
             
             <div class="cart-chips">
-              <button type="button" class="cart-chip is-active">Todas</button>
-              <!-- Categorías opcionales aquí -->
+              <button type="button" class="cart-chip{% if not categoria %} is-active{% endif %}" data-categoria="">Todas</button>
+              {% for valor, etiqueta in categorias %}
+              <button type="button" class="cart-chip{% if categoria == valor %} is-active{% endif %}" data-categoria="{{ valor }}">
+                <span class="cart-chip__dot cat-dot--{{ valor|lower }}"></span>{{ etiqueta }}
+              </button>
+              {% endfor %}
             </div>
           </div>
 
@@ -88,7 +90,7 @@
 
           <!-- Pie del resumen -->
           <div class="cart-foot">
-            <button type="button" class="cart-clear oculto" id="boton-vaciar-carrito" style="align-self: flex-end; margin-top: -0.2rem;">
+            <button type="button" class="cart-clear cart-clear--top oculto" id="boton-vaciar-carrito">
               <span class="material-symbols-outlined">delete_sweep</span>Vaciar carrito
             </button>
 

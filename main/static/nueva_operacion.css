@@ -4,7 +4,19 @@
    Tokens come from base.css.
    ============================================================ */
 
+.area-operacion { padding: 1.5rem; }
 .cart-screen { display: flex; flex-direction: column; gap: 1.25rem; }
+
+/* ---- Puntos de color por categoria (chips + listado) ------------------ */
+.cart-chip__dot, .cart-prod__dot { background: var(--text-subtle); }
+.cat-dot--miel { background: var(--color-amarillo-texto-etiqueta); }
+.cat-dot--alimento { background: var(--color-verde-texto-etiqueta); }
+.cat-dot--cera { background: var(--color-cera-texto-etiqueta); }
+.cat-dot--madera { background: var(--color-madera-texto-etiqueta); }
+.cat-dot--estampado { background: var(--text-subtle); }
+.cat-dot--insumos { background: var(--color-insumos-texto-etiqueta); }
+.cat-dot--medicamentos { background: var(--color-rojo-texto-etiqueta); }
+.cat-dot--otros { background: var(--color-gris-texto-etiqueta); }
 
 /* ---- Header ----------------------------------------------------------- */
 .cart-back {
@@ -31,13 +43,13 @@
 .cart-head__sub { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.3rem; flex-wrap: wrap; }
 .cart-head__cliente {
   display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.6rem; border-radius: var(--radius-pill);   
-  background: var(--honey-tint-10, rgb(255 181 4 / 0.1)); border: 1px solid var(--honey-200, #FDE68A); color: var(--honey-700, #975A16);
+  background: var(--honey-tint-10); border: 1px solid var(--honey-200); color: var(--honey-700);
   font-size: var(--text-xs); font-weight: var(--weight-bold);
 }
 .cart-head__cliente .material-symbols-outlined { font-size: 0.95rem; }
 .cart-head__cuit { font-size: var(--text-xs); color: var(--text-subtle); }
 .cart-head__change { background: none; border: none; cursor: pointer; color: var(--brand-active); font-family: var(--font-sans); font-size: var(--text-xs); font-weight: var(--weight-bold); padding: 0; }
-.cart-head__change:hover { color: var(--honey-700, #975A16); }
+.cart-head__change:hover { color: var(--honey-700); }
 .cart-head__seg { width: 280px; max-width: 100%; flex: none; }
 
 /* ---- Two-column layout ------------------------------------------------ */
@@ -58,7 +70,7 @@
   font-family: var(--font-sans); font-size: var(--text-sm); color: var(--text-body);
   background: var(--surface-card); box-sizing: border-box;
 }
-.cart-search input:focus { border-color: var(--brand); outline: none; box-shadow: 0 0 0 3px var(--brand-tint-20, rgba(15, 40, 32, 0.2)); }
+.cart-search input:focus { border-color: var(--brand); outline: none; box-shadow: var(--ring); }
 
 .cart-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .cart-chip {
@@ -69,7 +81,7 @@
   cursor: pointer; transition: background var(--dur-normal) var(--ease-standard), color var(--dur-normal) var(--ease-standard), border-color var(--dur-normal) var(--ease-standard);
 }
 .cart-chip:hover { background: var(--surface-hover); color: var(--text-body); }
-.cart-chip.is-active { background: var(--brand-secondary); color: #fff; border-color: var(--brand-secondary); }
+.cart-chip.is-active { background: var(--brand-secondary); color: var(--text-on-honey); border-color: var(--brand-secondary); }
 .cart-chip__dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
 
 .cart-tablecard { background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
@@ -83,7 +95,7 @@
 .cart-table tbody tr { transition: background var(--dur-normal) var(--ease-standard); }
 .cart-table tbody tr:hover { background: var(--surface-hover); }
 .cart-table tbody tr:last-child td { border-bottom: none; }
-.cart-table tbody tr.is-incart { background: var(--honey-tint-05, rgb(255 181 4 / 0.06)); }
+.cart-table tbody tr.is-incart { background: var(--honey-tint-10); }
 .cart-table .c { text-align: center; font-variant-numeric: tabular-nums; }
 .cart-table .r { text-align: right; font-variant-numeric: tabular-nums; }
 .cart-prod { display: flex; align-items: center; gap: 0.65rem; }
@@ -99,23 +111,29 @@
 .cart-addbtn {
   width: 34px; height: 34px; flex: none; border-radius: var(--radius-md);
   display: inline-flex; align-items: center; justify-content: center;
-  background: var(--brand-secondary, var(--honey-500, #FFB504)); color: var(--brand, var(--pine-900, #0F2820)); border: none; cursor: pointer;
+  background: var(--brand-secondary); color: var(--brand); border: none; cursor: pointer;
   transition: transform var(--dur-fast) var(--ease-standard), background var(--dur-normal) var(--ease-standard);        
 }
 .cart-addbtn .material-symbols-outlined { font-size: 1.25rem; }
-.cart-addbtn:hover { background: var(--pine-800, #16382C); color: white; }
+.cart-addbtn:hover { background: var(--pine-950); color: var(--text-on-inverse); }
 .cart-addbtn:active { transform: scale(0.92); }
 .cart-addbtn.is-incart { background: var(--brand); color: var(--brand-secondary); }
 .cart-addbtn:disabled { opacity: 0.4; cursor: not-allowed; background: var(--surface-sunken); color: var(--text-subtle); }
 .cart-incart-pill {
   display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.15rem 0.5rem; border-radius: var(--radius-pill);  
-  background: var(--success-50); border: 1px solid var(--success-200); color: var(--success-700, var(--success-600));   
+  background: var(--success-50); border: 1px solid var(--success-200); color: var(--success-600);   
   font-size: 0.68rem; font-weight: var(--weight-bold); white-space: nowrap; margin-right: 0.4rem;
 }
 .cart-incart-pill .material-symbols-outlined { font-size: 0.85rem; }
 .cart-table__empty { text-align: center; color: var(--text-subtle); padding: 2.5rem 1.5rem; font-size: var(--text-sm); }
 .cart-table__empty .material-symbols-outlined { display: block; font-size: 2.25rem; color: var(--sand-400); margin: 0 auto 0.5rem; }
-.cart-table__foot { padding: 0.75rem 1.25rem; border-top: 1px solid var(--border-subtle); font-size: var(--text-xs); color: var(--text-muted); background: var(--surface-card); }
+.cart-table__foot { padding: 0.75rem 1.25rem; border-top: 1px solid var(--border-subtle); font-size: var(--text-xs); color: var(--text-muted); background: var(--surface-card); display: flex; justify-content: flex-end; align-items: center; }
+.cart-table .col-accion { width: 56px; }
+.cart-addbtn-wrap { display: flex; align-items: center; justify-content: flex-end; }
+.paginacion-compacta { display: flex; align-items: center; gap: 0.5rem; }
+.paginacion-info { margin-right: 0.5rem; }
+.paginacion-compacta a { text-decoration: none; }
+.texto-gris { color: var(--text-muted); }
 
 /* density */
 .cart-density-compacta .cart-table th { padding: 0.55rem 1.25rem; }
@@ -136,6 +154,7 @@
 .cart-clear { background: none; border: none; cursor: pointer; color: var(--text-subtle); font-family: var(--font-sans); font-size: var(--text-xs); font-weight: var(--weight-semibold); padding: 0; display: inline-flex; align-items: center; gap: 0.2rem; }
 .cart-clear:hover { color: var(--danger-600); }
 .cart-clear .material-symbols-outlined { font-size: 1rem; }
+.cart-clear--top { align-self: flex-end; margin-top: -0.2rem; }
 
 .cart-items { flex: 1; overflow-y: auto; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem; min-height: 120px; }
 .cart-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; padding: 2.5rem 1.5rem; text-align: center; color: var(--text-subtle); flex: 1; }
@@ -170,8 +189,9 @@
 .cart-priceedit__cur { font-size: var(--text-xs); color: var(--text-subtle); font-weight: var(--weight-semibold); }
 .cart-priceedit input { width: 64px; border: none; background: none; font-family: var(--font-sans); font-size: var(--text-sm); font-weight: var(--weight-bold); color: var(--text-strong); text-align: right; font-variant-numeric: tabular-nums; -moz-appearance: textfield; }
 .cart-priceedit input::-webkit-outer-spin-button, .cart-priceedit input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.cart-priceedit:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px rgb(255 181 4 / 0.22); }
-.cart-pricestatic { font-size: var(--text-sm); color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.cart-priceedit:focus-within { border-color: var(--brand); box-shadow: var(--ring); }
+.cart-priceedit { margin-left: auto; }
+.cart-pricestatic { margin-left: auto; font-size: var(--text-sm); color: var(--text-muted); font-variant-numeric: tabular-nums; }
 .cart-pricestatic strong { color: var(--text-strong); font-weight: var(--weight-bold); }
 
 .cart-item__sub2 { display: flex; align-items: baseline; justify-content: space-between; margin-top: 0.55rem; padding-top: 0.5rem; border-top: 1px dashed var(--border-subtle); }
@@ -202,10 +222,10 @@
 }
 .cart-payseg__opt .material-symbols-outlined { font-size: 1.2rem; }
 .cart-payseg__opt:hover { color: var(--text-body); }
-.cart-payseg__opt.is-selected { color: var(--text-on-brand, white); }
+.cart-payseg__opt.is-selected { color: var(--text-on-inverse); }
 .cart-payseg__thumb {
   position: absolute; z-index: 1; top: 0.25rem; bottom: 0.25rem; left: 0.25rem;
-  width: calc(50% - 0.25rem); border-radius: var(--radius-pill); background: var(--brand, var(--pine-900));
+  width: calc(50% - 0.25rem); border-radius: var(--radius-pill); background: var(--brand);
   box-shadow: var(--shadow-sm);
   transition: transform 0.2s ease;
 }
@@ -222,11 +242,11 @@
 
 .cart-confirm {
   width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-  background: var(--brand, var(--pine-900)); color: white; border: none; padding: 0.8rem;
+  background: var(--brand); color: var(--text-on-inverse); border: none; padding: 0.8rem;
   font-family: var(--font-sans); font-size: var(--text-md); font-weight: var(--weight-bold);
   border-radius: var(--radius-md); cursor: pointer; transition: background 0.15s ease;
 }
-.cart-confirm:hover { background: var(--brand-hover, var(--pine-800)); }
+.cart-confirm:hover { background: var(--pine-950); }
 .cart-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .cart-foot__help { display: flex; align-items: center; gap: 0.35rem; margin: 0; font-size: var(--text-xs); color: var(--text-subtle); text-align: center; justify-content: center; }

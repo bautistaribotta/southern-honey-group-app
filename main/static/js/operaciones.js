@@ -172,7 +172,6 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="cart-item__top">
                 <div>
                     <div class="cart-item__name" title="${nombre}">${nombre}</div>
-                    <div class="cart-item__sub">ID: ${id}</div>
                 </div>
                 <button type="button" class="cart-item__rm" title="Quitar">
                     <span class="material-symbols-outlined">close</span>
@@ -184,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <input type="number" class="input-cantidad" value="${cantidad}" min="1" max="${stockOriginal}">
                     <button type="button" data-step="mas" title="Sumar"><span class="material-symbols-outlined">add</span></button>
                 </div>
-                <span class="cart-pricestatic" style="margin-left: auto;">$ <strong>${formatoMoneda.format(precio)}</strong> c/u</span>
+                <span class="cart-pricestatic">$ <strong>${formatoMoneda.format(precio)}</strong> c/u</span>
             </div>
             <div class="cart-item__sub2">
                 <span class="cart-item__sublabel">Subtotal</span>
@@ -294,6 +293,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // =============================================
 
     let timeoutBusqueda = null;
+    const chips = document.querySelectorAll('.cart-chip');
+    const chipActivo = document.querySelector('.cart-chip.is-active');
+    let categoriaActual = chipActivo ? (chipActivo.dataset.categoria || '') : '';
 
     function buscarProductos(urlString = null) {
         let url;
@@ -304,6 +306,11 @@ document.addEventListener('DOMContentLoaded', () => {
             url = new URL(window.location.href);
             url.searchParams.set('q', inputBusqueda.value.trim());
             url.searchParams.delete('page');
+            if (categoriaActual) {
+                url.searchParams.set('categoria', categoriaActual);
+            } else {
+                url.searchParams.delete('categoria');
+            }
         }
 
         fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
@@ -333,6 +340,16 @@ document.addEventListener('DOMContentLoaded', () => {
         timeoutBusqueda = setTimeout(() => {
             buscarProductos();
         }, 300);
+    });
+
+    // Filtro por categoría (chips)
+    chips.forEach(chip => {
+        chip.addEventListener('click', function () {
+            chips.forEach(c => c.classList.remove('is-active'));
+            this.classList.add('is-active');
+            categoriaActual = this.dataset.categoria || '';
+            buscarProductos();
+        });
     });
 
     // =============================================

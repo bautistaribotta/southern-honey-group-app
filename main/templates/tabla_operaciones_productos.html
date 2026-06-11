@@ -4,7 +4,7 @@
       <th>Producto</th>
       <th class="c">Stock</th>
       <th class="r">Precio</th>
-      <th class="c" style="width: 56px;"></th>
+      <th class="c col-accion"></th>
     </tr>
   </thead>
   <tbody>
@@ -12,7 +12,7 @@
     <tr>
       <td>
         <div class="cart-prod">
-          <span class="cart-prod__dot" style="background: var(--honey-500, #b07a00);"></span>
+          <span class="cart-prod__dot cat-dot--{{ producto.categoria|default:'otros'|lower }}"></span>
           <div>
             <div class="cart-prod__name">{{producto.nombre}}</div>
             <div class="cart-prod__sub">ID: {{producto.id}}</div>
@@ -26,11 +26,11 @@
         <span class="cart-price">$ {{ producto.precio|floatformat:"-2g" }}</span>
       </td>
       <td class="c">
-        <div style="display: flex; align-items: center; justify-content: flex-end;">
-          <button class="cart-addbtn boton-agregar-producto" 
-                  title="{% if producto.cantidad <= 0 %}Sin stock disponible{% else %}Añadir a la venta{% endif %}" 
-                  data-id="{{producto.id}}" 
-                  data-nombre="{{producto.nombre}}" 
+        <div class="cart-addbtn-wrap">
+          <button class="cart-addbtn boton-agregar-producto{% if producto.cantidad <= 0 %} boton-sin-stock{% endif %}"
+                  title="{% if producto.cantidad <= 0 %}Sin stock disponible{% else %}Añadir a la venta{% endif %}"
+                  data-id="{{producto.id}}"
+                  data-nombre="{{producto.nombre}}"
                   data-precio="{{producto.precio}}"
                   data-stock="{{ producto.cantidad|floatformat:0 }}"
                   {% if producto.cantidad <= 0 %}disabled{% endif %}>
@@ -50,20 +50,21 @@
   </tbody>
 </table>
 
-<div class="cart-table__foot" style="display: flex; justify-content: flex-end; align-items: center;">
-  <div class="paginacion-compacta" style="display: flex; align-items: center; gap: 0.5rem;">
-    <span class="texto-gris paginacion-info" style="margin-right: 0.5rem;">
+<!-- Paginación -->
+<div class="cart-table__foot">
+  <div class="paginacion-compacta">
+    <span class="texto-gris paginacion-info">
       Mostrando {{productos.start_index}}-{{productos.end_index}} de {{productos.paginator.count}}
     </span>
     {% if productos.has_previous %}
-    <a href="?page={{ productos.previous_page_number }}{% if q %}&q={{ q }}{% endif %}#contenedor-tabla-operaciones" style="text-decoration: none;">
+    <a href="?page={{ productos.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if categoria %}&categoria={{ categoria }}{% endif %}#contenedor-tabla-operaciones">
       <button class="boton-paginacion">Anterior</button>
     </a>
     {% else %}
     <button class="boton-paginacion" disabled>Anterior</button>
     {% endif %}
     {% if productos.has_next %}
-    <a href="?page={{ productos.next_page_number }}{% if q %}&q={{ q }}{% endif %}#contenedor-tabla-operaciones" style="text-decoration: none;">
+    <a href="?page={{ productos.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if categoria %}&categoria={{ categoria }}{% endif %}#contenedor-tabla-operaciones">
       <button class="boton-paginacion">Siguiente</button>
     </a>
     {% else %}
@@ -71,4 +72,3 @@
     {% endif %}
   </div>
 </div>
-
