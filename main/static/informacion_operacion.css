@@ -303,114 +303,16 @@
   font-variant-numeric: tabular-nums;
 }
 
+.op-table__foot td.r { white-space: nowrap; }
+
 .op-table__foot .op-foot-rest td { color: var(--danger-700); }
 
-.op-empty {
+.op-table td.op-empty {
   text-align: center;
   color: var(--text-subtle);
-  padding: 1.5rem 1rem;
+  padding: 2rem 1rem;
   font-size: var(--text-sm);
 }
-
-/* --- Valor de la deuda pendiente --- */
-.op-erosion {
-  display: flex;
-  flex-direction: column;
-  padding: 1.1rem 1.35rem 1rem;
-  background-color: var(--surface-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-}
-
-.op-erosion__top {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-bottom: 0.85rem;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.op-erosion__label {
-  font-size: var(--text-xs);
-  font-weight: var(--weight-bold);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-wide);
-  color: var(--text-muted);
-}
-
-.op-erosion__amount {
-  font-size: var(--text-lg);
-  font-weight: var(--weight-extra);
-  color: var(--text-strong);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: var(--tracking-tight);
-}
-
-.op-erosion__table { width: 100%; border-collapse: collapse; margin-top: 0.35rem; }
-
-.op-erosion__table thead th {
-  padding: 0.55rem 0.5rem 0.5rem;
-  font-size: 0.68rem;
-  font-weight: var(--weight-bold);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-wide);
-  color: var(--text-subtle);
-  text-align: right;
-}
-
-.op-erosion__table thead th:first-child { text-align: left; }
-
-.op-erosion__table tbody td,
-.op-erosion__table tbody th {
-  padding: 0.6rem 0.5rem;
-  border-top: 1px solid var(--border-subtle);
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-}
-
-.op-erosion__table tbody th {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  text-align: left;
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  color: var(--text-body);
-}
-
-.op-erosion__table tbody th .material-symbols-outlined { font-size: 1.1rem; color: var(--brand-active); }
-
-.op-erosion__then { color: var(--text-subtle); font-weight: var(--weight-semibold); }
-.op-erosion__now { font-size: var(--text-md); font-weight: var(--weight-extra); color: var(--text-strong); }
-
-.op-erosion__foot {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin: 0.85rem 0 0;
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-}
-
-.op-erosion__foot .material-symbols-outlined { font-size: 1.05rem; color: var(--sand-400); }
-
-/* --- Nota de operacion saldada --- */
-.op-paidnote {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 1rem 1.25rem;
-  background-color: var(--success-50);
-  border: 1px solid var(--success-200);
-  border-radius: var(--radius-lg);
-  color: var(--success-700);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-}
-
-.op-paidnote .material-symbols-outlined { font-size: 1.3rem; }
 
 /* --- Responsive --- */
 @media (max-width: 960px) {

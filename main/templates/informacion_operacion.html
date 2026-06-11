@@ -81,48 +81,6 @@
         </div>
     </div>
 
-    <!-- Valor de la deuda pendiente / nota de saldada -->
-    {% if operacion.estado_pago != 'Cancelada' %}
-        {% if erosion %}
-        <div class="op-erosion">
-            <div class="op-erosion__top">
-                <span class="op-erosion__label">Valor de la deuda pendiente</span>
-                <span class="op-erosion__amount">$ {{ restante|floatformat:"-2g" }}</span>
-            </div>
-            <table class="op-erosion__table">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>Al originarse</th>
-                        <th>Hoy</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row"><span class="material-symbols-outlined">attach_money</span>En dólares</th>
-                        <td class="op-erosion__then">{% if erosion.usd_origen != None %}US$ {{ erosion.usd_origen|floatformat:"-2g" }}{% else %}-{% endif %}</td>
-                        <td class="op-erosion__now">{% if erosion.usd_hoy != None %}US$ {{ erosion.usd_hoy|floatformat:"-2g" }}{% else %}-{% endif %}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row"><span class="material-symbols-outlined">water_drop</span>En kilos de miel</th>
-                        <td class="op-erosion__then">{% if erosion.kg_origen != None %}{{ erosion.kg_origen|floatformat:"-2g" }} kg{% else %}-{% endif %}</td>
-                        <td class="op-erosion__now">{% if erosion.kg_hoy != None %}{{ erosion.kg_hoy|floatformat:"-2g" }} kg{% else %}-{% endif %}</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p class="op-erosion__foot">
-                <span class="material-symbols-outlined">info</span>
-                El saldo está fijado en pesos: hace {{ erosion.dias }} día{{ erosion.dias|pluralize }} valía más en dólares y en miel.
-            </p>
-        </div>
-        {% elif restante <= 0 %}
-        <div class="op-paidnote">
-            <span class="material-symbols-outlined">check_circle</span>
-            Operación saldada por completo — no queda deuda pendiente que medir.
-        </div>
-        {% endif %}
-    {% endif %}
-
     <!-- Productos + Pagos -->
     <div class="op-grid">
 
