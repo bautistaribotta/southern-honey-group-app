@@ -52,10 +52,10 @@
 
 <!-- Paginación -->
 <div class="cart-table__foot">
-  <div class="paginacion-compacta">
-    <span class="texto-gris paginacion-info">
-      Mostrando {{productos.start_index}}-{{productos.end_index}} de {{productos.paginator.count}}
-    </span>
+  <span class="paginacion-info">
+    Mostrando <span>{{productos.start_index}}-{{productos.end_index}}</span> de <span>{{productos.paginator.count}}</span>
+  </span>
+  <div class="paginacion-botones">
     {% if productos.has_previous %}
     <a href="?page={{ productos.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if categoria %}&categoria={{ categoria }}{% endif %}#contenedor-tabla-operaciones">
       <button class="boton-paginacion">Anterior</button>
