@@ -96,7 +96,7 @@
             {% for vehiculo in vehiculos %}
             <tr>
               <td class="celda-flota-nombre">{{ vehiculo.nombre }}</td>
-              <td class="celda-flota-patente">{{ vehiculo.patente }}</td>
+              <td><span class="celda-flota-patente">{{ vehiculo.patente }}</span></td>
               <td class="col-centrada">{{ vehiculo.total_viajes|intcomma }}</td>
               <td class="col-acciones">
                 <button type="button" class="boton-accion-flota editar"
