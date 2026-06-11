@@ -344,6 +344,28 @@ html {
   margin-bottom: 1.5rem;
 }
 
+#panel-gasto .vd-hint {
+  display: block;
+  text-align: left;
+  font-size: var(--text-xs);
+  color: var(--text-subtle);
+}
+
+/* Input de monto: alineo el borde con el del select (design system) */
+#panel-gasto .grupo-input input {
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-strong);
+  transition: all var(--dur-normal) var(--ease-standard);
+}
+
+#panel-gasto .grupo-input input:focus {
+  border-color: var(--brand);
+  background-color: var(--surface-card);
+  box-shadow: var(--ring);
+}
+
 .acciones-modal {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -617,3 +639,95 @@ html {
   font-size: 0.875rem;
   padding: 1rem 0;
 }
+
+/* ============================================================
+   Override de modales con el design system (cargado al final
+   para pisar las reglas viejas de mas arriba).
+   ============================================================ */
+#panel-eliminar, #panel-gasto, #panel-cliente {
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-xl);
+  transition: all var(--dur-slow) var(--ease-standard);
+}
+
+.boton-cerrar { color: var(--sand-400); transition: all var(--dur-normal) var(--ease-standard); }
+.boton-cerrar:hover { background-color: var(--surface-hover); color: var(--text-muted); }
+
+#icono-gasto, #icono-cliente { color: var(--brand-active); }
+
+#panel-eliminar h3, #panel-gasto h3, #panel-cliente h3 {
+  font-weight: var(--weight-bold);
+  color: var(--text-strong);
+}
+
+#panel-eliminar p, #panel-gasto p, #panel-cliente p {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.boton-secundario {
+  background-color: var(--surface-card);
+  color: var(--text-body);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+  transition: background-color var(--dur-normal) var(--ease-standard);
+}
+
+.boton-secundario:hover { background-color: var(--surface-hover); }
+
+/* Boton primario del modal (Guardar gasto) */
+#panel-gasto .boton-primario {
+  background-color: var(--brand-secondary);
+  color: var(--text-on-inverse);
+  border: none;
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: all var(--dur-normal) var(--ease-standard);
+}
+
+#panel-gasto .boton-primario:hover { background-color: var(--pine-950); }
+
+#boton-confirmar-eliminar {
+  background-color: var(--danger-500);
+  border-radius: var(--radius-md);
+}
+
+/* Select de tipo de gasto */
+.vd-select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: var(--weight-semibold);
+  color: var(--text-strong);
+  background-color: var(--surface-card);
+  font-family: inherit;
+  outline: none;
+  transition: all var(--dur-normal) var(--ease-standard);
+}
+
+.vd-select:focus { border-color: var(--brand); box-shadow: var(--ring); }
+
+/* Buscador y lista del modal de cliente */
+.buscador-cliente {
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.buscador-cliente:focus-within { border-color: var(--brand); box-shadow: var(--ring); }
+.buscador-cliente span { color: var(--text-subtle); }
+.buscador-cliente input { color: var(--text-strong); }
+
+.item-cliente-modal { color: var(--text-body); border-radius: var(--radius-sm); }
+.item-cliente-modal:hover, .item-cliente-modal.resaltado { background-color: var(--surface-hover); }
+.item-cliente-modal.resaltado { outline-color: var(--brand); }
+.item-cliente-modal span { color: var(--text-subtle); }

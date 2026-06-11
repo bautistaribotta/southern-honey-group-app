@@ -308,12 +308,12 @@
         <span class="material-symbols-outlined">payments</span>
       </div>
 
-      <h3>Registrar Gasto</h3>
-      <p>Seleccione el tipo de gasto e ingrese el monto correspondiente.</p>
+      <h3>Registrar gasto</h3>
+      <p>Seleccioná el tipo de gasto e ingresá el monto correspondiente.</p>
 
       <div class="grupo-input">
-        <label for="tipo-gasto">Tipo de Gasto</label>
-        <select id="tipo-gasto" name="tipo_gasto" required style="width: 100%; padding: 0.75rem 0.875rem; background-color: var(--color-gris-fondo-input); border: 1px solid var(--stone-200); border-radius: 0.75rem; font-size: 0.875rem; font-family: inherit; outline: none;">
+        <label for="tipo-gasto">Tipo de gasto</label>
+        <select id="tipo-gasto" name="tipo_gasto" required class="vd-select">
           <option value="" disabled selected>Seleccione un tipo</option>
           <option value="Comida">Comida</option>
           <option value="Combustible">Combustible</option>
@@ -326,20 +326,19 @@
       </div>
 
       <div class="grupo-input">
-        <label for="monto-gasto">Monto Total</label>
+        <label for="monto-gasto">Monto total</label>
         <div class="input-con-icono">
           <span>$</span>
-          <input 
-            type="number" 
-            id="monto-gasto" 
-            name="monto_gasto" 
+          <input
+            type="number"
+            id="monto-gasto"
+            name="monto_gasto"
             placeholder="0"
             step="1"
             min="1"
-            required
-            pattern="[0-9+]"
-            style="width: 100%;">
+            required>
         </div>
+        <span class="vd-hint">Número entero, sin puntos ni comas.</span>
       </div>
 
       <div class="acciones-modal">
