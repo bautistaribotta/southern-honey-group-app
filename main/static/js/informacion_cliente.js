@@ -1,6 +1,6 @@
 // Redirecciono a la vista de nueva operacion al hacer click
 function irANuevaOperacion(id) {
-    window.location.href = `/operaciones/${id}/`;
+    window.location.href = `/nueva_operacion_venta/${id}/`;
 }
 
 // Funciones para el panel de eliminar

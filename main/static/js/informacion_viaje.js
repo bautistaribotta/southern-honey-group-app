@@ -130,7 +130,7 @@ function elegirClienteModal(item) {
     if (!item) return;
     const idCliente = item.dataset.id;
     const idViaje = obtenerIdViaje();
-    const base = tipoOperacionSeleccionada === 'compra' ? 'compras' : 'operaciones';
+    const base = tipoOperacionSeleccionada === 'compra' ? 'nueva_operacion_compra' : 'nueva_operacion_venta';
     window.location.href = `/${base}/${idCliente}/?viaje=${idViaje}`;
 }
 

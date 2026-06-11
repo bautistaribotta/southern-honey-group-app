@@ -415,7 +415,7 @@ def generar_remito(request, id_operacion):
 
 @login_required
 @ensure_csrf_cookie
-def operaciones(request, id_cliente):
+def nueva_operacion_venta(request, id_cliente):
     cliente = get_object_or_404(Cliente, id=id_cliente)
 
     if request.method == "POST":
@@ -478,12 +478,12 @@ def operaciones(request, id_cliente):
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
         return render(request, "tabla_operaciones_productos.html", contexto)
 
-    return render(request, "operaciones.html", contexto)
+    return render(request, "nueva_operacion_venta.html", contexto)
 
 
 @login_required
 @ensure_csrf_cookie
-def compras(request, id_cliente):
+def nueva_operacion_compra(request, id_cliente):
     cliente = get_object_or_404(Cliente, id=id_cliente)
 
     if request.method == "POST":
@@ -542,7 +542,7 @@ def compras(request, id_cliente):
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
         return render(request, "tabla_compras_productos.html", contexto)
 
-    return render(request, "compras.html", contexto)
+    return render(request, "nueva_operacion_compra.html", contexto)
 
 
 @login_required
