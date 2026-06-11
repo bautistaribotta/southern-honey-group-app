@@ -210,9 +210,9 @@
   height: 36px;
   flex: none;
   border-radius: 50%;
-  background-color: var(--danger-50);
-  border: 1px solid var(--danger-50);
-  color: var(--danger-600);
+  background-color: var(--brand-secondary);
+  border: 1px solid var(--brand-secondary);
+  color: var(--text-on-inverse);
   display: inline-flex;
   align-items: center;
   justify-content: center;
