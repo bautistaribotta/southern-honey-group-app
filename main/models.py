@@ -247,6 +247,7 @@ class Gasto(models.Model):
     viaje = models.ForeignKey(Viaje, on_delete=models.CASCADE, related_name="detalle_gastos", db_column="id_viaje")
     gasto = models.CharField(choices=TIPO_GASTOS, max_length=25)
     monto = models.IntegerField(default=0)
+    fecha = models.DateField(auto_now_add=True)
 
     class Meta:
         db_table = "gastos"

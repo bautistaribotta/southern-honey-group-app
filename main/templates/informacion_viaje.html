@@ -7,10 +7,11 @@
 {% endblock %}
 
 {% block links %}
-<link rel="stylesheet" href="{% static 'informacion_viaje.css' %}">
 <link rel="stylesheet" href="{% static 'autocompletado_ciudades.css' %}">
 <link rel="stylesheet" href="{% static 'panel_compartido.css' %}">
 <link rel="stylesheet" href="{% static 'operaciones_compartido.css' %}">
+<link rel="stylesheet" href="{% static 'informacion_operacion.css' %}">
+<link rel="stylesheet" href="{% static 'informacion_viaje.css' %}">
 {% endblock %}
 
 {% block top-header %}
@@ -18,237 +19,236 @@
 {% endblock %}
 
 {% block area-trabajo %}
-<section id="area-trabajo">
-  
+<section id="area-trabajo" class="vd-screen">
+
   <a href="{% url 'viajes' %}" class="boton-volver">
     <span class="material-symbols-outlined">arrow_back</span>
     Volver a Viajes
   </a>
 
-  <!-- CABECERA DE ACCIONES -->
-  <div class="header-acciones">
-    <div class="titulo-seccion">
-      <div class="icono-viaje-principal">
-        <span class="material-symbols-outlined">map</span>
-      </div>
-      <div class="texto-titulo">
-        <h2>Viaje #{{ viaje.id|default:"000" }}</h2>
+  <!-- CABECERA -->
+  <div class="op-head">
+    <div class="op-head__left">
+      <span class="op-head__tile"><span class="material-symbols-outlined">map</span></span>
+      <div>
+        <div class="op-head__titlerow">
+          <h1 class="op-head__title">Viaje #{{ viaje.id|default:"000" }}</h1>
+          <span class="vd-estado {% if viaje.estado == 'Finalizado' %}is-fin{% else %}is-curso{% endif %}">
+            <span class="vd-estado__dot"></span>{{ viaje.estado }}
+          </span>
+        </div>
+        <div class="op-head__meta">
+          <span class="op-head__metaitem vd-period">
+            <span class="material-symbols-outlined">event</span>
+            {{ viaje.fecha_inicio|date:"d/m/Y"|default:"--" }}
+            <span class="material-symbols-outlined">arrow_forward</span>
+            {% if viaje.fecha_vuelta %}{{ viaje.fecha_vuelta|date:"d/m/Y" }}{% else %}en curso{% endif %}
+          </span>
+          <span class="op-head__metaitem"><span class="material-symbols-outlined">person</span>{% if viaje.chofer %}{{ viaje.chofer.nombre }} {{ viaje.chofer.apellido }}{% else %}Sin chofer{% endif %}</span>
+          <span class="op-head__metaitem"><span class="material-symbols-outlined">local_shipping</span>{% if viaje.vehiculo %}{{ viaje.vehiculo.nombre }}{% else %}Sin vehículo{% endif %}</span>
+        </div>
       </div>
     </div>
-    
-    <div class="grupo-botones-principales">
-      <button class="boton-accion boton-editar" onclick="abrirSlideOver('slide-over-viaje')">
+    <div class="op-head__actions">
+      <button class="op-btn op-btn--dark" onclick="abrirSlideOver('slide-over-viaje')">
         <span class="material-symbols-outlined">edit</span>
-        Editar Viaje
+        Editar viaje
       </button>
-      <button class="boton-accion boton-cancelar" onclick="abrirModalEliminarViaje()">
-        <span class="material-symbols-outlined">cancel</span>
-        Eliminar Viaje
+      <button class="op-btn op-btn--danger" onclick="abrirModalEliminarViaje()">
+        <span class="material-symbols-outlined">delete</span>
+        Eliminar viaje
       </button>
     </div>
   </div>
 
-  <!-- CONTENIDO PRINCIPAL (GRID) -->
-  <div class="grid-informacion">
-    
-    <!-- FILA SUPERIOR: DATOS GENERALES -->
-    <div class="columna-datos">
-      <div class="tarjeta-info" style="height: 100%;">
-        <div class="cabecera-tarjeta">
-          <h3 class="titulo-tarjeta">
-            <span class="material-symbols-outlined">info</span>
-            Datos Generales
-          </h3>
-          <div class="etiqueta-estado">
-            {{ viaje.estado }}
+  <!-- DATOS GENERALES + RESUMEN DE CAJA -->
+  <div class="op-grid">
+
+    <!-- Datos generales -->
+    <div class="op-card">
+      <div class="op-card__head">
+        <span class="material-symbols-outlined">info</span>
+        <h4>Datos generales</h4>
+      </div>
+      <div class="vd-data">
+        <div class="vd-dates">
+          <div class="vd-data__row">
+            <span class="vd-data__ico"><span class="material-symbols-outlined">flight_takeoff</span></span>
+            <div class="vd-data__meta">
+              <div class="vd-data__label">Fecha de salida</div>
+              <div class="vd-data__value">{{ viaje.fecha_inicio|date:"d/m/Y"|default:"--" }}</div>
+            </div>
+          </div>
+          <div class="vd-data__row">
+            <span class="vd-data__ico"><span class="material-symbols-outlined">flight_land</span></span>
+            <div class="vd-data__meta">
+              <div class="vd-data__label">Fecha de regreso</div>
+              <div class="vd-data__value">{% if viaje.fecha_vuelta %}{{ viaje.fecha_vuelta|date:"d/m/Y" }}{% else %}En curso{% endif %}</div>
+            </div>
           </div>
         </div>
-        
-        <div class="lista-datos">
-          <div class="dato-item doble">
-            <div class="dato-item">
-              <span class="dato-label">Fecha Salida</span>
-              <span class="dato-valor">{{ viaje.fecha_inicio|date:"d/m/Y"|default:"--" }}</span>
+        <div class="vd-data__row vd-data__row--sep">
+          <span class="vd-avatar">{% if viaje.chofer %}{{ viaje.chofer.nombre|first|upper }}{{ viaje.chofer.apellido|first|upper }}{% else %}?{% endif %}</span>
+          <div class="vd-data__meta">
+            <div class="vd-data__label">Chofer</div>
+            <div class="vd-data__value">{% if viaje.chofer %}{{ viaje.chofer.nombre }} {{ viaje.chofer.apellido }}{% else %}Chofer no especificado{% endif %}</div>
+          </div>
+        </div>
+        <div class="vd-data__row">
+          <span class="vd-data__ico"><span class="material-symbols-outlined">local_shipping</span></span>
+          <div class="vd-data__meta">
+            <div class="vd-data__label">Vehículo</div>
+            <div class="vd-data__value">{% if viaje.vehiculo %}{{ viaje.vehiculo.nombre }}<span class="vd-pat">{{ viaje.vehiculo.patente }}</span>{% else %}Vehículo no especificado{% endif %}</div>
+          </div>
+        </div>
+      </div>
+      <div class="vd-journey">
+        <div class="vd-journey__label">Ruta de destinos</div>
+        {% if viaje.destinos.all %}
+        <div class="vd-stops">
+          {% for d in viaje.destinos.all %}
+          <div class="vd-stop">
+            <div class="vd-stop__rail">
+              <span class="vd-stop__dot"></span>
+              <span class="vd-stop__line"></span>
             </div>
-            <div class="dato-item" style="text-align: right;">
-              <span class="dato-label">Fecha Regreso</span>
-              <span class="dato-valor">{{ viaje.fecha_vuelta|date:"d/m/Y"|default:"--" }}</span>
+            <div class="vd-stop__body">
+              <div class="vd-stop__city">{{ d.destino }}</div>
+              <div class="vd-stop__tag">{% if forloop.first %}Primera parada{% elif forloop.last %}Destino final{% else %}Parada {{ forloop.counter }}{% endif %}</div>
             </div>
           </div>
-          
-          <div class="dato-item">
-            <span class="dato-label">Chofer</span>
-            <span class="dato-valor">
-              {% if viaje.chofer %}
-                {{ viaje.chofer.nombre }} {{ viaje.chofer.apellido }}
-              {% else %}
-                Chofer no especificado
-              {% endif %}
-            </span>
-          </div>
-          
-          <div class="dato-item">
-            <span class="dato-label">Vehículo</span>
-            <span class="dato-valor">
-              {% if viaje.vehiculo %}
-                {{ viaje.vehiculo.nombre }} ({{ viaje.vehiculo.patente }})
-              {% else %}
-                Vehículo no especificado
-              {% endif %}
-            </span>
-          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <span class="vd-data__value">Sin destinos registrados</span>
+        {% endif %}
+      </div>
+    </div>
 
-          <div class="dato-item">
-            <span class="dato-label">Ruta de Destinos</span>
-            {% if viaje and viaje.destinos.all %}
-              <div class="journey-map">
-                {% for d in viaje.destinos.all %}
-                  <div class="journey-stop">
-                    <div class="journey-dot"></div>
-                    <div class="journey-text">{{ d.destino }}</div>
-                  </div>
+    <!-- Resumen de caja -->
+    <div class="op-card">
+      <div class="op-card__head">
+        <span class="material-symbols-outlined">payments</span>
+        <h4>Resumen de caja</h4>
+        <button class="op-btn op-btn--secondary op-btn--sm vd-headbtn" onclick="abrirModalGasto()">
+          <span class="material-symbols-outlined">add</span>
+          Añadir gasto
+        </button>
+      </div>
+      <div class="vd-caja">
+        <div class="vd-caja__row vd-caja__row--head">
+          <span class="vd-caja__k vd-caja__k--strong"><span class="material-symbols-outlined">account_balance_wallet</span>Inicio de caja</span>
+          <span class="vd-caja__v">${{ viaje.inicio_caja|default:0|intcomma }}</span>
+        </div>
+        <div class="vd-gastos">
+          {% for gasto in viaje.detalle_gastos.all %}
+          <div class="vd-gasto">
+            <span class="vd-gasto__ico"><span class="material-symbols-outlined">{% if gasto.gasto == 'Comida' %}restaurant{% elif gasto.gasto == 'Combustible' %}local_gas_station{% elif gasto.gasto == 'Playa' %}local_parking{% elif gasto.gasto == 'Peaje' %}toll{% elif gasto.gasto == 'Hotel' %}hotel{% elif gasto.gasto == 'Viaticos personales' %}wallet{% else %}more_horiz{% endif %}</span></span>
+            <span class="vd-gasto__name">{{ gasto.gasto }}<span class="vd-gasto__date">{{ gasto.fecha|date:"d/m/Y" }}</span></span>
+            <span class="vd-gasto__amt">-${{ gasto.monto|intcomma }}</span>
+          </div>
+          {% empty %}
+          <div class="vd-gastos__empty">Sin gastos registrados.</div>
+          {% endfor %}
+        </div>
+        <div class="vd-caja__row vd-caja__row--total">
+          <span class="vd-caja__k"><span class="material-symbols-outlined">savings</span>Total restante</span>
+          <span class="vd-caja__v">${{ viaje.final_caja|intcomma }}</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- OPERACIONES (ANCHO COMPLETO) -->
+  <div class="op-card">
+    <div class="vd-opshead">
+      <span class="material-symbols-outlined">history</span>
+      <h4>Operaciones realizadas</h4>
+    </div>
+    <div class="vd-opsbar">
+      <div class="vd-tabs">
+        <button type="button" class="vd-tab is-active" data-filtro="todas">Todas</button>
+        <button type="button" class="vd-tab" data-filtro="compra">Compras</button>
+        <button type="button" class="vd-tab" data-filtro="venta">Ventas</button>
+      </div>
+      <div class="vd-opsbtns">
+        <button class="op-btn op-btn--secondary" onclick="abrirModalSeleccionCliente('compra')">
+          <span class="material-symbols-outlined">shopping_bag</span>
+          Nueva compra
+        </button>
+        <button class="op-btn op-btn--dark" onclick="abrirModalSeleccionCliente('venta')">
+          <span class="material-symbols-outlined">add</span>
+          Nueva venta
+        </button>
+      </div>
+    </div>
+
+    <div class="contenedor-listado-operaciones">
+      {% if operaciones %}
+      <table class="op-table vd-opstable">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>Detalle</th>
+            <th class="c">Tipo</th>
+            <th class="c">Estado</th>
+            <th class="r">Monto total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for operacion in operaciones %}
+          <tr data-url="{% url 'informacion_operacion' operacion.id %}" data-tipo="{{ operacion.tipo_operacion }}" onclick="window.location.href=this.dataset.url" class="fila-operacion">
+            <td class="vd-op-fecha">{{ operacion.fecha|date:"d/m/Y" }}</td>
+            <td><span class="vd-op-cli">{{ operacion.cliente.nombre }} {{ operacion.cliente.apellido|default:"" }}</span></td>
+            <td>
+              <div class="vd-op-detalle">
+                {% for detalle in operacion.detalleoperacion_set.all|slice:":2" %}
+                  <span class="vd-op-detalle__item">{{ detalle.cantidad|floatformat:"0g" }}x {{ detalle.producto.nombre }}</span>
+                {% empty %}
+                  <span class="vd-op-detalle__item">Sin productos</span>
                 {% endfor %}
+                {% if operacion.detalleoperacion_set.count > 2 %}
+                  <span class="vd-op-detalle__more">... y {{ operacion.detalleoperacion_set.count|add:"-2" }} más</span>
+                {% endif %}
               </div>
-            {% else %}
-              <span class="dato-valor">Sin destinos registrados</span>
-            {% endif %}
-          </div>
-        </div>
+            </td>
+            <td class="c">
+              {% if operacion.tipo_operacion == 'compra' %}
+                <span class="badge-tipo-operacion compra">Compra</span>
+              {% else %}
+                <span class="badge-tipo-operacion venta">Venta</span>
+              {% endif %}
+            </td>
+            <td class="c">
+              {% if operacion.estado_pago == 'Pagada' %}
+                <span class="pildora-estado pagada">Pagada</span>
+              {% elif operacion.estado_pago == 'Pago Parcial' %}
+                <span class="pildora-estado parcial">Pago Parcial</span>
+              {% elif operacion.estado_pago == 'Debe' %}
+                <span class="pildora-estado debe">Debe</span>
+              {% elif operacion.estado_pago == 'Cancelada' %}
+                <span class="pildora-estado cancelada">Cancelada</span>
+              {% endif %}
+            </td>
+            <td class="r vd-op-monto">${{ operacion.monto_total|floatformat:"-2g" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="vd-ops-empty-filtro" hidden>
+        <span class="material-symbols-outlined">history_toggle_off</span>
+        No hay operaciones de ese tipo en este viaje.
       </div>
-    </div>
-
-    <!-- FILA SUPERIOR: RESUMEN DE CAJA -->
-    <div class="columna-caja">
-      <div class="tarjeta-info" style="height: 100%;">
-        <div class="cabecera-tarjeta">
-          <h3 class="titulo-tarjeta">
-            <span class="material-symbols-outlined">payments</span>
-            Resumen de Caja
-          </h3>
-          <div class="acciones-secundarias">
-            <button class="boton-nuevo-item gasto" onclick="abrirModalGasto()">
-              <span class="material-symbols-outlined">paid</span>
-              Añadir Gasto
-            </button>
-          </div>
-        </div>
-        <div class="lista-datos" style="gap: 0; background-color: var(--color-blanco); border: 1px solid var(--stone-200); border-radius: 0.5rem; overflow: hidden;">
-          <div class="dato-item doble" style="background-color: var(--color-gris-fondo-input); border-radius: 0; border-bottom: 1px dashed var(--stone-200);">
-            <span class="dato-label">Inicio de Caja</span>
-            <span class="dato-valor" style="font-weight: 600; font-size: 0.875rem;">${{ viaje.inicio_caja|default:0|intcomma }}</span>
-          </div>
-          
-          <div style="display: flex; flex-direction: column; padding: 0.5rem 0; max-height: 200px; overflow-y: auto;">
-            {% for gasto in viaje.detalle_gastos.all %}
-            <div class="dato-item doble" style="background-color: transparent; padding: 0.375rem 0.75rem; border-radius: 0;">
-              <span class="dato-label" style="color: var(--slate-600); text-transform: none; font-size: 0.8125rem;">{{ gasto.gasto }}</span>
-              <span class="dato-valor" style="color: var(--color-rojo-eliminacion); font-weight: 600; font-size: 0.875rem;">-${{ gasto.monto|intcomma }}</span>
-            </div>
-            {% empty %}
-            <div class="dato-item doble" style="background-color: transparent; justify-content: center; padding: 1rem;">
-              <span class="dato-label" style="color: var(--slate-400);">Sin gastos registrados</span>
-            </div>
-            {% endfor %}
-          </div>
-
-          <div class="dato-item doble" style="background-color: var(--color-gris-fondo-input); border-top: 1px solid var(--stone-200); border-radius: 0;">
-            <span class="dato-label" style="color: var(--slate-900);">Total Restante</span>
-            <span class="dato-valor" style="font-weight: 600; font-size: 0.875rem;">${{ viaje.final_caja|intcomma }}</span>
-          </div>
-        </div>
+      {% else %}
+      <div class="estado-vacio">
+        <span class="material-symbols-outlined">history_toggle_off</span>
+        <h4>No hay movimientos</h4>
+        <p>Aún no se han registrado operaciones en este viaje.</p>
       </div>
+      {% endif %}
     </div>
-
-    <!-- FILA INFERIOR: OPERACIONES Y GASTOS (ANCHO COMPLETO) -->
-    <div class="columna-operaciones">
-      <div class="tarjeta-info" style="display: flex; flex-direction: column; margin-bottom: 0;">
-        <div class="cabecera-tarjeta">
-          <h3 class="titulo-tarjeta">
-            <span class="material-symbols-outlined">receipt_long</span>
-            Operaciones
-          </h3>
-          <div class="acciones-secundarias">
-            <button class="boton-nuevo-item compra" onclick="abrirModalSeleccionCliente('compra')">
-              <span class="material-symbols-outlined">shopping_bag</span>
-              Nueva compra
-            </button>
-            <button class="boton-nuevo-item" onclick="abrirModalSeleccionCliente('venta')">
-              <span class="material-symbols-outlined">add</span>
-              Nueva venta
-            </button>
-          </div>
-        </div>
-
-        <!-- AREA DE LISTADO -->
-        <div class="contenedor-listado-operaciones">
-          {% if operaciones %}
-          <div class="tabla-operaciones-container">
-            <table class="tabla-operaciones">
-              <thead>
-                <tr>
-                  <th class="th-fecha">Fecha</th>
-                  <th>Cliente</th>
-                  <th>Detalle</th>
-                  <th class="th-centrado">Tipo</th>
-                  <th class="th-centrado">Estado</th>
-                  <th class="th-monto">Monto Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for operacion in operaciones %}
-                <tr data-url="{% url 'informacion_operacion' operacion.id %}" onclick="window.location.href=this.dataset.url" class="fila-operacion">
-                  <td class="fecha-operacion">{{ operacion.fecha|date:"d/m/Y" }}</td>
-                  <td>{{ operacion.cliente.nombre }} {{ operacion.cliente.apellido|default:"" }}</td>
-                  <td>
-                    <div class="detalle-principal">
-                      <ul class="lista-detalle-operacion">
-                        {% for detalle in operacion.detalleoperacion_set.all|slice:":2" %}
-                          <li>{{ detalle.cantidad|floatformat:"0g" }}x {{ detalle.producto.nombre }}</li>
-                        {% empty %}
-                          <li class="detalle-vacio">Sin productos</li>
-                        {% endfor %}
-                        {% if operacion.detalleoperacion_set.count > 2 %}
-                          <li class="detalle-extra">... y {{ operacion.detalleoperacion_set.count|add:"-2" }} más</li>
-                        {% endif %}
-                      </ul>
-                    </div>
-                  </td>
-                  <td class="celda-centrada">
-                    {% if operacion.tipo_operacion == 'compra' %}
-                      <span class="badge-tipo-operacion compra">Compra</span>
-                    {% else %}
-                      <span class="badge-tipo-operacion venta">Venta</span>
-                    {% endif %}
-                  </td>
-                  <td class="estado celda-centrada">
-                    {% if operacion.estado_pago == 'Pagada' %}
-                      <span class="pildora-estado pagada">Pagada</span>
-                    {% elif operacion.estado_pago == 'Pago Parcial' %}
-                      <span class="pildora-estado parcial">Pago Parcial</span>
-                    {% elif operacion.estado_pago == 'Debe' %}
-                      <span class="pildora-estado debe">Debe</span>
-                    {% elif operacion.estado_pago == 'Cancelada' %}
-                      <span class="pildora-estado cancelada">Cancelada</span>
-                    {% endif %}
-                  </td>
-                  <td class="monto-total">${{ operacion.monto_total|floatformat:"-2g" }}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          {% else %}
-          <div class="estado-vacio">
-            <span class="material-symbols-outlined">history_toggle_off</span>
-            <h4>No hay movimientos</h4>
-            <p>Aún no se han registrado operaciones en este viaje.</p>
-          </div>
-          {% endif %}
-        </div>
-
-      </div>
-    </div>
-
   </div>
 
 </section>
@@ -529,4 +529,36 @@
 {% block codigo-javascript %}
   <script src="{% static 'js/autocompletado_ciudades.js' %}"></script>
   <script src="{% static 'js/informacion_viaje.js' %}"></script>
+  <script>
+    // Filtro de operaciones por tipo (Todas / Compras / Ventas)
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabs = document.querySelectorAll('.vd-tab');
+      const filas = document.querySelectorAll('.vd-opstable tbody .fila-operacion');
+      const vacioFiltro = document.querySelector('.vd-ops-empty-filtro');
+      const tabla = document.querySelector('.vd-opstable');
+      if (!tabs.length) return;
+
+      const aplicarFiltro = (filtro) => {
+        let visibles = 0;
+        filas.forEach((fila) => {
+          const mostrar = filtro === 'todas' || fila.dataset.tipo === filtro;
+          fila.hidden = !mostrar;
+          if (mostrar) visibles++;
+        });
+        if (vacioFiltro && tabla) {
+          const sinResultados = visibles === 0;
+          vacioFiltro.hidden = !sinResultados;
+          tabla.hidden = sinResultados;
+        }
+      };
+
+      tabs.forEach((tab) => {
+        tab.addEventListener('click', () => {
+          tabs.forEach((t) => t.classList.remove('is-active'));
+          tab.classList.add('is-active');
+          aplicarFiltro(tab.dataset.filtro);
+        });
+      });
+    });
+  </script>
 {% endblock %}
