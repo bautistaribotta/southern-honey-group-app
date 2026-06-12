@@ -376,6 +376,7 @@ def informacion_operacion(request, id_operacion):
     return render(request, "informacion_operacion.html", contexto)
 
 
+@login_required
 def generar_remito(request, id_operacion):
     operacion = get_object_or_404(Operacion, id=id_operacion)
     cliente = operacion.cliente
