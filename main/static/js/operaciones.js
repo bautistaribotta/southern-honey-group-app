@@ -195,19 +195,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const botonMenos = fila.querySelector('[data-step="menos"]');
         const botonMas = fila.querySelector('[data-step="mas"]');
 
+        // Quita el producto del carrito y restaura el stock y el resaltado
+        function quitar() {
+            fila.remove();
+            actualizarStockProducto(id, stockOriginal);
+            actualizarTotal();
+            actualizarVistaResumen();
+            guardarCarrito();
+            const btnTabla = contenedorTabla.querySelector(`.boton-agregar-producto[data-id="${id}"]`);
+            if (btnTabla) btnTabla.classList.remove('is-incart');
+        }
+
+        // Escritura libre: no forzamos el valor; la validación se hace al confirmar
         inputCantidad.addEventListener('input', function () {
-            let val = parseInt(this.value);
-
-            if (isNaN(val) || val < 1) {
-                val = 1;
-                this.value = 1;
-            }
-
-            if (val > stockOriginal) {
-                val = stockOriginal;
-                this.value = stockOriginal;
-            }
-
             actualizarFila(fila);
             actualizarTotal();
             guardarCarrito();
@@ -215,7 +215,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         botonMenos.addEventListener('click', function () {
             const actual = parseInt(inputCantidad.value);
-            if (actual > 1) {
+            if (isNaN(actual) || actual <= 1) {
+                // Con 1 unidad, reducir saca el producto del carrito
+                quitar();
+            } else {
                 inputCantidad.value = actual - 1;
                 actualizarFila(fila);
                 actualizarTotal();
@@ -224,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         botonMas.addEventListener('click', function () {
-            const actual = parseInt(inputCantidad.value);
+            const actual = parseInt(inputCantidad.value) || 0;
             if (actual < stockOriginal) {
                 inputCantidad.value = actual + 1;
                 actualizarFila(fila);
@@ -234,13 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const botonEliminar = fila.querySelector('.cart-item__rm');
-        botonEliminar.addEventListener('click', function () {
-            fila.remove();
-            actualizarStockProducto(id, stockOriginal);
-            actualizarTotal();
-            actualizarVistaResumen();
-            guardarCarrito();
-        });
+        botonEliminar.addEventListener('click', quitar);
 
         cuerpoCarrito.appendChild(fila);
         actualizarFila(fila);
@@ -254,10 +251,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function actualizarFila(fila) {
         const precio = parseFloat(fila.dataset.precio);
         const stockOriginal = parseInt(fila.dataset.stockOriginal);
-        const cantidad = parseInt(fila.querySelector('.input-cantidad').value);
+        const cantidad = parseInt(fila.querySelector('.input-cantidad').value) || 0;
 
         fila.querySelector('.cart-item__subval').textContent = `$ ${formatoMoneda.format(precio * cantidad)}`;
-        fila.querySelector('[data-step="menos"]').disabled = cantidad <= 1;
+        // El boton mas se frena al llegar al stock; el menos nunca se deshabilita (en 1 saca el producto)
         fila.querySelector('[data-step="mas"]').disabled = cantidad >= stockOriginal;
 
         actualizarStockProducto(fila.dataset.id, stockOriginal - cantidad);
@@ -269,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         filasCarrito.forEach(fila => {
             const precio = parseFloat(fila.dataset.precio);
-            const cantidad = parseInt(fila.querySelector('.input-cantidad').value);
+            const cantidad = parseInt(fila.querySelector('.input-cantidad').value) || 0;
             total += precio * cantidad;
         });
 
@@ -363,26 +360,43 @@ document.addEventListener('DOMContentLoaded', () => {
         return cookie ? cookie.split('=')[1] : '';
     }
 
+    // Muestra el aviso como toast del sistema; sólo cae al alert nativo si no está disponible
+    function avisar(mensaje) {
+        if (typeof notificarError === 'function') {
+            notificarError(mensaje);
+        } else {
+            alert(mensaje);
+        }
+    }
+
     botonConfirmar.addEventListener('click', function () {
         const filas = cuerpoCarrito.querySelectorAll('.cart-item');
 
         if (filas.length === 0) {
-            alert('Agregá al menos un producto antes de confirmar.');
+            avisar('Agregá al menos un producto antes de confirmar la venta.');
             return;
         }
 
         const items = [];
+        let cantidadInvalida = false;
         filas.forEach(fila => {
-            items.push({
-                id_producto: fila.dataset.id,
-                cantidad: parseInt(fila.querySelector('.input-cantidad').value)
-            });
+            const cantidad = parseInt(fila.querySelector('.input-cantidad').value);
+            const stockOriginal = parseInt(fila.dataset.stockOriginal);
+            if (isNaN(cantidad) || cantidad < 1 || cantidad > stockOriginal) {
+                cantidadInvalida = true;
+            }
+            items.push({ id_producto: fila.dataset.id, cantidad: cantidad });
         });
+
+        if (cantidadInvalida) {
+            avisar('Revisá las cantidades: cada producto necesita un número válido y dentro del stock disponible.');
+            return;
+        }
 
         const metodoPagoSeleccionado = document.querySelector('input[name="metodo_pago"]:checked');
 
         if (!metodoPagoSeleccionado) {
-            alert('Seleccioná un método de pago antes de continuar.');
+            avisar('Elegí un método de pago (cuenta corriente o contado) para registrar la venta.');
             return;
         }
 
@@ -413,14 +427,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         window.location.href = `/informacion_clientes/${data.id_cliente}/`;
                     }
                 } else {
-                    alert(data.error || 'Algo salió mal. Por favor, volvé a intentarlo.');
+                    avisar(data.error || 'Algo salió mal. Por favor, volvé a intentarlo.');
                     botonConfirmar.disabled = false;
                     botonConfirmar.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Confirmar venta';
                 }
             })
             .catch(error => {
                 console.error('Error en la petición:', error);
-                alert('Algo salió mal. Por favor, volvé a intentarlo.');
+                avisar('Algo salió mal. Por favor, volvé a intentarlo.');
                 botonConfirmar.disabled = false;
                 botonConfirmar.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Confirmar venta';
             });

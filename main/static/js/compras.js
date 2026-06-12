@@ -134,16 +134,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const botonMas = fila.querySelector('[data-step="mas"]');
         const inputPrecio = fila.querySelector('.input-precio-item');
 
+        // Escritura libre: no forzamos el valor; la validación se hace al confirmar
         function alCambiar() {
-            let cant = parseInt(inputCantidad.value);
-            if (isNaN(cant) || cant < 1) {
-                cant = 1;
-                inputCantidad.value = 1;
-            }
-            botonMenos.disabled = cant <= 1;
             actualizarSubtotalFila(fila);
             actualizarTotal();
             guardarCarrito();
+        }
+
+        // Quita el producto del carrito y limpia el resaltado
+        function quitar() {
+            fila.remove();
+            actualizarTotal();
+            actualizarVistaResumen();
+            guardarCarrito();
+            const btnTabla = contenedorTabla.querySelector(`.boton-agregar-producto[data-id="${id}"]`);
+            if (btnTabla) btnTabla.classList.remove('is-incart');
         }
 
         inputCantidad.addEventListener('input', alCambiar);
@@ -151,26 +156,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         botonMenos.addEventListener('click', function () {
             const actual = parseInt(inputCantidad.value);
-            if (actual > 1) {
+            if (isNaN(actual) || actual <= 1) {
+                // Con 1 unidad, reducir saca el producto del carrito
+                quitar();
+            } else {
                 inputCantidad.value = actual - 1;
                 alCambiar();
             }
         });
 
         botonMas.addEventListener('click', function () {
-            inputCantidad.value = parseInt(inputCantidad.value) + 1;
+            inputCantidad.value = (parseInt(inputCantidad.value) || 0) + 1;
             alCambiar();
         });
 
         const botonEliminar = fila.querySelector('.cart-item__rm');
-        botonEliminar.addEventListener('click', function () {
-            fila.remove();
-            actualizarTotal();
-            actualizarVistaResumen();
-            guardarCarrito();
-            const btnTabla = contenedorTabla.querySelector(`.boton-agregar-producto[data-id="${id}"]`);
-            if (btnTabla) btnTabla.classList.remove('is-incart');
-        });
+        botonEliminar.addEventListener('click', quitar);
 
         cuerpoCarrito.appendChild(fila);
         alCambiar();
@@ -305,14 +306,19 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Recopilar los items del carrito validando precio > 0
+        // Recopilar los items del carrito validando cantidad y precio
         const items = [];
         let precioInvalido = false;
+        let cantidadInvalida = false;
 
         filas.forEach(fila => {
             const cantidad = parseInt(fila.querySelector('.input-cantidad').value);
             const precioStr = fila.querySelector('.input-precio-item').value.trim();
             const precio = parseFloat(precioStr);
+
+            if (isNaN(cantidad) || cantidad < 1) {
+                cantidadInvalida = true;
+            }
 
             if (isNaN(precio) || precio <= 0) {
                 precioInvalido = true;
@@ -325,6 +331,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        if (cantidadInvalida) {
+            avisar('Revisá las cantidades: cada producto necesita un número válido mayor a 0.');
+            return;
+        }
+
         if (precioInvalido) {
             avisar('Cargá un precio mayor a 0 en todos los productos.');
             return;
@@ -333,7 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const metodoPagoSeleccionado = document.querySelector('input[name="metodo_pago"]:checked');
 
         if (!metodoPagoSeleccionado) {
-            avisar('Seleccioná un método de pago antes de continuar.');
+            avisar('Elegí un método de pago (cuenta corriente o contado) para registrar la compra.');
             return;
         }
 
