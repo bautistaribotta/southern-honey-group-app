@@ -4,7 +4,9 @@
    Tokens come from base.css.
    ============================================================ */
 
-.area-operacion { padding: 1.5rem; }
+/* Mismo encuadre que la vista de informacion del cliente: 24px arriba, 56px a los costados (de base.css) */
+#contenido-principal { padding-top: 1.5rem !important; }
+.area-operacion { padding: 0; }
 .cart-screen { display: flex; flex-direction: column; gap: 1.25rem; }
 
 /* ---- Puntos de color por categoria (chips + listado) ------------------ */
@@ -21,7 +23,7 @@
 /* ---- Header ----------------------------------------------------------- */
 .cart-back {
   display: inline-flex; align-items: center; gap: 0.5rem; align-self: flex-start;
-  background: none; border: none; cursor: pointer; padding: 0.2rem 0;
+  background: none; border: none; cursor: pointer; padding: 0 0 0.2rem;
   color: var(--text-muted); font-family: var(--font-sans); font-size: var(--text-xs); font-weight: var(--weight-bold);
   text-transform: uppercase; text-decoration: none; letter-spacing: var(--tracking-wide);
 }
