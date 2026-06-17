@@ -226,6 +226,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnQuitarDestino.style.display = 'none';
             }
         });
+
+        // Si el viaje ya trae varios destinos cargados, muestro el botón "Quitar"
+        if (contenedorDestinos.querySelectorAll('input[name="destino"]').length > 1) {
+            btnQuitarDestino.style.display = 'flex';
+        }
     }
 
     // Modal de seleccion de cliente: buscador y navegacion al carrito

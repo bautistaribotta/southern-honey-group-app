@@ -381,6 +381,7 @@
   <!-- PANEL LATERAL EDITAR VIAJE (SLIDE-OVER) -->
   <div id="slide-over-viaje">
     <div id="slide-over-fondo" onclick="cerrarSlideOver('slide-over-viaje')"></div>
+
     <div id="slide-over-panel">
       <form id="form-viaje" method="post" autocomplete="off">
         {% csrf_token %}
@@ -389,7 +390,7 @@
         <header class="panel-cabecera">
           <div class="panel-titulo-fila">
             <div class="icono-contenedor">
-              <span class="material-symbols-outlined">edit</span>
+              <span class="material-symbols-outlined">route</span>
             </div>
             <div class="texto-cabecera">
               <h3>Editar Viaje</h3>
@@ -403,109 +404,124 @@
 
         <!-- 2. Cuerpo con Scroll -->
         <main class="panel-cuerpo">
+          <!-- Sección 1: Asignación -->
           <section class="seccion-bloque">
             <div class="subtitulo-formulario">
-              <span class="material-symbols-outlined">info</span>
-              <h4>Detalles del Viaje</h4>
+              <span class="material-symbols-outlined">group</span>
+              <h4>Asignación</h4>
             </div>
 
-            <div class="sub-panel-datos">
-              <div class="grupo-input">
-                <label for="chofer-viaje">Chofer</label>
-                <select id="chofer-viaje" name="id_chofer" required style="padding: 0.75rem 0.875rem; background-color: var(--color-gris-fondo-input); border: 1px solid var(--stone-200); border-radius: 0.75rem; font-size: 0.875rem; font-family: inherit; outline: none;">
-                  <option value="" disabled>Seleccione un chofer</option>
-                  {% for chofer in choferes %}
-                  <option value="{{ chofer.id }}" {% if viaje.chofer.id == chofer.id %}selected{% endif %}>{{ chofer.nombre }} {{ chofer.apellido }}</option>
-                  {% endfor %}
-                </select>
-                <span class="mensaje-error">Por favor, seleccione un chofer de la lista.</span>
-              </div>
-
-              <div class="grupo-input">
-                <label for="vehiculo-viaje">Vehículo</label>
-                <select id="vehiculo-viaje" name="id_vehiculo" required style="padding: 0.75rem 0.875rem; background-color: var(--color-gris-fondo-input); border: 1px solid var(--stone-200); border-radius: 0.75rem; font-size: 0.875rem; font-family: inherit; outline: none;">
-                  <option value="" disabled>Seleccione un vehículo</option>
-                  {% for vehiculo in vehiculos %}
-                  <option value="{{ vehiculo.id }}" {% if viaje.vehiculo.id == vehiculo.id %}selected{% endif %}>{{ vehiculo.nombre }} ({{ vehiculo.patente }})</option>
-                  {% endfor %}
-                </select>
-                <span class="mensaje-error">Por favor, seleccione un vehículo de la lista.</span>
-              </div>
-
-              <div class="grupo-input" id="contenedor-destinos">
-                <label for="destino-viaje">Destino</label>
-                {% for destino in viaje.destinos.all %}
-                <input
-                  type="text"
-                  name="destino"
-                  placeholder="Ej: Buenos Aires"
-                  required
-                  maxlength="30"
-                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}"
-                  value="{{ destino.destino }}"
-                  data-autocompletar-ciudad
-                  {% if not forloop.first %}style="margin-top: 0.5rem;"{% else %}id="destino-viaje"{% endif %}>
-                {% empty %}
-                <input
-                  type="text"
-                  id="destino-viaje"
-                  name="destino"
-                  placeholder="Ej: Buenos Aires"
-                  required
-                  maxlength="30"
-                  pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}"
-                  data-autocompletar-ciudad>
+            <div class="grupo-input">
+              <label for="chofer-viaje">Chofer</label>
+              <select id="chofer-viaje" name="id_chofer" class="select-estandar" required>
+                <option value="" disabled>Seleccione un chofer</option>
+                {% for chofer in choferes %}
+                <option value="{{ chofer.id }}" {% if viaje.chofer.id == chofer.id %}selected{% endif %}>{{ chofer.nombre }} {{ chofer.apellido }}</option>
                 {% endfor %}
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.125rem;">
-                  <button type="button" id="btn-agregar-destino" style="background: none; border: none; color: var(--brand-olive); font-weight: 600; text-align: left; cursor: pointer; padding: 0.25rem 0; font-size: 0.875rem; display: flex; align-items: center; gap: 0.25rem; width: fit-content;">
-                    <span class="material-symbols-outlined" style="font-size: 18px;">add_circle</span>
-                    Añadir un destino
-                  </button>
-                  <button type="button" id="btn-quitar-destino" style="background: none; border: none; color: var(--color-rojo-eliminacion); font-weight: 600; text-align: right; cursor: pointer; padding: 0.25rem 0; font-size: 0.875rem; display: {% if viaje.destinos.count > 1 %}flex{% else %}none{% endif %}; align-items: center; gap: 0.25rem; width: fit-content;">
-                    <span class="material-symbols-outlined" style="font-size: 18px;">do_not_disturb_on</span>
-                    Quitar destino
-                  </button>
-                </div>
-                <span class="mensaje-error">Mínimo 3 caracteres (Solo letras y números)</span>
-              </div>
+              </select>
+              <span class="mensaje-error">Por favor, seleccione un chofer de la lista.</span>
+            </div>
 
-              <div class="grupo-input">
-                <label for="inicio-caja-viaje">Inicio de Caja</label>
-                <div class="input-con-icono">
-                  <span>$</span>
-                  <input 
-                    type="number" 
-                    id="inicio-caja" 
-                    name="inicio_caja" 
-                    placeholder="0"
-                    step="1"
-                    min="0"
-                    required
-                    pattern="[0-9+]"
-                    value="{{ viaje.inicio_caja|stringformat:'s' }}">
-                </div>
-                <span class="mensaje-error">Por favor, ingrese un monto válido.</span>
-              </div>
+            <div class="grupo-input">
+              <label for="vehiculo-viaje">Vehículo</label>
+              <select id="vehiculo-viaje" name="id_vehiculo" class="select-estandar" required>
+                <option value="" disabled>Seleccione un vehículo</option>
+                {% for vehiculo in vehiculos %}
+                <option value="{{ vehiculo.id }}" {% if viaje.vehiculo.id == vehiculo.id %}selected{% endif %}>{{ vehiculo.nombre }} ({{ vehiculo.patente }})</option>
+                {% endfor %}
+              </select>
+              <span class="mensaje-error">Por favor, seleccione un vehículo de la lista.</span>
+            </div>
+          </section>
 
+          <!-- Sección 2: Recorrido -->
+          <section class="seccion-bloque">
+            <div class="subtitulo-formulario">
+              <span class="material-symbols-outlined">location_on</span>
+              <h4>Recorrido</h4>
+            </div>
+
+            <div class="grupo-input" id="contenedor-destinos">
+              <label for="destino-viaje">Destinos</label>
+              {% for destino in viaje.destinos.all %}
+              <input
+                type="text"
+                name="destino"
+                placeholder="Ej: Buenos Aires"
+                required
+                maxlength="30"
+                pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}"
+                value="{{ destino.destino }}"
+                data-autocompletar-ciudad
+                {% if forloop.first %}id="destino-viaje"{% endif %}>
+              {% empty %}
+              <input
+                type="text"
+                id="destino-viaje"
+                name="destino"
+                placeholder="Ej: Buenos Aires"
+                required
+                maxlength="30"
+                pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}"
+                data-autocompletar-ciudad>
+              {% endfor %}
+
+              <div class="vje-destacciones">
+                <button type="button" id="btn-agregar-destino" class="vje-addbtn">
+                  <span class="material-symbols-outlined">add_circle</span>
+                  Añadir un destino
+                </button>
+                <button type="button" id="btn-quitar-destino" class="vje-removebtn">
+                  <span class="material-symbols-outlined">do_not_disturb_on</span>
+                  Quitar destino
+                </button>
+              </div>
+              <span class="mensaje-error">Mínimo 3 caracteres (Solo letras y números)</span>
+            </div>
+          </section>
+
+          <!-- Sección 3: Caja y fechas -->
+          <section class="seccion-bloque">
+            <div class="subtitulo-formulario">
+              <span class="material-symbols-outlined">event</span>
+              <h4>Caja y fechas</h4>
+            </div>
+
+            <div class="grupo-input">
+              <label for="inicio-caja">Inicio de Caja</label>
+              <div class="input-con-icono">
+                <span>$</span>
+                <input
+                  type="number"
+                  id="inicio-caja"
+                  name="inicio_caja"
+                  placeholder="0"
+                  step="1"
+                  min="0"
+                  required
+                  pattern="[0-9+]"
+                  value="{{ viaje.inicio_caja|stringformat:'s' }}">
+              </div>
+              <span class="mensaje-error">Por favor, ingrese un monto válido.</span>
+            </div>
+
+            <div class="vje-grid2">
               <div class="grupo-input">
                 <label for="fecha-inicio-viaje">Fecha de Inicio</label>
-                <input 
-                  type="date" 
-                  id="fecha-inicio-viaje" 
-                  name="fecha_inicio_viaje" 
+                <input
+                  type="date"
+                  id="fecha-inicio-viaje"
+                  name="fecha_inicio_viaje"
                   required
                   value="{{ viaje.fecha_inicio|date:'Y-m-d' }}">
                 <span class="mensaje-error">Por favor, seleccione una fecha válida.</span>
               </div>
 
               <div class="grupo-input">
-                <div style="display: flex; justify-content: start;">
-                  <label for="fecha-regreso-viaje">Fecha de Regreso (Opcional)</label>
-                </div>
-                <input 
-                  type="date" 
-                  id="fecha-regreso-viaje" 
+                <label for="fecha-regreso-viaje">Regreso (opcional)</label>
+                <input
+                  type="date"
+                  id="fecha-regreso-viaje"
                   name="fecha_regreso_viaje"
                   value="{{ viaje.fecha_vuelta|date:'Y-m-d' }}">
                 <span class="mensaje-error">La fecha ingresada no es válida.</span>
