@@ -194,7 +194,6 @@ class Cotizaciones(models.Model):
 class Chofer(models.Model):
     nombre = models.CharField(max_length=25)
     apellido = models.CharField(max_length=25)
-    total_viajes = models.IntegerField(default=0)
     activo = models.BooleanField(default=True)
 
     class Meta:
@@ -207,6 +206,16 @@ class Chofer(models.Model):
             )
         ]
 
+    @property
+    def total_viajes(self):
+        # Cantidad de viajes activos del chofer. Un viaje cuenta como uno,
+        # sin importar cuantos destinos tenga. Si el queryset vino anotado con
+        # _num_viajes (ver obtener_choferes_activos) reutilizo ese valor para
+        # evitar una query por fila en el listado de flota.
+        if hasattr(self, "_num_viajes"):
+            return self._num_viajes
+        return self.viaje_set.filter(activo=True).count()
+
     def __str__(self):
         return f"Chofer: {self.nombre} {self.apellido}"
 
@@ -214,14 +223,19 @@ class Chofer(models.Model):
 class Vehiculo(models.Model):
     nombre = models.CharField(max_length=30)
     patente = models.CharField(max_length=7, unique=True)
-    total_viajes = models.IntegerField(default=0)
     activo = models.BooleanField(default=True)
 
     class Meta:
         db_table = "vehiculos"
 
+    @property
+    def total_viajes(self):
+        if hasattr(self, "_num_viajes"):
+            return self._num_viajes
+        return self.viaje_set.filter(activo=True).count()
+
     def __str__(self):
-        return f"Vehiculo"
+        return f"Vehiculo {self.nombre} ({self.patente})"
 
 
 class Viaje(models.Model):

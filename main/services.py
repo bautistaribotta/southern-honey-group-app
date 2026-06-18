@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from django.shortcuts import get_object_or_404
 from django.db import transaction
-from django.db.models import Sum, F, Value
+from django.db.models import Sum, F, Value, Count, Q
 from django.db.models.functions import Coalesce
 from django.core.cache import cache
 from .models import Producto, Cliente, Operacion, DetalleOperacion, Pago, Cotizaciones, Chofer, Vehiculo, Viaje, DetalleViaje, Gasto
@@ -554,25 +554,25 @@ def crear_viaje(id_chofer, id_vehiculo, destinos, inicio_caja, fecha_inicio, fec
                 destino=destino_nombre
             )
 
-        # Incremento el contador de viajes del Chofer sumando la cantidad de destinos
-        chofer = Chofer.objects.get(id=id_chofer)
-        chofer.total_viajes += len(destinos_limpios)
-        chofer.save()
-
-        # Incremento el contador de viajes del Vehículo sumando la cantidad de destinos
-        vehiculo = Vehiculo.objects.get(id=id_vehiculo)
-        vehiculo.total_viajes += len(destinos_limpios)
-        vehiculo.save()
-
     return nuevo_viaje
 
 
 def obtener_choferes_activos():
-    return Chofer.objects.filter(activo=True).order_by('nombre')
+    # Anoto _num_viajes (viajes activos) para que la property total_viajes no
+    # dispare una query por cada chofer en el listado de flota.
+    return (
+        Chofer.objects.filter(activo=True)
+        .annotate(_num_viajes=Count("viaje", filter=Q(viaje__activo=True)))
+        .order_by('nombre')
+    )
 
 
 def obtener_vehiculos_activos():
-    return Vehiculo.objects.filter(activo=True).order_by('nombre')
+    return (
+        Vehiculo.objects.filter(activo=True)
+        .annotate(_num_viajes=Count("viaje", filter=Q(viaje__activo=True)))
+        .order_by('nombre')
+    )
 
 
 def obtener_viajes():
@@ -618,10 +618,6 @@ def editar_viaje(id_viaje, id_chofer, id_vehiculo, destinos, inicio_caja, fecha_
     with transaction.atomic():
         viaje = get_object_or_404(Viaje, id=id_viaje)
 
-        chofer_anterior_id = viaje.chofer_id
-        vehiculo_anterior_id = viaje.vehiculo_id
-        cantidad_destinos_anterior = viaje.destinos.count()
-
         viaje.chofer_id = id_chofer
         viaje.vehiculo_id = id_vehiculo
         viaje.inicio_caja = inicio_caja
@@ -636,34 +632,6 @@ def editar_viaje(id_viaje, id_chofer, id_vehiculo, destinos, inicio_caja, fecha_
                 viaje=viaje,
                 destino=destino_nombre
             )
-
-        # Actualizar contador de chofer
-        if chofer_anterior_id == int(id_chofer):
-            chofer = Chofer.objects.get(id=id_chofer)
-            chofer.total_viajes = chofer.total_viajes - cantidad_destinos_anterior + len(destinos_limpios)
-            chofer.save()
-        else:
-            chofer_anterior = Chofer.objects.get(id=chofer_anterior_id)
-            if chofer_anterior.total_viajes >= cantidad_destinos_anterior:
-                chofer_anterior.total_viajes -= cantidad_destinos_anterior
-                chofer_anterior.save()
-            chofer_nuevo = Chofer.objects.get(id=id_chofer)
-            chofer_nuevo.total_viajes += len(destinos_limpios)
-            chofer_nuevo.save()
-
-        # Actualizar contador de vehiculo
-        if vehiculo_anterior_id == int(id_vehiculo):
-            vehiculo = Vehiculo.objects.get(id=id_vehiculo)
-            vehiculo.total_viajes = vehiculo.total_viajes - cantidad_destinos_anterior + len(destinos_limpios)
-            vehiculo.save()
-        else:
-            vehiculo_anterior = Vehiculo.objects.get(id=vehiculo_anterior_id)
-            if vehiculo_anterior.total_viajes >= cantidad_destinos_anterior:
-                vehiculo_anterior.total_viajes -= cantidad_destinos_anterior
-                vehiculo_anterior.save()
-            vehiculo_nuevo = Vehiculo.objects.get(id=id_vehiculo)
-            vehiculo_nuevo.total_viajes += len(destinos_limpios)
-            vehiculo_nuevo.save()
 
     return viaje
 
