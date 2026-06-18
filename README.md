@@ -5,52 +5,54 @@
 Usuario: usuario <br>
 Clave: User1234!
 
-Portal interno de gestión administrativa, control de stock, clientes y facturación desarrollado para la empresa Southern Honey Group. Este sistema centraliza las operaciones diarias.
+Portal interno de gestión administrativa desarrollado para Southern Honey Group. Centraliza el control de stock, clientes, operaciones comerciales y viajes de distribución.
 
 El proyecto es desarrollado, diseñado y mantenido de manera independiente, abarcando tanto la arquitectura del backend como el diseño de la interfaz de usuario.
 
 ---
 
-## Características Principales
+## Módulos
 
-* **Panel de Control (Dashboard):** Visualización en tiempo real de variables económicas clave mediante la integración de APIs externas
-* **Gestión de Inventario:** Sistema CRUD para la administración de productos (miel, alimento, cera, madera, medicamentos, etc.). 
-* **Administración de Clientes:** Registro detallado de clientes con soporte para datos de facturación
-* **Gestión de Operaciones:** Seguimiento de deudores, remitos e historial de compras/ventas utilizando un diseño de base de datos relacional para vincular clientes, operaciones, detalle de productos, etc.
-* **Autenticación y Seguridad:** Sistema de login seguro con control de sesiones, implementando decoradores de Django para restringir el acceso únicamente al personal autorizado.
+* **Dashboard:** Cotización actualizada del dólar oficial y paralelo mediante consumo de DolarAPI. Precio del kilo de miel configurable.
+* **Inventario:** CRUD de productos con categorías, control de stock y baja lógica. Registra cantidad vendida y comprada por producto.
+* **Clientes:** Registro de clientes con datos de contacto, domicilio y datos de facturación (CUIT, condición de facturación). Baja lógica.
+* **Operaciones:** Compras y ventas vinculadas a un cliente y opcionalmente a un viaje. Estado de pago calculado dinámicamente (Debe / Pago Parcial / Pagada / Cancelada). Soporta pagos parciales. Generación de remitos.
+* **Deudores:** Vista filtrable con operaciones impagas o con saldo pendiente, ordenables por monto y antigüedad.
+* **Viajes:** Registro de viajes de distribución con chofer, vehículo, destinos múltiples e inicio de caja. Gastos asociados por tipo (combustible, peaje, comida, etc.) con cálculo de caja final. Operaciones vinculables al viaje. Baja lógica.
+* **Flota:** Administración de choferes y vehículos con conteo de viajes activos por entidad.
 
 ---
 
-## Librerías, Integraciones y Tecnologías Utilizadas
+## Tecnologías
 
-**Backend y Lógica de Negocio**
+**Backend**
 
-* **Python 3.10+**
-* **Django 6.0.2:** Framework principal para la lógica de negocio, ORM, enrutamiento y seguridad (manejo de CSRF y autenticación).
-* **MySQL:** Motor de base de datos relacional.
+* Python 3.10+
+* Django 6.0.2 — lógica de negocio, ORM, enrutamiento, autenticación y CSRF
+* MySQL — motor de base de datos relacional
 
-**Librerías de Terceros (Python)**
+**Librerías Python**
 
-* **Requests:** Utilizada para realizar peticiones HTTP seguras hacia servicios externos y APIs.
-* **BeautifulSoup4 (bs4):** Implementada para el análisis y parseo de documentos HTML en las rutinas de web scraping.
+* `requests` — peticiones HTTP hacia APIs externas
+* `beautifulsoup4` — parseo HTML para rutinas de scraping
 
-**Integraciones Externas**
+**Integraciones externas**
 
-* **DolarAPI:** Consumo de API RESTful (`https://dolarapi.com/v1/dolares/oficial` y `blue`) para obtener la cotización actualizada del dólar oficial y paralelo.
+* DolarAPI (`/v1/dolares/oficial` y `blue`) — cotización del dólar en tiempo real
 
 **Frontend**
 
-* **HTML5 & CSS3:** Diseño estructurado y modular empleando variables nativas de CSS.
-* **JavaScript Vanilla:** Manejo de componentes interactivos de la UI, como los modales de tipo Slide-Over y lógica de formularios.
+* HTML5 / CSS3 con custom properties (paleta en `oklch`)
+* JavaScript Vanilla — modales, slide-overs, carrito de productos, filtros y validaciones de formularios
 
 ---
 
-## Arquitectura del Proyecto
+## Arquitectura
 
-El proyecto sigue el patrón de diseño MVT (Model-View-Template) propio de Django, pero incorpora una capa adicional de abstracción en su arquitectura:
+El proyecto sigue el patrón MVT de Django con una capa de servicios adicional:
 
-* **Models:** Definen la estructura estricta de la base de datos con restricciones como `PROTECT` en llaves foráneas y `UniqueConstraint` para garantizar la coherencia de las transacciones comerciales.
-* **Services (`services.py`):** Toda la lógica externa (consumo de APIs, rutinas de Web Scraping con BeautifulSoup4) y las transacciones de creación, edición o eliminación lógica de la base de datos están aisladas en este módulo, manteniendo las vistas (`views.py`) limpias y enfocadas únicamente en el manejo del flujo de las peticiones HTTP.
+* **Models:** Relaciones con `PROTECT` en claves foráneas críticas y `UniqueConstraint` para garantizar integridad de datos. Baja lógica mediante campo `activo` en las entidades principales. Totales de operaciones calculados como `@property` sobre los detalles y pagos asociados, con soporte de anotaciones ORM (`con_totales()`) para evitar el problema N+1 en listados.
+* **Services (`services.py`):** Aísla las transacciones de base de datos y el consumo de APIs externas, manteniendo las vistas enfocadas únicamente en el flujo HTTP.
 
 ---
 
