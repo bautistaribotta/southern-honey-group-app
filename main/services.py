@@ -636,6 +636,13 @@ def editar_viaje(id_viaje, id_chofer, id_vehiculo, destinos, inicio_caja, fecha_
     return viaje
 
 
+def eliminar_viaje(id_viaje):
+    viaje = get_object_or_404(Viaje, id=id_viaje)
+    viaje.activo = False
+    viaje.save()
+    return viaje
+
+
 def crear_gasto(id_viaje, tipo_gasto, monto):
     viaje = get_object_or_404(Viaje, id=id_viaje)
 

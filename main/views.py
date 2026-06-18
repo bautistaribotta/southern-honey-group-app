@@ -16,7 +16,7 @@ from .services import (nuevo_producto, editar_producto, eliminar_producto, nuevo
                        eliminar_cliente, get_cotizacion_dolar_oficial, get_cotizaciones, actualizar_cotizacion, obtener_datos_cliente,
                        obtener_datos_producto, modificar_stock, crear_operacion, servicio_cancelar_operacion,
                        obtener_listado_deudores, crear_chofer, crear_vehiculo, crear_viaje, obtener_choferes_activos,
-                       obtener_vehiculos_activos, obtener_viajes, editar_viaje, crear_gasto,
+                       obtener_vehiculos_activos, obtener_viajes, editar_viaje, eliminar_viaje, crear_gasto,
                        editar_chofer, eliminar_chofer, editar_vehiculo, eliminar_vehiculo)
 
 
@@ -775,7 +775,7 @@ def flota(request):
 
 @login_required
 def informacion_viaje(request, id_viaje):
-    viaje = get_object_or_404(Viaje, id=id_viaje)
+    viaje = get_object_or_404(Viaje, id=id_viaje, activo=True)
 
     if request.method == "POST":
         accion = request.POST.get("accion")
