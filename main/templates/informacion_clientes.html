@@ -172,6 +172,7 @@
             </div>
         </div>
         <div class="tabla-operaciones-container">
+            {% if operaciones %}
             <table class="tabla-operaciones">
                 <thead>
                     <tr>
@@ -241,12 +242,6 @@
                             </div>
                         </td>
                     </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="6" style="text-align: center; padding: 2rem; color: var(--slate-500);">
-                            Este cliente no posee operaciones registradas.
-                        </td>
-                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -274,6 +269,13 @@
                 {% endif %}
               </div>
             </div>
+            {% else %}
+            <div class="estado-vacio">
+                <span class="material-symbols-outlined">history_toggle_off</span>
+                <h4>No hay movimientos</h4>
+                <p>Este cliente no posee operaciones registradas.</p>
+            </div>
+            {% endif %}
         </div>
     </section>
 </div>
