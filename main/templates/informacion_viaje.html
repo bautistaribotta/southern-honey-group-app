@@ -161,7 +161,7 @@
   </div>
 
   <!-- OPERACIONES (ANCHO COMPLETO) -->
-  <div class="op-card">
+  <section class="vd-ops">
     <div class="vd-opshead">
       <span class="material-symbols-outlined">history</span>
       <h4>Operaciones realizadas</h4>
@@ -175,16 +175,16 @@
       <div class="vd-opsbtns">
         <button class="op-btn op-btn--secondary" onclick="abrirModalSeleccionCliente('compra')">
           <span class="material-symbols-outlined">shopping_bag</span>
-          Nueva compra
+          Nueva Compra
         </button>
         <button class="op-btn op-btn--dark" onclick="abrirModalSeleccionCliente('venta')">
           <span class="material-symbols-outlined">add</span>
-          Nueva venta
+          Nueva Venta
         </button>
       </div>
     </div>
 
-    <div class="contenedor-listado-operaciones">
+    <div class="op-card contenedor-listado-operaciones">
       {% if operaciones %}
       <table class="op-table vd-opstable">
         <thead>
@@ -249,7 +249,7 @@
       </div>
       {% endif %}
     </div>
-  </div>
+  </section>
 
 </section>
 
