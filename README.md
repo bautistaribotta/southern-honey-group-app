@@ -1,6 +1,6 @@
 # Southern Honey Group - Staff Portal
 
-## Prueba la demo: https://juanbautistaribotta.pythonanywhere.com/
+## Prueba la demo: https://bautistaribotta.pythonanywhere.com/
 <u>Datos de ingreso al portal</u> <br>
 Usuario: usuario <br>
 Clave: User1234!
@@ -34,7 +34,6 @@ El proyecto es desarrollado, diseñado y mantenido de manera independiente, abar
 **Librerías Python**
 
 * `requests` — peticiones HTTP hacia APIs externas
-* `beautifulsoup4` — parseo HTML para rutinas de scraping
 
 **Integraciones externas**
 
@@ -42,7 +41,8 @@ El proyecto es desarrollado, diseñado y mantenido de manera independiente, abar
 
 **Frontend**
 
-* HTML5 / CSS3 con custom properties (paleta en `oklch`)
+* HTML 5
+* CSS 3
 * JavaScript Vanilla — modales, slide-overs, carrito de productos, filtros y validaciones de formularios
 
 ---
