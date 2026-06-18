@@ -346,12 +346,14 @@ def get_cotizacion_dolar_oficial():
 
     url_dolar_oficial = "https://dolarapi.com/v1/dolares/oficial"
     try:
-        respuesta = requests.get(url_dolar_oficial, verify=True)
+        # timeout para no bloquear el worker si la API externa cuelga
+        respuesta = requests.get(url_dolar_oficial, verify=True, timeout=5)
+        respuesta.raise_for_status()
         datos = respuesta.json()
         resultado = {"compra": datos.get("compra"), "venta": datos.get("venta")}
         cache.set("cotizacion_oficial", resultado, 3600)  # Cache por 1 hora
         return resultado
-    except Exception as e:
+    except requests.RequestException:
         return {"compra": None, "venta": None}
 
 
