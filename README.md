@@ -7,8 +7,6 @@ Clave: User1234!
 
 Portal interno de gestión administrativa desarrollado para Southern Honey Group. Centraliza el control de stock, clientes, operaciones comerciales y viajes de distribución.
 
-El proyecto es desarrollado, diseñado y mantenido de manera independiente, abarcando tanto la arquitectura del backend como el diseño de la interfaz de usuario.
-
 ---
 
 ## Módulos
@@ -123,7 +121,7 @@ python manage.py runserver
 
 ```
 
-El portal estará disponible de forma local ingresando a `http://127.0.0.1:8000/`.
+El software estará disponible de forma local ingresando a `http://127.0.0.1:8000/`.
 
 ---
 
