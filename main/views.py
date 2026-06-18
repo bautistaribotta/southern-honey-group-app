@@ -392,7 +392,6 @@ def generar_remito(request, id_operacion):
         lista_productos.append({
             'cantidad': d.cantidad,
             'detalle': d.producto.nombre,
-            'precio_unitario': d.producto.precio
         })
 
     pdf = Remito(
