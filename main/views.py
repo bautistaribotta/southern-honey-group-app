@@ -309,7 +309,7 @@ def informacion_clientes(request, id_cliente):
         messages.success(request, "Cliente editado correctamente")
         return redirect("informacion_clientes", id_cliente=id_cliente)
 
-    operaciones_cliente = Operacion.objects.filter(cliente=cliente).prefetch_related("detalleoperacion_set__producto", "pago_set").order_by("-fecha")
+    operaciones_cliente = Operacion.objects.filter(cliente=cliente).con_totales().prefetch_related("detalleoperacion_set__producto", "pago_set").order_by("-fecha")
 
     # Filtro por tipo de operacion segun la pestaña activa (todas / venta / compra)
     tipo_actual = request.GET.get("tipo", "todas")
@@ -344,8 +344,8 @@ def obtener_cliente_json(request, id_cliente):
 @login_required
 @ensure_csrf_cookie
 def informacion_operacion(request, id_operacion):
-    operacion = get_object_or_404(Operacion, id=id_operacion)
-            
+    operacion = get_object_or_404(Operacion.objects.con_totales(), id=id_operacion)
+
     from django.db.models import F
     pagos = operacion.pago_set.all().order_by("-fecha")
     # Anoto el subtotal por linea (cantidad * precio fijado en la operacion) para la tabla de productos
@@ -832,6 +832,7 @@ def informacion_viaje(request, id_viaje):
     # Operaciones asociadas al viaje, para el listado
     operaciones_viaje = (
         viaje.operaciones
+        .con_totales()
         .select_related("cliente")
         .prefetch_related("detalleoperacion_set__producto", "pago_set")
         .order_by("-fecha")

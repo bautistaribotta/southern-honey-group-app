@@ -1,5 +1,6 @@
-from dataclasses import field, fields
 from django.db import models
+from django.db.models import Sum, F, Subquery, OuterRef, DecimalField, Value
+from django.db.models.functions import Coalesce
 
 
 class Producto(models.Model):
@@ -53,11 +54,47 @@ class Cliente(models.Model):
         return f"{self.nombre} {self.apellido}"
 
 
+class OperacionQuerySet(models.QuerySet):
+    def con_totales(self):
+        """
+        Anota el monto total (suma de detalles) y el total pagado en una sola query,
+        evitando el N+1 que generan las properties monto_total/total_pagado al iterar
+        sobre un listado. Uso subqueries separadas para no sufrir el fan-out que
+        multiplicaria los montos al combinar dos agregaciones por JOIN.
+        """
+        monto_detalles = (
+            DetalleOperacion.objects.filter(operacion=OuterRef("pk"))
+            .values("operacion")
+            .annotate(total=Sum(F("cantidad") * F("precio_unitario")))
+            .values("total")
+        )
+        monto_pagos = (
+            Pago.objects.filter(operacion=OuterRef("pk"))
+            .values("operacion")
+            .annotate(total=Sum("monto"))
+            .values("total")
+        )
+        return self.annotate(
+            _monto_total_anotado=Coalesce(
+                Subquery(monto_detalles, output_field=DecimalField()),
+                Value(0),
+                output_field=DecimalField(),
+            ),
+            _total_pagado_anotado=Coalesce(
+                Subquery(monto_pagos, output_field=DecimalField()),
+                Value(0),
+                output_field=DecimalField(),
+            ),
+        )
+
+
 class Operacion(models.Model):
     TIPO_OPERACION = [
         ("compra", "Compra"),
         ("venta", "Venta"),
     ]
+
+    objects = OperacionQuerySet.as_manager()
 
     # Como la tabla viaje esta definida mas abajo, coloco el nombre entre comillas para que Django la lea antes
     viaje = models.ForeignKey("Viaje", on_delete=models.SET_NULL, null=True,
@@ -76,7 +113,10 @@ class Operacion(models.Model):
 
     @property
     def monto_total(self):
-        from django.db.models import Sum, F
+        # Si el queryset vino anotado con con_totales(), uso el valor ya calculado
+        # para no disparar una query por cada operacion del listado.
+        if hasattr(self, "_monto_total_anotado"):
+            return self._monto_total_anotado or 0
         resultado = self.detalleoperacion_set.aggregate(
             total=Sum(F('cantidad') * F('precio_unitario'))
         )['total']
@@ -84,7 +124,8 @@ class Operacion(models.Model):
 
     @property
     def total_pagado(self):
-        from django.db.models import Sum
+        if hasattr(self, "_total_pagado_anotado"):
+            return self._total_pagado_anotado or 0
         return self.pago_set.aggregate(total=Sum('monto'))['total'] or 0
 
     @property
