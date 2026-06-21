@@ -17,15 +17,30 @@
 {% endblock %}
 
 {% block area-trabajo %}
-<div id="area-trabajo-meli">
-  <div class="cartel-construccion">
-    <div class="cartel-construccion__icono">
-      <span class="material-symbols-outlined">construction</span>
+<!-- ÁREA DE TRABAJO -->
+<section id="area-trabajo-meli">
+  
+  <!-- Controles Superiores: Buscador + Boton nuevo -->
+  <div class="barra-herramientas">
+    <div class="grupo-busqueda">
+      <div class="contenedor-buscador">
+        <span class="material-symbols-outlined icono-busqueda">search</span>
+        <input type="text" id="buscador-viajes-meli" class="input-busqueda" placeholder="Busca un viaje de reparto">
+      </div>
     </div>
-    <h3>Apartado en construccion</h3>
-    <p>Estoy trabajando en esta seccion.</p>
+
+    <button id="nuevo-viaje-meli"> 
+      <span class="material-symbols-outlined">local_shipping</span>
+      <span class="boton-nuevo-reparto"> Nuevo reparto </span>
+    </button>
   </div>
-</div>
+
+  <!-- Tabla de Viajes de reparto -->
+  <div id="contenedor-tabla-viajes-meli">
+    {% include 'tabla_viajes_mercado_libre.html' %}
+  </div>
+  
+</section>
 {% endblock %}
 
 {% block codigo-javascript %}

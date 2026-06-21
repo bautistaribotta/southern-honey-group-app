@@ -1,54 +1,28 @@
-/* --- Area de trabajo: contenedor que ocupa el alto restante --- */
-#area-trabajo-meli {
-  flex: 1;
+/* --- Area de trabajo --- */
+
+.barra-herramientas {
   display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  min-height: 0;
 }
 
-/* --- Cartel "Apartado en construccion" --- */
-.cartel-construccion {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 1rem;
-  max-width: 440px;
-  padding: 3rem 2.5rem;
-  background-color: var(--surface-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-2xl);
-  box-shadow: var(--shadow-lg);
+#contenedor-tabla-viajes-meli {
+
 }
 
-.cartel-construccion__icono {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 5rem;
-  height: 5rem;
-  border-radius: var(--radius-pill);
-  background-color: var(--honey-tint-10);
+#tabla-viajes-meli {
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+  border: 1px solid;
 }
 
-.cartel-construccion__icono .material-symbols-outlined {
-  font-size: 2.75rem;
-  color: var(--brand-active);
+#tabla-viajes-meli th {
+  padding: 14px 24px 14px 24px;
+  background-color: ;
 }
 
-.cartel-construccion h3 {
-  margin: 0;
-  font-size: var(--text-xl);
-  font-weight: var(--weight-extra);
-  letter-spacing: var(--tracking-tight);
-  color: var(--text-strong);
-}
-
-.cartel-construccion p {
-  margin: 0;
-  font-size: var(--text-sm);
-  color: var(--text-muted);
-  max-width: 320px;
-  line-height: 1.5;
+#tabla-viajes-meli td {
+  padding: 16px 24px 16px 24px;
 }
