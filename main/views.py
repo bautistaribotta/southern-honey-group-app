@@ -570,7 +570,6 @@ def nueva_operacion_compra(request, id_cliente):
 def registrar_pago(request, id_operacion):
     if request.method == "POST":
         try:
-            operacion = get_object_or_404(Operacion, id=id_operacion)
             datos = json.loads(request.body)
             monto_str = datos.get("monto")
 
@@ -583,16 +582,25 @@ def registrar_pago(request, id_operacion):
             if monto <= 0:
                 return JsonResponse({"error": "El monto debe ser mayor a 0."}, status=400)
 
-            restante = Decimal(str(operacion.monto_total or 0)) - Decimal(str(operacion.total_pagado))
+            with transaction.atomic():
+                # Bloqueo la operación con select_for_update para que el cálculo
+                # del restante y el INSERT del pago sean atómicos. Sin esto, dos
+                # pagos concurrentes leen el mismo restante, ambos validan y
+                # ambos insertan, produciendo un sobrepago (TOCTOU).
+                operacion = get_object_or_404(
+                    Operacion.objects.select_for_update(), id=id_operacion
+                )
 
-            if monto > restante:
-                return JsonResponse({"error": "El monto no puede superar el restante a pagar."}, status=400)
+                restante = Decimal(str(operacion.monto_total or 0)) - Decimal(str(operacion.total_pagado))
 
-            # Crear el pago
-            Pago.objects.create(
-                operacion=operacion,
-                monto=monto
-            )
+                if monto > restante:
+                    return JsonResponse({"error": "El monto no puede superar el restante a pagar."}, status=400)
+
+                # Crear el pago
+                Pago.objects.create(
+                    operacion=operacion,
+                    monto=monto
+                )
 
             messages.success(request, "Pago registrado correctamente")
             return JsonResponse({"ok": True})
