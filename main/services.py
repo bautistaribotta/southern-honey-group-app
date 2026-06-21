@@ -370,6 +370,14 @@ def get_cotizacion_dolar_oficial():
         return cotizacion
 
     url_dolar_oficial = "https://dolarapi.com/v1/dolares/oficial"
+
+    # cache.add() es atómico (set-if-not-exists): solo un worker gana el lock y
+    # consulta la API externa. El resto evita el cache stampede (varios workers
+    # golpeando la API a la vez cuando expira la clave).
+    if not cache.add("cotizacion_oficial_lock", "1", 10):
+        # No gané el lock: devuelvo lo que haya en cache o un fallback neutro
+        return cache.get("cotizacion_oficial") or {"compra": None, "venta": None}
+
     try:
         # timeout para no bloquear el worker si la API externa cuelga
         respuesta = requests.get(url_dolar_oficial, verify=True, timeout=5)
@@ -380,6 +388,8 @@ def get_cotizacion_dolar_oficial():
         return resultado
     except requests.RequestException:
         return {"compra": None, "venta": None}
+    finally:
+        cache.delete("cotizacion_oficial_lock")
 
 
 def get_cotizaciones():
