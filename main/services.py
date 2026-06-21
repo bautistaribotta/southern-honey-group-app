@@ -189,19 +189,21 @@ def crear_operacion(cliente, items, metodo_pago, tipo_operacion, viaje=None):
             if tipo_operacion == "venta":
                 # En una venta, el precio se toma del producto
                 precio_unitario = producto.precio
-                # Resto el stock y sumo a la cantidad vendida
+                # Resto el stock y sumo a la cantidad vendida con un incremento
+                # atómico a nivel BD (F()), evitando el lost update del patrón
+                # refresh + save sobre una copia en memoria.
                 modificar_stock(id_producto, -cantidad)
-                producto.refresh_from_db()
-                producto.cantidad_vendida += cantidad
-                producto.save()
+                Producto.objects.filter(id=id_producto).update(
+                    cantidad_vendida=F("cantidad_vendida") + cantidad
+                )
             else:
                 # En una compra, el precio viene en el ítem
                 precio_unitario = Decimal(item.get("precio_unitario"))
-                # Sumo el stock y sumo a la cantidad comprada
+                # Sumo el stock y sumo a la cantidad comprada de forma atómica
                 modificar_stock(id_producto, cantidad)
-                producto.refresh_from_db()
-                producto.cantidad_comprada += cantidad
-                producto.save()
+                Producto.objects.filter(id=id_producto).update(
+                    cantidad_comprada=F("cantidad_comprada") + cantidad
+                )
 
             # Creo el detalle vinculado a la operación
             DetalleOperacion.objects.create(
