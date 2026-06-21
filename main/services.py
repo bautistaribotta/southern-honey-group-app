@@ -225,7 +225,13 @@ def crear_operacion(cliente, items, metodo_pago, tipo_operacion, viaje=None):
 
 def servicio_cancelar_operacion(id_operacion):
     with transaction.atomic():
-        operacion = get_object_or_404(Operacion, id=id_operacion)
+        # Bloqueo la fila de la operación con select_for_update: una segunda
+        # cancelación concurrente queda en espera aquí y, al desbloquearse tras
+        # el commit de la primera, encontrará activa=False y saldrá por el guard.
+        # Esto evita que el stock se revierta dos veces (TOCTOU sobre activa).
+        operacion = get_object_or_404(
+            Operacion.objects.select_for_update(), id=id_operacion
+        )
 
         # Si ya está cancelada, no hacemos nada
         if not operacion.activa:
@@ -238,21 +244,22 @@ def servicio_cancelar_operacion(id_operacion):
             producto = detalle.producto
 
             if operacion.tipo_operacion == "venta":
-                # Si era venta, devuelvo stock y resto de cantidad vendida
+                # Si era venta, devuelvo stock y resto de cantidad vendida de
+                # forma atómica con F()
                 modificar_stock(producto.id, detalle.cantidad)
-                producto.refresh_from_db()
-                producto.cantidad_vendida -= detalle.cantidad
-                producto.save()
+                Producto.objects.filter(id=producto.id).update(
+                    cantidad_vendida=F("cantidad_vendida") - detalle.cantidad
+                )
             else:
                 # Si era compra, quito stock y resto de cantidad comprada
                 modificar_stock(producto.id, -detalle.cantidad)
-                producto.refresh_from_db()
-                producto.cantidad_comprada -= detalle.cantidad
-                producto.save()
+                Producto.objects.filter(id=producto.id).update(
+                    cantidad_comprada=F("cantidad_comprada") - detalle.cantidad
+                )
 
         # Marcamos la operación como inactiva (cancelada)
         operacion.activa = False
-        operacion.save()
+        operacion.save(update_fields=["activa"])
 
     return operacion
 
