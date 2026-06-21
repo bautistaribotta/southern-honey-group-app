@@ -4,6 +4,7 @@ import requests
 from decimal import Decimal
 
 from django.shortcuts import get_object_or_404
+from django.http import Http404
 from django.db import transaction
 from django.db.models import Sum, F, Value, Count, Q
 from django.db.models.functions import Coalesce
@@ -52,15 +53,30 @@ def modificar_stock(id_producto, cantidad):
 
     Retorna el producto actualizado o lanza ValueError si el stock quedaría negativo.
     """
-    producto = get_object_or_404(Producto, id=id_producto, activo=True)
+    # Verifico existencia para mantener el comportamiento 404 ante productos
+    # inexistentes o inactivos
+    if not Producto.objects.filter(id=id_producto, activo=True).exists():
+        raise Http404("Producto no encontrado")
 
-    # Si estoy restando, válido que haya stock suficiente antes de operar
-    if cantidad < 0 and producto.cantidad < abs(cantidad):
-        raise ValueError("No se puede quitar más stock del existente.")
+    if cantidad < 0:
+        # UPDATE condicional atómico: el chequeo de stock (WHERE cantidad__gte)
+        # y el descuento (SET cantidad = cantidad + n) ocurren en UNA sola
+        # sentencia SQL. No hay ventana entre verificar y escribir, por lo que
+        # se elimina el read-modify-write que permitía lost updates y sobreventa.
+        filas = Producto.objects.filter(
+            id=id_producto, activo=True, cantidad__gte=abs(cantidad)
+        ).update(cantidad=F("cantidad") + cantidad)
 
-    producto.cantidad += cantidad
-    producto.save()
-    return producto
+        if filas == 0:
+            # 0 filas afectadas significa que no había stock suficiente
+            raise ValueError("No se puede quitar más stock del existente.")
+    else:
+        # Ingreso de stock: incremento atómico sin lectura previa
+        Producto.objects.filter(id=id_producto, activo=True).update(
+            cantidad=F("cantidad") + cantidad
+        )
+
+    return Producto.objects.get(id=id_producto)
 
 
 def editar_producto(id_producto, nombre, categoria, precio, cantidad, activo):
