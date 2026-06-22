@@ -900,7 +900,11 @@ def deudores(request):
 
 @login_required
 def mercado_libre(request):
-    return render(request, "mercado_libre.html")
+    contexto = {
+        "choferes": obtener_choferes_activos(),
+        "vehiculos": obtener_vehiculos_activos(),
+    }
+    return render(request, "mercado_libre.html", contexto)
 
 
 def cerrar_sesion(request):
