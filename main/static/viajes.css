@@ -375,8 +375,8 @@
 }
 
 .vje-fechas__open {
-  color: var(--info-600);
-  font-weight: var(--weight-semibold);
+  color: var(--text-subtle);
+  font-weight: var(--weight-medium);
 }
 
 /* --- Badge de estado --- */

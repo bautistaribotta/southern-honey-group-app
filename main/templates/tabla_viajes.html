@@ -43,7 +43,7 @@
         <span class="vje-fechas">
           {{ viaje.fecha_inicio|date:"d/m/y" }}
           <span class="material-symbols-outlined">arrow_forward</span>
-          {% if viaje.fecha_vuelta %}{{ viaje.fecha_vuelta|date:"d/m/y" }}{% else %}<span class="vje-fechas__open">en curso</span>{% endif %}
+          {% if viaje.fecha_vuelta %}{{ viaje.fecha_vuelta|date:"d/m/y" }}{% else %}<span class="vje-fechas__open">No definido</span>{% endif %}
         </span>
       </td>
       <td class="alineado-centro">

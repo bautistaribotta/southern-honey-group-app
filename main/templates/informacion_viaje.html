@@ -42,7 +42,7 @@
             <span class="material-symbols-outlined">event</span>
             {{ viaje.fecha_inicio|date:"d/m/Y"|default:"--" }}
             <span class="material-symbols-outlined">arrow_forward</span>
-            {% if viaje.fecha_vuelta %}{{ viaje.fecha_vuelta|date:"d/m/Y" }}{% else %}en curso{% endif %}
+            {% if viaje.fecha_vuelta %}{{ viaje.fecha_vuelta|date:"d/m/Y" }}{% else %}No definido{% endif %}
           </span>
           <span class="op-head__metaitem"><span class="material-symbols-outlined">person</span>{% if viaje.chofer %}{{ viaje.chofer.nombre }} {{ viaje.chofer.apellido }}{% else %}Sin chofer{% endif %}</span>
           <span class="op-head__metaitem"><span class="material-symbols-outlined">local_shipping</span>{% if viaje.vehiculo %}{{ viaje.vehiculo.nombre }}{% else %}Sin vehículo{% endif %}</span>
@@ -83,7 +83,7 @@
             <span class="vd-data__ico"><span class="material-symbols-outlined">flight_land</span></span>
             <div class="vd-data__meta">
               <div class="vd-data__label">Fecha de regreso</div>
-              <div class="vd-data__value">{% if viaje.fecha_vuelta %}{{ viaje.fecha_vuelta|date:"d/m/Y" }}{% else %}En curso{% endif %}</div>
+              <div class="vd-data__value">{% if viaje.fecha_vuelta %}{{ viaje.fecha_vuelta|date:"d/m/Y" }}{% else %}No definido{% endif %}</div>
             </div>
           </div>
         </div>
