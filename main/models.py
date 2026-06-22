@@ -312,12 +312,19 @@ class Gasto(models.Model):
 
 class ViajeReparto(models.Model):
     fecha_viaje_reparto = models.DateField()
-    gasto_combustible_viaje_reparto = models.IntegerField(default=0)
     chofer = models.ForeignKey(Chofer, on_delete=models.PROTECT, db_column="id_chofer")
     vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT, db_column="id_vehiculo")
+    gasto_combustible_viaje_reparto = models.IntegerField(default=0)
+    costo_empleado = models.IntegerField(default=0)
+    valor_viaje = models.IntegerField(default=0)
 
     class Meta:
         db_table = "viaje_reparto"
+
+    # Calculo la ganancia como el valor del viaje - combustible - nomina empleado
+    @property
+    def ganancia(self):
+        return self.valor_viaje - self.gasto_combustible_viaje_reparto - self.costo_empleado
 
     def __str__(self):
         return f"Viaje reparto nro: {self.id}"
