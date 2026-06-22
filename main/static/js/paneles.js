@@ -53,6 +53,30 @@ function cerrarSlideOver(idContenedor = 'contenedor-slide-over') {
             inputFechaInicio.value = hoy;
         }
     }
+
+    // LÓGICA ESPECÍFICA PARA EL MODAL DE REPARTOS (Mercado Libre):
+    // Misma limpieza de destinos extra que el modal de viajes
+    if (idContenedor === 'slide-over-reparto') {
+        const contenedorDestinos = document.getElementById('contenedor-destinos-reparto');
+        if (contenedorDestinos) {
+            const inputsDestino = contenedorDestinos.querySelectorAll('input[name="destino_reparto"]');
+            if (inputsDestino.length > 1) {
+                for (let i = 1; i < inputsDestino.length; i++) {
+                    inputsDestino[i].remove();
+                }
+            }
+            const btnQuitarDestino = document.getElementById('btn-quitar-destino-reparto');
+            if (btnQuitarDestino) {
+                btnQuitarDestino.style.display = 'none';
+            }
+        }
+
+        // Volvemos a popular la fecha del reparto por defecto
+        const inputFechaReparto = document.getElementById('fecha-viaje-reparto');
+        if (inputFechaReparto) {
+            inputFechaReparto.value = new Date().toISOString().split('T')[0];
+        }
+    }
 }
 
 function abrirPanelEliminar() {

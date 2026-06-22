@@ -7,6 +7,7 @@
 
 {% block links %}
 <link rel="stylesheet" href="{% static 'mercado_libre.css' %}">
+<link rel="stylesheet" href="{% static 'autocompletado_ciudades.css' %}">
 {% endblock %}
 
 {% block cabecera %}
@@ -29,7 +30,7 @@
       </div>
     </div>
 
-    <button id="nuevo-viaje-meli"> 
+    <button id="nuevo-viaje-meli" onclick="abrirSlideOver('slide-over-reparto')">
       <span class="material-symbols-outlined">local_shipping</span>
       <span class="boton-nuevo-reparto"> Nuevo reparto </span>
     </button>
@@ -41,8 +42,234 @@
   </div>
 
 </section>
+
+<!-- PANEL LATERAL NUEVO REPARTO (SLIDE-OVER) -->
+<div id="slide-over-reparto">
+  <div class="slide-over-fondo" onclick="cerrarSlideOver('slide-over-reparto')"></div>
+
+  <div class="slide-over-panel">
+    <form id="form-reparto" method="post" autocomplete="off">
+      {% csrf_token %}
+      <input type="hidden" name="accion" value="nuevo_viaje_reparto">
+
+      <!-- 1. Cabecera -->
+      <header class="panel-cabecera">
+        <div class="panel-titulo-fila">
+          <div class="icono-contenedor">
+            <span class="material-symbols-outlined">local_shipping</span>
+          </div>
+          <div class="texto-cabecera">
+            <h3>Nuevo Reparto</h3>
+            <p>Complete los detalles del nuevo viaje de reparto</p>
+          </div>
+        </div>
+        <button type="button" class="boton-cerrar" onclick="cerrarSlideOver('slide-over-reparto')">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </header>
+
+      <!-- 2. Cuerpo con Scroll -->
+      <main class="panel-cuerpo">
+        <!-- Seccion 1: Asignacion -->
+        <section class="seccion-bloque">
+          <div class="subtitulo-formulario">
+            <span class="material-symbols-outlined">group</span>
+            <h4>Asignacion</h4>
+          </div>
+
+          <div class="grupo-input">
+            <label for="fecha-viaje-reparto">Fecha del reparto</label>
+            <input
+              type="date"
+              id="fecha-viaje-reparto"
+              name="fecha_viaje_reparto"
+              required>
+            <span class="mensaje-error">Por favor, seleccione una fecha valida.</span>
+          </div>
+
+          <div class="grupo-input">
+            <label for="chofer-reparto">Chofer</label>
+            <select id="chofer-reparto" name="id_chofer" class="select-estandar" required>
+              <option value="" disabled selected>Seleccione un chofer</option>
+              {% for chofer in choferes %}
+              <option value="{{ chofer.id }}">{{ chofer.nombre }} {{ chofer.apellido }}</option>
+              {% endfor %}
+            </select>
+            <span class="mensaje-error">Por favor, seleccione un chofer de la lista.</span>
+          </div>
+
+          <div class="grupo-input">
+            <label for="vehiculo-reparto">Vehiculo</label>
+            <select id="vehiculo-reparto" name="id_vehiculo" class="select-estandar" required>
+              <option value="" disabled selected>Seleccione un vehiculo</option>
+              {% for vehiculo in vehiculos %}
+              <option value="{{ vehiculo.id }}">{{ vehiculo.nombre }} ({{ vehiculo.patente }})</option>
+              {% endfor %}
+            </select>
+            <span class="mensaje-error">Por favor, seleccione un vehiculo de la lista.</span>
+          </div>
+        </section>
+
+        <!-- Seccion 2: Recorrido -->
+        <section class="seccion-bloque">
+          <div class="subtitulo-formulario">
+            <span class="material-symbols-outlined">location_on</span>
+            <h4>Recorrido</h4>
+          </div>
+
+          <div class="grupo-input" id="contenedor-destinos-reparto">
+            <label for="destino-reparto">Destinos</label>
+            <input
+              type="text"
+              id="destino-reparto"
+              name="destino_reparto"
+              placeholder="Ej: Buenos Aires"
+              required
+              maxlength="30"
+              pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}"
+              data-autocompletar-ciudad>
+
+            <div class="vje-destacciones">
+              <button type="button" id="btn-agregar-destino-reparto" class="vje-addbtn">
+                <span class="material-symbols-outlined">add_circle</span>
+                Añadir un destino
+              </button>
+              <button type="button" id="btn-quitar-destino-reparto" class="vje-removebtn">
+                <span class="material-symbols-outlined">do_not_disturb_on</span>
+                Quitar destino
+              </button>
+            </div>
+            <span class="mensaje-error">Minimo 3 caracteres (Solo letras y numeros)</span>
+          </div>
+        </section>
+
+        <!-- Seccion 3: Costos -->
+        <section class="seccion-bloque">
+          <div class="subtitulo-formulario">
+            <span class="material-symbols-outlined">payments</span>
+            <h4>Costos</h4>
+          </div>
+
+          <div class="grupo-input">
+            <label for="gasto-combustible-reparto">Gasto de combustible</label>
+            <div class="input-con-icono">
+              <span>$</span>
+              <input
+                type="number"
+                id="gasto-combustible-reparto"
+                name="gasto_combustible_viaje_reparto"
+                placeholder="0"
+                step="1"
+                min="0"
+                required
+                pattern="[0-9+]">
+            </div>
+            <span class="mensaje-error">Por favor, ingrese un monto valido.</span>
+          </div>
+
+          <div class="vje-grid2">
+            <div class="grupo-input">
+              <label for="empleado-costo-reparto">Costo empleado</label>
+              <div class="input-con-icono">
+                <span>$</span>
+                <input
+                  type="number"
+                  id="empleado-costo-reparto"
+                  name="empleado_costo"
+                  placeholder="0"
+                  step="1"
+                  min="0"
+                  required
+                  pattern="[0-9+]">
+              </div>
+              <span class="mensaje-error">Por favor, ingrese un monto valido.</span>
+            </div>
+
+            <div class="grupo-input">
+              <label for="valor-viaje-reparto">Valor del viaje</label>
+              <div class="input-con-icono">
+                <span>$</span>
+                <input
+                  type="number"
+                  id="valor-viaje-reparto"
+                  name="valor_viaje"
+                  placeholder="0"
+                  step="1"
+                  min="0"
+                  required
+                  pattern="[0-9+]">
+              </div>
+              <span class="mensaje-error">Por favor, ingrese un monto valido.</span>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- 3. Pie del Panel -->
+      <footer class="panel-pie">
+        <button type="submit" class="boton-primario">Guardar Reparto</button>
+        <button type="button" class="boton-secundario" onclick="cerrarSlideOver('slide-over-reparto')">Cancelar</button>
+      </footer>
+    </form>
+  </div>
+</div>
 {% endblock %}
 
 {% block codigo-javascript %}
-<script></script>
+<script src="{% static 'js/autocompletado_ciudades.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Autocompletar la fecha del reparto con la fecha actual al cargar la pagina
+    const inputFechaReparto = document.getElementById('fecha-viaje-reparto');
+    if (inputFechaReparto) {
+      inputFechaReparto.value = new Date().toISOString().split('T')[0];
+    }
+
+    // Logica para añadir y quitar dinamicamente multiples destinos
+    const btnAgregarDestino = document.getElementById('btn-agregar-destino-reparto');
+    const btnQuitarDestino = document.getElementById('btn-quitar-destino-reparto');
+    const contenedorDestinos = document.getElementById('contenedor-destinos-reparto');
+
+    if (btnAgregarDestino && btnQuitarDestino && contenedorDestinos) {
+      const contenedorBotones = btnAgregarDestino.parentElement;
+
+      // Evento Agregar
+      btnAgregarDestino.addEventListener('click', () => {
+        const nuevoInput = document.createElement('input');
+        nuevoInput.type = 'text';
+        nuevoInput.name = 'destino_reparto';
+        nuevoInput.placeholder = 'Siguiente destino...';
+        nuevoInput.required = true;
+        nuevoInput.maxLength = 30;
+        nuevoInput.pattern = '[a-zA-ZÁÉÍÓÚáéíóúñÑ\\s\\d]{3,}';
+        nuevoInput.style.marginTop = '0.5rem';
+
+        contenedorDestinos.insertBefore(nuevoInput, contenedorBotones);
+        inicializarAutocompletadoCiudad(nuevoInput);
+
+        // Mostrar boton de quitar si hay mas de 1 input
+        btnQuitarDestino.style.display = 'flex';
+      });
+
+      // Evento Quitar
+      btnQuitarDestino.addEventListener('click', () => {
+        const inputs = contenedorDestinos.querySelectorAll('input[name="destino_reparto"]');
+        if (inputs.length > 1) {
+          // Borra el ultimo input añadido y su lista de sugerencias asociada
+          const ultimoInput = inputs[inputs.length - 1];
+          const listaSugerencias = ultimoInput.nextElementSibling;
+          if (listaSugerencias && listaSugerencias.classList.contains('lista-autocompletado-ciudades')) {
+            listaSugerencias.remove();
+          }
+          ultimoInput.remove();
+        }
+
+        // Ocultar el boton de quitar si solo queda el input original
+        if (inputs.length - 1 <= 1) {
+          btnQuitarDestino.style.display = 'none';
+        }
+      });
+    }
+  });
+</script>
 {% endblock %}
