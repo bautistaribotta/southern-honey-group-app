@@ -26,7 +26,7 @@ body {
 #pantalla-izquierda {
   background-image:
     linear-gradient(oklch(20.493% 0.0261 168.787 / 0.28), oklch(20.493% 0.0261 168.787 / 0.28)),
-    url("login_apicultor.webp");
+    url("imagenes/login_apicultor.webp");
   background-size: cover;
   background-position: center;
   display: flex;
