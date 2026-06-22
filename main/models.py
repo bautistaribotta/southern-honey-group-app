@@ -308,3 +308,28 @@ class Gasto(models.Model):
 
     def __str__(self):
         return f"Gasto {self.gasto} de {self.monto} pesos (Viaje: {self.viaje})"
+
+
+class ViajeReparto(models.Model):
+    fecha_viaje_reparto = models.DateField()
+    gasto_combustible_viaje_reparto = models.IntegerField(default=0)
+    chofer = models.ForeignKey(Chofer, on_delete=models.PROTECT, db_column="id_chofer")
+    vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT, db_column="id_vehiculo")
+
+    class Meta:
+        db_table = "viaje_reparto"
+
+    def __str__(self):
+        return f"Viaje reparto nro: {self.id}"
+
+
+class DetalleViajeReparto(models.Model):
+    viaje_reparto = models.ForeignKey(ViajeReparto, on_delete=models.CASCADE,
+                                      related_name="destinos", db_column="id_viajereparto")
+    destinos_reparto = models.CharField(max_length=30)
+
+    class Meta:
+        db_table = "detalle_viaje_reparto"
+
+    def __str__(self):
+        return f"Destino {self.destinos_reparto} del {self.viaje_reparto}"
