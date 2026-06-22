@@ -327,10 +327,11 @@
 
 /* --- Celda Destinos --- */
 .vje-dest {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 0.4rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  max-width: 100%;
 }
 
 .vje-dest__pin {
@@ -340,6 +341,11 @@
 }
 
 .vje-dest__first {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-weight: var(--weight-semibold);
   color: var(--text-body);
 }
@@ -348,6 +354,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex: none;
   min-width: 1.4rem;
   height: 1.25rem;
   padding: 0 0.4rem;
