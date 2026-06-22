@@ -4,8 +4,8 @@
       <th class="alineado-izq">Vehículo</th>
       <th class="alineado-izq">Chofer</th>
       <th class="alineado-izq">Destinos</th>
-      <th class="alineado-centro">Inicio/Regreso</th>
       <th class="alineado-centro">Estado</th>
+      <th class="alineado-centro">Inicio/Regreso</th>
     </tr>
   </thead>
   <tbody>
@@ -39,19 +39,19 @@
           {% endif %}
         </div>
       </td>
-      <td>
-        <span class="vje-fechas">
-          {{ viaje.fecha_inicio|date:"d/m/y" }}
-          <span class="material-symbols-outlined">arrow_forward</span>
-          {% if viaje.fecha_vuelta %}{{ viaje.fecha_vuelta|date:"d/m/y" }}{% else %}<span class="vje-fechas__open">No definido</span>{% endif %}
-        </span>
-      </td>
       <td class="alineado-centro">
         {% if viaje.estado == "Finalizado" %}
           <span class="vje-badge vje-badge--neutral"><span class="vje-badge__dot"></span>Finalizado</span>
         {% else %}
           <span class="vje-badge vje-badge--info"><span class="vje-badge__dot"></span>En curso</span>
         {% endif %}
+      </td>
+      <td>
+        <span class="vje-fechas">
+          {{ viaje.fecha_inicio|date:"d/m/y" }}
+          <span class="material-symbols-outlined">arrow_forward</span>
+          {% if viaje.fecha_vuelta %}{{ viaje.fecha_vuelta|date:"d/m/y" }}{% else %}<span class="vje-fechas__open">No definido</span>{% endif %}
+        </span>
       </td>
     </tr>
     {% empty %}
