@@ -88,17 +88,17 @@
           </div>
         </div>
         <div class="vd-data__row vd-data__row--sep">
-          <span class="vd-avatar">{% if viaje.chofer %}{{ viaje.chofer.nombre|first|upper }}{{ viaje.chofer.apellido|first|upper }}{% else %}?{% endif %}</span>
-          <div class="vd-data__meta">
-            <div class="vd-data__label">Chofer</div>
-            <div class="vd-data__value">{% if viaje.chofer %}{{ viaje.chofer.nombre }} {{ viaje.chofer.apellido }}{% else %}Chofer no especificado{% endif %}</div>
-          </div>
-        </div>
-        <div class="vd-data__row">
           <span class="vd-data__ico"><span class="material-symbols-outlined">local_shipping</span></span>
           <div class="vd-data__meta">
             <div class="vd-data__label">Vehículo</div>
             <div class="vd-data__value">{% if viaje.vehiculo %}{{ viaje.vehiculo.nombre }}<span class="vd-pat">{{ viaje.vehiculo.patente }}</span>{% else %}Vehículo no especificado{% endif %}</div>
+          </div>
+        </div>
+        <div class="vd-data__row">
+          <span class="vd-avatar">{% if viaje.chofer %}{{ viaje.chofer.nombre|first|upper }}{{ viaje.chofer.apellido|first|upper }}{% else %}?{% endif %}</span>
+          <div class="vd-data__meta">
+            <div class="vd-data__label">Chofer</div>
+            <div class="vd-data__value">{% if viaje.chofer %}{{ viaje.chofer.nombre }} {{ viaje.chofer.apellido }}{% else %}Chofer no especificado{% endif %}</div>
           </div>
         </div>
       </div>
