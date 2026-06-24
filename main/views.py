@@ -907,6 +907,15 @@ def mercado_libre(request):
     return render(request, "mercado_libre.html", contexto)
 
 
+@login_required
+def viaje_cereales(request):
+    contexto = {
+        "choferes": obtener_choferes_activos(),
+        "vehiculos": obtener_vehiculos_activos(),
+    }
+    return render(request, "viajes_cereales.html", contexto)
+
+
 def cerrar_sesion(request):
     auth_logout(request)
     return redirect("login")
