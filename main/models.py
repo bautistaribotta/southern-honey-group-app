@@ -357,6 +357,12 @@ class ViajeCereal(models.Model):
     precio_tonelada = models.IntegerField(default=0)
     porcentaje_chofer = models.IntegerField(default=0)
 
+    class Meta:
+        db_table = "viaje_cereal"
+
+    def __str__(self):
+        return f"Viaje de cereal nro: {self.id}"
+
 
 class DetalleViajeCereal(models.Model):
     # TODO: ¿Los viajes tienen destino?
