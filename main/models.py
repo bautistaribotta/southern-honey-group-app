@@ -317,6 +317,7 @@ class ViajeReparto(models.Model):
     gasto_combustible_viaje_reparto = models.IntegerField(default=0)
     costo_empleado = models.IntegerField(default=0)
     valor_viaje = models.IntegerField(default=0)
+    activo = models.BooleanField(default=True)
 
     class Meta:
         db_table = "viaje_reparto"
@@ -357,6 +358,7 @@ class ViajeCereal(models.Model):
     toneladas = models.IntegerField(default=0)
     precio_tonelada = models.IntegerField(default=0)
     porcentaje_chofer = models.IntegerField(default=0)
+    activo = models.BooleanField(default=True)
 
     class Meta:
         db_table = "viaje_cereal"
