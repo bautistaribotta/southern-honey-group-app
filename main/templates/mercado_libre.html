@@ -78,16 +78,6 @@
           </div>
 
           <div class="grupo-input">
-            <label for="fecha-viaje-reparto">Fecha del reparto</label>
-            <input
-              type="date"
-              id="fecha-viaje-reparto"
-              name="fecha_viaje_reparto"
-              required>
-            <span class="mensaje-error">Por favor, seleccione una fecha valida.</span>
-          </div>
-
-          <div class="grupo-input">
             <label for="chofer-reparto">Chofer</label>
             <select id="chofer-reparto" name="id_chofer" class="select-estandar" required>
               <option value="" disabled selected>Seleccione un chofer</option>
@@ -201,6 +191,24 @@
               </div>
               <span class="mensaje-error">Por favor, ingrese un monto valido.</span>
             </div>
+          </div>
+        </section>
+
+        <!-- Seccion 4: Fecha -->
+        <section class="seccion-bloque">
+          <div class="subtitulo-formulario">
+            <span class="material-symbols-outlined">event</span>
+            <h4>Fecha</h4>
+          </div>
+
+          <div class="grupo-input">
+            <label for="fecha-viaje-reparto">Fecha del reparto</label>
+            <input
+              type="date"
+              id="fecha-viaje-reparto"
+              name="fecha_viaje_reparto"
+              required>
+            <span class="mensaje-error">Por favor, seleccione una fecha valida.</span>
           </div>
         </section>
       </main>
