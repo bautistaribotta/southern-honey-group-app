@@ -10,14 +10,16 @@ from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.db import transaction
 
-from .models import Cliente, Producto, Operacion, DetalleOperacion, Pago, Cotizaciones, Chofer, Vehiculo, Viaje
+from .models import Cliente, Producto, Operacion, DetalleOperacion, Pago, Cotizaciones, Chofer, Vehiculo, Viaje, ViajeCereal
 from .pdf_services import Remito
 from .services import (nuevo_producto, editar_producto, eliminar_producto, nuevo_cliente, editar_cliente,
                        eliminar_cliente, get_cotizacion_dolar_oficial, get_cotizaciones, actualizar_cotizacion, obtener_datos_cliente,
                        obtener_datos_producto, modificar_stock, crear_operacion, servicio_cancelar_operacion,
                        obtener_listado_deudores, crear_chofer, crear_vehiculo, crear_viaje, obtener_choferes_activos,
                        obtener_vehiculos_activos, obtener_viajes, editar_viaje, eliminar_viaje, crear_gasto,
-                       editar_chofer, eliminar_chofer, editar_vehiculo, eliminar_vehiculo)
+                       editar_chofer, eliminar_chofer, editar_vehiculo, eliminar_vehiculo,
+                       crear_viaje_cereal, obtener_viajes_cereales, obtener_datos_viaje_cereal,
+                       editar_viaje_cereal, eliminar_viaje_cereal)
 
 
 def login(request):
@@ -909,11 +911,153 @@ def mercado_libre(request):
 
 @login_required
 def viaje_cereales(request):
+    if request.method == "POST":
+        accion = request.POST.get("accion")
+
+        try:
+            if accion == "nuevo_viaje_cereal":
+                # 1. Extraccion de datos del formulario
+                id_chofer = request.POST.get("id_chofer")
+                id_vehiculo = request.POST.get("id_vehiculo")
+                tipo_cereal = request.POST.get("tipo_cereal")
+                codigo_trazabilidad = request.POST.get("codigo_trazabilidad")
+                toneladas = request.POST.get("toneladas")
+                precio_tonelada = request.POST.get("precio_tonelada")
+                # El porcentaje es opcional: si llega vacio lo paso como None
+                porcentaje_chofer = request.POST.get("porcentaje_chofer") or None
+                fecha_viaje_cereal = request.POST.get("fecha_viaje_cereal")
+                destinos = request.POST.getlist("destino")
+
+                # 2. Validacion de presencia de lo obligatorio (lo esencial en la vista)
+                if not all([id_chofer, id_vehiculo, tipo_cereal, codigo_trazabilidad,
+                            toneladas, precio_tonelada, fecha_viaje_cereal]) or not destinos:
+                    messages.error(request, "Faltan datos obligatorios para crear el viaje de cereal.")
+                    return redirect("viajes_cereales")
+
+                # 3. Delegacion al servicio (reglas de negocio y validacion con regex)
+                crear_viaje_cereal(id_chofer, id_vehiculo, tipo_cereal, codigo_trazabilidad,
+                                   toneladas, precio_tonelada, porcentaje_chofer, fecha_viaje_cereal, destinos)
+                messages.success(request, "Viaje de cereal registrado exitosamente.")
+
+        except ValueError as e:
+            # Captura los errores de validacion provenientes de services.py
+            messages.error(request, str(e))
+        except Exception as e:
+            # Captura errores inesperados (ej: base de datos)
+            messages.error(request, f"Ocurrió un error inesperado: {e}")
+
+        return redirect("viajes_cereales")
+
+    from django.db.models import Q
+
+    # Base de viajes de cereal activos (sirve para los conteos y para filtrar)
+    base_viajes = obtener_viajes_cereales()
+
+    # Conteos por tipo de cereal, calculados sobre el total (para los chips de filtro)
+    count_total = base_viajes.count()
+    counts_cereal = {c[0]: base_viajes.filter(tipo_cereal=c[0]).count() for c in ViajeCereal.cereales}
+
+    lista_viajes = base_viajes
+
+    # Busqueda por vehiculo, chofer, tipo de cereal, destino o ID
+    q = request.GET.get("q", "")
+    if q:
+        if q.isdigit():
+            lista_viajes = lista_viajes.filter(id__icontains=q)
+        else:
+            lista_viajes = lista_viajes.filter(
+                Q(vehiculo__nombre__icontains=q)
+                | Q(vehiculo__patente__icontains=q)
+                | Q(chofer__nombre__icontains=q)
+                | Q(chofer__apellido__icontains=q)
+                | Q(tipo_cereal__icontains=q)
+                | Q(destinos__destino__icontains=q)
+            ).distinct()
+
+    # Filtro por tipo de cereal (chips)
+    cereal = request.GET.get("cereal", "")
+    if cereal in dict(ViajeCereal.cereales):
+        lista_viajes = lista_viajes.filter(tipo_cereal=cereal)
+
+    # Cargo de a 5 viajes
+    paginator = Paginator(lista_viajes, 5)
+    pagina_numero = request.GET.get("page")
+    page_obj = paginator.get_page(pagina_numero)
+
     contexto = {
+        "page_obj": page_obj,
         "choferes": obtener_choferes_activos(),
         "vehiculos": obtener_vehiculos_activos(),
+        "cereales": ViajeCereal.cereales,
+        "q": q,
+        "cereal": cereal,
+        "count_total": count_total,
+        "counts_cereal": counts_cereal,
     }
+
+    # Si es una peticion AJAX (buscador/chips/paginacion), devuelvo solo la tabla parcial
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return render(request, "tabla_viajes_cereales.html", contexto)
+
     return render(request, "viajes_cereales.html", contexto)
+
+
+@login_required
+def informacion_viaje_cereal(request, id_viaje_cereal):
+    viaje_cereal = obtener_datos_viaje_cereal(id_viaje_cereal)
+
+    if request.method == "POST":
+        accion = request.POST.get("accion")
+
+        if accion == "eliminar_viaje_cereal":
+            try:
+                eliminar_viaje_cereal(id_viaje_cereal)
+                messages.success(request, "Viaje de cereal eliminado correctamente")
+                return redirect("viajes_cereales")
+            except Exception as e:
+                messages.error(request, f"{e}")
+                return redirect("informacion_viaje_cereal", id_viaje_cereal=id_viaje_cereal)
+
+        elif accion == "editar_viaje_cereal":
+            id_chofer = request.POST.get("id_chofer")
+            id_vehiculo = request.POST.get("id_vehiculo")
+            tipo_cereal = request.POST.get("tipo_cereal")
+            codigo_trazabilidad = request.POST.get("codigo_trazabilidad")
+            toneladas = request.POST.get("toneladas")
+            precio_tonelada = request.POST.get("precio_tonelada")
+            porcentaje_chofer = request.POST.get("porcentaje_chofer") or None
+            fecha_viaje_cereal = request.POST.get("fecha_viaje_cereal")
+            destinos = request.POST.getlist("destino")
+
+            try:
+                editar_viaje_cereal(
+                    id_viaje_cereal=id_viaje_cereal,
+                    id_chofer=id_chofer,
+                    id_vehiculo=id_vehiculo,
+                    tipo_cereal=tipo_cereal,
+                    codigo_trazabilidad=codigo_trazabilidad,
+                    toneladas=toneladas,
+                    precio_tonelada=precio_tonelada,
+                    porcentaje_chofer=porcentaje_chofer,
+                    fecha_viaje_cereal=fecha_viaje_cereal,
+                    destinos=destinos,
+                )
+                messages.success(request, "Viaje de cereal modificado exitosamente.")
+            except ValueError as e:
+                messages.error(request, str(e))
+            except Exception as e:
+                messages.error(request, f"Ocurrió un error inesperado: {e}")
+
+            return redirect("informacion_viaje_cereal", id_viaje_cereal=id_viaje_cereal)
+
+    contexto = {
+        "viaje_cereal": viaje_cereal,
+        "pestaña": "viajes",
+        "choferes": obtener_choferes_activos(),
+        "vehiculos": obtener_vehiculos_activos(),
+        "cereales": ViajeCereal.cereales,
+    }
+    return render(request, "informacion_viaje_cereal.html", contexto)
 
 
 def cerrar_sesion(request):

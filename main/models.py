@@ -344,7 +344,6 @@ class DetalleViajeReparto(models.Model):
 
 
 class ViajeCereal(models.Model):
-    # TODO: Completar los tipos
     cereales = [
         ("Maiz", "Maiz"),
         ("Soja", "Soja"),
@@ -353,8 +352,10 @@ class ViajeCereal(models.Model):
     fecha_viaje_cereal = models.DateField()
     chofer = models.ForeignKey(Chofer, on_delete=models.PROTECT, db_column="id_chofer")
     vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT, db_column="id_vehiculo")
-    tipo_cereal = models.CharField(max_length=50, choices=cereales, null=True, blank=True)
-    codigo_trazabilidad_granos = models.IntegerField(default=0)
+    tipo_cereal = models.CharField(max_length=50, choices=cereales)
+    # El CTG es un codigo de 8 digitos que puede tener ceros a la izquierda, por eso
+    # lo guardo como texto: un IntegerField perderia esos ceros (00123456 -> 123456)
+    codigo_trazabilidad_granos = models.CharField(max_length=8)
     toneladas = models.IntegerField(default=0)
     precio_tonelada = models.IntegerField(default=0)
     porcentaje_chofer = models.IntegerField(default=0)
@@ -363,10 +364,32 @@ class ViajeCereal(models.Model):
     class Meta:
         db_table = "viaje_cereal"
 
+    @property
+    def total_bruto(self):
+        # Facturacion del flete: toneladas transportadas por el precio de cada una
+        return self.toneladas * self.precio_tonelada
+
+    @property
+    def pago_chofer(self):
+        # Lo que se lleva el chofer segun su porcentaje sobre el total bruto
+        return self.total_bruto * self.porcentaje_chofer / 100
+
+    @property
+    def ganancia_neta(self):
+        # Lo que le queda a la empresa una vez pagada la parte del chofer
+        return self.total_bruto - self.pago_chofer
+
     def __str__(self):
         return f"Viaje de cereal nro: {self.id}"
 
 
 class DetalleViajeCereal(models.Model):
-    # TODO: ¿Los viajes tienen destino?
-    pass
+    viaje_cereal = models.ForeignKey(ViajeCereal, on_delete=models.CASCADE,
+                                     related_name="destinos", db_column="id_viajecereal")
+    destino = models.CharField(max_length=30)
+
+    class Meta:
+        db_table = "detalle_viaje_cereal"
+
+    def __str__(self):
+        return f"Destino {self.destino} del {self.viaje_cereal}"

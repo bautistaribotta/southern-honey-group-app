@@ -76,7 +76,7 @@
           </a>
         </li>
         <li>
-          <a href="{% url 'viajes_cereales' %}" class="item-menu {% if request.resolver_match.url_name == 'viajes_cereales' %} activo {% endif %}">
+          <a href="{% url 'viajes_cereales' %}" class="item-menu {% if request.resolver_match.url_name == 'viajes_cereales' or request.resolver_match.url_name == 'informacion_viaje_cereal' %} activo {% endif %}">
             <span class="material-symbols-outlined">agriculture</span>
             Viajes cereales
           </a>
