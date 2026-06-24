@@ -1,0 +1,74 @@
+<table class="tabla-viajes tabla-cereales">
+  <thead>
+    <tr>
+      <th class="alineado-izq">Fecha</th>
+      <th class="alineado-izq">Vehículo</th>
+      <th class="alineado-izq">Chofer</th>
+      <th class="alineado-izq">Cereal</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for viaje in page_obj %}
+    <tr class="fila-viaje" onclick="window.location.href='{% url 'informacion_viaje_cereal' viaje.id %}'">
+      <td>
+        <span class="vjc-fecha">
+          <span class="material-symbols-outlined">event</span>
+          {{ viaje.fecha_viaje_cereal|date:"d/m/y" }}
+        </span>
+      </td>
+      <td>
+        <div class="vje-veh">
+          <span class="vje-veh__tile"><span class="material-symbols-outlined">local_shipping</span></span>
+          <div>
+            <div class="vehiculo-nombre">{{ viaje.vehiculo.nombre }}</div>
+            <span class="vje-veh__pat">{{ viaje.vehiculo.patente }}</span>
+          </div>
+        </div>
+      </td>
+      <td>
+        <div class="vje-chofer">
+          <span class="vje-avatar">{{ viaje.chofer.nombre|first|upper }}{{ viaje.chofer.apellido|first|upper }}</span>
+          <span class="vje-chofer__name">{{ viaje.chofer.nombre }} {{ viaje.chofer.apellido }}</span>
+        </div>
+      </td>
+      <td>
+        <span class="cereal-pill cereal-pill--{{ viaje.tipo_cereal|lower }}">
+          <span class="cereal-pill__dot"></span>{{ viaje.get_tipo_cereal_display }}
+        </span>
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="4" class="celda-vacia">
+        <span class="material-symbols-outlined">agriculture</span>
+        No se encontraron viajes de cereales con esos filtros.
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- PAGINACION -->
+<div class="paginacion">
+  <div class="paginacion-info">
+    Mostrando <span>{{ page_obj.start_index|default:"0" }}-{{ page_obj.end_index|default:"0" }}</span>
+    de <span>{{ page_obj.paginator.count|default:"0" }}</span> viajes
+  </div>
+  <div class="paginacion-botones">
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if cereal %}&cereal={{ cereal }}{% endif %}">
+        <button class="boton-paginacion">Anterior</button>
+      </a>
+    {% else %}
+      <button class="boton-paginacion" disabled>Anterior</button>
+    {% endif %}
+
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if cereal %}&cereal={{ cereal }}{% endif %}">
+        <button class="boton-paginacion">Siguiente</button>
+      </a>
+    {% else %}
+      <button class="boton-paginacion" disabled>Siguiente</button>
+    {% endif %}
+  </div>
+</div>

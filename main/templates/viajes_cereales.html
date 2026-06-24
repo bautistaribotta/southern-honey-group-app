@@ -6,7 +6,9 @@
 {% endblock %}
 
 {% block links %}
+<link rel="stylesheet" href="{% static 'viajes.css' %}">
 <link rel="stylesheet" href="{% static 'viajes_cereales.css' %}">
+<link rel="stylesheet" href="{% static 'autocompletado_ciudades.css' %}">
 {% endblock %}
 
 {% block cabecera %}
@@ -17,4 +19,294 @@
 {% endblock %}
 
 {% block area-trabajo %}
+<section id="area-trabajo">
+
+  <!-- Controles superiores: buscador y boton -->
+  <div class="barra-herramientas">
+    <div class="grupo-busqueda">
+      <div class="contenedor-input-busqueda">
+        <span class="material-symbols-outlined icono-busqueda">search</span>
+        <input type="text" id="buscar-viaje-cereal" class="input-busqueda"
+               placeholder="Buscar por chofer, vehículo, cereal o destino" value="{{ q|default:'' }}">
+      </div>
+    </div>
+
+    <div class="grupo-botones">
+      <button class="boton-nuevo" id="btn-nuevo-acopio" onclick="abrirSlideOver('slide-over-acopio')">
+        <span class="material-symbols-outlined">add</span>
+        <span class="texto-boton">Nuevo acopio</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filtros por tipo de cereal como pildoras -->
+  <input type="hidden" id="filtro-cereal" value="{{ cereal|default:'' }}">
+  <div class="prod-chips" id="chips-cereal">
+    <button type="button" class="prod-chip {% if not cereal %}is-active{% endif %}" data-cereal="">
+      Todos <span class="vje-chipcount">{{ count_total }}</span>
+    </button>
+    <button type="button" class="prod-chip {% if cereal == 'Maiz' %}is-active{% endif %}" data-cereal="Maiz">
+      <span class="prod-chip__dot prod-chip__dot--maiz"></span>Maíz <span class="vje-chipcount">{{ counts_cereal.Maiz }}</span>
+    </button>
+    <button type="button" class="prod-chip {% if cereal == 'Soja' %}is-active{% endif %}" data-cereal="Soja">
+      <span class="prod-chip__dot prod-chip__dot--soja"></span>Soja <span class="vje-chipcount">{{ counts_cereal.Soja }}</span>
+    </button>
+    <button type="button" class="prod-chip {% if cereal == 'Trigo' %}is-active{% endif %}" data-cereal="Trigo">
+      <span class="prod-chip__dot prod-chip__dot--trigo"></span>Trigo <span class="vje-chipcount">{{ counts_cereal.Trigo }}</span>
+    </button>
+  </div>
+
+  <!-- Tabla de viajes de cereales -->
+  <div class="contenedor-tabla" id="tabla-viajes-cereales-container">
+    {% include 'tabla_viajes_cereales.html' %}
+  </div>
+
+</section>
+
+<!-- PANEL LATERAL NUEVO ACOPIO (SLIDE-OVER) -->
+<div id="slide-over-acopio">
+  <div id="slide-over-fondo" onclick="cerrarSlideOver('slide-over-acopio')"></div>
+
+  <div id="slide-over-panel">
+    <form id="form-acopio" method="post" autocomplete="off">
+      {% csrf_token %}
+      <input type="hidden" name="accion" value="nuevo_viaje_cereal">
+
+      <!-- 1. Cabecera -->
+      <header class="panel-cabecera">
+        <div class="panel-titulo-fila">
+          <div class="icono-contenedor">
+            <span class="material-symbols-outlined">agriculture</span>
+          </div>
+          <div class="texto-cabecera">
+            <h3>Nuevo acopio</h3>
+            <p>Complete los datos del viaje de cereal</p>
+          </div>
+        </div>
+        <button type="button" class="boton-cerrar" onclick="cerrarSlideOver('slide-over-acopio')">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </header>
+
+      <!-- 2. Cuerpo con scroll -->
+      <main class="panel-cuerpo">
+
+        <!-- Seccion 1: Asignacion -->
+        <section class="seccion-bloque">
+          <div class="subtitulo-formulario">
+            <span class="material-symbols-outlined">group</span>
+            <h4>Asignación</h4>
+          </div>
+
+          <div class="grupo-input">
+            <label for="chofer-acopio">Chofer</label>
+            <select id="chofer-acopio" name="id_chofer" class="select-estandar" required>
+              <option value="" disabled selected>Seleccione un chofer</option>
+              {% for chofer in choferes %}
+              <option value="{{ chofer.id }}">{{ chofer.nombre }} {{ chofer.apellido }}</option>
+              {% endfor %}
+            </select>
+            <span class="mensaje-error">Por favor, seleccione un chofer de la lista.</span>
+          </div>
+
+          <div class="grupo-input">
+            <label for="vehiculo-acopio">Vehículo</label>
+            <select id="vehiculo-acopio" name="id_vehiculo" class="select-estandar" required>
+              <option value="" disabled selected>Seleccione un vehículo</option>
+              {% for vehiculo in vehiculos %}
+              <option value="{{ vehiculo.id }}">{{ vehiculo.nombre }} ({{ vehiculo.patente }})</option>
+              {% endfor %}
+            </select>
+            <span class="mensaje-error">Por favor, seleccione un vehículo de la lista.</span>
+          </div>
+        </section>
+
+        <!-- Seccion 2: Carga -->
+        <section class="seccion-bloque">
+          <div class="subtitulo-formulario">
+            <span class="material-symbols-outlined">inventory_2</span>
+            <h4>Carga</h4>
+          </div>
+
+          <div class="grupo-input">
+            <label for="tipo-cereal-acopio">Tipo de cereal</label>
+            <select id="tipo-cereal-acopio" name="tipo_cereal" class="select-estandar" required>
+              <option value="" disabled selected>Seleccione un cereal</option>
+              {% for valor, etiqueta in cereales %}
+              <option value="{{ valor }}">{{ etiqueta }}</option>
+              {% endfor %}
+            </select>
+            <span class="mensaje-error">Por favor, seleccione un tipo de cereal.</span>
+          </div>
+
+          <div class="grupo-input">
+            <label for="codigo-acopio">Código de trazabilidad (CTG)</label>
+            <input
+              type="text"
+              id="codigo-acopio"
+              name="codigo_trazabilidad"
+              placeholder="Ej: 00123456"
+              required
+              maxlength="8"
+              inputmode="numeric"
+              pattern="[0-9]{8}">
+            <span class="mensaje-error">Debe tener exactamente 8 dígitos numéricos.</span>
+          </div>
+
+          <div class="vje-grid2">
+            <div class="grupo-input">
+              <label for="toneladas-acopio">Toneladas</label>
+              <input
+                type="number"
+                id="toneladas-acopio"
+                name="toneladas"
+                placeholder="0"
+                min="1"
+                step="1"
+                required>
+              <span class="mensaje-error">Ingrese un entero mayor a 0.</span>
+            </div>
+
+            <div class="grupo-input">
+              <label for="precio-acopio">Precio por tonelada</label>
+              <div class="input-con-icono">
+                <span>$</span>
+                <input
+                  type="number"
+                  id="precio-acopio"
+                  name="precio_tonelada"
+                  placeholder="0"
+                  min="1"
+                  step="1"
+                  required>
+              </div>
+              <span class="mensaje-error">Ingrese un monto válido mayor a 0.</span>
+            </div>
+          </div>
+
+          <div class="grupo-input">
+            <label for="porcentaje-acopio">Porcentaje del chofer (%)</label>
+            <input
+              type="number"
+              id="porcentaje-acopio"
+              name="porcentaje_chofer"
+              placeholder="Opcional"
+              min="1"
+              max="100"
+              step="1">
+            <span class="mensaje-error">Debe ser un número entre 1 y 100.</span>
+          </div>
+        </section>
+
+        <!-- Seccion 3: Recorrido -->
+        <section class="seccion-bloque">
+          <div class="subtitulo-formulario">
+            <span class="material-symbols-outlined">location_on</span>
+            <h4>Recorrido</h4>
+          </div>
+
+          <div class="grupo-input" id="contenedor-destinos-acopio">
+            <label for="destino-acopio">Destinos</label>
+            <input
+              type="text"
+              id="destino-acopio"
+              name="destino"
+              placeholder="Ej: Rosario"
+              required
+              maxlength="30"
+              pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}"
+              data-autocompletar-ciudad>
+
+            <div class="vje-destacciones">
+              <button type="button" id="btn-agregar-destino-acopio" class="vje-addbtn">
+                <span class="material-symbols-outlined">add_circle</span>
+                Añadir un destino
+              </button>
+              <button type="button" id="btn-quitar-destino-acopio" class="vje-removebtn">
+                <span class="material-symbols-outlined">do_not_disturb_on</span>
+                Quitar destino
+              </button>
+            </div>
+            <span class="mensaje-error">Mínimo 3 caracteres (Solo letras y números)</span>
+          </div>
+        </section>
+
+        <!-- Seccion 4: Fecha -->
+        <section class="seccion-bloque">
+          <div class="subtitulo-formulario">
+            <span class="material-symbols-outlined">event</span>
+            <h4>Fecha</h4>
+          </div>
+
+          <div class="grupo-input">
+            <label for="fecha-acopio">Fecha del viaje</label>
+            <input type="date" id="fecha-acopio" name="fecha_viaje_cereal" required>
+            <span class="mensaje-error">Por favor, seleccione una fecha válida.</span>
+          </div>
+        </section>
+      </main>
+
+      <!-- 3. Pie del panel -->
+      <footer class="panel-pie">
+        <button type="submit" class="boton-primario">Guardar acopio</button>
+        <button type="button" class="boton-secundario" onclick="cerrarSlideOver('slide-over-acopio')">Cancelar</button>
+      </footer>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block codigo-javascript %}
+<script src="{% static 'js/autocompletado_ciudades.js' %}"></script>
+<script src="{% static 'js/viajes_cereales.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Autocompletar la fecha del viaje con la fecha actual al cargar la pagina
+    const inputFecha = document.getElementById('fecha-acopio');
+    if (inputFecha) {
+      inputFecha.value = new Date().toISOString().split('T')[0];
+    }
+
+    // Logica para anadir y quitar dinamicamente multiples destinos
+    const btnAgregarDestino = document.getElementById('btn-agregar-destino-acopio');
+    const btnQuitarDestino = document.getElementById('btn-quitar-destino-acopio');
+    const contenedorDestinos = document.getElementById('contenedor-destinos-acopio');
+
+    if (btnAgregarDestino && btnQuitarDestino && contenedorDestinos) {
+      const contenedorBotones = btnAgregarDestino.parentElement;
+
+      btnAgregarDestino.addEventListener('click', () => {
+        const nuevoInput = document.createElement('input');
+        nuevoInput.type = 'text';
+        nuevoInput.name = 'destino';
+        nuevoInput.placeholder = 'Siguiente destino...';
+        nuevoInput.required = true;
+        nuevoInput.maxLength = 30;
+        nuevoInput.pattern = '[a-zA-ZÁÉÍÓÚáéíóúñÑ\\s\\d]{3,}';
+        nuevoInput.style.marginTop = '0.5rem';
+
+        contenedorDestinos.insertBefore(nuevoInput, contenedorBotones);
+        inicializarAutocompletadoCiudad(nuevoInput);
+
+        btnQuitarDestino.style.display = 'flex';
+      });
+
+      btnQuitarDestino.addEventListener('click', () => {
+        const inputs = contenedorDestinos.querySelectorAll('input[name="destino"]');
+        if (inputs.length > 1) {
+          const ultimoInput = inputs[inputs.length - 1];
+          const listaSugerencias = ultimoInput.nextElementSibling;
+          if (listaSugerencias && listaSugerencias.classList.contains('lista-autocompletado-ciudades')) {
+            listaSugerencias.remove();
+          }
+          ultimoInput.remove();
+        }
+
+        if (inputs.length - 1 <= 1) {
+          btnQuitarDestino.style.display = 'none';
+        }
+      });
+    }
+  });
+</script>
 {% endblock %}

@@ -1,5 +1,124 @@
 /*
   Estilos propios de la vista de viajes de cereales.
-  Por ahora la vista es basica (solo cabecera), asi que el archivo
-  queda preparado para ir sumando los estilos de la tabla mas adelante.
+  La estructura de tabla, barra de herramientas, chips y paginacion se reutiliza
+  desde viajes.css (mismo sistema de diseno). Aca solo se define lo especifico
+  del cereal: la pildora de tipo y el ajuste de columnas de esta tabla.
 */
+
+:root {
+  /* Paleta de la pildora de cereal, derivada del propio grano.
+     Maiz: dorado miel (reusa la familia honey).
+     Soja: verde (reusa la familia success).
+     Trigo: ambar tostado, tono propio para diferenciarlo del dorado del maiz. */
+  --cereal-maiz-bg: var(--honey-50);
+  --cereal-maiz-fg: var(--honey-700);
+  --cereal-maiz-dot: var(--honey-500);
+
+  --cereal-soja-bg: var(--success-50);
+  --cereal-soja-fg: var(--success-600);
+  --cereal-soja-dot: var(--success-500);
+
+  --cereal-trigo-bg: oklch(95.5% 0.040 74);
+  --cereal-trigo-fg: oklch(48% 0.085 60);
+  --cereal-trigo-dot: oklch(70% 0.120 66);
+}
+
+/* --- Anchos de columna propios de esta tabla (4 columnas).
+   Uso el prefijo .contenedor-tabla para ganarle en especificidad a las
+   reglas de 5 columnas que define viajes.css para .tabla-viajes. --- */
+.contenedor-tabla .tabla-cereales th:nth-child(1) { width: 20%; } /* Fecha */
+.contenedor-tabla .tabla-cereales th:nth-child(2) { width: 32%; } /* Vehiculo */
+.contenedor-tabla .tabla-cereales th:nth-child(3) { width: 30%; } /* Chofer */
+.contenedor-tabla .tabla-cereales th:nth-child(4) { width: 18%; } /* Cereal */
+
+/* --- Celda Fecha: icono + fecha (una sola fecha de viaje) --- */
+.vjc-fecha {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-body);
+  white-space: nowrap;
+  font-weight: var(--weight-semibold);
+}
+
+.vjc-fecha .material-symbols-outlined {
+  font-size: 1.05rem;
+  color: var(--sand-400);
+}
+
+/* --- Pildora de tipo de cereal --- */
+.cereal-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+}
+
+.cereal-pill__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.cereal-pill--maiz { background-color: var(--cereal-maiz-bg); color: var(--cereal-maiz-fg); }
+.cereal-pill--maiz .cereal-pill__dot { background-color: var(--cereal-maiz-dot); }
+
+.cereal-pill--soja { background-color: var(--cereal-soja-bg); color: var(--cereal-soja-fg); }
+.cereal-pill--soja .cereal-pill__dot { background-color: var(--cereal-soja-dot); }
+
+.cereal-pill--trigo { background-color: var(--cereal-trigo-bg); color: var(--cereal-trigo-fg); }
+.cereal-pill--trigo .cereal-pill__dot { background-color: var(--cereal-trigo-dot); }
+
+/* Fallback neutro por si llegara un tipo sin estilo asignado */
+.cereal-pill:not([class*="cereal-pill--"]),
+.cereal-pill--otro {
+  background-color: var(--surface-sunken);
+  color: var(--text-muted);
+}
+.cereal-pill--otro .cereal-pill__dot { background-color: var(--sand-400); }
+
+/* --- Puntos de color en los chips de filtro por cereal --- */
+.prod-chip__dot--maiz { background-color: var(--cereal-maiz-dot); }
+.prod-chip__dot--soja { background-color: var(--cereal-soja-dot); }
+.prod-chip__dot--trigo { background-color: var(--cereal-trigo-dot); }
+
+/* --- Slide-over "Nuevo acopio" ---
+   Las clases internas del panel (.panel-cabecera, .grupo-input, .boton-primario,
+   etc.) y las reglas base de #slide-over-fondo / #slide-over-panel se heredan de
+   viajes.css. Aca solo se define el contenedor por id y sus estados de apertura. */
+#slide-over-acopio {
+  position: fixed;
+  inset: 0;
+  z-index: 1100; /* Por encima de la barra superior mobile (#mobile-top-bar: 1000) */
+  visibility: hidden;
+  overflow: hidden;
+  display: flex;
+  justify-content: flex-end;
+  transition: visibility var(--dur-slow);
+}
+
+#slide-over-acopio.slide-over-abierto {
+  visibility: visible;
+  pointer-events: auto;
+  transition: none;
+}
+
+#slide-over-acopio.slide-over-abierto #slide-over-fondo {
+  opacity: 1;
+}
+
+#slide-over-acopio.slide-over-abierto #slide-over-panel {
+  transform: translateX(0);
+}
+
+#form-acopio {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}

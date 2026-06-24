@@ -77,6 +77,30 @@ function cerrarSlideOver(idContenedor = 'contenedor-slide-over') {
             inputFechaReparto.value = new Date().toISOString().split('T')[0];
         }
     }
+
+    // LÓGICA ESPECÍFICA PARA EL MODAL DE ACOPIOS (Viajes de cereales):
+    // Misma limpieza de destinos extra que el modal de viajes
+    if (idContenedor === 'slide-over-acopio') {
+        const contenedorDestinos = document.getElementById('contenedor-destinos-acopio');
+        if (contenedorDestinos) {
+            const inputsDestino = contenedorDestinos.querySelectorAll('input[name="destino"]');
+            if (inputsDestino.length > 1) {
+                for (let i = 1; i < inputsDestino.length; i++) {
+                    inputsDestino[i].remove();
+                }
+            }
+            const btnQuitarDestino = document.getElementById('btn-quitar-destino-acopio');
+            if (btnQuitarDestino) {
+                btnQuitarDestino.style.display = 'none';
+            }
+        }
+
+        // Volvemos a popular la fecha del viaje por defecto
+        const inputFechaAcopio = document.getElementById('fecha-acopio');
+        if (inputFechaAcopio) {
+            inputFechaAcopio.value = new Date().toISOString().split('T')[0];
+        }
+    }
 }
 
 function abrirPanelEliminar() {
