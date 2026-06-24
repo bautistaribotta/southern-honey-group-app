@@ -340,3 +340,24 @@ class DetalleViajeReparto(models.Model):
 
     def __str__(self):
         return f"Destino {self.destinos_reparto} del {self.viaje_reparto}"
+
+
+class ViajeCereal(models.Model):
+    # TODO: Completar los tipos
+    cereales = [
+        ("Maiz", "Maiz"),
+        ("Soja", "Soja"),
+        ("Trigo", "Trigo")
+    ]
+    fecha_viaje_cereal = models.DateField()
+    chofer = models.ForeignKey(Chofer, on_delete=models.PROTECT, db_column="id_chofer")
+    tipo_cereal = models.CharField(max_length=50, choices=cereales, null=True, blank=True)
+    codigo_trazabilidad_granos = models.IntegerField(default=0)
+    toneladas = models.IntegerField(default=0)
+    precio_tonelada = models.IntegerField(default=0)
+    porcentaje_chofer = models.IntegerField(default=0)
+
+
+class DetalleViajeCereal(models.Model):
+    # TODO: ¿Los viajes tienen destino?
+    pass
