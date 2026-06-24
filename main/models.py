@@ -351,6 +351,7 @@ class ViajeCereal(models.Model):
     ]
     fecha_viaje_cereal = models.DateField()
     chofer = models.ForeignKey(Chofer, on_delete=models.PROTECT, db_column="id_chofer")
+    vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT, db_column="id_vehiculo")
     tipo_cereal = models.CharField(max_length=50, choices=cereales, null=True, blank=True)
     codigo_trazabilidad_granos = models.IntegerField(default=0)
     toneladas = models.IntegerField(default=0)
