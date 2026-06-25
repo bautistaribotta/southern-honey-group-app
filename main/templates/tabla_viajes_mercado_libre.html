@@ -1,3 +1,4 @@
+{% load static %}
 <table id="tabla-viajes-meli">
   <thead id="cabecera-tabla">
     <tr>
@@ -8,11 +9,12 @@
     </tr>
   </thead>
   <tbody>
-    <tr class="fila-tabla">
+    {% for viaje in page_obj %}
+    <tr class="fila-tabla" onclick="window.location.href='{% url 'informacion_viaje_reparto' viaje.id %}'">
       <td>
         <span class="meli-fecha">
           <span class="material-symbols-outlined">calendar_today</span>
-          10/05/26
+          {{ viaje.fecha_viaje_reparto|date:"d/m/y" }}
         </span>
       </td>
       <td>
@@ -21,162 +23,71 @@
             <span class="material-symbols-outlined">local_shipping</span>
           </span>
           <span class="meli-veh__info">
-            <span class="meli-veh__nombre">Scannia 2011</span>
-            <span class="meli-veh__pat">AB02QR</span>
+            <span class="meli-veh__nombre">{{ viaje.vehiculo.nombre }}</span>
+            <span class="meli-veh__pat">{{ viaje.vehiculo.patente }}</span>
           </span>
         </span>
       </td>
       <td>
         <span class="meli-chofer">
-          <span class="meli-avatar">MA</span>
-          <span class="meli-chofer__name">Miguel Arrieta</span>
+          <span class="meli-avatar">{{ viaje.chofer.nombre|first|upper }}{{ viaje.chofer.apellido|first|upper }}</span>
+          <span class="meli-chofer__name">{{ viaje.chofer.nombre }} {{ viaje.chofer.apellido }}</span>
         </span>
       </td>
       <td>
         <span class="meli-dest">
+          {% with destinos_lista=viaje.destinos.all %}
           <span class="material-symbols-outlined meli-dest__pin">location_on</span>
-          <span class="meli-dest__first">Buenos Aires</span>
-          <span class="meli-dest__more">+1</span>
+          <span class="meli-dest__first">{{ destinos_lista.0.destinos_reparto }}</span>
+          {% if destinos_lista|length > 1 %}
+          <span class="meli-dest__more">+{{ destinos_lista|length|add:"-1" }}</span>
+          {% endif %}
+          {% endwith %}
         </span>
       </td>
     </tr>
-    <tr class="fila-tabla">
-      <td>
-        <span class="meli-fecha">
-          <span class="material-symbols-outlined">calendar_today</span>
-          10/05/26
-        </span>
-      </td>
-      <td>
-        <span class="meli-veh">
-          <span class="meli-veh__tile">
+    {% empty %}
+    <tr>
+      <td colspan="4">
+        <div class="meli-vacio">
+          <span class="meli-vacio__icono">
             <span class="material-symbols-outlined">local_shipping</span>
           </span>
-          <span class="meli-veh__info">
-            <span class="meli-veh__nombre">Scannia 2011</span>
-            <span class="meli-veh__pat">AB02QR</span>
-          </span>
-        </span>
-      </td>
-      <td>
-        <span class="meli-chofer">
-          <span class="meli-avatar">MA</span>
-          <span class="meli-chofer__name">Miguel Arrieta</span>
-        </span>
-      </td>
-      <td>
-        <span class="meli-dest">
-          <span class="material-symbols-outlined meli-dest__pin">location_on</span>
-          <span class="meli-dest__first">Buenos Aires</span>
-          <span class="meli-dest__more">+1</span>
-        </span>
+          {% if q %}
+          <p class="meli-vacio__titulo">Sin resultados para "{{ q }}"</p>
+          <p class="meli-vacio__texto">Proba con otro chofer, vehiculo o destino.</p>
+          {% else %}
+          <p class="meli-vacio__titulo">Todavia no hay repartos</p>
+          <p class="meli-vacio__texto">Cargá el primero con el boton "Nuevo reparto".</p>
+          {% endif %}
+        </div>
       </td>
     </tr>
-    <tr class="fila-tabla">
-      <td>
-        <span class="meli-fecha">
-          <span class="material-symbols-outlined">calendar_today</span>
-          10/05/26
-        </span>
-      </td>
-      <td>
-        <span class="meli-veh">
-          <span class="meli-veh__tile">
-            <span class="material-symbols-outlined">local_shipping</span>
-          </span>
-          <span class="meli-veh__info">
-            <span class="meli-veh__nombre">Scannia 2011</span>
-            <span class="meli-veh__pat">AB02QR</span>
-          </span>
-        </span>
-      </td>
-      <td>
-        <span class="meli-chofer">
-          <span class="meli-avatar">MA</span>
-          <span class="meli-chofer__name">Miguel Arrieta</span>
-        </span>
-      </td>
-      <td>
-        <span class="meli-dest">
-          <span class="material-symbols-outlined meli-dest__pin">location_on</span>
-          <span class="meli-dest__first">Buenos Aires</span>
-          <span class="meli-dest__more">+1</span>
-        </span>
-      </td>
-    </tr>
-    <tr class="fila-tabla">
-      <td>
-        <span class="meli-fecha">
-          <span class="material-symbols-outlined">calendar_today</span>
-          10/05/26
-        </span>
-      </td>
-      <td>
-        <span class="meli-veh">
-          <span class="meli-veh__tile">
-            <span class="material-symbols-outlined">local_shipping</span>
-          </span>
-          <span class="meli-veh__info">
-            <span class="meli-veh__nombre">Scannia 2011</span>
-            <span class="meli-veh__pat">AB02QR</span>
-          </span>
-        </span>
-      </td>
-      <td>
-        <span class="meli-chofer">
-          <span class="meli-avatar">MA</span>
-          <span class="meli-chofer__name">Miguel Arrieta</span>
-        </span>
-      </td>
-      <td>
-        <span class="meli-dest">
-          <span class="material-symbols-outlined meli-dest__pin">location_on</span>
-          <span class="meli-dest__first">Buenos Aires</span>
-          <span class="meli-dest__more">+1</span>
-        </span>
-      </td>
-    </tr>
-    <tr class="fila-tabla">
-      <td>
-        <span class="meli-fecha">
-          <span class="material-symbols-outlined">calendar_today</span>
-          10/05/26
-        </span>
-      </td>
-      <td>
-        <span class="meli-veh">
-          <span class="meli-veh__tile">
-            <span class="material-symbols-outlined">local_shipping</span>
-          </span>
-          <span class="meli-veh__info">
-            <span class="meli-veh__nombre">Scannia 2011</span>
-            <span class="meli-veh__pat">AB02QR</span>
-          </span>
-        </span>
-      </td>
-      <td>
-        <span class="meli-chofer">
-          <span class="meli-avatar">MA</span>
-          <span class="meli-chofer__name">Miguel Arrieta</span>
-        </span>
-      </td>
-      <td>
-        <span class="meli-dest">
-          <span class="material-symbols-outlined meli-dest__pin">location_on</span>
-          <span class="meli-dest__first">Buenos Aires</span>
-          <span class="meli-dest__more">+1</span>
-        </span>
-      </td>
-    </tr>
+    {% endfor %}
   </tbody>
 </table>
 
+<!-- FOOTER / PAGINACION -->
 <div class="paginacion-meli">
   <div class="paginacion-meli__info">
-    Mostrando <span>1-5</span> de <span>20</span> repartos
+    Mostrando <span>{{ page_obj.start_index|default:"0" }}-{{ page_obj.end_index|default:"0" }}</span>
+    de <span>{{ page_obj.paginator.count|default:"0" }}</span> repartos
   </div>
   <div class="paginacion-meli__botones">
-    <button class="boton-paginacion-meli" disabled>Anterior</button>
-    <button class="boton-paginacion-meli">Siguiente</button>
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}">
+        <button class="boton-paginacion-meli">Anterior</button>
+      </a>
+    {% else %}
+      <button class="boton-paginacion-meli" disabled>Anterior</button>
+    {% endif %}
+
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}">
+        <button class="boton-paginacion-meli">Siguiente</button>
+      </a>
+    {% else %}
+      <button class="boton-paginacion-meli" disabled>Siguiente</button>
+    {% endif %}
   </div>
 </div>

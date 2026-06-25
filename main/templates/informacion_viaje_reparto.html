@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block nombre-pestaña %}
+<title>Reparto #{{ viaje_reparto.id }}</title>
+{% endblock %}
+
+{% block cabecera %}
+<div id="titulos-cabecera">
+  <h2>Reparto #{{ viaje_reparto.id }}</h2>
+  <p>Detalle del viaje de reparto</p>
+</div>
+{% endblock %}
+
+{% block area-trabajo %}
+<!-- Front pendiente: por ahora solo el header. El backend (editar/eliminar) ya esta listo en la vista. -->
+{% endblock %}

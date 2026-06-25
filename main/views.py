@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.db import transaction
 
-from .models import Cliente, Producto, Operacion, DetalleOperacion, Pago, Cotizaciones, Chofer, Vehiculo, Viaje, ViajeCereal
+from .models import Cliente, Producto, Operacion, DetalleOperacion, Pago, Cotizaciones, Chofer, Vehiculo, Viaje, ViajeCereal, ViajeReparto
 from .pdf_services import Remito
 from .services import (nuevo_producto, editar_producto, eliminar_producto, nuevo_cliente, editar_cliente,
                        eliminar_cliente, get_cotizacion_dolar_oficial, get_cotizaciones, actualizar_cotizacion, obtener_datos_cliente,
@@ -19,7 +19,9 @@ from .services import (nuevo_producto, editar_producto, eliminar_producto, nuevo
                        obtener_vehiculos_activos, obtener_viajes, editar_viaje, eliminar_viaje, crear_gasto,
                        editar_chofer, eliminar_chofer, editar_vehiculo, eliminar_vehiculo,
                        crear_viaje_cereal, obtener_viajes_cereales, obtener_datos_viaje_cereal,
-                       editar_viaje_cereal, eliminar_viaje_cereal)
+                       editar_viaje_cereal, eliminar_viaje_cereal,
+                       crear_viaje_reparto, obtener_viajes_reparto, obtener_datos_viaje_reparto,
+                       editar_viaje_reparto, eliminar_viaje_reparto)
 
 
 def login(request):
@@ -902,11 +904,129 @@ def deudores(request):
 
 @login_required
 def mercado_libre(request):
+    if request.method == "POST":
+        accion = request.POST.get("accion")
+
+        try:
+            if accion == "nuevo_viaje_reparto":
+                # 1. Extraccion de datos del formulario
+                id_chofer = request.POST.get("id_chofer")
+                id_vehiculo = request.POST.get("id_vehiculo")
+                gasto_combustible = request.POST.get("gasto_combustible_viaje_reparto")
+                costo_empleado = request.POST.get("costo_empleado")
+                valor_viaje = request.POST.get("valor_viaje")
+                fecha_viaje_reparto = request.POST.get("fecha_viaje_reparto")
+                destinos = request.POST.getlist("destino_reparto")
+
+                # 2. Validacion de presencia de lo obligatorio (lo esencial en la vista)
+                if not all([id_chofer, id_vehiculo, gasto_combustible, costo_empleado,
+                            valor_viaje, fecha_viaje_reparto]) or not destinos:
+                    messages.error(request, "Faltan datos obligatorios para crear el viaje de reparto.")
+                    return redirect("mercado_libre")
+
+                # 3. Delegacion al servicio (reglas de negocio y validacion)
+                crear_viaje_reparto(id_chofer, id_vehiculo, gasto_combustible, costo_empleado,
+                                    valor_viaje, fecha_viaje_reparto, destinos)
+                messages.success(request, "Viaje de reparto registrado exitosamente.")
+
+        except ValueError as e:
+            # Captura los errores de validacion provenientes de services.py
+            messages.error(request, str(e))
+        except Exception as e:
+            # Captura errores inesperados (ej: base de datos)
+            messages.error(request, f"Ocurrió un error inesperado: {e}")
+
+        return redirect("mercado_libre")
+
+    from django.db.models import Q
+
+    # Base de viajes de reparto activos
+    lista_viajes = obtener_viajes_reparto()
+
+    # Busqueda por vehiculo, chofer, destino o ID
+    q = request.GET.get("q", "")
+    if q:
+        if q.isdigit():
+            lista_viajes = lista_viajes.filter(id__icontains=q)
+        else:
+            lista_viajes = lista_viajes.filter(
+                Q(vehiculo__nombre__icontains=q)
+                | Q(vehiculo__patente__icontains=q)
+                | Q(chofer__nombre__icontains=q)
+                | Q(chofer__apellido__icontains=q)
+                | Q(destinos__destinos_reparto__icontains=q)
+            ).distinct()
+
+    # Cargo de a 5 viajes
+    paginator = Paginator(lista_viajes, 5)
+    pagina_numero = request.GET.get("page")
+    page_obj = paginator.get_page(pagina_numero)
+
     contexto = {
+        "page_obj": page_obj,
+        "choferes": obtener_choferes_activos(),
+        "vehiculos": obtener_vehiculos_activos(),
+        "q": q,
+    }
+
+    # Si es una peticion AJAX (buscador/paginacion), devuelvo solo la tabla parcial
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return render(request, "tabla_viajes_mercado_libre.html", contexto)
+
+    return render(request, "mercado_libre.html", contexto)
+
+
+@login_required
+def informacion_viaje_reparto(request, id_viaje_reparto):
+    viaje_reparto = obtener_datos_viaje_reparto(id_viaje_reparto)
+
+    if request.method == "POST":
+        accion = request.POST.get("accion")
+
+        if accion == "eliminar_viaje_reparto":
+            try:
+                eliminar_viaje_reparto(id_viaje_reparto)
+                messages.success(request, "Viaje de reparto eliminado correctamente")
+                return redirect("mercado_libre")
+            except Exception as e:
+                messages.error(request, f"{e}")
+                return redirect("informacion_viaje_reparto", id_viaje_reparto=id_viaje_reparto)
+
+        elif accion == "editar_viaje_reparto":
+            id_chofer = request.POST.get("id_chofer")
+            id_vehiculo = request.POST.get("id_vehiculo")
+            gasto_combustible = request.POST.get("gasto_combustible_viaje_reparto")
+            costo_empleado = request.POST.get("costo_empleado")
+            valor_viaje = request.POST.get("valor_viaje")
+            fecha_viaje_reparto = request.POST.get("fecha_viaje_reparto")
+            destinos = request.POST.getlist("destino_reparto")
+
+            try:
+                editar_viaje_reparto(
+                    id_viaje_reparto=id_viaje_reparto,
+                    id_chofer=id_chofer,
+                    id_vehiculo=id_vehiculo,
+                    gasto_combustible=gasto_combustible,
+                    costo_empleado=costo_empleado,
+                    valor_viaje=valor_viaje,
+                    fecha_viaje_reparto=fecha_viaje_reparto,
+                    destinos=destinos,
+                )
+                messages.success(request, "Viaje de reparto modificado exitosamente.")
+            except ValueError as e:
+                messages.error(request, str(e))
+            except Exception as e:
+                messages.error(request, f"Ocurrió un error inesperado: {e}")
+
+            return redirect("informacion_viaje_reparto", id_viaje_reparto=id_viaje_reparto)
+
+    contexto = {
+        "viaje_reparto": viaje_reparto,
+        "pestaña": "viajes",
         "choferes": obtener_choferes_activos(),
         "vehiculos": obtener_vehiculos_activos(),
     }
-    return render(request, "mercado_libre.html", contexto)
+    return render(request, "informacion_viaje_reparto.html", contexto)
 
 
 @login_required

@@ -10,7 +10,7 @@ from django.db.models import Sum, F, Value, Count, Q
 from django.db.models.functions import Coalesce
 from django.core.cache import cache
 from .models import (Producto, Cliente, Operacion, DetalleOperacion, Pago, Cotizaciones, Chofer, Vehiculo, Viaje,
-                     DetalleViaje, Gasto, ViajeCereal, DetalleViajeCereal)
+                     DetalleViaje, Gasto, ViajeCereal, DetalleViajeCereal, ViajeReparto, DetalleViajeReparto)
 
 
 # --- Validadores REGEX ---
@@ -867,3 +867,150 @@ def eliminar_viaje_cereal(id_viaje_cereal):
     viaje_cereal.activo = False
     viaje_cereal.save()
     return viaje_cereal
+
+
+# --- Viajes de reparto (Mercado Libre) ---
+
+def _validar_viaje_reparto(id_chofer, id_vehiculo, gasto_combustible,
+                           costo_empleado, valor_viaje, fecha_viaje_reparto, destinos):
+    """
+    Centraliza las validaciones de un viaje de reparto (crear y editar comparten las
+    mismas reglas). Devuelve una tupla con los valores ya limpios y convertidos,
+    listos para persistir, o lanza ValueError ante el primer dato invalido.
+    """
+    # 1. El chofer debe existir en la base de datos
+    if not Chofer.objects.filter(id=id_chofer).exists():
+        raise ValueError("El chofer seleccionado no existe en el sistema.")
+
+    # 2. El vehiculo debe existir en la base de datos
+    if not Vehiculo.objects.filter(id=id_vehiculo).exists():
+        raise ValueError("El vehiculo seleccionado no existe en el sistema.")
+
+    # 3. Gasto de combustible: entero positivo dentro del limite de la BD
+    try:
+        gasto_val = int(gasto_combustible)
+        if gasto_val <= 0 or gasto_val > 2147483647:
+            raise ValueError()
+    except (ValueError, TypeError):
+        raise ValueError("El gasto de combustible debe ser un numero entero positivo.")
+
+    # 4. Costo del empleado: entero positivo dentro del limite de la BD
+    try:
+        costo_val = int(costo_empleado)
+        if costo_val <= 0 or costo_val > 2147483647:
+            raise ValueError()
+    except (ValueError, TypeError):
+        raise ValueError("El costo del empleado debe ser un numero entero positivo.")
+
+    # 5. Valor del viaje: entero positivo dentro del limite de la BD
+    try:
+        valor_val = int(valor_viaje)
+        if valor_val <= 0 or valor_val > 2147483647:
+            raise ValueError()
+    except (ValueError, TypeError):
+        raise ValueError("El valor del viaje debe ser un numero entero positivo.")
+
+    # 6. Fecha del reparto: obligatoria y con formato YYYY-MM-DD
+    try:
+        datetime.strptime(fecha_viaje_reparto, "%Y-%m-%d")
+    except (ValueError, TypeError):
+        raise ValueError("La fecha del reparto debe tener el formato valido YYYY-MM-DD.")
+
+    # 7. Destinos: al menos uno, cada uno alfanumerico de 3 a 30 caracteres
+    if not destinos:
+        raise ValueError("Debe ingresar al menos un destino.")
+
+    destinos_limpios = []
+    for d in destinos:
+        d_limpio = d.strip()
+        if not (3 <= len(d_limpio) <= 30) or not REGEX_TEXTO_NUMEROS.match(d_limpio):
+            raise ValueError(f"El destino '{d}' es invalido (debe tener entre 3 y 30 caracteres alfanumericos).")
+        destinos_limpios.append(d_limpio)
+
+    return gasto_val, costo_val, valor_val, destinos_limpios
+
+
+def crear_viaje_reparto(id_chofer, id_vehiculo, gasto_combustible, costo_empleado,
+                        valor_viaje, fecha_viaje_reparto, destinos):
+    """
+    Crea un viaje de reparto (maestro) y sus destinos asociados (detalle) en una
+    transaccion atomica. 'destinos' es una lista de strings.
+    """
+    gasto_val, costo_val, valor_val, destinos_limpios = _validar_viaje_reparto(
+        id_chofer, id_vehiculo, gasto_combustible, costo_empleado,
+        valor_viaje, fecha_viaje_reparto, destinos
+    )
+
+    with transaction.atomic():
+        nuevo_viaje_reparto = ViajeReparto.objects.create(
+            chofer_id=id_chofer,
+            vehiculo_id=id_vehiculo,
+            gasto_combustible_viaje_reparto=gasto_val,
+            costo_empleado=costo_val,
+            valor_viaje=valor_val,
+            fecha_viaje_reparto=fecha_viaje_reparto,
+        )
+
+        for destino_nombre in destinos_limpios:
+            DetalleViajeReparto.objects.create(
+                viaje_reparto=nuevo_viaje_reparto,
+                destinos_reparto=destino_nombre
+            )
+
+    return nuevo_viaje_reparto
+
+
+def obtener_viajes_reparto():
+    # Solo los viajes activos (borrado logico), con relaciones precargadas para evitar el N+1
+    return (
+        ViajeReparto.objects.filter(activo=True)
+        .select_related("chofer", "vehiculo")
+        .prefetch_related("destinos")
+        .order_by("-fecha_viaje_reparto")
+    )
+
+
+def obtener_datos_viaje_reparto(id_viaje_reparto):
+    # Trae un viaje de reparto activo con sus relaciones listas para la vista de informacion
+    return get_object_or_404(
+        ViajeReparto.objects.select_related("chofer", "vehiculo").prefetch_related("destinos"),
+        id=id_viaje_reparto,
+        activo=True,
+    )
+
+
+def editar_viaje_reparto(id_viaje_reparto, id_chofer, id_vehiculo, gasto_combustible,
+                         costo_empleado, valor_viaje, fecha_viaje_reparto, destinos):
+    gasto_val, costo_val, valor_val, destinos_limpios = _validar_viaje_reparto(
+        id_chofer, id_vehiculo, gasto_combustible, costo_empleado,
+        valor_viaje, fecha_viaje_reparto, destinos
+    )
+
+    with transaction.atomic():
+        viaje_reparto = get_object_or_404(ViajeReparto, id=id_viaje_reparto)
+
+        viaje_reparto.chofer_id = id_chofer
+        viaje_reparto.vehiculo_id = id_vehiculo
+        viaje_reparto.gasto_combustible_viaje_reparto = gasto_val
+        viaje_reparto.costo_empleado = costo_val
+        viaje_reparto.valor_viaje = valor_val
+        viaje_reparto.fecha_viaje_reparto = fecha_viaje_reparto
+        viaje_reparto.save()
+
+        # Reemplazo los destinos (mismo patron que editar_viaje_cereal)
+        viaje_reparto.destinos.all().delete()
+        for destino_nombre in destinos_limpios:
+            DetalleViajeReparto.objects.create(
+                viaje_reparto=viaje_reparto,
+                destinos_reparto=destino_nombre
+            )
+
+    return viaje_reparto
+
+
+def eliminar_viaje_reparto(id_viaje_reparto):
+    viaje_reparto = get_object_or_404(ViajeReparto, id=id_viaje_reparto)
+    # Borrado logico: lo marco inactivo para no perder el historial
+    viaje_reparto.activo = False
+    viaje_reparto.save()
+    return viaje_reparto

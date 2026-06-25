@@ -26,7 +26,7 @@
     <div class="grupo-busqueda">
       <div class="contenedor-buscador">
         <span class="material-symbols-outlined icono-busqueda">search</span>
-        <input type="text" id="buscador-viajes-meli" class="input-busqueda" placeholder="Busca un viaje por vehiculo o chofer">
+        <input type="text" id="buscador-viajes-meli" class="input-busqueda" placeholder="Busca un viaje por vehiculo, chofer o destino" value="{{ q|default:'' }}">
       </div>
     </div>
 
@@ -150,7 +150,7 @@
                 name="gasto_combustible_viaje_reparto"
                 placeholder="0"
                 step="1"
-                min="0"
+                min="1"
                 required
                 pattern="[0-9+]">
             </div>
@@ -165,10 +165,10 @@
                 <input
                   type="number"
                   id="empleado-costo-reparto"
-                  name="empleado_costo"
+                  name="costo_empleado"
                   placeholder="0"
                   step="1"
-                  min="0"
+                  min="1"
                   required
                   pattern="[0-9+]">
               </div>
@@ -185,7 +185,7 @@
                   name="valor_viaje"
                   placeholder="0"
                   step="1"
-                  min="0"
+                  min="1"
                   required
                   pattern="[0-9+]">
               </div>
@@ -225,6 +225,7 @@
 
 {% block codigo-javascript %}
 <script src="{% static 'js/autocompletado_ciudades.js' %}"></script>
+<script src="{% static 'js/mercado_libre.js' %}"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     // Autocompletar la fecha del reparto con la fecha actual al cargar la pagina
