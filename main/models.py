@@ -363,6 +363,8 @@ class ViajeCereal(models.Model):
 
     class Meta:
         db_table = "viaje_cereal"
+        verbose_name = "Viaje cereal"
+        verbose_name_plural = "Viajes cereales"
 
     @property
     def total_bruto(self):
