@@ -19,7 +19,7 @@ from .services import (nuevo_producto, editar_producto, eliminar_producto, nuevo
                        obtener_vehiculos_activos, obtener_viajes, editar_viaje, eliminar_viaje, crear_gasto,
                        editar_chofer, eliminar_chofer, editar_vehiculo, eliminar_vehiculo,
                        crear_viaje_cereal, obtener_viajes_cereales, obtener_datos_viaje_cereal,
-                       editar_viaje_cereal, eliminar_viaje_cereal,
+                       editar_viaje_cereal, eliminar_viaje_cereal, crear_gasto_viaje_cereal,
                        crear_viaje_reparto, obtener_viajes_reparto, obtener_datos_viaje_reparto,
                        editar_viaje_reparto, eliminar_viaje_reparto)
 
@@ -1037,6 +1037,7 @@ def viaje_cereales(request):
         try:
             if accion == "nuevo_viaje_cereal":
                 # 1. Extraccion de datos del formulario
+                id_cliente = request.POST.get("id_cliente")
                 id_chofer = request.POST.get("id_chofer")
                 id_vehiculo = request.POST.get("id_vehiculo")
                 tipo_cereal = request.POST.get("tipo_cereal")
@@ -1049,13 +1050,13 @@ def viaje_cereales(request):
                 destinos = request.POST.getlist("destino")
 
                 # 2. Validacion de presencia de lo obligatorio (lo esencial en la vista)
-                if not all([id_chofer, id_vehiculo, tipo_cereal, codigo_trazabilidad,
+                if not all([id_cliente, id_chofer, id_vehiculo, tipo_cereal, codigo_trazabilidad,
                             toneladas, precio_tonelada, fecha_viaje_cereal]) or not destinos:
                     messages.error(request, "Faltan datos obligatorios para crear el viaje de cereal.")
                     return redirect("viajes_cereales")
 
                 # 3. Delegacion al servicio (reglas de negocio y validacion con regex)
-                crear_viaje_cereal(id_chofer, id_vehiculo, tipo_cereal, codigo_trazabilidad,
+                crear_viaje_cereal(id_cliente, id_chofer, id_vehiculo, tipo_cereal, codigo_trazabilidad,
                                    toneladas, precio_tonelada, porcentaje_chofer, fecha_viaje_cereal, destinos)
                 messages.success(request, "Viaje de cereal registrado exitosamente.")
 
@@ -1106,6 +1107,7 @@ def viaje_cereales(request):
 
     contexto = {
         "page_obj": page_obj,
+        "clientes": Cliente.objects.filter(activo=True).order_by("nombre", "apellido"),
         "choferes": obtener_choferes_activos(),
         "vehiculos": obtener_vehiculos_activos(),
         "cereales": ViajeCereal.cereales,
@@ -1139,6 +1141,7 @@ def informacion_viaje_cereal(request, id_viaje_cereal):
                 return redirect("informacion_viaje_cereal", id_viaje_cereal=id_viaje_cereal)
 
         elif accion == "editar_viaje_cereal":
+            id_cliente = request.POST.get("id_cliente")
             id_chofer = request.POST.get("id_chofer")
             id_vehiculo = request.POST.get("id_vehiculo")
             tipo_cereal = request.POST.get("tipo_cereal")
@@ -1152,6 +1155,7 @@ def informacion_viaje_cereal(request, id_viaje_cereal):
             try:
                 editar_viaje_cereal(
                     id_viaje_cereal=id_viaje_cereal,
+                    id_cliente=id_cliente,
                     id_chofer=id_chofer,
                     id_vehiculo=id_vehiculo,
                     tipo_cereal=tipo_cereal,
@@ -1170,9 +1174,24 @@ def informacion_viaje_cereal(request, id_viaje_cereal):
 
             return redirect("informacion_viaje_cereal", id_viaje_cereal=id_viaje_cereal)
 
+        elif accion == "nuevo_gasto_cereal":
+            tipo_gasto = request.POST.get("tipo_gasto")
+            monto_gasto = request.POST.get("monto_gasto")
+
+            try:
+                crear_gasto_viaje_cereal(id_viaje_cereal, tipo_gasto, monto_gasto)
+                messages.success(request, "Gasto registrado exitosamente.")
+            except ValueError as e:
+                messages.error(request, str(e))
+            except Exception as e:
+                messages.error(request, f"Ocurrió un error inesperado: {e}")
+
+            return redirect("informacion_viaje_cereal", id_viaje_cereal=id_viaje_cereal)
+
     contexto = {
         "viaje_cereal": viaje_cereal,
         "pestaña": "viajes",
+        "clientes": Cliente.objects.filter(activo=True).order_by("nombre", "apellido"),
         "choferes": obtener_choferes_activos(),
         "vehiculos": obtener_vehiculos_activos(),
         "cereales": ViajeCereal.cereales,

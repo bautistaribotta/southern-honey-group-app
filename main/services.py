@@ -10,7 +10,8 @@ from django.db.models import Sum, F, Value, Count, Q
 from django.db.models.functions import Coalesce
 from django.core.cache import cache
 from .models import (Producto, Cliente, Operacion, DetalleOperacion, Pago, Cotizaciones, Chofer, Vehiculo, Viaje,
-                     DetalleViaje, Gasto, ViajeCereal, DetalleViajeCereal, ViajeReparto, DetalleViajeReparto)
+                     DetalleViaje, Gasto, ViajeCereal, DetalleViajeCereal, GastoViajeCereal,
+                     ViajeReparto, DetalleViajeReparto)
 
 
 # --- Validadores REGEX ---
@@ -707,32 +708,36 @@ def crear_gasto(id_viaje, tipo_gasto, monto):
 
 # --- Viajes de cereales ---
 
-def _validar_viaje_cereal(id_chofer, id_vehiculo, tipo_cereal, codigo_trazabilidad,
+def _validar_viaje_cereal(id_cliente, id_chofer, id_vehiculo, tipo_cereal, codigo_trazabilidad,
                           toneladas, precio_tonelada, porcentaje_chofer, fecha_viaje_cereal, destinos):
     """
     Centraliza las validaciones de un viaje de cereal (crear y editar comparten las
     mismas reglas). Devuelve una tupla con los valores ya limpios y convertidos,
     listos para persistir, o lanza ValueError ante el primer dato invalido.
     """
-    # 1. El chofer debe existir en la base de datos
+    # 1. El cliente es obligatorio y debe existir en la base de datos
+    if not Cliente.objects.filter(id=id_cliente, activo=True).exists():
+        raise ValueError("El cliente seleccionado no existe en el sistema.")
+
+    # 2. El chofer debe existir en la base de datos
     if not Chofer.objects.filter(id=id_chofer).exists():
         raise ValueError("El chofer seleccionado no existe en el sistema.")
 
-    # 2. El vehiculo debe existir en la base de datos
+    # 3. El vehiculo debe existir en la base de datos
     if not Vehiculo.objects.filter(id=id_vehiculo).exists():
         raise ValueError("El vehiculo seleccionado no existe en el sistema.")
 
-    # 3. El tipo de cereal es obligatorio y debe ser una de las opciones validas
+    # 4. El tipo de cereal es obligatorio y debe ser una de las opciones validas
     tipos_validos = dict(ViajeCereal.cereales).keys()
     if tipo_cereal not in tipos_validos:
         raise ValueError("Debe seleccionar un tipo de cereal valido.")
 
-    # 4. Codigo de trazabilidad (CTG): exactamente 8 digitos, conservando ceros a la izquierda
+    # 5. Codigo de trazabilidad (CTG): exactamente 8 digitos, conservando ceros a la izquierda
     codigo_limpio = (codigo_trazabilidad or "").strip()
     if not REGEX_CTG.match(codigo_limpio):
         raise ValueError("El codigo de trazabilidad debe tener exactamente 8 digitos numericos.")
 
-    # 5. Toneladas: entero positivo dentro del limite de la BD
+    # 6. Toneladas: entero positivo dentro del limite de la BD
     try:
         toneladas_val = int(toneladas)
         if toneladas_val <= 0 or toneladas_val > 2147483647:
@@ -740,7 +745,7 @@ def _validar_viaje_cereal(id_chofer, id_vehiculo, tipo_cereal, codigo_trazabilid
     except (ValueError, TypeError):
         raise ValueError("Las toneladas deben ser un numero entero positivo.")
 
-    # 6. Precio por tonelada: entero positivo dentro del limite de la BD
+    # 7. Precio por tonelada: entero positivo dentro del limite de la BD
     try:
         precio_val = int(precio_tonelada)
         if precio_val <= 0 or precio_val > 2147483647:
@@ -748,7 +753,7 @@ def _validar_viaje_cereal(id_chofer, id_vehiculo, tipo_cereal, codigo_trazabilid
     except (ValueError, TypeError):
         raise ValueError("El precio por tonelada debe ser un numero entero positivo.")
 
-    # 7. Porcentaje del chofer: opcional. Si no se carga queda en 0; si viene, debe ser 1 a 100
+    # 8. Porcentaje del chofer: opcional. Si no se carga queda en 0; si viene, debe ser 1 a 100
     if porcentaje_chofer in (None, ""):
         porcentaje_val = 0
     else:
@@ -759,13 +764,13 @@ def _validar_viaje_cereal(id_chofer, id_vehiculo, tipo_cereal, codigo_trazabilid
         except (ValueError, TypeError):
             raise ValueError("El porcentaje del chofer debe ser un numero entero entre 1 y 100.")
 
-    # 8. Fecha del viaje: obligatoria y con formato YYYY-MM-DD
+    # 9. Fecha del viaje: obligatoria y con formato YYYY-MM-DD
     try:
         datetime.strptime(fecha_viaje_cereal, "%Y-%m-%d")
     except (ValueError, TypeError):
         raise ValueError("La fecha del viaje debe tener el formato valido YYYY-MM-DD.")
 
-    # 9. Destinos: al menos uno, cada uno alfanumerico de 3 a 30 caracteres
+    # 10. Destinos: al menos uno, cada uno alfanumerico de 3 a 30 caracteres
     if not destinos:
         raise ValueError("Debe ingresar al menos un destino.")
 
@@ -779,19 +784,20 @@ def _validar_viaje_cereal(id_chofer, id_vehiculo, tipo_cereal, codigo_trazabilid
     return codigo_limpio, toneladas_val, precio_val, porcentaje_val, destinos_limpios
 
 
-def crear_viaje_cereal(id_chofer, id_vehiculo, tipo_cereal, codigo_trazabilidad,
+def crear_viaje_cereal(id_cliente, id_chofer, id_vehiculo, tipo_cereal, codigo_trazabilidad,
                        toneladas, precio_tonelada, porcentaje_chofer, fecha_viaje_cereal, destinos):
     """
     Crea un viaje de cereal (maestro) y sus destinos asociados (detalle) en una
     transaccion atomica. 'destinos' es una lista de strings.
     """
     codigo, toneladas_val, precio_val, porcentaje_val, destinos_limpios = _validar_viaje_cereal(
-        id_chofer, id_vehiculo, tipo_cereal, codigo_trazabilidad,
+        id_cliente, id_chofer, id_vehiculo, tipo_cereal, codigo_trazabilidad,
         toneladas, precio_tonelada, porcentaje_chofer, fecha_viaje_cereal, destinos
     )
 
     with transaction.atomic():
         nuevo_viaje_cereal = ViajeCereal.objects.create(
+            cliente_id=id_cliente,
             chofer_id=id_chofer,
             vehiculo_id=id_vehiculo,
             tipo_cereal=tipo_cereal,
@@ -815,31 +821,34 @@ def obtener_viajes_cereales():
     # Solo los viajes activos (borrado logico), con relaciones precargadas para evitar el N+1
     return (
         ViajeCereal.objects.filter(activo=True)
-        .select_related("chofer", "vehiculo")
+        .select_related("cliente", "chofer", "vehiculo")
         .prefetch_related("destinos")
         .order_by("-fecha_viaje_cereal")
     )
 
 
 def obtener_datos_viaje_cereal(id_viaje_cereal):
-    # Trae un viaje de cereal activo con sus relaciones listas para la vista de informacion
+    # Trae un viaje de cereal activo con sus relaciones listas para la vista de informacion.
+    # Precargo tambien los gastos para que la tarjeta de calculo no dispare queries extra.
     return get_object_or_404(
-        ViajeCereal.objects.select_related("chofer", "vehiculo").prefetch_related("destinos"),
+        ViajeCereal.objects.select_related("cliente", "chofer", "vehiculo")
+        .prefetch_related("destinos", "detalle_gastos"),
         id=id_viaje_cereal,
         activo=True,
     )
 
 
-def editar_viaje_cereal(id_viaje_cereal, id_chofer, id_vehiculo, tipo_cereal, codigo_trazabilidad,
+def editar_viaje_cereal(id_viaje_cereal, id_cliente, id_chofer, id_vehiculo, tipo_cereal, codigo_trazabilidad,
                         toneladas, precio_tonelada, porcentaje_chofer, fecha_viaje_cereal, destinos):
     codigo, toneladas_val, precio_val, porcentaje_val, destinos_limpios = _validar_viaje_cereal(
-        id_chofer, id_vehiculo, tipo_cereal, codigo_trazabilidad,
+        id_cliente, id_chofer, id_vehiculo, tipo_cereal, codigo_trazabilidad,
         toneladas, precio_tonelada, porcentaje_chofer, fecha_viaje_cereal, destinos
     )
 
     with transaction.atomic():
         viaje_cereal = get_object_or_404(ViajeCereal, id=id_viaje_cereal)
 
+        viaje_cereal.cliente_id = id_cliente
         viaje_cereal.chofer_id = id_chofer
         viaje_cereal.vehiculo_id = id_vehiculo
         viaje_cereal.tipo_cereal = tipo_cereal
@@ -867,6 +876,33 @@ def eliminar_viaje_cereal(id_viaje_cereal):
     viaje_cereal.activo = False
     viaje_cereal.save()
     return viaje_cereal
+
+
+def crear_gasto_viaje_cereal(id_viaje_cereal, tipo_gasto, monto):
+    # Mismo patron que crear_gasto (viajes comunes), pero sobre la tabla GastoViajeCereal.
+    # Cada gasto cargado recalcula automaticamente el subtotal y el pago del chofer, porque
+    # esas propiedades del modelo se derivan de la suma de gastos del viaje.
+    viaje_cereal = get_object_or_404(ViajeCereal, id=id_viaje_cereal)
+
+    # Validamos que el tipo de gasto sea correcto
+    tipos_validos = dict(GastoViajeCereal._meta.get_field("gasto").choices).keys()
+    if tipo_gasto not in tipos_validos:
+        raise ValueError(f"El tipo de gasto '{tipo_gasto}' no es válido.")
+
+    # Validamos el monto
+    try:
+        monto_val = int(monto)
+        if monto_val <= 0:
+            raise ValueError()
+    except (ValueError, TypeError):
+        raise ValueError("El monto debe ser un número entero positivo mayor a 0.")
+
+    nuevo_gasto = GastoViajeCereal.objects.create(
+        viaje_cereal=viaje_cereal,
+        gasto=tipo_gasto,
+        monto=monto_val
+    )
+    return nuevo_gasto
 
 
 # --- Viajes de reparto (Mercado Libre) ---
