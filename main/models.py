@@ -347,7 +347,8 @@ class ViajeCereal(models.Model):
     cereales = [
         ("Maiz", "Maiz"),
         ("Soja", "Soja"),
-        ("Trigo", "Trigo")
+        ("Trigo", "Trigo"),
+        ("Mani", "Mani")
     ]
     fecha_viaje_cereal = models.DateField()
     chofer = models.ForeignKey(Chofer, on_delete=models.PROTECT, db_column="id_chofer")
