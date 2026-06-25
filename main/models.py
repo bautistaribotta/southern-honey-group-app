@@ -353,6 +353,10 @@ class ViajeCereal(models.Model):
     fecha_viaje_cereal = models.DateField()
     chofer = models.ForeignKey(Chofer, on_delete=models.PROTECT, db_column="id_chofer")
     vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT, db_column="id_vehiculo")
+    # Cliente al que se le presta el flete. Es nullable para no romper los viajes
+    # de cereal que ya existian antes de incorporar este campo (quedan "Sin cliente").
+    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, null=True, blank=True,
+                                db_column="id_cliente", related_name="viajes_cereales")
     tipo_cereal = models.CharField(max_length=50, choices=cereales)
     # El CTG es un codigo de 8 digitos que puede tener ceros a la izquierda, por eso
     # lo guardo como texto: un IntegerField perderia esos ceros (00123456 -> 123456)
@@ -373,14 +377,30 @@ class ViajeCereal(models.Model):
         return self.toneladas * self.precio_tonelada
 
     @property
+    def total_gastos(self) -> int:
+        # Suma de todos los gastos cargados a este viaje de cereal. Si el viaje no
+        # tiene gastos, aggregate devuelve None y lo normalizo a 0.
+        resultado = self.detalle_gastos.aggregate(total=Sum('monto'))['total']
+        return resultado if resultado is not None else 0
+
+    @property
+    def subtotal(self):
+        # Base sobre la que se reparte el chofer: facturacion menos los gastos del viaje
+        return self.total_bruto - self.total_gastos
+
+    @property
     def pago_chofer(self):
-        # Lo que se lleva el chofer segun su porcentaje sobre el total bruto
-        return self.total_bruto * self.porcentaje_chofer / 100
+        # Lo que se lleva el chofer segun su porcentaje sobre el subtotal (bruto - gastos).
+        # Si los gastos superan al bruto el subtotal es negativo; en ese caso el chofer no
+        # "aporta" plata, asi que tomo la base en 0 para no calcular un pago negativo.
+        base = self.subtotal if self.subtotal > 0 else 0
+        return base * self.porcentaje_chofer / 100
 
     @property
     def ganancia_neta(self):
-        # Lo que le queda a la empresa una vez pagada la parte del chofer
-        return self.total_bruto - self.pago_chofer
+        # Lo que le queda a la empresa: el subtotal (ya descontados los gastos) menos
+        # la parte del chofer. Puede ser negativo si los gastos superan la facturacion.
+        return self.subtotal - self.pago_chofer
 
     def __str__(self):
         return f"Viaje de cereal nro: {self.id}"
@@ -396,3 +416,18 @@ class DetalleViajeCereal(models.Model):
 
     def __str__(self):
         return f"Destino {self.destino} del {self.viaje_cereal}"
+
+
+class GastoViajeCereal(models.Model):
+    # Reutilizo las mismas categorias de gasto que los viajes comunes (tabla Gasto)
+    viaje_cereal = models.ForeignKey(ViajeCereal, on_delete=models.CASCADE,
+                                     related_name="detalle_gastos", db_column="id_viajecereal")
+    gasto = models.CharField(choices=Gasto.TIPO_GASTOS, max_length=25)
+    monto = models.IntegerField(default=0)
+    fecha = models.DateField(auto_now_add=True)
+
+    class Meta:
+        db_table = "gastos_viaje_cereal"
+
+    def __str__(self):
+        return f"Gasto {self.gasto} de {self.monto} pesos (Viaje cereal: {self.viaje_cereal})"

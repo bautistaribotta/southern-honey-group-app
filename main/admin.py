@@ -3,6 +3,7 @@ from .models import (
     Cliente, Producto, Operacion, DetalleOperacion, Pago, Cotizaciones,
     Chofer, Vehiculo, Viaje, DetalleViaje, Gasto,
     ViajeReparto, DetalleViajeReparto, ViajeCereal, DetalleViajeCereal,
+    GastoViajeCereal,
 )
 
 admin.site.register(Cliente)
@@ -50,7 +51,15 @@ class DetalleViajeCerealInline(admin.TabularInline):
     model = DetalleViajeCereal
     extra = 1
 
+class GastoViajeCerealInline(admin.TabularInline):
+    model = GastoViajeCereal
+    extra = 1
+
 @admin.register(ViajeCereal)
 class ViajeCerealAdmin(admin.ModelAdmin):
-    inlines = [DetalleViajeCerealInline]
-    list_display = ('id', 'fecha_viaje_cereal', 'chofer', 'vehiculo', 'tipo_cereal', 'toneladas', 'activo')
+    inlines = [DetalleViajeCerealInline, GastoViajeCerealInline]
+    list_display = ('id', 'fecha_viaje_cereal', 'cliente', 'chofer', 'vehiculo', 'tipo_cereal', 'toneladas', 'activo')
+
+@admin.register(GastoViajeCereal)
+class GastoViajeCerealAdmin(admin.ModelAdmin):
+    list_display = ('id', 'viaje_cereal', 'gasto', 'monto', 'fecha')
