@@ -1,5 +1,9 @@
 from django.contrib import admin
-from .models import Cliente, Producto, Operacion, DetalleOperacion, Pago, Cotizaciones, Chofer, Vehiculo, Viaje, DetalleViaje
+from .models import (
+    Cliente, Producto, Operacion, DetalleOperacion, Pago, Cotizaciones,
+    Chofer, Vehiculo, Viaje, DetalleViaje, Gasto,
+    ViajeReparto, DetalleViajeReparto, ViajeCereal, DetalleViajeCereal,
+)
 
 admin.site.register(Cliente)
 admin.site.register(Producto)
@@ -20,7 +24,33 @@ class DetalleViajeInline(admin.TabularInline):
     model = DetalleViaje
     extra = 1
 
+class GastoInline(admin.TabularInline):
+    model = Gasto
+    extra = 1
+
 @admin.register(Viaje)
 class ViajeAdmin(admin.ModelAdmin):
-    inlines = [DetalleViajeInline]
+    inlines = [DetalleViajeInline, GastoInline]
     list_display = ('id', 'chofer', 'vehiculo', 'fecha_inicio', 'fecha_vuelta')
+
+@admin.register(Gasto)
+class GastoAdmin(admin.ModelAdmin):
+    list_display = ('id', 'viaje', 'gasto', 'monto', 'fecha')
+
+class DetalleViajeRepartoInline(admin.TabularInline):
+    model = DetalleViajeReparto
+    extra = 1
+
+@admin.register(ViajeReparto)
+class ViajeRepartoAdmin(admin.ModelAdmin):
+    inlines = [DetalleViajeRepartoInline]
+    list_display = ('id', 'fecha_viaje_reparto', 'chofer', 'vehiculo', 'valor_viaje', 'activo')
+
+class DetalleViajeCerealInline(admin.TabularInline):
+    model = DetalleViajeCereal
+    extra = 1
+
+@admin.register(ViajeCereal)
+class ViajeCerealAdmin(admin.ModelAdmin):
+    inlines = [DetalleViajeCerealInline]
+    list_display = ('id', 'fecha_viaje_cereal', 'chofer', 'vehiculo', 'tipo_cereal', 'toneladas', 'activo')
