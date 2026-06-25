@@ -1,0 +1,343 @@
+/* ============================================================
+   Estilos propios de la vista "Informacion del viaje de cereal".
+   La estructura general (cabecera op-head, tarjetas op-card, datos
+   vd-*, modales de gasto y eliminacion) se reutiliza de
+   informacion_viaje.css. Aca solo va lo especifico del cereal:
+   los datos de la carga, la tarjeta de calculo del flete y el
+   slide-over de edicion (#slide-over-cereal).
+   ============================================================ */
+
+/* --- Datos de la carga (grilla 2x2 dentro de "Datos generales") --- */
+.vc-carga {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.vc-carga__cell {
+  padding: 0.8rem 1.15rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.vc-carga__cell:nth-child(odd) {
+  border-right: 1px solid var(--border-subtle);
+}
+
+/* La ultima fila no lleva borde inferior: lo aporta el borde superior de la ruta */
+.vc-carga__cell:nth-last-child(-n+2) {
+  border-bottom: none;
+}
+
+.vc-ctg {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+
+/* --- Tarjeta "Calculo del flete" --- */
+
+/* Caption con el desglose de la facturacion (toneladas x precio) */
+.vc-cap {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.1rem;
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  font-size: 0.68rem;
+  font-weight: var(--weight-semibold);
+  color: var(--text-subtle);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Fila del subtotal: separada del listado de gastos con fondo hundido */
+.vc-row--sub {
+  background-color: var(--surface-sunken);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+/* Insignia con el porcentaje que se lleva el chofer */
+.vc-pct {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  background-color: var(--honey-tint-10);
+  border: 1px solid var(--honey-200);
+  font-size: 0.68rem;
+  font-weight: var(--weight-bold);
+  color: var(--honey-700);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Monto que se reparte al chofer: se descuenta del subtotal */
+.vc-deduct {
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   Slide-over de edicion del viaje de cereal.
+   Replica del panel de edicion de informacion_viaje.css
+   (#slide-over-viaje), acotado a #slide-over-cereal. Las clases
+   internas (.panel-cabecera, .grupo-input, etc.) y la base de
+   #slide-over-panel / #slide-over-fondo se heredan de
+   panel_compartido.css; aca solo se define el contenedor, sus
+   estados de apertura y el reskin con el design system.
+   ============================================================ */
+#slide-over-cereal {
+  position: fixed;
+  inset: 0;
+  z-index: 1100; /* Por encima de la barra superior mobile (#mobile-top-bar: 1000) */
+  visibility: hidden;
+  overflow: hidden;
+  display: flex;
+  justify-content: flex-end;
+  transition: visibility 0.3s;
+}
+
+#slide-over-cereal.slide-over-abierto {
+  visibility: visible;
+  pointer-events: auto;
+  transition: none;
+}
+
+#slide-over-cereal.slide-over-abierto #slide-over-fondo {
+  opacity: 1;
+}
+
+#slide-over-cereal.slide-over-abierto #slide-over-panel {
+  transform: translateX(0);
+}
+
+#form-cereal {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#slide-over-cereal #slide-over-fondo {
+  background-color: var(--overlay-ink);
+}
+
+#slide-over-cereal #slide-over-panel {
+  max-width: 28rem;
+  background-color: var(--surface-card);
+  box-shadow: -12px 0 24px -8px var(--shadow-tint);
+  transition: transform var(--dur-slow) var(--ease-standard);
+}
+
+#slide-over-cereal .panel-cabecera {
+  border-bottom: 1px solid var(--border-subtle);
+  background-color: var(--surface-card);
+}
+
+#slide-over-cereal .icono-contenedor {
+  background-color: var(--honey-tint-10);
+  color: var(--brand-active);
+  border-radius: var(--radius-md);
+}
+
+#slide-over-cereal .texto-cabecera h3 {
+  color: var(--text-strong);
+  font-size: var(--text-md);
+  font-weight: var(--weight-bold);
+}
+
+#slide-over-cereal .texto-cabecera p {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+#slide-over-cereal .boton-cerrar {
+  color: var(--sand-400);
+  transition: all var(--dur-normal) var(--ease-standard);
+}
+
+#slide-over-cereal .boton-cerrar:hover {
+  background-color: var(--surface-hover);
+  color: var(--text-muted);
+}
+
+#slide-over-cereal .panel-cuerpo {
+  gap: 1.35rem;
+}
+
+#slide-over-cereal .panel-cuerpo::-webkit-scrollbar-thumb {
+  background-color: var(--border-subtle);
+}
+
+/* Secciones planas con divisor inferior */
+#slide-over-cereal .seccion-bloque {
+  gap: 0.85rem;
+  padding-bottom: 1.35rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+#slide-over-cereal .seccion-bloque:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+#slide-over-cereal .subtitulo-formulario {
+  padding: 0;
+}
+
+#slide-over-cereal .subtitulo-formulario span {
+  color: var(--brand-active);
+  font-size: 1.2rem;
+}
+
+#slide-over-cereal .subtitulo-formulario h4 {
+  color: var(--text-strong);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-wide);
+}
+
+/* Inputs y selects */
+#slide-over-cereal .grupo-input label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-body);
+}
+
+#slide-over-cereal .grupo-input input,
+#slide-over-cereal .grupo-input select {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--text-strong);
+  font-family: inherit;
+  outline: none;
+  box-shadow: 0 1px 2px var(--color-sombra-1);
+  transition: all var(--dur-normal) var(--ease-standard);
+}
+
+#slide-over-cereal .grupo-input select { cursor: pointer; }
+
+#slide-over-cereal .grupo-input input::placeholder {
+  color: var(--text-subtle);
+}
+
+#slide-over-cereal .grupo-input input:focus,
+#slide-over-cereal .grupo-input select:focus {
+  border-color: var(--brand);
+  background-color: var(--surface-card);
+  box-shadow: var(--ring);
+}
+
+#slide-over-cereal .input-con-icono span {
+  color: var(--brand-active);
+}
+
+#slide-over-cereal .input-con-icono input { padding-left: 2.25rem; }
+
+/* Grid de dos columnas (toneladas / precio) */
+#slide-over-cereal .vje-grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+/* Editor de multiples destinos */
+#slide-over-cereal .vje-destacciones {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.125rem;
+}
+
+#slide-over-cereal .vje-addbtn {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: none;
+  border: none;
+  color: var(--brand-active);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  padding: 0.25rem 0;
+  width: fit-content;
+}
+
+#slide-over-cereal .vje-addbtn:hover { color: var(--honey-700); }
+#slide-over-cereal .vje-addbtn .material-symbols-outlined { font-size: 18px; }
+
+#slide-over-cereal .vje-removebtn {
+  display: none; /* JS lo muestra como flex cuando hay mas de un destino */
+  align-items: center;
+  gap: 0.25rem;
+  background: none;
+  border: none;
+  color: var(--color-rojo-eliminacion);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  padding: 0.25rem 0;
+  width: fit-content;
+}
+
+#slide-over-cereal .vje-removebtn .material-symbols-outlined { font-size: 18px; }
+
+/* Pie del panel */
+#slide-over-cereal .panel-pie {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-subtle);
+  background-color: var(--surface-sunken);
+}
+
+#slide-over-cereal .boton-primario {
+  background-color: var(--brand-secondary);
+  color: var(--text-on-inverse);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+  box-shadow: var(--shadow-md);
+  transition: all var(--dur-normal) var(--ease-standard);
+  font-family: inherit;
+}
+
+#slide-over-cereal .boton-primario:hover { background-color: var(--pine-950); filter: none; }
+#slide-over-cereal .boton-primario:active { transform: scale(0.98); }
+
+#slide-over-cereal .boton-secundario {
+  background-color: var(--surface-card);
+  color: var(--text-body);
+  border: 1px solid var(--border-subtle);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+  transition: all var(--dur-normal) var(--ease-standard);
+  font-family: inherit;
+}
+
+#slide-over-cereal .boton-secundario:hover { background-color: var(--surface-hover); }
+
+@media (max-width: 600px) {
+  #slide-over-cereal #slide-over-panel {
+    width: 100%;
+    border-radius: 0;
+  }
+
+  #slide-over-cereal .vje-grid2 {
+    grid-template-columns: 1fr;
+  }
+
+  #slide-over-cereal .panel-pie {
+    flex-direction: column;
+  }
+
+  #slide-over-cereal .panel-pie button {
+    width: 100%;
+  }
+}

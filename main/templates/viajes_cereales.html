@@ -99,6 +99,17 @@
           </div>
 
           <div class="grupo-input">
+            <label for="cliente-acopio">Cliente</label>
+            <select id="cliente-acopio" name="id_cliente" class="select-estandar" required>
+              <option value="" disabled selected>Seleccione un cliente</option>
+              {% for cliente in clientes %}
+              <option value="{{ cliente.id }}">{{ cliente.nombre }} {{ cliente.apellido|default:'' }}</option>
+              {% endfor %}
+            </select>
+            <span class="mensaje-error">Por favor, seleccione un cliente de la lista.</span>
+          </div>
+
+          <div class="grupo-input">
             <label for="chofer-acopio">Chofer</label>
             <select id="chofer-acopio" name="id_chofer" class="select-estandar" required>
               <option value="" disabled selected>Seleccione un chofer</option>

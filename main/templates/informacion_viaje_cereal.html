@@ -1,17 +1,504 @@
 {% extends "base.html" %}
 {% load static %}
+{% load humanize %}
 
 {% block nombre-pestaña %}
-<title>Información viaje de cereal</title>
+<title>Viaje de cereal #{{ viaje_cereal.id }}</title>
 {% endblock %}
 
-{% block cabecera %}
-<div id="titulos-cabecera">
-  <h2>Información del viaje de cereal</h2>
-  <p>Detalle, edición y baja de un viaje de transporte de cereales</p>
-</div>
+{% block links %}
+<link rel="stylesheet" href="{% static 'autocompletado_ciudades.css' %}">
+<link rel="stylesheet" href="{% static 'panel_compartido.css' %}">
+<link rel="stylesheet" href="{% static 'operaciones_compartido.css' %}">
+<link rel="stylesheet" href="{% static 'informacion_operacion.css' %}">
+<link rel="stylesheet" href="{% static 'informacion_viaje.css' %}">
+<link rel="stylesheet" href="{% static 'viajes_cereales.css' %}">
+<link rel="stylesheet" href="{% static 'informacion_viaje_cereal.css' %}">
+{% endblock %}
+
+{% block top-header %}
+<!-- Bloque vacio: oculto el header global para usar la cabecera propia de la vista -->
 {% endblock %}
 
 {% block area-trabajo %}
-{# Front pendiente de diseño. El backend (editar/eliminar) ya queda operativo via POST. #}
+<section id="area-trabajo" class="vd-screen">
+
+  <a href="{% url 'viajes_cereales' %}" class="boton-volver">
+    <span class="material-symbols-outlined">arrow_back</span>
+    Volver a Viajes de cereales
+  </a>
+
+  <!-- CABECERA -->
+  <div class="op-head">
+    <div class="op-head__left">
+      <span class="op-head__tile"><span class="material-symbols-outlined">agriculture</span></span>
+      <div>
+        <div class="op-head__titlerow">
+          <h1 class="op-head__title">Viaje de cereal #{{ viaje_cereal.id|default:"000" }}</h1>
+          <span class="cereal-pill {% if viaje_cereal.tipo_cereal == 'Maiz' %}cereal-pill--maiz{% elif viaje_cereal.tipo_cereal == 'Soja' %}cereal-pill--soja{% elif viaje_cereal.tipo_cereal == 'Trigo' %}cereal-pill--trigo{% else %}cereal-pill--otro{% endif %}">
+            <span class="cereal-pill__dot"></span>{{ viaje_cereal.tipo_cereal }}
+          </span>
+        </div>
+        <div class="op-head__meta">
+          <span class="op-head__metaitem">
+            <span class="material-symbols-outlined">event</span>
+            {{ viaje_cereal.fecha_viaje_cereal|date:"d/m/Y"|default:"--" }}
+          </span>
+          <span class="op-head__metaitem"><span class="material-symbols-outlined">store</span>{% if viaje_cereal.cliente %}{{ viaje_cereal.cliente.nombre }} {{ viaje_cereal.cliente.apellido|default:"" }}{% else %}Sin cliente{% endif %}</span>
+          <span class="op-head__metaitem"><span class="material-symbols-outlined">person</span>{% if viaje_cereal.chofer %}{{ viaje_cereal.chofer.nombre }} {{ viaje_cereal.chofer.apellido }}{% else %}Sin chofer{% endif %}</span>
+          <span class="op-head__metaitem"><span class="material-symbols-outlined">local_shipping</span>{% if viaje_cereal.vehiculo %}{{ viaje_cereal.vehiculo.nombre }}{% else %}Sin vehiculo{% endif %}</span>
+        </div>
+      </div>
+    </div>
+    <div class="op-head__actions">
+      <button class="op-btn op-btn--dark" onclick="abrirSlideOver('slide-over-cereal')">
+        <span class="material-symbols-outlined">edit</span>
+        Editar viaje
+      </button>
+      <button class="op-btn op-btn--danger" onclick="abrirPanelEliminar()">
+        <span class="material-symbols-outlined">delete</span>
+        Eliminar viaje
+      </button>
+    </div>
+  </div>
+
+  <!-- DATOS GENERALES + CALCULO DEL FLETE -->
+  <div class="op-grid">
+
+    <!-- Datos generales -->
+    <div class="op-card">
+      <div class="op-card__head">
+        <span class="material-symbols-outlined">info</span>
+        <h4>Datos generales</h4>
+      </div>
+      <div class="vd-data">
+        <div class="vd-data__row">
+          <span class="vd-data__ico"><span class="material-symbols-outlined">store</span></span>
+          <div class="vd-data__meta">
+            <div class="vd-data__label">Cliente</div>
+            <div class="vd-data__value">{% if viaje_cereal.cliente %}{{ viaje_cereal.cliente.nombre }} {{ viaje_cereal.cliente.apellido|default:"" }}{% else %}Sin cliente asignado{% endif %}</div>
+          </div>
+        </div>
+        <div class="vd-data__row">
+          <span class="vd-data__ico"><span class="material-symbols-outlined">local_shipping</span></span>
+          <div class="vd-data__meta">
+            <div class="vd-data__label">Vehiculo</div>
+            <div class="vd-data__value">{% if viaje_cereal.vehiculo %}{{ viaje_cereal.vehiculo.nombre }}<span class="vd-pat">{{ viaje_cereal.vehiculo.patente }}</span>{% else %}Vehiculo no especificado{% endif %}</div>
+          </div>
+        </div>
+        <div class="vd-data__row">
+          <span class="vd-avatar">{% if viaje_cereal.chofer %}{{ viaje_cereal.chofer.nombre|first|upper }}{{ viaje_cereal.chofer.apellido|first|upper }}{% else %}?{% endif %}</span>
+          <div class="vd-data__meta">
+            <div class="vd-data__label">Chofer</div>
+            <div class="vd-data__value">{% if viaje_cereal.chofer %}{{ viaje_cereal.chofer.nombre }} {{ viaje_cereal.chofer.apellido }}{% else %}Chofer no especificado{% endif %}</div>
+          </div>
+        </div>
+        <!-- Datos de la carga -->
+        <div class="vc-carga">
+          <div class="vc-carga__cell">
+            <div class="vd-data__label">Cereal</div>
+            <div class="vd-data__value">{{ viaje_cereal.tipo_cereal }}</div>
+          </div>
+          <div class="vc-carga__cell">
+            <div class="vd-data__label">CTG</div>
+            <div class="vd-data__value vc-ctg">{{ viaje_cereal.codigo_trazabilidad_granos }}</div>
+          </div>
+          <div class="vc-carga__cell">
+            <div class="vd-data__label">Toneladas</div>
+            <div class="vd-data__value">{{ viaje_cereal.toneladas|intcomma }} t</div>
+          </div>
+          <div class="vc-carga__cell">
+            <div class="vd-data__label">Precio / tonelada</div>
+            <div class="vd-data__value">${{ viaje_cereal.precio_tonelada|intcomma }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="vd-journey">
+        <div class="vd-journey__label">Ruta de destinos</div>
+        {% if viaje_cereal.destinos.all %}
+        <div class="vd-stops">
+          {% for d in viaje_cereal.destinos.all %}
+          <div class="vd-stop">
+            <div class="vd-stop__rail">
+              <span class="vd-stop__dot"></span>
+              <span class="vd-stop__line"></span>
+            </div>
+            <div class="vd-stop__body">
+              <div class="vd-stop__city">{{ d.destino }}</div>
+              <div class="vd-stop__tag">{% if forloop.first %}Primera parada{% elif forloop.last %}Destino final{% else %}Parada {{ forloop.counter }}{% endif %}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <span class="vd-data__value">Sin destinos registrados</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Calculo del flete -->
+    <div class="op-card">
+      <div class="op-card__head">
+        <span class="material-symbols-outlined">calculate</span>
+        <h4>Calculo del flete</h4>
+        <button class="op-btn op-btn--secondary op-btn--sm vd-headbtn" onclick="abrirModalGasto()">
+          <span class="material-symbols-outlined">add</span>
+          Anadir gasto
+        </button>
+      </div>
+      <div class="vd-caja">
+        <div class="vd-caja__row vd-caja__row--head">
+          <span class="vd-caja__k vd-caja__k--strong">
+            <span class="material-symbols-outlined">receipt_long</span>
+            Facturacion del flete
+            <span class="vc-cap">{{ viaje_cereal.toneladas|intcomma }} t &times; ${{ viaje_cereal.precio_tonelada|intcomma }}</span>
+          </span>
+          <span class="vd-caja__v">${{ viaje_cereal.total_bruto|intcomma }}</span>
+        </div>
+        <div class="vd-gastos">
+          {% for gasto in viaje_cereal.detalle_gastos.all %}
+          <div class="vd-gasto">
+            <span class="vd-gasto__ico"><span class="material-symbols-outlined">{% if gasto.gasto == 'Comida' %}restaurant{% elif gasto.gasto == 'Combustible' %}local_gas_station{% elif gasto.gasto == 'Playa' %}local_parking{% elif gasto.gasto == 'Peaje' %}toll{% elif gasto.gasto == 'Hotel' %}hotel{% elif gasto.gasto == 'Viaticos personales' %}wallet{% else %}more_horiz{% endif %}</span></span>
+            <span class="vd-gasto__name">{{ gasto.gasto }}<span class="vd-gasto__date">{{ gasto.fecha|date:"d/m/Y" }}</span></span>
+            <span class="vd-gasto__amt">-${{ gasto.monto|intcomma }}</span>
+          </div>
+          {% empty %}
+          <div class="vd-gastos__empty">Sin gastos registrados.</div>
+          {% endfor %}
+        </div>
+        <div class="vd-caja__row vc-row--sub">
+          <span class="vd-caja__k vd-caja__k--strong"><span class="material-symbols-outlined">functions</span>Subtotal (facturacion - gastos)</span>
+          <span class="vd-caja__v">${{ viaje_cereal.subtotal|intcomma }}</span>
+        </div>
+        <div class="vd-caja__row">
+          <span class="vd-caja__k">
+            <span class="material-symbols-outlined">badge</span>
+            Pago del chofer
+            <span class="vc-pct">{{ viaje_cereal.porcentaje_chofer }}%</span>
+          </span>
+          <span class="vd-caja__v vc-deduct">-${{ viaje_cereal.pago_chofer|floatformat:0|intcomma }}</span>
+        </div>
+        <div class="vd-caja__row vd-caja__row--total">
+          <span class="vd-caja__k"><span class="material-symbols-outlined">savings</span>Ganancia neta</span>
+          <span class="vd-caja__v">${{ viaje_cereal.ganancia_neta|floatformat:0|intcomma }}</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- Panel de Nuevo Gasto -->
+<form id="formulario-gasto" method="POST">
+  {% csrf_token %}
+  <div id="contenedor-modal-gasto">
+    <div id="contenedor-modal-fondo-gasto" onclick="cerrarModalGasto()"></div>
+
+    <div id="panel-gasto">
+      <input type="hidden" name="accion" value="nuevo_gasto_cereal">
+
+      <button type="button" class="boton-cerrar" onclick="cerrarModalGasto()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+
+      <div id="icono-gasto">
+        <span class="material-symbols-outlined">payments</span>
+      </div>
+
+      <h3>Registrar gasto</h3>
+      <p>Seleccioná el tipo de gasto e ingresá el monto. El subtotal y el pago del chofer se recalculan solos.</p>
+
+      <div class="grupo-input">
+        <label for="tipo-gasto">Tipo de gasto</label>
+        <select id="tipo-gasto" name="tipo_gasto" required class="vd-select">
+          <option value="" disabled selected>Seleccione un tipo</option>
+          <option value="Comida">Comida</option>
+          <option value="Combustible">Combustible</option>
+          <option value="Playa">Playa</option>
+          <option value="Peaje">Peaje</option>
+          <option value="Hotel">Hotel</option>
+          <option value="Viaticos personales">Viaticos personales</option>
+          <option value="Extras">Extras</option>
+        </select>
+      </div>
+
+      <div class="grupo-input">
+        <label for="monto-gasto">Monto total</label>
+        <div class="input-con-icono">
+          <span>$</span>
+          <input
+            type="number"
+            id="monto-gasto"
+            name="monto_gasto"
+            placeholder="0"
+            step="1"
+            min="1"
+            required>
+        </div>
+        <span class="vd-hint">Numero entero, sin puntos ni comas.</span>
+      </div>
+
+      <div class="acciones-modal">
+        <button type="submit" class="boton-primario">Guardar</button>
+        <button type="button" class="boton-secundario" onclick="cerrarModalGasto()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</form>
+
+<!-- Panel de eliminacion -->
+<form id="formulario-eliminar" method="POST">
+  {% csrf_token %}
+  <div id="contenedor-panel-eliminar">
+    <div id="contenedor-panel-fondo" onclick="cerrarPanelEliminar()"></div>
+
+    <div id="panel-eliminar">
+      <input type="hidden" name="accion" value="eliminar_viaje_cereal">
+
+      <button type="button" class="boton-cerrar" id="icono-cerrar-panel-eliminar" onclick="cerrarPanelEliminar()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+
+      <div id="icono-advertencia">
+        <span class="material-symbols-outlined">warning</span>
+      </div>
+
+      <h3>Confirmar eliminacion</h3>
+      <p id="texto-confirmacion-eliminar">¿Está seguro que quiere eliminar este viaje de cereal?</p>
+
+      <div class="acciones-modal">
+        <button type="button" class="boton-secundario" onclick="cerrarPanelEliminar()">No, mantener</button>
+        <button type="button" class="boton-primario" id="boton-confirmar-eliminar"><span>Sí, eliminar</span></button>
+      </div>
+    </div>
+  </div>
+</form>
+
+<!-- PANEL LATERAL EDITAR VIAJE DE CEREAL (SLIDE-OVER) -->
+<div id="slide-over-cereal">
+  <div id="slide-over-fondo" onclick="cerrarSlideOver('slide-over-cereal')"></div>
+
+  <div id="slide-over-panel">
+    <form id="form-cereal" method="post" autocomplete="off">
+      {% csrf_token %}
+      <input type="hidden" name="accion" value="editar_viaje_cereal">
+
+      <!-- 1. Cabecera -->
+      <header class="panel-cabecera">
+        <div class="panel-titulo-fila">
+          <div class="icono-contenedor">
+            <span class="material-symbols-outlined">agriculture</span>
+          </div>
+          <div class="texto-cabecera">
+            <h3>Editar viaje de cereal</h3>
+            <p>Modifique los datos del viaje</p>
+          </div>
+        </div>
+        <button type="button" class="boton-cerrar" onclick="cerrarSlideOver('slide-over-cereal')">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </header>
+
+      <!-- 2. Cuerpo con scroll -->
+      <main class="panel-cuerpo">
+
+        <!-- Seccion 1: Asignacion -->
+        <section class="seccion-bloque">
+          <div class="subtitulo-formulario">
+            <span class="material-symbols-outlined">group</span>
+            <h4>Asignacion</h4>
+          </div>
+
+          <div class="grupo-input">
+            <label for="cliente-cereal">Cliente</label>
+            <select id="cliente-cereal" name="id_cliente" class="select-estandar" required>
+              <option value="" disabled>Seleccione un cliente</option>
+              {% for cliente in clientes %}
+              <option value="{{ cliente.id }}" {% if viaje_cereal.cliente_id == cliente.id %}selected{% endif %}>{{ cliente.nombre }} {{ cliente.apellido|default:"" }}</option>
+              {% endfor %}
+            </select>
+            <span class="mensaje-error">Por favor, seleccione un cliente de la lista.</span>
+          </div>
+
+          <div class="grupo-input">
+            <label for="chofer-cereal">Chofer</label>
+            <select id="chofer-cereal" name="id_chofer" class="select-estandar" required>
+              <option value="" disabled>Seleccione un chofer</option>
+              {% for chofer in choferes %}
+              <option value="{{ chofer.id }}" {% if viaje_cereal.chofer_id == chofer.id %}selected{% endif %}>{{ chofer.nombre }} {{ chofer.apellido }}</option>
+              {% endfor %}
+            </select>
+            <span class="mensaje-error">Por favor, seleccione un chofer de la lista.</span>
+          </div>
+
+          <div class="grupo-input">
+            <label for="vehiculo-cereal">Vehiculo</label>
+            <select id="vehiculo-cereal" name="id_vehiculo" class="select-estandar" required>
+              <option value="" disabled>Seleccione un vehiculo</option>
+              {% for vehiculo in vehiculos %}
+              <option value="{{ vehiculo.id }}" {% if viaje_cereal.vehiculo_id == vehiculo.id %}selected{% endif %}>{{ vehiculo.nombre }} ({{ vehiculo.patente }})</option>
+              {% endfor %}
+            </select>
+            <span class="mensaje-error">Por favor, seleccione un vehiculo de la lista.</span>
+          </div>
+        </section>
+
+        <!-- Seccion 2: Carga -->
+        <section class="seccion-bloque">
+          <div class="subtitulo-formulario">
+            <span class="material-symbols-outlined">inventory_2</span>
+            <h4>Carga</h4>
+          </div>
+
+          <div class="grupo-input">
+            <label for="tipo-cereal-cereal">Tipo de cereal</label>
+            <select id="tipo-cereal-cereal" name="tipo_cereal" class="select-estandar" required>
+              <option value="" disabled>Seleccione un cereal</option>
+              {% for valor, etiqueta in cereales %}
+              <option value="{{ valor }}" {% if viaje_cereal.tipo_cereal == valor %}selected{% endif %}>{{ etiqueta }}</option>
+              {% endfor %}
+            </select>
+            <span class="mensaje-error">Por favor, seleccione un tipo de cereal.</span>
+          </div>
+
+          <div class="grupo-input">
+            <label for="codigo-cereal">Codigo de trazabilidad (CTG)</label>
+            <input
+              type="text"
+              id="codigo-cereal"
+              name="codigo_trazabilidad"
+              placeholder="Ej: 00123456"
+              required
+              maxlength="8"
+              inputmode="numeric"
+              pattern="[0-9]{8}"
+              value="{{ viaje_cereal.codigo_trazabilidad_granos }}">
+            <span class="mensaje-error">Debe tener exactamente 8 digitos numericos.</span>
+          </div>
+
+          <div class="vje-grid2">
+            <div class="grupo-input">
+              <label for="toneladas-cereal">Toneladas</label>
+              <input
+                type="number"
+                id="toneladas-cereal"
+                name="toneladas"
+                placeholder="0"
+                min="1"
+                step="1"
+                required
+                value="{{ viaje_cereal.toneladas }}">
+              <span class="mensaje-error">Ingrese un entero mayor a 0.</span>
+            </div>
+
+            <div class="grupo-input">
+              <label for="precio-cereal">Precio por tonelada</label>
+              <div class="input-con-icono">
+                <span>$</span>
+                <input
+                  type="number"
+                  id="precio-cereal"
+                  name="precio_tonelada"
+                  placeholder="0"
+                  min="1"
+                  step="1"
+                  required
+                  value="{{ viaje_cereal.precio_tonelada }}">
+              </div>
+              <span class="mensaje-error">Ingrese un monto valido mayor a 0.</span>
+            </div>
+          </div>
+
+          <div class="grupo-input">
+            <label for="porcentaje-cereal">Porcentaje del chofer (%)</label>
+            <input
+              type="number"
+              id="porcentaje-cereal"
+              name="porcentaje_chofer"
+              placeholder="Opcional"
+              min="1"
+              max="100"
+              step="1"
+              value="{% if viaje_cereal.porcentaje_chofer %}{{ viaje_cereal.porcentaje_chofer }}{% endif %}">
+            <span class="mensaje-error">Debe ser un numero entre 1 y 100.</span>
+          </div>
+        </section>
+
+        <!-- Seccion 3: Recorrido -->
+        <section class="seccion-bloque">
+          <div class="subtitulo-formulario">
+            <span class="material-symbols-outlined">location_on</span>
+            <h4>Recorrido</h4>
+          </div>
+
+          <div class="grupo-input" id="contenedor-destinos-cereal">
+            <label for="destino-cereal">Destinos</label>
+            {% for destino in viaje_cereal.destinos.all %}
+            <input
+              type="text"
+              name="destino"
+              placeholder="Ej: Rosario"
+              required
+              maxlength="30"
+              pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}"
+              value="{{ destino.destino }}"
+              data-autocompletar-ciudad
+              {% if forloop.first %}id="destino-cereal"{% endif %}>
+            {% empty %}
+            <input
+              type="text"
+              id="destino-cereal"
+              name="destino"
+              placeholder="Ej: Rosario"
+              required
+              maxlength="30"
+              pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}"
+              data-autocompletar-ciudad>
+            {% endfor %}
+
+            <div class="vje-destacciones">
+              <button type="button" id="btn-agregar-destino-cereal" class="vje-addbtn">
+                <span class="material-symbols-outlined">add_circle</span>
+                Anadir un destino
+              </button>
+              <button type="button" id="btn-quitar-destino-cereal" class="vje-removebtn">
+                <span class="material-symbols-outlined">do_not_disturb_on</span>
+                Quitar destino
+              </button>
+            </div>
+            <span class="mensaje-error">Minimo 3 caracteres (Solo letras y numeros)</span>
+          </div>
+        </section>
+
+        <!-- Seccion 4: Fecha -->
+        <section class="seccion-bloque">
+          <div class="subtitulo-formulario">
+            <span class="material-symbols-outlined">event</span>
+            <h4>Fecha</h4>
+          </div>
+
+          <div class="grupo-input">
+            <label for="fecha-cereal">Fecha del viaje</label>
+            <input type="date" id="fecha-cereal" name="fecha_viaje_cereal" required
+                   value="{{ viaje_cereal.fecha_viaje_cereal|date:'Y-m-d' }}">
+            <span class="mensaje-error">Por favor, seleccione una fecha valida.</span>
+          </div>
+        </section>
+      </main>
+
+      <!-- 3. Pie del panel -->
+      <footer class="panel-pie">
+        <button type="submit" class="boton-primario">Guardar cambios</button>
+        <button type="button" class="boton-secundario" onclick="cerrarSlideOver('slide-over-cereal')">Cancelar</button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block codigo-javascript %}
+<script src="{% static 'js/autocompletado_ciudades.js' %}"></script>
+<script src="{% static 'js/informacion_viaje_cereal.js' %}"></script>
 {% endblock %}
