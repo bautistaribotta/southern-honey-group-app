@@ -164,6 +164,29 @@ def eliminar_cliente(id_cliente):
     return cliente
 
 
+def buscar_clientes(q, limite=10):
+    """
+    Busqueda acotada de clientes activos para el autocompletado del select de cliente
+    (viajes de cereal). Limito los resultados para no serializar miles de filas en cada
+    tecla; devuelvo una lista de dicts {id, texto} lista para el JSON del front.
+    """
+    q = (q or "").strip()
+    if not q:
+        return []
+
+    clientes = Cliente.objects.filter(activo=True)
+    if q.isdigit():
+        clientes = clientes.filter(id=q)
+    else:
+        clientes = clientes.filter(Q(nombre__icontains=q) | Q(apellido__icontains=q))
+
+    clientes = clientes.order_by("nombre", "apellido")[:limite]
+    return [
+        {"id": c.id, "texto": f"{c.nombre} {c.apellido or ''}".strip()}
+        for c in clientes
+    ]
+
+
 def crear_operacion(cliente, items, metodo_pago, tipo_operacion, viaje=None):
     # Obtenemos las cotizaciones actuales antes de la transacción
     cotizacion_dolar = get_cotizacion_dolar_oficial()

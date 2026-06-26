@@ -103,12 +103,14 @@
 
           <div class="grupo-input">
             <label for="cliente-acopio">Cliente</label>
-            <select id="cliente-acopio" name="id_cliente" class="select-estandar">
-              <option value="" selected>Sin cliente</option>
-              {% for cliente in clientes %}
-              <option value="{{ cliente.id }}">{{ cliente.nombre }} {{ cliente.apellido|default:'' }}</option>
-              {% endfor %}
-            </select>
+            <input
+              type="text"
+              id="cliente-acopio"
+              placeholder="Buscar cliente por nombre (opcional)"
+              autocomplete="off"
+              data-autocompletar-cliente
+              data-target="#id-cliente-acopio">
+            <input type="hidden" id="id-cliente-acopio" name="id_cliente" value="">
           </div>
 
           <div class="grupo-input">
@@ -271,6 +273,7 @@
 
 {% block codigo-javascript %}
 <script src="{% static 'js/autocompletado_ciudades.js' %}"></script>
+<script src="{% static 'js/autocompletado_clientes.js' %}"></script>
 <script src="{% static 'js/viajes_cereales.js' %}"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {

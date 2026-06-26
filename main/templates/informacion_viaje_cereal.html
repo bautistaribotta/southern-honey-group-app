@@ -312,12 +312,15 @@
 
           <div class="grupo-input">
             <label for="cliente-cereal">Cliente</label>
-            <select id="cliente-cereal" name="id_cliente" class="select-estandar">
-              <option value="" {% if not viaje_cereal.cliente_id %}selected{% endif %}>Sin cliente</option>
-              {% for cliente in clientes %}
-              <option value="{{ cliente.id }}" {% if viaje_cereal.cliente_id == cliente.id %}selected{% endif %}>{{ cliente.nombre }} {{ cliente.apellido|default:"" }}</option>
-              {% endfor %}
-            </select>
+            <input
+              type="text"
+              id="cliente-cereal"
+              placeholder="Buscar cliente por nombre (opcional)"
+              autocomplete="off"
+              data-autocompletar-cliente
+              data-target="#id-cliente-cereal"
+              value="{% if viaje_cereal.cliente %}{{ viaje_cereal.cliente.nombre }} {{ viaje_cereal.cliente.apellido|default:'' }}{% endif %}">
+            <input type="hidden" id="id-cliente-cereal" name="id_cliente" value="{{ viaje_cereal.cliente_id|default:'' }}">
           </div>
 
           <div class="grupo-input">
@@ -499,5 +502,6 @@
 
 {% block codigo-javascript %}
 <script src="{% static 'js/autocompletado_ciudades.js' %}"></script>
+<script src="{% static 'js/autocompletado_clientes.js' %}"></script>
 <script src="{% static 'js/informacion_viaje_cereal.js' %}"></script>
 {% endblock %}

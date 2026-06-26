@@ -13,7 +13,7 @@ from django.db import transaction
 from .models import Cliente, Producto, Operacion, DetalleOperacion, Pago, Cotizaciones, Chofer, Vehiculo, Viaje, ViajeCereal, ViajeReparto
 from .pdf_services import Remito
 from .services import (nuevo_producto, editar_producto, eliminar_producto, nuevo_cliente, editar_cliente,
-                       eliminar_cliente, get_cotizacion_dolar_oficial, get_cotizaciones, actualizar_cotizacion, obtener_datos_cliente,
+                       eliminar_cliente, buscar_clientes, get_cotizacion_dolar_oficial, get_cotizaciones, actualizar_cotizacion, obtener_datos_cliente,
                        obtener_datos_producto, modificar_stock, crear_operacion, servicio_cancelar_operacion,
                        obtener_listado_deudores, crear_chofer, crear_vehiculo, crear_viaje, obtener_choferes_activos,
                        obtener_vehiculos_activos, obtener_viajes, obtener_datos_viaje, editar_viaje, eliminar_viaje, crear_gasto,
@@ -344,6 +344,13 @@ def obtener_cliente_json(request, id_cliente):
 
     # Si el servicio me devuelve None (cliente no encontrado o inactivo), respondo con un error 404
     return JsonResponse({"Error": "Cliente no encontrado"}, status=404)
+
+
+@login_required
+def buscar_clientes_json(request):
+    # Autocompletado del select de cliente: devuelve hasta 10 coincidencias activas.
+    q = request.GET.get("q", "")
+    return JsonResponse({"clientes": buscar_clientes(q)})
 
 
 @login_required
@@ -1108,7 +1115,6 @@ def viaje_cereales(request):
 
     contexto = {
         "page_obj": page_obj,
-        "clientes": Cliente.objects.filter(activo=True).order_by("nombre", "apellido"),
         "choferes": obtener_choferes_activos(),
         "vehiculos": obtener_vehiculos_activos(),
         "cereales": ViajeCereal.cereales,
@@ -1192,7 +1198,6 @@ def informacion_viaje_cereal(request, id_viaje_cereal):
     contexto = {
         "viaje_cereal": viaje_cereal,
         "pestaña": "viajes",
-        "clientes": incluir_asignado(Cliente.objects.filter(activo=True).order_by("nombre", "apellido"), viaje_cereal.cliente),
         "choferes": incluir_asignado(obtener_choferes_activos(), viaje_cereal.chofer),
         "vehiculos": incluir_asignado(obtener_vehiculos_activos(), viaje_cereal.vehiculo),
         "cereales": ViajeCereal.cereales,
