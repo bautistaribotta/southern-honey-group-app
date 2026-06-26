@@ -34,9 +34,6 @@
       <div>
         <div class="op-head__titlerow">
           <h1 class="op-head__title">Reparto #{{ viaje_reparto.id|default:"000" }}</h1>
-          <span class="rp-pill {% if viaje_reparto.ganancia >= 0 %}rp-pill--ok{% else %}rp-pill--bad{% endif %}">
-            <span class="rp-pill__dot"></span>{% if viaje_reparto.ganancia >= 0 %}Rentable{% else %}En perdida{% endif %}
-          </span>
         </div>
         <div class="op-head__meta">
           <span class="op-head__metaitem">
