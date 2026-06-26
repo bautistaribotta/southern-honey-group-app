@@ -35,7 +35,7 @@
       <div>
         <div class="op-head__titlerow">
           <h1 class="op-head__title">Viaje de cereal #{{ viaje_cereal.id|default:"000" }}</h1>
-          <span class="cereal-pill {% if viaje_cereal.tipo_cereal == 'Maiz' %}cereal-pill--maiz{% elif viaje_cereal.tipo_cereal == 'Soja' %}cereal-pill--soja{% elif viaje_cereal.tipo_cereal == 'Trigo' %}cereal-pill--trigo{% else %}cereal-pill--otro{% endif %}">
+          <span class="cereal-pill cereal-pill--{{ viaje_cereal.tipo_cereal|lower }}">
             <span class="cereal-pill__dot"></span>{{ viaje_cereal.tipo_cereal }}
           </span>
         </div>

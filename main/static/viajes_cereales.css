@@ -80,6 +80,9 @@
 .cereal-pill--trigo { background-color: var(--cereal-trigo-bg); color: var(--cereal-trigo-fg); }
 .cereal-pill--trigo .cereal-pill__dot { background-color: var(--cereal-trigo-dot); }
 
+.cereal-pill--mani { background-color: var(--cereal-mani-bg); color: var(--cereal-mani-fg); }
+.cereal-pill--mani .cereal-pill__dot { background-color: var(--cereal-mani-dot); }
+
 /* Fallback neutro por si llegara un tipo sin estilo asignado */
 .cereal-pill:not([class*="cereal-pill--"]),
 .cereal-pill--otro {
