@@ -19,7 +19,7 @@ REGEX_TEXTO_BASICO = re.compile(r"^[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]+$")
 REGEX_TEXTO_NUMEROS = re.compile(r"^[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]+$")
 REGEX_PATENTE = re.compile(r"^[A-Z0-9]{6,7}$")
 # El codigo de trazabilidad de granos (CTG) debe tener exactamente 8 digitos
-REGEX_CTG = re.compile(r"^[0-9]{8}$")
+REGEX_CTG = re.compile(r"^[0-9]{15}$")
 
 
 def nuevo_producto(nombre, categoria=None, precio=None, cantidad=None):
@@ -536,20 +536,21 @@ def eliminar_vehiculo(id_vehiculo):
     return vehiculo
 
 
-def crear_viaje(id_chofer, id_vehiculo, destinos, inicio_caja, fecha_inicio, fecha_vuelta=None):
+def _validar_viaje(id_chofer, id_vehiculo, destinos, inicio_caja, fecha_inicio, fecha_vuelta):
     """
-    Crea un viaje (maestro) y sus destinos asociados (detalle) usando una transacción atómica.
-    'destinos' debe ser una lista de strings. Ejemplo: ["Buenos Aires", "Rosario"].
+    Centraliza las validaciones de un viaje comun (crear y editar comparten las
+    mismas reglas). Devuelve una tupla con los valores ya limpios y convertidos
+    (caja_val, destinos_limpios), o lanza ValueError ante el primer dato invalido.
     """
-    # 1. Valido que el chofer exista en la base de datos
+    # 1. El chofer debe existir en la base de datos
     if not Chofer.objects.filter(id=id_chofer).exists():
         raise ValueError("El chofer seleccionado no existe en el sistema.")
 
-    # 2. Valido que el vehículo exista en la base de datos
+    # 2. El vehiculo debe existir en la base de datos
     if not Vehiculo.objects.filter(id=id_vehiculo).exists():
         raise ValueError("El vehículo seleccionado no existe en el sistema.")
 
-    # 3. Valido los destinos
+    # 3. Destinos: al menos uno, cada uno alfanumerico de 3 a 30 caracteres
     if not destinos:
         raise ValueError("Debe ingresar al menos un destino.")
 
@@ -560,7 +561,7 @@ def crear_viaje(id_chofer, id_vehiculo, destinos, inicio_caja, fecha_inicio, fec
             raise ValueError(f"El destino '{d}' es inválido (debe tener entre 3 y 30 caracteres alfanuméricos).")
         destinos_limpios.append(d_limpio)
 
-    # 4. Valido el inicio de caja
+    # 4. Inicio de caja: entero no negativo dentro del limite de la BD
     try:
         caja_val = int(inicio_caja)
         if caja_val < 0 or caja_val > 2147483647:
@@ -568,20 +569,32 @@ def crear_viaje(id_chofer, id_vehiculo, destinos, inicio_caja, fecha_inicio, fec
     except (ValueError, TypeError):
         raise ValueError("El monto de inicio de caja debe ser un número entero positivo y no superar el límite permitido de la BD.")
 
-    # 5. Valido estrictamente el formato de las fechas para la BD
+    # 5. Fechas: inicio obligatoria, vuelta opcional, ambas con formato YYYY-MM-DD
     try:
         datetime.strptime(fecha_inicio, "%Y-%m-%d")
-        if fecha_vuelta: # La fecha de vuelta es opcional
+        if fecha_vuelta:
             datetime.strptime(fecha_vuelta, "%Y-%m-%d")
     except (ValueError, TypeError):
         raise ValueError("Las fechas deben tener el formato válido YYYY-MM-DD.")
+
+    return caja_val, destinos_limpios
+
+
+def crear_viaje(id_chofer, id_vehiculo, destinos, inicio_caja, fecha_inicio, fecha_vuelta=None):
+    """
+    Crea un viaje (maestro) y sus destinos asociados (detalle) usando una transacción atómica.
+    'destinos' debe ser una lista de strings. Ejemplo: ["Buenos Aires", "Rosario"].
+    """
+    caja_val, destinos_limpios = _validar_viaje(
+        id_chofer, id_vehiculo, destinos, inicio_caja, fecha_inicio, fecha_vuelta
+    )
 
     with transaction.atomic():
         # Creamos el viaje (Tabla Maestra)
         nuevo_viaje = Viaje.objects.create(
             chofer_id=id_chofer,
             vehiculo_id=id_vehiculo,
-            inicio_caja=inicio_caja,
+            inicio_caja=caja_val,
             fecha_inicio=fecha_inicio,
             fecha_vuelta=fecha_vuelta
         )
@@ -631,48 +644,27 @@ def obtener_viajes():
     return Viaje.objects.filter(activo=True).select_related('chofer', 'vehiculo').prefetch_related('destinos').order_by('-fecha_inicio')
 
 
+def obtener_datos_viaje(id_viaje):
+    # Trae un viaje comun activo con sus relaciones listas para la vista de informacion.
+    # Mismo patron que obtener_datos_viaje_cereal / _reparto: la vista no toca el ORM directo.
+    return get_object_or_404(
+        Viaje.objects.select_related("chofer", "vehiculo").prefetch_related("destinos", "detalle_gastos"),
+        id=id_viaje,
+        activo=True,
+    )
+
+
 def editar_viaje(id_viaje, id_chofer, id_vehiculo, destinos, inicio_caja, fecha_inicio, fecha_vuelta):
-    # 1. Valido que el chofer exista en la base de datos
-    if not Chofer.objects.filter(id=id_chofer).exists():
-        raise ValueError("El chofer seleccionado no existe en el sistema.")
-
-    # 2. Valido que el vehículo exista en la base de datos
-    if not Vehiculo.objects.filter(id=id_vehiculo).exists():
-        raise ValueError("El vehículo seleccionado no existe en el sistema.")
-
-    # 3. Valido los destinos
-    if not destinos:
-        raise ValueError("Debe ingresar al menos un destino.")
-
-    destinos_limpios = []
-    for d in destinos:
-        d_limpio = d.strip()
-        if not (3 <= len(d_limpio) <= 30) or not REGEX_TEXTO_NUMEROS.match(d_limpio):
-            raise ValueError(f"El destino '{d}' es inválido (debe tener entre 3 y 30 caracteres alfanuméricos).")
-        destinos_limpios.append(d_limpio)
-
-    # 4. Valido el inicio de caja
-    try:
-        caja_val = int(inicio_caja)
-        if caja_val < 0 or caja_val > 2147483647:
-            raise ValueError()
-    except (ValueError, TypeError):
-        raise ValueError("El monto de inicio de caja debe ser un número entero positivo y no superar el límite permitido de la BD.")
-
-    # 5. Valido estrictamente el formato de las fechas para la BD
-    try:
-        datetime.strptime(fecha_inicio, "%Y-%m-%d")
-        if fecha_vuelta: # La fecha de vuelta es opcional
-            datetime.strptime(fecha_vuelta, "%Y-%m-%d")
-    except (ValueError, TypeError):
-        raise ValueError("Las fechas deben tener el formato válido YYYY-MM-DD.")
+    caja_val, destinos_limpios = _validar_viaje(
+        id_chofer, id_vehiculo, destinos, inicio_caja, fecha_inicio, fecha_vuelta
+    )
 
     with transaction.atomic():
         viaje = get_object_or_404(Viaje, id=id_viaje)
 
         viaje.chofer_id = id_chofer
         viaje.vehiculo_id = id_vehiculo
-        viaje.inicio_caja = inicio_caja
+        viaje.inicio_caja = caja_val
         viaje.fecha_inicio = fecha_inicio
         viaje.fecha_vuelta = fecha_vuelta if fecha_vuelta else None
         viaje.save()
