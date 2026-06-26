@@ -124,8 +124,3 @@ python manage.py runserver
 El software estará disponible de forma local ingresando a `http://127.0.0.1:8000/`.
 
 ---
-
-## Datos personales
-
-**Bautista Ribotta**
-Desarrollador Full Stack a cargo del ciclo de vida completo del software: analisis de requerimientos, diseño UI/UX, modelado de la base de datos y programación del backend y frontend.
