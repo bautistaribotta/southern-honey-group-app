@@ -61,18 +61,10 @@
             Viajes
           </a>
         </li>
-        {% if user.is_staff %}
-        <li>
-          <a href="{% url 'deudores' %}" class="item-menu {% if request.resolver_match.url_name == 'deudores' %} activo {% endif %}">
-            <span class="material-symbols-outlined">payments</span>
-            Deudores
-          </a>
-        </li>
-        {% endif %}
         <li>
           <a href="{% url 'mercado_libre' %}" class="item-menu {% if request.resolver_match.url_name == 'mercado_libre' or request.resolver_match.url_name == 'informacion_viaje_reparto' %} activo {% endif %}">
             <span class="material-symbols-outlined">inventory</span>
-            Mercado Libre
+            Viajes repartos
           </a>
         </li>
         <li>
@@ -81,6 +73,14 @@
             Viajes cereales
           </a>
         </li>
+        {% if user.is_staff %}
+        <li>
+          <a href="{% url 'deudores' %}" class="item-menu {% if request.resolver_match.url_name == 'deudores' %} activo {% endif %}">
+            <span class="material-symbols-outlined">payments</span>
+            Deudores
+          </a>
+        </li>
+        {% endif %}
       </ul>
     </nav>
 
