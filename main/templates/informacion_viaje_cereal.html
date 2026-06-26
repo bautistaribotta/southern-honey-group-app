@@ -369,11 +369,11 @@
               name="codigo_trazabilidad"
               placeholder="Ej: 00123456"
               required
-              maxlength="8"
+              maxlength="15"
               inputmode="numeric"
-              pattern="[0-9]{8}"
+              pattern="[0-9]{1,15}"
               value="{{ viaje_cereal.codigo_trazabilidad_granos }}">
-            <span class="mensaje-error">Debe tener exactamente 8 digitos numericos.</span>
+            <span class="mensaje-error">Solo números, hasta 15 dígitos.</span>
           </div>
 
           <div class="vje-grid2">

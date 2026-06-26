@@ -358,9 +358,9 @@ class ViajeCereal(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, null=True, blank=True,
                                 db_column="id_cliente", related_name="viajes_cereales")
     tipo_cereal = models.CharField(max_length=50, choices=cereales)
-    # El CTG es un codigo de 8 digitos que puede tener ceros a la izquierda, por eso
+    # El CTG es un codigo de hasta 15 digitos que puede tener ceros a la izquierda, por eso
     # lo guardo como texto: un IntegerField perderia esos ceros (00123456 -> 123456)
-    codigo_trazabilidad_granos = models.CharField(max_length=8)
+    codigo_trazabilidad_granos = models.CharField(max_length=15)
     toneladas = models.IntegerField(default=0)
     precio_tonelada = models.IntegerField(default=0)
     porcentaje_chofer = models.IntegerField(default=0)

@@ -18,8 +18,8 @@ from .models import (Producto, Cliente, Operacion, DetalleOperacion, Pago, Cotiz
 REGEX_TEXTO_BASICO = re.compile(r"^[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]+$")
 REGEX_TEXTO_NUMEROS = re.compile(r"^[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]+$")
 REGEX_PATENTE = re.compile(r"^[A-Z0-9]{6,7}$")
-# El codigo de trazabilidad de granos (CTG) debe tener exactamente 8 digitos
-REGEX_CTG = re.compile(r"^[0-9]{15}$")
+# El codigo de trazabilidad de granos (CTG) admite hasta 15 digitos, solo numeros
+REGEX_CTG = re.compile(r"^[0-9]{1,15}$")
 
 
 def nuevo_producto(nombre, categoria=None, precio=None, cantidad=None):
@@ -737,10 +737,11 @@ def _validar_viaje_cereal(id_cliente, id_chofer, id_vehiculo, tipo_cereal, codig
     if tipo_cereal not in tipos_validos:
         raise ValueError("Debe seleccionar un tipo de cereal valido.")
 
-    # 5. Codigo de trazabilidad (CTG): exactamente 8 digitos, conservando ceros a la izquierda
+    # 5. Codigo de trazabilidad (CTG): obligatorio, solo numeros, hasta 15 digitos
+    #    (conservando ceros a la izquierda al ser texto)
     codigo_limpio = (codigo_trazabilidad or "").strip()
     if not REGEX_CTG.match(codigo_limpio):
-        raise ValueError("El codigo de trazabilidad debe tener exactamente 8 digitos numericos.")
+        raise ValueError("El codigo de trazabilidad debe ser numerico y tener hasta 15 digitos.")
 
     # 6. Toneladas: entero positivo dentro del limite de la BD
     try:
