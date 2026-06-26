@@ -9,4 +9,5 @@ CLAUDE.md
 GEMINI.md
 .agents/skills/
 skills-lock.json
-.claude/
+.claude/*
+!.claude/skills/
