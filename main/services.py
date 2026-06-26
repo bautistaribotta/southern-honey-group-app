@@ -715,8 +715,8 @@ def _validar_viaje_cereal(id_cliente, id_chofer, id_vehiculo, tipo_cereal, codig
     mismas reglas). Devuelve una tupla con los valores ya limpios y convertidos,
     listos para persistir, o lanza ValueError ante el primer dato invalido.
     """
-    # 1. El cliente es obligatorio y debe existir en la base de datos
-    if not Cliente.objects.filter(id=id_cliente, activo=True).exists():
+    # 1. El cliente es opcional (el modelo permite null). Si se informa, debe existir y estar activo.
+    if id_cliente and not Cliente.objects.filter(id=id_cliente, activo=True).exists():
         raise ValueError("El cliente seleccionado no existe en el sistema.")
 
     # 2. El chofer debe existir en la base de datos
@@ -797,7 +797,7 @@ def crear_viaje_cereal(id_cliente, id_chofer, id_vehiculo, tipo_cereal, codigo_t
 
     with transaction.atomic():
         nuevo_viaje_cereal = ViajeCereal.objects.create(
-            cliente_id=id_cliente,
+            cliente_id=id_cliente or None,
             chofer_id=id_chofer,
             vehiculo_id=id_vehiculo,
             tipo_cereal=tipo_cereal,
@@ -848,7 +848,7 @@ def editar_viaje_cereal(id_viaje_cereal, id_cliente, id_chofer, id_vehiculo, tip
     with transaction.atomic():
         viaje_cereal = get_object_or_404(ViajeCereal, id=id_viaje_cereal)
 
-        viaje_cereal.cliente_id = id_cliente
+        viaje_cereal.cliente_id = id_cliente or None
         viaje_cereal.chofer_id = id_chofer
         viaje_cereal.vehiculo_id = id_vehiculo
         viaje_cereal.tipo_cereal = tipo_cereal

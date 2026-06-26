@@ -312,13 +312,12 @@
 
           <div class="grupo-input">
             <label for="cliente-cereal">Cliente</label>
-            <select id="cliente-cereal" name="id_cliente" class="select-estandar" required>
-              <option value="" disabled>Seleccione un cliente</option>
+            <select id="cliente-cereal" name="id_cliente" class="select-estandar">
+              <option value="" {% if not viaje_cereal.cliente_id %}selected{% endif %}>Sin cliente</option>
               {% for cliente in clientes %}
               <option value="{{ cliente.id }}" {% if viaje_cereal.cliente_id == cliente.id %}selected{% endif %}>{{ cliente.nombre }} {{ cliente.apellido|default:"" }}</option>
               {% endfor %}
             </select>
-            <span class="mensaje-error">Por favor, seleccione un cliente de la lista.</span>
           </div>
 
           <div class="grupo-input">
