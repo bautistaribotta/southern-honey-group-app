@@ -17,6 +17,7 @@ from .services import (nuevo_producto, editar_producto, eliminar_producto, nuevo
                        obtener_datos_producto, modificar_stock, crear_operacion, servicio_cancelar_operacion,
                        obtener_listado_deudores, crear_chofer, crear_vehiculo, crear_viaje, obtener_choferes_activos,
                        obtener_vehiculos_activos, obtener_viajes, editar_viaje, eliminar_viaje, crear_gasto,
+                       incluir_asignado,
                        editar_chofer, eliminar_chofer, editar_vehiculo, eliminar_vehiculo,
                        crear_viaje_cereal, obtener_viajes_cereales, obtener_datos_viaje_cereal,
                        editar_viaje_cereal, eliminar_viaje_cereal, crear_gasto_viaje_cereal,
@@ -852,8 +853,8 @@ def informacion_viaje(request, id_viaje):
     contexto = {
         'viaje': viaje,
         'pestaña': 'viajes',
-        'choferes': obtener_choferes_activos(),
-        'vehiculos': obtener_vehiculos_activos(),
+        'choferes': incluir_asignado(obtener_choferes_activos(), viaje.chofer),
+        'vehiculos': incluir_asignado(obtener_vehiculos_activos(), viaje.vehiculo),
         'operaciones': operaciones_viaje,
         'clientes': Cliente.objects.filter(activo=True).order_by("nombre", "apellido"),
     }
@@ -1023,8 +1024,8 @@ def informacion_viaje_reparto(request, id_viaje_reparto):
     contexto = {
         "viaje_reparto": viaje_reparto,
         "pestaña": "viajes",
-        "choferes": obtener_choferes_activos(),
-        "vehiculos": obtener_vehiculos_activos(),
+        "choferes": incluir_asignado(obtener_choferes_activos(), viaje_reparto.chofer),
+        "vehiculos": incluir_asignado(obtener_vehiculos_activos(), viaje_reparto.vehiculo),
     }
     return render(request, "informacion_viaje_reparto.html", contexto)
 
@@ -1191,9 +1192,9 @@ def informacion_viaje_cereal(request, id_viaje_cereal):
     contexto = {
         "viaje_cereal": viaje_cereal,
         "pestaña": "viajes",
-        "clientes": Cliente.objects.filter(activo=True).order_by("nombre", "apellido"),
-        "choferes": obtener_choferes_activos(),
-        "vehiculos": obtener_vehiculos_activos(),
+        "clientes": incluir_asignado(Cliente.objects.filter(activo=True).order_by("nombre", "apellido"), viaje_cereal.cliente),
+        "choferes": incluir_asignado(obtener_choferes_activos(), viaje_cereal.chofer),
+        "vehiculos": incluir_asignado(obtener_vehiculos_activos(), viaje_cereal.vehiculo),
         "cereales": ViajeCereal.cereales,
     }
     return render(request, "informacion_viaje_cereal.html", contexto)

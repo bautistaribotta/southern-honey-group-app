@@ -614,6 +614,19 @@ def obtener_vehiculos_activos():
     )
 
 
+def incluir_asignado(opciones, asignado):
+    """
+    Devuelve las opciones de un <select> incluyendo el registro actualmente asignado,
+    aunque este inactivo (y por lo tanto ausente del queryset de activos). Asi, al editar
+    un viaje cuyo chofer, vehiculo o cliente fue dado de baja, su valor sigue
+    preseleccionado en vez de obligar a elegir otro.
+    """
+    opciones = list(opciones)
+    if asignado and asignado not in opciones:
+        opciones.append(asignado)
+    return opciones
+
+
 def obtener_viajes():
     return Viaje.objects.filter(activo=True).select_related('chofer', 'vehiculo').prefetch_related('destinos').order_by('-fecha_inicio')
 
