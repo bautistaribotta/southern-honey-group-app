@@ -21,6 +21,11 @@
   --cereal-trigo-bg: oklch(95.5% 0.040 74);
   --cereal-trigo-fg: oklch(48% 0.085 60);
   --cereal-trigo-dot: oklch(70% 0.120 66);
+
+  /* Mani: marron tostado, tono propio para diferenciarlo del trigo. */
+  --cereal-mani-bg: oklch(94% 0.035 55);
+  --cereal-mani-fg: oklch(45% 0.070 45);
+  --cereal-mani-dot: oklch(63% 0.100 48);
 }
 
 /* --- Anchos de columna propios de esta tabla (4 columnas).
@@ -87,6 +92,7 @@
 .prod-chip__dot--maiz { background-color: var(--cereal-maiz-dot); }
 .prod-chip__dot--soja { background-color: var(--cereal-soja-dot); }
 .prod-chip__dot--trigo { background-color: var(--cereal-trigo-dot); }
+.prod-chip__dot--mani { background-color: var(--cereal-mani-dot); }
 
 /* --- Slide-over "Nuevo acopio" ---
    Las clases internas del panel (.panel-cabecera, .grupo-input, .boton-primario,
