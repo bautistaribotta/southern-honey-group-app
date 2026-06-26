@@ -1,17 +1,375 @@
 {% extends "base.html" %}
 {% load static %}
+{% load humanize %}
 
 {% block nombre-pestaña %}
 <title>Reparto #{{ viaje_reparto.id }}</title>
 {% endblock %}
 
-{% block cabecera %}
-<div id="titulos-cabecera">
-  <h2>Reparto #{{ viaje_reparto.id }}</h2>
-  <p>Detalle del viaje de reparto</p>
-</div>
+{% block links %}
+<link rel="stylesheet" href="{% static 'autocompletado_ciudades.css' %}">
+<link rel="stylesheet" href="{% static 'panel_compartido.css' %}">
+<link rel="stylesheet" href="{% static 'operaciones_compartido.css' %}">
+<link rel="stylesheet" href="{% static 'informacion_operacion.css' %}">
+<link rel="stylesheet" href="{% static 'informacion_viaje.css' %}">
+<link rel="stylesheet" href="{% static 'informacion_viaje_reparto.css' %}">
+{% endblock %}
+
+{% block top-header %}
+<!-- Bloque vacio: oculto el header global para usar la cabecera propia de la vista -->
 {% endblock %}
 
 {% block area-trabajo %}
-<!-- Front pendiente: por ahora solo el header. El backend (editar/eliminar) ya esta listo en la vista. -->
+<section id="area-trabajo" class="vd-screen">
+
+  <a href="{% url 'mercado_libre' %}" class="boton-volver">
+    <span class="material-symbols-outlined">arrow_back</span>
+    Volver a Repartos
+  </a>
+
+  <!-- CABECERA -->
+  <div class="op-head">
+    <div class="op-head__left">
+      <span class="op-head__tile"><span class="material-symbols-outlined">local_shipping</span></span>
+      <div>
+        <div class="op-head__titlerow">
+          <h1 class="op-head__title">Reparto #{{ viaje_reparto.id|default:"000" }}</h1>
+          <span class="rp-pill {% if viaje_reparto.ganancia >= 0 %}rp-pill--ok{% else %}rp-pill--bad{% endif %}">
+            <span class="rp-pill__dot"></span>{% if viaje_reparto.ganancia >= 0 %}Rentable{% else %}En perdida{% endif %}
+          </span>
+        </div>
+        <div class="op-head__meta">
+          <span class="op-head__metaitem">
+            <span class="material-symbols-outlined">event</span>
+            {{ viaje_reparto.fecha_viaje_reparto|date:"d/m/Y"|default:"--" }}
+          </span>
+          <span class="op-head__metaitem"><span class="material-symbols-outlined">person</span>{% if viaje_reparto.chofer %}{{ viaje_reparto.chofer.nombre }} {{ viaje_reparto.chofer.apellido }}{% else %}Sin chofer{% endif %}</span>
+          <span class="op-head__metaitem"><span class="material-symbols-outlined">local_shipping</span>{% if viaje_reparto.vehiculo %}{{ viaje_reparto.vehiculo.nombre }}{% else %}Sin vehiculo{% endif %}</span>
+        </div>
+      </div>
+    </div>
+    <div class="op-head__actions">
+      <button class="op-btn op-btn--dark" onclick="abrirSlideOver('slide-over-reparto-editar')">
+        <span class="material-symbols-outlined">edit</span>
+        Editar reparto
+      </button>
+      <button class="op-btn op-btn--danger" onclick="abrirPanelEliminar()">
+        <span class="material-symbols-outlined">delete</span>
+        Eliminar reparto
+      </button>
+    </div>
+  </div>
+
+  <!-- DATOS GENERALES + RESULTADO DEL REPARTO -->
+  <div class="op-grid">
+
+    <!-- Datos generales -->
+    <div class="op-card">
+      <div class="op-card__head">
+        <span class="material-symbols-outlined">info</span>
+        <h4>Datos generales</h4>
+      </div>
+      <div class="vd-data">
+        <div class="vd-data__row">
+          <span class="vd-data__ico"><span class="material-symbols-outlined">event</span></span>
+          <div class="vd-data__meta">
+            <div class="vd-data__label">Fecha del reparto</div>
+            <div class="vd-data__value">{{ viaje_reparto.fecha_viaje_reparto|date:"d/m/Y"|default:"--" }}</div>
+          </div>
+        </div>
+        <div class="vd-data__row">
+          <span class="vd-data__ico"><span class="material-symbols-outlined">local_shipping</span></span>
+          <div class="vd-data__meta">
+            <div class="vd-data__label">Vehiculo</div>
+            <div class="vd-data__value">{% if viaje_reparto.vehiculo %}{{ viaje_reparto.vehiculo.nombre }}<span class="vd-pat">{{ viaje_reparto.vehiculo.patente }}</span>{% else %}Vehiculo no especificado{% endif %}</div>
+          </div>
+        </div>
+        <div class="vd-data__row">
+          <span class="vd-avatar">{% if viaje_reparto.chofer %}{{ viaje_reparto.chofer.nombre|first|upper }}{{ viaje_reparto.chofer.apellido|first|upper }}{% else %}?{% endif %}</span>
+          <div class="vd-data__meta">
+            <div class="vd-data__label">Chofer</div>
+            <div class="vd-data__value">{% if viaje_reparto.chofer %}{{ viaje_reparto.chofer.nombre }} {{ viaje_reparto.chofer.apellido }}{% else %}Chofer no especificado{% endif %}</div>
+          </div>
+        </div>
+      </div>
+      <div class="vd-journey">
+        <div class="vd-journey__label">Ruta de destinos</div>
+        {% if viaje_reparto.destinos.all %}
+        <div class="vd-stops">
+          {% for d in viaje_reparto.destinos.all %}
+          <div class="vd-stop">
+            <div class="vd-stop__rail">
+              <span class="vd-stop__dot"></span>
+              <span class="vd-stop__line"></span>
+            </div>
+            <div class="vd-stop__body">
+              <div class="vd-stop__city">{{ d.destinos_reparto }}</div>
+              <div class="vd-stop__tag">{% if forloop.first %}Primera parada{% elif forloop.last %}Destino final{% else %}Parada {{ forloop.counter }}{% endif %}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <span class="vd-data__value">Sin destinos registrados</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Resultado del reparto -->
+    <div class="op-card">
+      <div class="op-card__head">
+        <span class="material-symbols-outlined">payments</span>
+        <h4>Resultado del reparto</h4>
+      </div>
+      <div class="vd-caja">
+        <div class="vd-caja__row vd-caja__row--head">
+          <span class="vd-caja__k vd-caja__k--strong"><span class="material-symbols-outlined">request_quote</span>Valor del viaje</span>
+          <span class="vd-caja__v">${{ viaje_reparto.valor_viaje|intcomma }}</span>
+        </div>
+        <div class="vd-gastos">
+          <div class="vd-gasto">
+            <span class="vd-gasto__ico"><span class="material-symbols-outlined">local_gas_station</span></span>
+            <span class="vd-gasto__name">Combustible</span>
+            <span class="vd-gasto__amt">-${{ viaje_reparto.gasto_combustible_viaje_reparto|intcomma }}</span>
+          </div>
+          <div class="vd-gasto">
+            <span class="vd-gasto__ico"><span class="material-symbols-outlined">badge</span></span>
+            <span class="vd-gasto__name">Costo del empleado</span>
+            <span class="vd-gasto__amt">-${{ viaje_reparto.costo_empleado|intcomma }}</span>
+          </div>
+        </div>
+        <div class="vd-caja__row vd-caja__row--total {% if viaje_reparto.ganancia < 0 %}vd-caja__row--loss{% endif %}">
+          <span class="vd-caja__k"><span class="material-symbols-outlined">savings</span>Ganancia neta</span>
+          <span class="vd-caja__v">${{ viaje_reparto.ganancia|intcomma }}</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- Panel de eliminacion -->
+<form id="formulario-eliminar" method="POST">
+  {% csrf_token %}
+  <div id="contenedor-panel-eliminar">
+    <div id="contenedor-panel-fondo" onclick="cerrarPanelEliminar()"></div>
+
+    <div id="panel-eliminar">
+      <input type="hidden" name="accion" value="eliminar_viaje_reparto">
+
+      <button type="button" class="boton-cerrar" id="icono-cerrar-panel-eliminar" onclick="cerrarPanelEliminar()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+
+      <div id="icono-advertencia">
+        <span class="material-symbols-outlined">warning</span>
+      </div>
+
+      <h3>Confirmar eliminacion</h3>
+      <p id="texto-confirmacion-eliminar">¿Está seguro que quiere eliminar este viaje de reparto?</p>
+
+      <div class="acciones-modal">
+        <button type="button" class="boton-secundario" onclick="cerrarPanelEliminar()">No, mantener</button>
+        <button type="button" class="boton-primario" id="boton-confirmar-eliminar"><span>Sí, eliminar</span></button>
+      </div>
+    </div>
+  </div>
+</form>
+
+<!-- PANEL LATERAL EDITAR REPARTO (SLIDE-OVER) -->
+<div id="slide-over-reparto-editar">
+  <div id="slide-over-fondo" onclick="cerrarSlideOver('slide-over-reparto-editar')"></div>
+
+  <div id="slide-over-panel">
+    <form id="form-reparto-editar" method="post" autocomplete="off">
+      {% csrf_token %}
+      <input type="hidden" name="accion" value="editar_viaje_reparto">
+
+      <!-- 1. Cabecera -->
+      <header class="panel-cabecera">
+        <div class="panel-titulo-fila">
+          <div class="icono-contenedor">
+            <span class="material-symbols-outlined">local_shipping</span>
+          </div>
+          <div class="texto-cabecera">
+            <h3>Editar reparto</h3>
+            <p>Modifique los datos del viaje</p>
+          </div>
+        </div>
+        <button type="button" class="boton-cerrar" onclick="cerrarSlideOver('slide-over-reparto-editar')">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </header>
+
+      <!-- 2. Cuerpo con scroll -->
+      <main class="panel-cuerpo">
+
+        <!-- Seccion 1: Asignacion -->
+        <section class="seccion-bloque">
+          <div class="subtitulo-formulario">
+            <span class="material-symbols-outlined">group</span>
+            <h4>Asignacion</h4>
+          </div>
+
+          <div class="grupo-input">
+            <label for="chofer-reparto-editar">Chofer</label>
+            <select id="chofer-reparto-editar" name="id_chofer" class="select-estandar" required>
+              <option value="" disabled>Seleccione un chofer</option>
+              {% for chofer in choferes %}
+              <option value="{{ chofer.id }}" {% if viaje_reparto.chofer_id == chofer.id %}selected{% endif %}>{{ chofer.nombre }} {{ chofer.apellido }}</option>
+              {% endfor %}
+            </select>
+            <span class="mensaje-error">Por favor, seleccione un chofer de la lista.</span>
+          </div>
+
+          <div class="grupo-input">
+            <label for="vehiculo-reparto-editar">Vehiculo</label>
+            <select id="vehiculo-reparto-editar" name="id_vehiculo" class="select-estandar" required>
+              <option value="" disabled>Seleccione un vehiculo</option>
+              {% for vehiculo in vehiculos %}
+              <option value="{{ vehiculo.id }}" {% if viaje_reparto.vehiculo_id == vehiculo.id %}selected{% endif %}>{{ vehiculo.nombre }} ({{ vehiculo.patente }})</option>
+              {% endfor %}
+            </select>
+            <span class="mensaje-error">Por favor, seleccione un vehiculo de la lista.</span>
+          </div>
+        </section>
+
+        <!-- Seccion 2: Recorrido -->
+        <section class="seccion-bloque">
+          <div class="subtitulo-formulario">
+            <span class="material-symbols-outlined">location_on</span>
+            <h4>Recorrido</h4>
+          </div>
+
+          <div class="grupo-input" id="contenedor-destinos-reparto-editar">
+            <label for="destino-reparto-editar">Destinos</label>
+            {% for destino in viaje_reparto.destinos.all %}
+            <input
+              type="text"
+              name="destino_reparto"
+              placeholder="Ej: Buenos Aires"
+              required
+              maxlength="30"
+              pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}"
+              value="{{ destino.destinos_reparto }}"
+              data-autocompletar-ciudad
+              {% if forloop.first %}id="destino-reparto-editar"{% endif %}>
+            {% empty %}
+            <input
+              type="text"
+              id="destino-reparto-editar"
+              name="destino_reparto"
+              placeholder="Ej: Buenos Aires"
+              required
+              maxlength="30"
+              pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}"
+              data-autocompletar-ciudad>
+            {% endfor %}
+
+            <div class="vje-destacciones">
+              <button type="button" id="btn-agregar-destino-reparto-editar" class="vje-addbtn">
+                <span class="material-symbols-outlined">add_circle</span>
+                Añadir un destino
+              </button>
+              <button type="button" id="btn-quitar-destino-reparto-editar" class="vje-removebtn">
+                <span class="material-symbols-outlined">do_not_disturb_on</span>
+                Quitar destino
+              </button>
+            </div>
+            <span class="mensaje-error">Minimo 3 caracteres (Solo letras y numeros)</span>
+          </div>
+        </section>
+
+        <!-- Seccion 3: Costos -->
+        <section class="seccion-bloque">
+          <div class="subtitulo-formulario">
+            <span class="material-symbols-outlined">payments</span>
+            <h4>Costos</h4>
+          </div>
+
+          <div class="grupo-input">
+            <label for="gasto-combustible-reparto-editar">Gasto de combustible</label>
+            <div class="input-con-icono">
+              <span>$</span>
+              <input
+                type="number"
+                id="gasto-combustible-reparto-editar"
+                name="gasto_combustible_viaje_reparto"
+                placeholder="0"
+                step="1"
+                min="1"
+                required
+                value="{{ viaje_reparto.gasto_combustible_viaje_reparto }}">
+            </div>
+            <span class="mensaje-error">Por favor, ingrese un monto valido.</span>
+          </div>
+
+          <div class="vje-grid2">
+            <div class="grupo-input">
+              <label for="empleado-costo-reparto-editar">Costo empleado</label>
+              <div class="input-con-icono">
+                <span>$</span>
+                <input
+                  type="number"
+                  id="empleado-costo-reparto-editar"
+                  name="costo_empleado"
+                  placeholder="0"
+                  step="1"
+                  min="1"
+                  required
+                  value="{{ viaje_reparto.costo_empleado }}">
+              </div>
+              <span class="mensaje-error">Por favor, ingrese un monto valido.</span>
+            </div>
+
+            <div class="grupo-input">
+              <label for="valor-viaje-reparto-editar">Valor del viaje</label>
+              <div class="input-con-icono">
+                <span>$</span>
+                <input
+                  type="number"
+                  id="valor-viaje-reparto-editar"
+                  name="valor_viaje"
+                  placeholder="0"
+                  step="1"
+                  min="1"
+                  required
+                  value="{{ viaje_reparto.valor_viaje }}">
+              </div>
+              <span class="mensaje-error">Por favor, ingrese un monto valido.</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Seccion 4: Fecha -->
+        <section class="seccion-bloque">
+          <div class="subtitulo-formulario">
+            <span class="material-symbols-outlined">event</span>
+            <h4>Fecha</h4>
+          </div>
+
+          <div class="grupo-input">
+            <label for="fecha-reparto-editar">Fecha del reparto</label>
+            <input type="date" id="fecha-reparto-editar" name="fecha_viaje_reparto" required
+                   value="{{ viaje_reparto.fecha_viaje_reparto|date:'Y-m-d' }}">
+            <span class="mensaje-error">Por favor, seleccione una fecha valida.</span>
+          </div>
+        </section>
+      </main>
+
+      <!-- 3. Pie del panel -->
+      <footer class="panel-pie">
+        <button type="submit" class="boton-primario">Guardar cambios</button>
+        <button type="button" class="boton-secundario" onclick="cerrarSlideOver('slide-over-reparto-editar')">Cancelar</button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block codigo-javascript %}
+<script src="{% static 'js/autocompletado_ciudades.js' %}"></script>
+<script src="{% static 'js/informacion_viaje_reparto.js' %}"></script>
 {% endblock %}

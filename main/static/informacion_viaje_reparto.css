@@ -1,0 +1,303 @@
+/* ============================================================
+   Estilos propios de la vista "Informacion del viaje de reparto".
+   La estructura general (cabecera op-head, tarjetas op-card, datos
+   vd-*, panel de eliminacion) se reutiliza de informacion_viaje.css.
+   Aca solo va lo especifico del reparto: la pildora de resultado de
+   la cabecera, la variante de "perdida" en el total y el slide-over
+   de edicion (#slide-over-reparto-editar).
+   ============================================================ */
+
+/* --- Pildora de resultado en la cabecera (rentable / en perdida) --- */
+.rp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+}
+
+.rp-pill__dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+
+.rp-pill--ok { background-color: var(--success-50); border: 1px solid var(--success-200); color: var(--success-600); }
+.rp-pill--ok .rp-pill__dot { background-color: var(--success-600); }
+
+.rp-pill--bad { background-color: var(--danger-50); border: 1px solid var(--danger-500); color: var(--danger-600); }
+.rp-pill--bad .rp-pill__dot { background-color: var(--danger-600); }
+
+/* --- Variante de "perdida" para la fila de ganancia neta --- */
+.vd-caja__row--total.vd-caja__row--loss {
+  background-color: var(--danger-50);
+  border-top: 1px solid var(--danger-500);
+}
+.vd-caja__row--total.vd-caja__row--loss .vd-caja__k,
+.vd-caja__row--total.vd-caja__row--loss .vd-caja__k .material-symbols-outlined,
+.vd-caja__row--total.vd-caja__row--loss .vd-caja__v {
+  color: var(--danger-600);
+}
+
+/* ============================================================
+   Slide-over de edicion del viaje de reparto.
+   Replica del panel de edicion de informacion_viaje.css
+   (#slide-over-viaje), acotado a #slide-over-reparto-editar. Las
+   clases internas (.panel-cabecera, .grupo-input, etc.) y la base de
+   #slide-over-panel / #slide-over-fondo se heredan de
+   panel_compartido.css; aca solo se define el contenedor, sus
+   estados de apertura y el reskin con el design system.
+   ============================================================ */
+#slide-over-reparto-editar {
+  position: fixed;
+  inset: 0;
+  z-index: 1100; /* Por encima de la barra superior mobile (#mobile-top-bar: 1000) */
+  visibility: hidden;
+  overflow: hidden;
+  display: flex;
+  justify-content: flex-end;
+  transition: visibility 0.3s;
+}
+
+#slide-over-reparto-editar.slide-over-abierto {
+  visibility: visible;
+  pointer-events: auto;
+  transition: none;
+}
+
+#slide-over-reparto-editar.slide-over-abierto #slide-over-fondo {
+  opacity: 1;
+}
+
+#slide-over-reparto-editar.slide-over-abierto #slide-over-panel {
+  transform: translateX(0);
+}
+
+#form-reparto-editar {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#slide-over-reparto-editar #slide-over-fondo {
+  background-color: var(--overlay-ink);
+}
+
+#slide-over-reparto-editar #slide-over-panel {
+  max-width: 28rem;
+  background-color: var(--surface-card);
+  box-shadow: -12px 0 24px -8px var(--shadow-tint);
+  transition: transform var(--dur-slow) var(--ease-standard);
+}
+
+#slide-over-reparto-editar .panel-cabecera {
+  border-bottom: 1px solid var(--border-subtle);
+  background-color: var(--surface-card);
+}
+
+#slide-over-reparto-editar .icono-contenedor {
+  background-color: var(--honey-tint-10);
+  color: var(--brand-active);
+  border-radius: var(--radius-md);
+}
+
+#slide-over-reparto-editar .texto-cabecera h3 {
+  color: var(--text-strong);
+  font-size: var(--text-md);
+  font-weight: var(--weight-bold);
+}
+
+#slide-over-reparto-editar .texto-cabecera p {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+#slide-over-reparto-editar .boton-cerrar {
+  color: var(--sand-400);
+  transition: all var(--dur-normal) var(--ease-standard);
+}
+
+#slide-over-reparto-editar .boton-cerrar:hover {
+  background-color: var(--surface-hover);
+  color: var(--text-muted);
+}
+
+#slide-over-reparto-editar .panel-cuerpo {
+  gap: 1.35rem;
+}
+
+#slide-over-reparto-editar .panel-cuerpo::-webkit-scrollbar-thumb {
+  background-color: var(--border-subtle);
+}
+
+/* Secciones planas con divisor inferior */
+#slide-over-reparto-editar .seccion-bloque {
+  gap: 0.85rem;
+  padding-bottom: 1.35rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+#slide-over-reparto-editar .seccion-bloque:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+#slide-over-reparto-editar .subtitulo-formulario {
+  padding: 0;
+}
+
+#slide-over-reparto-editar .subtitulo-formulario span {
+  color: var(--brand-active);
+  font-size: 1.2rem;
+}
+
+#slide-over-reparto-editar .subtitulo-formulario h4 {
+  color: var(--text-strong);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-wide);
+}
+
+/* Inputs y selects */
+#slide-over-reparto-editar .grupo-input label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-body);
+}
+
+#slide-over-reparto-editar .grupo-input input,
+#slide-over-reparto-editar .grupo-input select {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--text-strong);
+  font-family: inherit;
+  outline: none;
+  box-shadow: 0 1px 2px var(--color-sombra-1);
+  transition: all var(--dur-normal) var(--ease-standard);
+}
+
+#slide-over-reparto-editar .grupo-input select { cursor: pointer; }
+
+#slide-over-reparto-editar .grupo-input input::placeholder {
+  color: var(--text-subtle);
+}
+
+#slide-over-reparto-editar .grupo-input input:focus,
+#slide-over-reparto-editar .grupo-input select:focus {
+  border-color: var(--brand);
+  background-color: var(--surface-card);
+  box-shadow: var(--ring);
+}
+
+#slide-over-reparto-editar .input-con-icono span {
+  color: var(--brand-active);
+}
+
+#slide-over-reparto-editar .input-con-icono input { padding-left: 2.25rem; }
+
+/* Grid de dos columnas (costo empleado / valor del viaje) */
+#slide-over-reparto-editar .vje-grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+/* Editor de multiples destinos */
+#slide-over-reparto-editar .vje-destacciones {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.125rem;
+}
+
+#slide-over-reparto-editar .vje-addbtn {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: none;
+  border: none;
+  color: var(--brand-active);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  padding: 0.25rem 0;
+  width: fit-content;
+}
+
+#slide-over-reparto-editar .vje-addbtn:hover { color: var(--honey-700); }
+#slide-over-reparto-editar .vje-addbtn .material-symbols-outlined { font-size: 18px; }
+
+#slide-over-reparto-editar .vje-removebtn {
+  display: none; /* JS lo muestra como flex cuando hay mas de un destino */
+  align-items: center;
+  gap: 0.25rem;
+  background: none;
+  border: none;
+  color: var(--color-rojo-eliminacion);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  padding: 0.25rem 0;
+  width: fit-content;
+}
+
+#slide-over-reparto-editar .vje-removebtn .material-symbols-outlined { font-size: 18px; }
+
+/* Pie del panel */
+#slide-over-reparto-editar .panel-pie {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-subtle);
+  background-color: var(--surface-sunken);
+}
+
+#slide-over-reparto-editar .boton-primario {
+  background-color: var(--brand-secondary);
+  color: var(--text-on-inverse);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+  box-shadow: var(--shadow-md);
+  transition: all var(--dur-normal) var(--ease-standard);
+  font-family: inherit;
+}
+
+#slide-over-reparto-editar .boton-primario:hover { background-color: var(--pine-950); filter: none; }
+#slide-over-reparto-editar .boton-primario:active { transform: scale(0.98); }
+
+#slide-over-reparto-editar .boton-secundario {
+  background-color: var(--surface-card);
+  color: var(--text-body);
+  border: 1px solid var(--border-subtle);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+  transition: all var(--dur-normal) var(--ease-standard);
+  font-family: inherit;
+}
+
+#slide-over-reparto-editar .boton-secundario:hover { background-color: var(--surface-hover); }
+
+@media (max-width: 600px) {
+  #slide-over-reparto-editar #slide-over-panel {
+    width: 100%;
+    border-radius: 0;
+  }
+
+  #slide-over-reparto-editar .vje-grid2 {
+    grid-template-columns: 1fr;
+  }
+
+  #slide-over-reparto-editar .panel-pie {
+    flex-direction: column;
+  }
+
+  #slide-over-reparto-editar .panel-pie button {
+    width: 100%;
+  }
+}
