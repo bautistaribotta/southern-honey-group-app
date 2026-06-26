@@ -98,7 +98,9 @@ const prepararPanelNuevoProducto = () => {
   // Limpio el formulario y el ID oculto
   document.getElementById('form-producto').reset();
   document.getElementById('id_producto').value = '';
+  // Stock solo se carga en el alta: muestro y habilito el campo
   document.getElementById('campo-stock-container').style.display = 'flex';
+  document.getElementById('stock').disabled = false;
 
   if (typeof abrirSlideOver === 'function') abrirSlideOver();
 };
@@ -124,8 +126,10 @@ const prepararPanelNuevoProducto = () => {
       document.getElementById('categoria').value = producto.categoria;
       document.getElementById('precio').value = producto.precio;
 
-      // Oculto el campo de stock porque se maneja en un modal aparte
+      // Oculto y deshabilito el stock: al editar no se modifica (se maneja en el
+      // modal de agregar/quitar). Deshabilitado, ademas, no viaja en el submit.
       document.getElementById('campo-stock-container').style.display = 'none';
+      document.getElementById('stock').disabled = true;
 
       if (typeof abrirSlideOver === 'function') abrirSlideOver();
     })

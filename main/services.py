@@ -83,13 +83,16 @@ def modificar_stock(id_producto, cantidad):
     return Producto.objects.get(id=id_producto)
 
 
-def editar_producto(id_producto, nombre, categoria, precio, cantidad, activo):
+def editar_producto(id_producto, nombre, categoria, precio, activo):
+    # El stock NO se modifica al editar: se gestiona solo en el alta y con el modal
+    # de agregar/quitar (UPDATE atomico). Asi evito el lost update de pisar 'cantidad'
+    # con un valor del form leido al abrir la pantalla, descartando una venta o compra
+    # concurrente que haya movido el stock entremedio.
     producto = get_object_or_404(Producto, id=id_producto)
 
     producto.nombre = nombre
     producto.categoria = categoria
     producto.precio = precio
-    producto.cantidad = cantidad
     producto.activo = activo
 
     producto.save()

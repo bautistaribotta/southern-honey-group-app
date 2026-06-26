@@ -137,7 +137,7 @@ def productos(request):
             # Si es una EDICION
             if id_producto:
                 editar_producto(
-                    id_producto, nombre_producto, categoria, precio, cantidad, True
+                    id_producto, nombre_producto, categoria, precio, True
                 )
                 messages.success(request, "Producto editado correctamente")
 
