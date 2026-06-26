@@ -2,11 +2,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Selecciono los elementos del DOM que voy a usar para la búsqueda
     const inputBusqueda = document.getElementById('buscar-deudor');
     const contenedorTabla = document.getElementById('tabla-deudores-container');
-    const pildoras = document.querySelectorAll('.deu-pill');
+    const pildoras = document.querySelectorAll('#chips-orden .prod-chip');
 
     // Devuelve el orden actualmente seleccionado por las píldoras
     const ordenActivo = () => {
-        const activa = document.querySelector('.deu-pill.is-active');
+        const activa = document.querySelector('#chips-orden .prod-chip.is-active');
         return activa ? activa.dataset.orden : 'monto';
     };
 
