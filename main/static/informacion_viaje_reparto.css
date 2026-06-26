@@ -2,29 +2,9 @@
    Estilos propios de la vista "Informacion del viaje de reparto".
    La estructura general (cabecera op-head, tarjetas op-card, datos
    vd-*, panel de eliminacion) se reutiliza de informacion_viaje.css.
-   Aca solo va lo especifico del reparto: la pildora de resultado de
-   la cabecera, la variante de "perdida" en el total y el slide-over
-   de edicion (#slide-over-reparto-editar).
+   Aca solo va lo especifico del reparto: la variante de "perdida" en
+   el total y el slide-over de edicion (#slide-over-reparto-editar).
    ============================================================ */
-
-/* --- Pildora de resultado en la cabecera (rentable / en perdida) --- */
-.rp-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.25rem 0.7rem;
-  border-radius: var(--radius-pill);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-semibold);
-}
-
-.rp-pill__dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
-
-.rp-pill--ok { background-color: var(--success-50); border: 1px solid var(--success-200); color: var(--success-600); }
-.rp-pill--ok .rp-pill__dot { background-color: var(--success-600); }
-
-.rp-pill--bad { background-color: var(--danger-50); border: 1px solid var(--danger-500); color: var(--danger-600); }
-.rp-pill--bad .rp-pill__dot { background-color: var(--danger-600); }
 
 /* --- Variante de "perdida" para la fila de ganancia neta --- */
 .vd-caja__row--total.vd-caja__row--loss {
