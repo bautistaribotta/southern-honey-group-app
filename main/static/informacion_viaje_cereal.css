@@ -77,6 +77,13 @@
   color: var(--text-muted);
 }
 
+/* El icono de "Pago del chofer" va en caja neutra (igual que los gastos), no con
+   el color de marca de los iconos de resumen. Gano especificidad a la regla
+   .vd-caja__k .material-symbols-outlined de informacion_viaje.css. */
+.vd-caja__k .vd-gasto__ico .material-symbols-outlined {
+  color: var(--text-muted);
+}
+
 /* ============================================================
    Slide-over de edicion del viaje de cereal.
    Replica del panel de edicion de informacion_viaje.css
