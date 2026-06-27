@@ -22,7 +22,7 @@ from .services import (nuevo_producto, editar_producto, eliminar_producto, nuevo
                        crear_viaje_cereal, obtener_viajes_cereales, obtener_datos_viaje_cereal,
                        editar_viaje_cereal, eliminar_viaje_cereal, crear_gasto_viaje_cereal,
                        crear_viaje_reparto, obtener_viajes_reparto, obtener_datos_viaje_reparto,
-                       editar_viaje_reparto, eliminar_viaje_reparto)
+                       editar_viaje_reparto, eliminar_viaje_reparto, crear_gasto_viaje_reparto)
 
 
 def login(request):
@@ -1021,6 +1021,20 @@ def informacion_viaje_reparto(request, id_viaje_reparto):
                     destinos=destinos,
                 )
                 messages.success(request, "Viaje de reparto modificado exitosamente.")
+            except ValueError as e:
+                messages.error(request, str(e))
+            except Exception as e:
+                messages.error(request, f"Ocurrió un error inesperado: {e}")
+
+            return redirect("informacion_viaje_reparto", id_viaje_reparto=id_viaje_reparto)
+
+        elif accion == "nuevo_gasto_reparto":
+            tipo_gasto = request.POST.get("tipo_gasto")
+            monto_gasto = request.POST.get("monto_gasto")
+
+            try:
+                crear_gasto_viaje_reparto(id_viaje_reparto, tipo_gasto, monto_gasto)
+                messages.success(request, "Gasto registrado exitosamente.")
             except ValueError as e:
                 messages.error(request, str(e))
             except Exception as e:

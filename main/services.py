@@ -11,7 +11,7 @@ from django.db.models.functions import Coalesce
 from django.core.cache import cache
 from .models import (Producto, Cliente, Operacion, DetalleOperacion, Pago, Cotizaciones, Chofer, Vehiculo, Viaje,
                      DetalleViaje, Gasto, ViajeCereal, DetalleViajeCereal, GastoViajeCereal,
-                     ViajeReparto, DetalleViajeReparto)
+                     ViajeReparto, DetalleViajeReparto, GastoViajeReparto)
 
 
 # --- Validadores REGEX ---
@@ -1039,12 +1039,41 @@ def obtener_viajes_reparto():
 
 
 def obtener_datos_viaje_reparto(id_viaje_reparto):
-    # Trae un viaje de reparto activo con sus relaciones listas para la vista de informacion
+    # Trae un viaje de reparto activo con sus relaciones listas para la vista de informacion.
+    # Precargo tambien los gastos para que la tarjeta de resultado no dispare queries extra.
     return get_object_or_404(
-        ViajeReparto.objects.select_related("chofer", "vehiculo").prefetch_related("destinos"),
+        ViajeReparto.objects.select_related("chofer", "vehiculo")
+        .prefetch_related("destinos", "detalle_gastos"),
         id=id_viaje_reparto,
         activo=True,
     )
+
+
+def crear_gasto_viaje_reparto(id_viaje_reparto, tipo_gasto, monto):
+    # Mismo patron que crear_gasto_viaje_cereal, sobre la tabla GastoViajeReparto.
+    # Cada gasto cargado recalcula la ganancia, porque la property del modelo se deriva
+    # de la suma de gastos del viaje.
+    viaje_reparto = get_object_or_404(ViajeReparto, id=id_viaje_reparto)
+
+    # Validamos que el tipo de gasto sea correcto
+    tipos_validos = dict(GastoViajeReparto._meta.get_field("gasto").choices).keys()
+    if tipo_gasto not in tipos_validos:
+        raise ValueError(f"El tipo de gasto '{tipo_gasto}' no es válido.")
+
+    # Validamos el monto
+    try:
+        monto_val = int(monto)
+        if monto_val <= 0:
+            raise ValueError()
+    except (ValueError, TypeError):
+        raise ValueError("El monto debe ser un número entero positivo mayor a 0.")
+
+    nuevo_gasto = GastoViajeReparto.objects.create(
+        viaje_reparto=viaje_reparto,
+        gasto=tipo_gasto,
+        monto=monto_val
+    )
+    return nuevo_gasto
 
 
 def editar_viaje_reparto(id_viaje_reparto, id_chofer, id_vehiculo, gasto_combustible,

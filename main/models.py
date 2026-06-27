@@ -322,10 +322,17 @@ class ViajeReparto(models.Model):
     class Meta:
         db_table = "viaje_reparto"
 
-    # Calculo la ganancia como el valor del viaje - combustible - nomina empleado
+    @property
+    def total_gastos(self) -> int:
+        # Suma de los gastos extra cargados a este viaje de reparto (tabla hija).
+        # Si el viaje no tiene gastos, aggregate devuelve None y lo normalizo a 0.
+        resultado = self.detalle_gastos.aggregate(total=Sum('monto'))['total']
+        return resultado if resultado is not None else 0
+
+    # Ganancia: valor del viaje menos combustible, nomina del empleado y los gastos extra
     @property
     def ganancia(self):
-        return self.valor_viaje - self.gasto_combustible_viaje_reparto - self.costo_empleado
+        return self.valor_viaje - self.gasto_combustible_viaje_reparto - self.costo_empleado - self.total_gastos
 
     def __str__(self):
         return f"Viaje reparto nro: {self.id}"
@@ -341,6 +348,21 @@ class DetalleViajeReparto(models.Model):
 
     def __str__(self):
         return f"Destino {self.destinos_reparto} del {self.viaje_reparto}"
+
+
+class GastoViajeReparto(models.Model):
+    # Reutilizo las mismas categorias de gasto que los viajes comunes (tabla Gasto)
+    viaje_reparto = models.ForeignKey(ViajeReparto, on_delete=models.CASCADE,
+                                      related_name="detalle_gastos", db_column="id_viajereparto")
+    gasto = models.CharField(choices=Gasto.TIPO_GASTOS, max_length=25)
+    monto = models.IntegerField(default=0)
+    fecha = models.DateField(auto_now_add=True)
+
+    class Meta:
+        db_table = "gastos_viaje_reparto"
+
+    def __str__(self):
+        return f"Gasto {self.gasto} de {self.monto} pesos (Viaje reparto: {self.viaje_reparto})"
 
 
 class ViajeCereal(models.Model):

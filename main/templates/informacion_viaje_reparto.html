@@ -117,6 +117,10 @@
       <div class="op-card__head">
         <span class="material-symbols-outlined">payments</span>
         <h4>Resultado del reparto</h4>
+        <button class="op-btn op-btn--secondary op-btn--sm vd-headbtn" onclick="abrirModalGasto()">
+          <span class="material-symbols-outlined">add</span>
+          Anadir gasto
+        </button>
       </div>
       <div class="vd-caja">
         <div class="vd-caja__row vd-caja__row--head">
@@ -126,14 +130,21 @@
         <div class="vd-gastos">
           <div class="vd-gasto">
             <span class="vd-gasto__ico"><span class="material-symbols-outlined">local_gas_station</span></span>
-            <span class="vd-gasto__name">Combustible</span>
+            <span class="vd-gasto__name">Combustible<span class="vd-gasto__date">{{ viaje_reparto.fecha_viaje_reparto|date:"d/m/Y" }}</span></span>
             <span class="vd-gasto__amt">-${{ viaje_reparto.gasto_combustible_viaje_reparto|intcomma }}</span>
           </div>
           <div class="vd-gasto">
             <span class="vd-gasto__ico"><span class="material-symbols-outlined">badge</span></span>
-            <span class="vd-gasto__name">Costo del empleado</span>
+            <span class="vd-gasto__name">Costo del empleado<span class="vd-gasto__date">{{ viaje_reparto.fecha_viaje_reparto|date:"d/m/Y" }}</span></span>
             <span class="vd-gasto__amt">-${{ viaje_reparto.costo_empleado|intcomma }}</span>
           </div>
+          {% for gasto in viaje_reparto.detalle_gastos.all %}
+          <div class="vd-gasto">
+            <span class="vd-gasto__ico"><span class="material-symbols-outlined">{% if gasto.gasto == 'Comida' %}restaurant{% elif gasto.gasto == 'Combustible' %}local_gas_station{% elif gasto.gasto == 'Playa' %}local_parking{% elif gasto.gasto == 'Peaje' %}toll{% elif gasto.gasto == 'Hotel' %}hotel{% elif gasto.gasto == 'Viaticos personales' %}wallet{% else %}more_horiz{% endif %}</span></span>
+            <span class="vd-gasto__name">{{ gasto.gasto }}<span class="vd-gasto__date">{{ gasto.fecha|date:"d/m/Y" }}</span></span>
+            <span class="vd-gasto__amt">-${{ gasto.monto|intcomma }}</span>
+          </div>
+          {% endfor %}
         </div>
         <div class="vd-caja__row vd-caja__row--total {% if viaje_reparto.ganancia < 0 %}vd-caja__row--loss{% endif %}">
           <span class="vd-caja__k"><span class="material-symbols-outlined">savings</span>Ganancia neta</span>
@@ -145,6 +156,64 @@
   </div>
 
 </section>
+
+<!-- Panel de Nuevo Gasto -->
+<form id="formulario-gasto" method="POST">
+  {% csrf_token %}
+  <div id="contenedor-modal-gasto">
+    <div id="contenedor-modal-fondo-gasto" onclick="cerrarModalGasto()"></div>
+
+    <div id="panel-gasto">
+      <input type="hidden" name="accion" value="nuevo_gasto_reparto">
+
+      <button type="button" class="boton-cerrar" onclick="cerrarModalGasto()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+
+      <div id="icono-gasto">
+        <span class="material-symbols-outlined">payments</span>
+      </div>
+
+      <h3>Registrar gasto</h3>
+      <p>Seleccioná el tipo de gasto e ingresá el monto. La ganancia neta se recalcula sola.</p>
+
+      <div class="grupo-input">
+        <label for="tipo-gasto">Tipo de gasto</label>
+        <select id="tipo-gasto" name="tipo_gasto" required class="vd-select">
+          <option value="" disabled selected>Seleccione un tipo</option>
+          <option value="Comida">Comida</option>
+          <option value="Combustible">Combustible</option>
+          <option value="Playa">Playa</option>
+          <option value="Peaje">Peaje</option>
+          <option value="Hotel">Hotel</option>
+          <option value="Viaticos personales">Viaticos personales</option>
+          <option value="Extras">Extras</option>
+        </select>
+      </div>
+
+      <div class="grupo-input">
+        <label for="monto-gasto">Monto total</label>
+        <div class="input-con-icono">
+          <span>$</span>
+          <input
+            type="number"
+            id="monto-gasto"
+            name="monto_gasto"
+            placeholder="0"
+            step="1"
+            min="1"
+            required>
+        </div>
+        <span class="vd-hint">Numero entero, sin puntos ni comas.</span>
+      </div>
+
+      <div class="acciones-modal">
+        <button type="submit" class="boton-primario">Guardar</button>
+        <button type="button" class="boton-secundario" onclick="cerrarModalGasto()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</form>
 
 <!-- Panel de eliminacion -->
 <form id="formulario-eliminar" method="POST">

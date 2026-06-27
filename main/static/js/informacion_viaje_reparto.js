@@ -2,7 +2,21 @@
 // La eliminacion reutiliza abrirPanelEliminar()/cerrarPanelEliminar() de
 // paneles.js (mismo markup #contenedor-panel-eliminar / #boton-confirmar-eliminar)
 // y la apertura/cierre del slide-over usa abrirSlideOver()/cerrarSlideOver().
-// Aca solo va el alta/baja dinamica de destinos en el panel de edicion.
+// Aca van el modal de "Registrar gasto" y el alta/baja dinamica de destinos.
+
+function abrirModalGasto() {
+    document.getElementById('contenedor-modal-gasto').classList.add('abierto');
+    document.body.style.overflow = 'hidden';
+}
+
+function cerrarModalGasto() {
+    document.getElementById('contenedor-modal-gasto').classList.remove('abierto');
+    document.body.style.overflow = 'auto';
+    const formGasto = document.getElementById('formulario-gasto');
+    if (formGasto) {
+        formGasto.reset();
+    }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     const btnAgregarDestino = document.getElementById('btn-agregar-destino-reparto-editar');
