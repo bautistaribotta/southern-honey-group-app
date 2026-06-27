@@ -199,7 +199,7 @@
         </thead>
         <tbody>
           {% for operacion in operaciones %}
-          <tr data-url="{% url 'informacion_operacion' operacion.id %}" data-tipo="{{ operacion.tipo_operacion }}" onclick="window.location.href=this.dataset.url" class="fila-operacion">
+          <tr data-url="{% url 'informacion_operacion' operacion.id %}?origen=viaje" data-tipo="{{ operacion.tipo_operacion }}" onclick="window.location.href=this.dataset.url" class="fila-operacion">
             <td class="vd-op-fecha">{{ operacion.fecha|date:"d/m/Y" }}</td>
             <td><span class="vd-op-cli">{{ operacion.cliente.nombre }} {{ operacion.cliente.apellido|default:"" }}</span></td>
             <td>

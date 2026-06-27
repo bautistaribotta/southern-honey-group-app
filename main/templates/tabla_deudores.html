@@ -10,7 +10,7 @@
         </thead>
         <tbody>
           {% for deudor in deudores %}
-            <tr data-url="{% url 'informacion_operacion' deudor.id %}" onclick="window.location.href=this.dataset.url" class="fila-deudor">
+            <tr data-url="{% url 'informacion_operacion' deudor.id %}?origen=deudores" onclick="window.location.href=this.dataset.url" class="fila-deudor">
               <td>
                 <div class="deu-cliente">
                   <span class="deu-avatar">{{ deudor.iniciales }}</span>

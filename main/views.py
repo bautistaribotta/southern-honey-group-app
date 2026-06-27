@@ -1,6 +1,7 @@
 import json
 
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
@@ -783,7 +784,12 @@ def flota(request):
             # Capturo errores inesperados (ej: base de datos)
             messages.error(request, f"Ocurrió un error inesperado: {e}")
 
-        return redirect("flota")
+        # Conservo el origen de navegacion para que el boton "Volver" siga apuntando bien
+        origen = request.GET.get("origen", "")
+        url_flota = reverse("flota")
+        if origen:
+            url_flota = f"{url_flota}?origen={origen}"
+        return redirect(url_flota)
 
     contexto = {
         "choferes": obtener_choferes_activos(),

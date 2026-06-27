@@ -13,8 +13,18 @@
 {% block area-trabajo %}
 <div id="espacio-trabajo-cliente" class="op-screen">
 
-    <!-- Volver -->
-    {% if operacion.viaje %}
+    <!-- Volver: el destino depende del origen de navegacion (?origen=) -->
+    {% if request.GET.origen == 'deudores' %}
+    <a href="{% url 'deudores' %}" class="boton-volver">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Volver a Deudores
+    </a>
+    {% elif request.GET.origen == 'cliente' %}
+    <a href="{% url 'informacion_clientes' operacion.cliente.id %}" class="boton-volver">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Volver al perfil de {{ operacion.cliente.nombre }} {{ operacion.cliente.apellido|default:"" }}
+    </a>
+    {% elif operacion.viaje %}
     <a href="{% url 'informacion_viaje' operacion.viaje.id %}" class="boton-volver">
         <span class="material-symbols-outlined">arrow_back</span>
         Volver al viaje #{{ operacion.viaje.id }}
