@@ -30,10 +30,16 @@
       </div>
     </div>
 
-    <button id="nuevo-viaje-meli" onclick="abrirSlideOver('slide-over-reparto')">
-      <span class="material-symbols-outlined">local_shipping</span>
-      <span class="boton-nuevo-reparto"> Nuevo reparto </span>
-    </button>
+    <div class="grupo-botones-meli">
+      <a id="btn-gestionar-flota-meli" href="{% url 'flota' %}">
+        <span class="material-symbols-outlined">groups</span>
+        <span class="boton-nuevo-reparto"> Choferes y Vehiculos </span>
+      </a>
+      <button id="nuevo-viaje-meli" onclick="abrirSlideOver('slide-over-reparto')">
+        <span class="material-symbols-outlined">local_shipping</span>
+        <span class="boton-nuevo-reparto"> Nuevo reparto </span>
+      </button>
+    </div>
   </div>
 
   <!-- Tabla de Viajes de reparto -->
