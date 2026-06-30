@@ -288,7 +288,7 @@ class DetalleViaje(models.Model):
         return f"Destino {self.destino} (Viaje {self.viaje_id})"
 
 
-class Gasto(models.Model):
+class GastoBase(models.Model):
     TIPO_GASTOS = [
         ("Comida", "Comida"),
         ("Combustible", "Combustible"),
@@ -298,10 +298,16 @@ class Gasto(models.Model):
         ("Viaticos personales", "Viaticos personales"),
         ("Extras", "Extras")
     ]
-    viaje = models.ForeignKey(Viaje, on_delete=models.CASCADE, related_name="detalle_gastos", db_column="id_viaje")
+    fecha = models.DateField(auto_now_add=True)
     gasto = models.CharField(choices=TIPO_GASTOS, max_length=25)
     monto = models.IntegerField(default=0)
-    fecha = models.DateField(auto_now_add=True)
+
+    class Meta:
+        abstract = True
+
+
+class Gasto(GastoBase):
+    viaje = models.ForeignKey(Viaje, on_delete=models.CASCADE, related_name="detalle_gastos", db_column="id_viaje")
 
     class Meta:
         db_table = "gastos"
@@ -350,13 +356,9 @@ class DetalleViajeReparto(models.Model):
         return f"Destino {self.destinos_reparto} del {self.viaje_reparto}"
 
 
-class GastoViajeReparto(models.Model):
-    # Reutilizo las mismas categorias de gasto que los viajes comunes (tabla Gasto)
+class GastoViajeReparto(GastoBase):
     viaje_reparto = models.ForeignKey(ViajeReparto, on_delete=models.CASCADE,
                                       related_name="detalle_gastos", db_column="id_viajereparto")
-    gasto = models.CharField(choices=Gasto.TIPO_GASTOS, max_length=25)
-    monto = models.IntegerField(default=0)
-    fecha = models.DateField(auto_now_add=True)
 
     class Meta:
         db_table = "gastos_viaje_reparto"
@@ -440,13 +442,9 @@ class DetalleViajeCereal(models.Model):
         return f"Destino {self.destino} del {self.viaje_cereal}"
 
 
-class GastoViajeCereal(models.Model):
-    # Reutilizo las mismas categorias de gasto que los viajes comunes (tabla Gasto)
+class GastoViajeCereal(GastoBase):
     viaje_cereal = models.ForeignKey(ViajeCereal, on_delete=models.CASCADE,
                                      related_name="detalle_gastos", db_column="id_viajecereal")
-    gasto = models.CharField(choices=Gasto.TIPO_GASTOS, max_length=25)
-    monto = models.IntegerField(default=0)
-    fecha = models.DateField(auto_now_add=True)
 
     class Meta:
         db_table = "gastos_viaje_cereal"
