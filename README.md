@@ -2,10 +2,10 @@
 
 ## Prueba la demo: https://bautistaribotta.pythonanywhere.com/
 <u>Datos de ingreso al portal</u> <br>
-Usuario: usuario <br>
-Clave: User4321!
+Usuario: **usuario** <br>
+Clave: **User4321!**
 
-Portal interno de gestión administrativa desarrollado para Southern Honey Group. Centraliza el control de stock, clientes, operaciones comerciales y viajes de distribución.
+Portal interno de gestión administrativa desarrollado para Southern Honey Group. Centraliza el control de stock, clientes, operaciones comerciales y viajes de distribución. 
 
 ---
 
