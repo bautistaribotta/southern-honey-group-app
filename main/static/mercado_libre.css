@@ -403,6 +403,14 @@
     width: 100%;
   }
 
+  .grupo-botones-meli {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  #btn-gestionar-flota-meli,
   #nuevo-viaje-meli {
     width: 100%;
     padding: 0.75rem;
@@ -771,6 +779,10 @@
 
 /* --- RESPONSIVE PANEL --- */
 @media (max-width: 600px) {
+  .grupo-botones-meli {
+    grid-template-columns: 1fr;
+  }
+
   #slide-over-reparto .slide-over-panel {
     width: 100%;
     border-radius: 0;
