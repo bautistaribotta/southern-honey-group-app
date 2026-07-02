@@ -20,7 +20,15 @@ ENVIRONMENT = os.getenv('ENVIRONMENT', 'development')
 
 if ENVIRONMENT == 'production':
     DEBUG = False
-    ALLOWED_HOSTS = ["192.168.0.200", "localhost", "127.0.0.1"]
+    ALLOWED_HOSTS = ['192.168.0.200', '100.82.236.64', 'localhost', '127.0.0.1']
+    # Para que Django no rechace los formularios
+    CSRF_TRUSTED_ORIGINS = [
+        'http://192.168.0.200:8000',
+        'http://100.82.236.64:8000',
+        'http://localhost:8000',
+        'http://127.0.0.1:8000',
+    ]
+
 
 elif ENVIRONMENT == "demonstration":
     DEBUG = False
@@ -48,6 +56,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -135,6 +144,16 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Para que whitenoise comprima y cachee los archivos estaticos
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # Sirve para que sin importar desde donde se acceda
 # lleve a la url de inicio
