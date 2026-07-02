@@ -18,14 +18,13 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 ENVIRONMENT = os.getenv('ENVIRONMENT', 'development')
 
-# SECURITY WARNING: don't run with debug turned on in production!
 if ENVIRONMENT == 'production':
     DEBUG = False
-    ALLOWED_HOSTS = ['bautistaribotta.pythonanywhere.com']
+    ALLOWED_HOSTS = ["192.168.0.200", "localhost", "127.0.0.1"]
 
 elif ENVIRONMENT == "demonstration":
     DEBUG = False
-    ALLOWED_HOSTS = ['juanbautistaribotta.pythonanywhere.com']
+    ALLOWED_HOSTS = ['bautistaribotta.pythonanywhere.com']
 
 else:
     DEBUG = True
