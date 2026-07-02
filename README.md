@@ -1,9 +1,11 @@
 # Southern Honey Group - Staff Portal
 
-## Prueba la demo: https://bautistaribotta.pythonanywhere.com/
-<u>Datos de ingreso al portal</u> <br>
-Usuario: **usuario** <br>
-Clave: **User4321!**
+## Prueba el software: https://bautistaribotta.pythonanywhere.com/
+**Datos de ingreso al portal** <br>
+Usuario: usuario <br>
+Clave: User4321! <br>
+
+_Nota_: Los datos utilizados en la base de datos de la prueba son falsos y no representan a ninguna persona
 
 Portal interno de gestión administrativa desarrollado para Southern Honey Group. Centraliza el control de stock, clientes, operaciones comerciales y viajes de distribución. 
 
