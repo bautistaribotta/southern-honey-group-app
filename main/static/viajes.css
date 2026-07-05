@@ -8,7 +8,6 @@
 }
 
 /* Nota: La barra lateral, header y layout base se heredan de base.css */
-
 /* --- BARRA DE HERRAMIENTAS (Buscador y Botones) --- */
 .barra-herramientas {
   display: flex;
@@ -157,8 +156,13 @@
   flex: none;
 }
 
-.prod-chip__dot--encurso { background-color: var(--info-500); }
-.prod-chip__dot--finalizado { background-color: var(--success-500); }
+.prod-chip__dot--encurso {
+  background-color: var(--info-500);
+}
+
+.prod-chip__dot--finalizado {
+  background-color: var(--success-500);
+}
 
 .vje-chipcount {
   display: inline-flex;
@@ -208,16 +212,40 @@
   white-space: nowrap;
 }
 
-.alineado-izq { text-align: left; }
-.alineado-centro { text-align: center; }
+.alineado-izq {
+  text-align: left;
+}
+
+.alineado-centro {
+  text-align: center;
+}
 
 /* Anchos de columnas */
-.tabla-viajes th:nth-child(1) { width: 22%; } /* Vehiculo */
-.tabla-viajes th:nth-child(2) { width: 24%; } /* Chofer */
-.tabla-viajes th:nth-child(3) { width: 22%; } /* Destinos */
-.tabla-viajes th:nth-child(4) { width: 12%; } /* Estado */
-.tabla-viajes th:nth-child(5) { width: 20%; } /* Periodo */
+.tabla-viajes th:nth-child(1) {
+  width: 22%;
+}
 
+/* Vehiculo */
+.tabla-viajes th:nth-child(2) {
+  width: 24%;
+}
+
+/* Chofer */
+.tabla-viajes th:nth-child(3) {
+  width: 22%;
+}
+
+/* Destinos */
+.tabla-viajes th:nth-child(4) {
+  width: 12%;
+}
+
+/* Estado */
+.tabla-viajes th:nth-child(5) {
+  width: 20%;
+}
+
+/* Periodo */
 .tabla-viajes td {
   padding: 1rem 1.5rem;
   font-size: var(--text-sm);
@@ -276,7 +304,9 @@
   justify-content: center;
 }
 
-.vje-veh__tile .material-symbols-outlined { font-size: 1.25rem; }
+.vje-veh__tile .material-symbols-outlined {
+  font-size: 1.25rem;
+}
 
 .vehiculo-nombre {
   font-weight: var(--weight-semibold);
@@ -410,14 +440,18 @@
   color: var(--info-600);
 }
 
-.vje-badge--info .vje-badge__dot { background-color: var(--info-500); }
+.vje-badge--info .vje-badge__dot {
+  background-color: var(--info-500);
+}
 
 .vje-badge--neutral {
   background-color: var(--surface-sunken);
   color: var(--text-muted);
 }
 
-.vje-badge--neutral .vje-badge__dot { background-color: var(--sand-400); }
+.vje-badge--neutral .vje-badge__dot {
+  background-color: var(--sand-400);
+}
 
 /* --- PAGINACION --- */
 .paginacion {
@@ -474,7 +508,8 @@
 #slide-over-viaje {
   position: fixed;
   inset: 0;
-  z-index: 1100; /* Por encima de la barra superior mobile (#mobile-top-bar: 1000) */
+  z-index: 1100;
+  /* Por encima de la barra superior mobile (#mobile-top-bar: 1000) */
   visibility: hidden;
   overflow: hidden;
   display: flex;
@@ -512,7 +547,6 @@
   box-shadow: -12px 0 24px -8px var(--shadow-tint);
   transform: translateX(100%);
   transition: transform var(--dur-slow) var(--ease-standard);
-
   will-change: transform;
   backface-visibility: hidden;
   -webkit-font-smoothing: antialiased;
@@ -558,7 +592,9 @@
   justify-content: center;
 }
 
-.icono-contenedor span { font-size: 22px; }
+.icono-contenedor span {
+  font-size: 22px;
+}
 
 .texto-cabecera h3 {
   color: var(--text-strong);
@@ -601,7 +637,10 @@
   gap: 1.35rem;
 }
 
-.panel-cuerpo::-webkit-scrollbar { width: 5px; }
+.panel-cuerpo::-webkit-scrollbar {
+  width: 5px;
+}
+
 .panel-cuerpo::-webkit-scrollbar-thumb {
   background-color: var(--border-subtle);
   border-radius: var(--radius-pill);
@@ -669,7 +708,9 @@
   transition: all var(--dur-normal) var(--ease-standard);
 }
 
-.grupo-input select { cursor: pointer; }
+.grupo-input select {
+  cursor: pointer;
+}
 
 .grupo-input input::placeholder {
   color: var(--text-subtle);
@@ -681,7 +722,10 @@
   box-shadow: var(--ring);
 }
 
-.input-con-icono { position: relative; }
+.input-con-icono {
+  position: relative;
+}
+
 .input-con-icono span {
   position: absolute;
   left: 0.875rem;
@@ -691,7 +735,11 @@
   color: var(--brand-active);
   pointer-events: none;
 }
-.input-con-icono input { width: 100%; padding-left: 2.25rem; }
+
+.input-con-icono input {
+  width: 100%;
+  padding-left: 2.25rem;
+}
 
 /* Grid de dos columnas (fechas) */
 .vje-grid2 {
@@ -723,11 +771,17 @@
   width: fit-content;
 }
 
-.vje-addbtn:hover { color: var(--honey-700); }
-.vje-addbtn .material-symbols-outlined { font-size: 18px; }
+.vje-addbtn:hover {
+  color: var(--honey-700);
+}
+
+.vje-addbtn .material-symbols-outlined {
+  font-size: 18px;
+}
 
 .vje-removebtn {
-  display: none; /* JS lo muestra como flex cuando hay destinos extra */
+  display: none;
+  /* JS lo muestra como flex cuando hay destinos extra */
   align-items: center;
   gap: 0.25rem;
   background: none;
@@ -741,7 +795,9 @@
   width: fit-content;
 }
 
-.vje-removebtn .material-symbols-outlined { font-size: 18px; }
+.vje-removebtn .material-symbols-outlined {
+  font-size: 18px;
+}
 
 /* Validaciones personalizadas */
 .mensaje-error {
@@ -754,8 +810,14 @@
 }
 
 @keyframes aparecer {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .grupo-input input:invalid:not(:placeholder-shown) {
@@ -809,8 +871,13 @@
   font-family: inherit;
 }
 
-.boton-primario:hover { background-color: var(--pine-950); }
-.boton-primario:active { transform: scale(0.98); }
+.boton-primario:hover {
+  background-color: var(--pine-950);
+}
+
+.boton-primario:active {
+  transform: scale(0.98);
+}
 
 .boton-secundario {
   background-color: var(--surface-card);
@@ -825,15 +892,21 @@
   font-family: inherit;
 }
 
-.boton-secundario:hover { background-color: var(--surface-hover); }
+.boton-secundario:hover {
+  background-color: var(--surface-hover);
+}
 
 /* --- ADAPTACIÓN PARA PANTALLAS GRANDES --- */
 @media (min-width: 1440px) {
-  html { font-size: 18px; }
+  html {
+    font-size: 18px;
+  }
 }
 
 @media (min-width: 1920px) {
-  html { font-size: 20px; }
+  html {
+    font-size: 20px;
+  }
 }
 
 /* --- RESPONSIVE --- */
@@ -843,28 +916,23 @@
     align-items: stretch;
     gap: 1rem;
   }
-
   .grupo-busqueda,
   .contenedor-input-busqueda {
     width: 100%;
   }
-
   .grupo-botones {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.75rem;
     width: 100%;
   }
-
   .boton-nuevo {
     width: 100%;
     padding: 0.75rem;
   }
-
   .tabla-viajes th, .tabla-viajes td {
     padding: 0.875rem 1rem;
   }
-
   .contenedor-tabla {
     overflow-x: auto;
   }
@@ -874,20 +942,16 @@
   .grupo-botones {
     grid-template-columns: 1fr;
   }
-
   #slide-over-panel {
     width: 100%;
     border-radius: 0;
   }
-
   .vje-grid2 {
     grid-template-columns: 1fr;
   }
-
   .panel-pie {
     flex-direction: column;
   }
-
   .panel-pie button {
     width: 100%;
   }

@@ -3,7 +3,6 @@
    Saldos pendientes: tarjetas de resumen, celdas de equivalencia
    multimoneda (hoy + origen) y antiguedad de la deuda.
    ============================================================ */
-
 /* --- TARJETAS DE RESUMEN --- */
 .deu-stats {
   display: grid;
@@ -223,12 +222,31 @@
 }
 
 /* Anchos de columnas para Deudores (5 columnas) */
-.tabla-deudores th:nth-child(1) { width: 30%; } /* Cliente */
-.tabla-deudores th:nth-child(2) { width: 16%; } /* Fecha */
-.tabla-deudores th:nth-child(3) { width: 18%; } /* Deuda */
-.tabla-deudores th:nth-child(4) { width: 18%; } /* En dolares */
-.tabla-deudores th:nth-child(5) { width: 18%; } /* En miel */
+.tabla-deudores th:nth-child(1) {
+  width: 30%;
+}
 
+/* Cliente */
+.tabla-deudores th:nth-child(2) {
+  width: 16%;
+}
+
+/* Fecha */
+.tabla-deudores th:nth-child(3) {
+  width: 18%;
+}
+
+/* Deuda */
+.tabla-deudores th:nth-child(4) {
+  width: 18%;
+}
+
+/* En dolares */
+.tabla-deudores th:nth-child(5) {
+  width: 18%;
+}
+
+/* En miel */
 .tabla-deudores td {
   padding: 1rem 1.5rem;
   font-size: var(--text-sm);
@@ -435,26 +453,21 @@
   .deu-stats {
     grid-template-columns: 1fr;
   }
-
   .barra-herramientas {
     flex-direction: column;
     align-items: stretch;
     gap: 1rem;
   }
-
   .grupo-busqueda {
     flex-direction: column;
     width: 100%;
   }
-
   .contenedor-input-busqueda {
     width: 100%;
   }
-
   .tabla-deudores th, .tabla-deudores td {
     padding: 0.875rem 1rem;
   }
-
   /* Permite que la tabla haga scroll horizontal en moviles */
   .contenedor-tabla {
     overflow-x: auto;

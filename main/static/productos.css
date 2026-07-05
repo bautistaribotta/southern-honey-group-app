@@ -4,7 +4,6 @@
 }
 
 /* Nota: La barra lateral, header y layout base se heredan de base.css */
-
 /* --- BARRA DE HERRAMIENTAS (Buscador y Filtros) --- */
 .barra-herramientas {
   display: flex;
@@ -104,14 +103,37 @@
   flex: none;
 }
 
-.prod-chip__dot--miel { background-color: var(--color-amarillo-texto-etiqueta); }
-.prod-chip__dot--alimento { background-color: var(--color-verde-texto-etiqueta); }
-.prod-chip__dot--cera { background-color: var(--color-cera-texto-etiqueta); }
-.prod-chip__dot--madera { background-color: var(--color-madera-texto-etiqueta); }
-.prod-chip__dot--estampado { background-color: var(--text-muted); }
-.prod-chip__dot--insumos { background-color: var(--color-insumos-texto-etiqueta); }
-.prod-chip__dot--medicamentos { background-color: var(--color-rojo-texto-etiqueta); }
-.prod-chip__dot--otros { background-color: var(--color-gris-texto-etiqueta); }
+.prod-chip__dot--miel {
+  background-color: var(--color-amarillo-texto-etiqueta);
+}
+
+.prod-chip__dot--alimento {
+  background-color: var(--color-verde-texto-etiqueta);
+}
+
+.prod-chip__dot--cera {
+  background-color: var(--color-cera-texto-etiqueta);
+}
+
+.prod-chip__dot--madera {
+  background-color: var(--color-madera-texto-etiqueta);
+}
+
+.prod-chip__dot--estampado {
+  background-color: var(--text-muted);
+}
+
+.prod-chip__dot--insumos {
+  background-color: var(--color-insumos-texto-etiqueta);
+}
+
+.prod-chip__dot--medicamentos {
+  background-color: var(--color-rojo-texto-etiqueta);
+}
+
+.prod-chip__dot--otros {
+  background-color: var(--color-gris-texto-etiqueta);
+}
 
 .boton-nuevo {
   background-color: var(--brand-secondary);
@@ -144,7 +166,8 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  overflow: hidden; /* Mantiene los bordes redondeados */
+  overflow: hidden;
+  /* Mantiene los bordes redondeados */
 }
 
 .tabla-productos {
@@ -234,14 +257,53 @@
   font-weight: 500;
 }
 
-.etiqueta-miel { background-color: var(--color-amarillo-claro-etiqueta); color: var(--color-amarillo-texto-etiqueta); border: 1px solid var(--color-amarillo-borde-etiqueta); }
-.etiqueta-alimento { background-color: var(--color-verde-claro-etiqueta); color: var(--color-verde-texto-etiqueta); border: 1px solid var(--color-verde-borde-etiqueta); }
-.etiqueta-cera { background-color: var(--color-cera-fondo-etiqueta); color: var(--color-cera-texto-etiqueta); border: 1px solid var(--color-cera-borde-etiqueta); }
-.etiqueta-madera { background-color: var(--color-madera-fondo-etiqueta); color: var(--color-madera-texto-etiqueta); border: 1px solid var(--color-madera-borde-etiqueta); }
-.etiqueta-estampado { background-color: var(--surface-hover); color: var(--text-muted); border: 1px solid var(--color-gris-borde-etiqueta); }
-.etiqueta-insumos { background-color: var(--color-insumos-fondo-etiqueta); color: var(--color-insumos-texto-etiqueta); border: 1px solid var(--color-insumos-borde-etiqueta); }
-.etiqueta-medicamentos { background-color: var(--color-rojo-claro-etiqueta); color: var(--color-rojo-texto-etiqueta); border: 1px solid var(--color-rojo-borde-etiqueta); }
-.etiqueta-otros { background-color: var(--color-gris-claro-etiqueta); color: var(--color-gris-texto-etiqueta); border: 1px solid var(--border-default); }
+.etiqueta-miel {
+  background-color: var(--color-amarillo-claro-etiqueta);
+  color: var(--color-amarillo-texto-etiqueta);
+  border: 1px solid var(--color-amarillo-borde-etiqueta);
+}
+
+.etiqueta-alimento {
+  background-color: var(--color-verde-claro-etiqueta);
+  color: var(--color-verde-texto-etiqueta);
+  border: 1px solid var(--color-verde-borde-etiqueta);
+}
+
+.etiqueta-cera {
+  background-color: var(--color-cera-fondo-etiqueta);
+  color: var(--color-cera-texto-etiqueta);
+  border: 1px solid var(--color-cera-borde-etiqueta);
+}
+
+.etiqueta-madera {
+  background-color: var(--color-madera-fondo-etiqueta);
+  color: var(--color-madera-texto-etiqueta);
+  border: 1px solid var(--color-madera-borde-etiqueta);
+}
+
+.etiqueta-estampado {
+  background-color: var(--surface-hover);
+  color: var(--text-muted);
+  border: 1px solid var(--color-gris-borde-etiqueta);
+}
+
+.etiqueta-insumos {
+  background-color: var(--color-insumos-fondo-etiqueta);
+  color: var(--color-insumos-texto-etiqueta);
+  border: 1px solid var(--color-insumos-borde-etiqueta);
+}
+
+.etiqueta-medicamentos {
+  background-color: var(--color-rojo-claro-etiqueta);
+  color: var(--color-rojo-texto-etiqueta);
+  border: 1px solid var(--color-rojo-borde-etiqueta);
+}
+
+.etiqueta-otros {
+  background-color: var(--color-gris-claro-etiqueta);
+  color: var(--color-gris-texto-etiqueta);
+  border: 1px solid var(--border-default);
+}
 
 /* --- Celda de stock: cantidad + unidad + badge de estado --- */
 .prod-stock {
@@ -372,7 +434,8 @@
 #contenedor-slide-over {
   position: fixed;
   inset: 0;
-  z-index: 1100; /* Por encima de la barra superior mobile (#mobile-top-bar: 1000) */
+  z-index: 1100;
+  /* Por encima de la barra superior mobile (#mobile-top-bar: 1000) */
   visibility: hidden;
   overflow: hidden;
   display: flex;
@@ -383,7 +446,8 @@
 
 #contenedor-slide-over.slide-over-abierto {
   visibility: visible;
-  transition: none; /* Al abrir no necesitamos delay */
+  transition: none;
+  /* Al abrir no necesitamos delay */
 }
 
 #slide-over-fondo {
@@ -409,10 +473,11 @@
   flex-direction: column;
   transform: translateX(100%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
   /* MEJORAS DE ANIMACION */
-  will-change: transform; /* Prepara al navegador para la animación */
-  backface-visibility: hidden; /* Evita parpadeos en elementos internos */
+  will-change: transform;
+  /* Prepara al navegador para la animación */
+  backface-visibility: hidden;
+  /* Evita parpadeos en elementos internos */
   -webkit-font-smoothing: antialiased;
 }
 
@@ -450,7 +515,9 @@
   justify-content: center;
 }
 
-.icono-contenedor span { font-size: 22px; }
+.icono-contenedor span {
+  font-size: 22px;
+}
 
 .texto-cabecera h3 {
   color: var(--text-strong);
@@ -555,8 +622,14 @@
 }
 
 @keyframes aparecer {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Cuando el input es requerido/inválido (todos se muestran rojos por defecto) */
@@ -642,19 +715,21 @@
   justify-content: center;
   align-items: center;
   visibility: hidden;
-  transition: visibility 0.3s; /* Permite que la animación de salida termine antes de ocultar */
+  transition: visibility 0.3s;
+  /* Permite que la animación de salida termine antes de ocultar */
 }
 
 #contenedor-panel-eliminar.abierto {
   visibility: visible;
-  transition: none; /* Aparece al instante para dejar que los hijos se animen */
+  transition: none;
+  /* Aparece al instante para dejar que los hijos se animen */
 }
 
 #contenedor-panel-fondo {
   position: absolute;
   inset: 0;
   background-color: var(--overlay-ink);
-  backdrop-filter: blur(4px); 
+  backdrop-filter: blur(4px);
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
 }
@@ -675,7 +750,6 @@
   display: flex;
   flex-direction: column;
   text-align: center;
-  
   /* Animación de entrada: escala y opacidad */
   opacity: 0;
   transform: scale(0.95);
@@ -689,7 +763,7 @@
 
 #icono-cerrar-panel-eliminar {
   position: absolute;
-  top: 1rem; 
+  top: 1rem;
   right: 1rem;
   width: auto;
   background: none;
@@ -839,7 +913,6 @@
   display: flex;
   flex-direction: column;
   text-align: center;
-  
   opacity: 0;
   transform: scale(0.95);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -852,7 +925,7 @@
 
 #cerrar-modal-stock {
   position: absolute;
-  top: 1rem; 
+  top: 1rem;
   right: 1rem;
 }
 
@@ -995,7 +1068,8 @@
 }
 
 .input-wrapper .input-estandar {
-  padding-right: 3rem; /* Espacio para la unidad */
+  padding-right: 3rem;
+  /* Espacio para la unidad */
   font-size: 1.25rem;
   font-weight: 600;
   padding-top: 0.875rem;
@@ -1035,11 +1109,9 @@
   .boton-nuevo {
     padding: 0.625rem 1rem;
   }
-
   .boton-nuevo .texto-boton {
     font-size: 0;
   }
-
   .boton-nuevo .texto-boton::before {
     content: "Nuevo";
     font-size: 0.875rem;
@@ -1052,39 +1124,31 @@
     align-items: stretch;
     gap: 1rem;
   }
-
   .grupo-busqueda {
     width: 100%;
   }
-
   .contenedor-input-busqueda {
     width: 100%;
   }
-
   .boton-nuevo {
     width: 100%;
     height: auto;
     justify-content: center;
     padding: 0.75rem;
   }
-
   .boton-nuevo .texto-boton {
     display: inline;
   }
-
   #panel-eliminar, #panel-actualizar-cotizacion, #panel-actualizar-stock {
     padding: 2rem 1.5rem;
     width: 95%;
   }
-
   .acciones-modal {
     grid-template-columns: 1fr;
   }
-
   .tabla-productos th, .tabla-productos td {
     padding: 0.875rem 1rem;
   }
-  
   /* Permite que la tabla haga scroll horizontal en móviles */
   .contenedor-tabla {
     overflow-x: auto;
@@ -1096,24 +1160,19 @@
     width: 100%;
     border-radius: 0;
   }
-  
   .panel-cabecera {
     padding: 1.25rem 1.5rem;
   }
-  
   .panel-cuerpo {
     padding: 1.5rem;
   }
-  
   .panel-pie {
     padding: 1.25rem 1.5rem;
     flex-direction: column;
   }
-  
   .panel-pie button {
     width: 100%;
   }
-  
   /* Ocultar columnas menos importantes en móviles muy pequeños */
   .columna-ocultable-movil {
     display: none;

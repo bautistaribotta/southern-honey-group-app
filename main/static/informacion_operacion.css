@@ -3,7 +3,6 @@
    Cabecera, totales, productos + pagos y el panel de erosion
    "valor de la deuda pendiente".
    ============================================================ */
-
 /* Tokens de estado que aun no estan en base.css */
 :root {
   --info-50: oklch(96.5% 0.018 250);
@@ -36,8 +35,13 @@
   transition: color var(--dur-normal) var(--ease-standard);
 }
 
-.boton-volver:hover { color: var(--brand-active); }
-.boton-volver .material-symbols-outlined { font-size: 1.05rem; }
+.boton-volver:hover {
+  color: var(--brand-active);
+}
+
+.boton-volver .material-symbols-outlined {
+  font-size: 1.05rem;
+}
 
 /* --- Cabecera --- */
 .op-head {
@@ -52,7 +56,11 @@
   box-shadow: var(--shadow-sm);
 }
 
-.op-head__left { display: flex; align-items: flex-start; gap: 0.95rem; }
+.op-head__left {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.95rem;
+}
 
 .op-head__tile {
   width: 52px;
@@ -66,9 +74,16 @@
   justify-content: center;
 }
 
-.op-head__tile .material-symbols-outlined { font-size: 1.7rem; }
+.op-head__tile .material-symbols-outlined {
+  font-size: 1.7rem;
+}
 
-.op-head__titlerow { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.op-head__titlerow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
 
 .op-head__title {
   font-size: var(--text-xl);
@@ -94,7 +109,10 @@
   color: var(--text-muted);
 }
 
-.op-head__metaitem .material-symbols-outlined { font-size: 1.05rem; color: var(--sand-400); }
+.op-head__metaitem .material-symbols-outlined {
+  font-size: 1.05rem;
+  color: var(--sand-400);
+}
 
 .op-viaje {
   display: inline-flex;
@@ -111,7 +129,9 @@
   cursor: pointer;
 }
 
-.op-viaje .material-symbols-outlined { font-size: 0.95rem; }
+.op-viaje .material-symbols-outlined {
+  font-size: 0.95rem;
+}
 
 .op-head__actions {
   display: flex;
@@ -138,7 +158,9 @@
   transition: all var(--dur-normal) var(--ease-standard);
 }
 
-.op-btn .material-symbols-outlined { font-size: 1.1rem; }
+.op-btn .material-symbols-outlined {
+  font-size: 1.1rem;
+}
 
 .op-btn:disabled {
   opacity: 0.5;
@@ -150,7 +172,9 @@
   color: var(--text-on-inverse);
 }
 
-.op-btn--dark:not(:disabled):hover { background-color: var(--pine-950); }
+.op-btn--dark:not(:disabled):hover {
+  background-color: var(--pine-950);
+}
 
 .op-btn--secondary {
   background-color: var(--surface-card);
@@ -158,7 +182,9 @@
   color: var(--text-body);
 }
 
-.op-btn--secondary:not(:disabled):hover { background-color: var(--surface-hover); }
+.op-btn--secondary:not(:disabled):hover {
+  background-color: var(--surface-hover);
+}
 
 .op-btn--danger {
   background-color: var(--danger-50);
@@ -201,7 +227,9 @@
   color: var(--text-muted);
 }
 
-.op-total__k .material-symbols-outlined { font-size: 1.05rem; }
+.op-total__k .material-symbols-outlined {
+  font-size: 1.05rem;
+}
 
 .op-total__v {
   font-size: var(--text-xl);
@@ -211,13 +239,31 @@
   letter-spacing: var(--tracking-tight);
 }
 
-.op-total--rest { background-color: var(--danger-50); border-color: var(--danger-200); }
-.op-total--rest .op-total__k { color: var(--danger-600); }
-.op-total--rest .op-total__v { color: var(--danger-700); }
+.op-total--rest {
+  background-color: var(--danger-50);
+  border-color: var(--danger-200);
+}
 
-.op-total--paid { background-color: var(--success-50); border-color: var(--success-200); }
-.op-total--paid .op-total__k { color: var(--success-600); }
-.op-total--paid .op-total__v { color: var(--success-700); }
+.op-total--rest .op-total__k {
+  color: var(--danger-600);
+}
+
+.op-total--rest .op-total__v {
+  color: var(--danger-700);
+}
+
+.op-total--paid {
+  background-color: var(--success-50);
+  border-color: var(--success-200);
+}
+
+.op-total--paid .op-total__k {
+  color: var(--success-600);
+}
+
+.op-total--paid .op-total__v {
+  color: var(--success-700);
+}
 
 .op-total__bar {
   height: 6px;
@@ -258,12 +304,30 @@
   border-bottom: 1px solid var(--border-subtle);
 }
 
-.op-card__head .material-symbols-outlined { font-size: 1.2rem; color: var(--brand-active); }
-.op-card__head h4 { margin: 0; font-size: var(--text-sm); font-weight: var(--weight-bold); color: var(--text-strong); }
-.op-card__count { margin-left: auto; font-size: var(--text-xs); color: var(--text-subtle); font-weight: var(--weight-semibold); }
+.op-card__head .material-symbols-outlined {
+  font-size: 1.2rem;
+  color: var(--brand-active);
+}
+
+.op-card__head h4 {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  color: var(--text-strong);
+}
+
+.op-card__count {
+  margin-left: auto;
+  font-size: var(--text-xs);
+  color: var(--text-subtle);
+  font-weight: var(--weight-semibold);
+}
 
 /* --- Tablas de detalle --- */
-.op-table { width: 100%; border-collapse: collapse; }
+.op-table {
+  width: 100%;
+  border-collapse: collapse;
+}
 
 .op-table th {
   text-align: left;
@@ -285,13 +349,35 @@
   vertical-align: middle;
 }
 
-.op-table tbody tr:last-child td { border-bottom: none; }
-.op-table .r { text-align: right; font-variant-numeric: tabular-nums; }
-.op-table .c { text-align: center; font-variant-numeric: tabular-nums; }
+.op-table tbody tr:last-child td {
+  border-bottom: none;
+}
 
-.op-prod__name { font-weight: var(--weight-semibold); color: var(--text-strong); }
-.op-sub { font-weight: var(--weight-bold); color: var(--text-strong); }
-.op-pago__amt { color: var(--success-700); font-weight: var(--weight-bold); font-variant-numeric: tabular-nums; }
+.op-table .r {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.op-table .c {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.op-prod__name {
+  font-weight: var(--weight-semibold);
+  color: var(--text-strong);
+}
+
+.op-sub {
+  font-weight: var(--weight-bold);
+  color: var(--text-strong);
+}
+
+.op-pago__amt {
+  color: var(--success-700);
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+}
 
 .op-table__foot td {
   padding: 0.8rem 1.15rem;
@@ -303,9 +389,13 @@
   font-variant-numeric: tabular-nums;
 }
 
-.op-table__foot td.r { white-space: nowrap; }
+.op-table__foot td.r {
+  white-space: nowrap;
+}
 
-.op-table__foot .op-foot-rest td { color: var(--danger-700); }
+.op-table__foot .op-foot-rest td {
+  color: var(--danger-700);
+}
 
 .op-table td.op-empty {
   text-align: center;
@@ -316,13 +406,21 @@
 
 /* --- Responsive --- */
 @media (max-width: 960px) {
-  .op-grid { grid-template-columns: 1fr; }
+  .op-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 720px) {
-  .op-totals { grid-template-columns: 1fr; }
-  .op-head { flex-direction: column; }
-  .op-head__actions { justify-content: flex-start; }
+  .op-totals {
+    grid-template-columns: 1fr;
+  }
+  .op-head {
+    flex-direction: column;
+  }
+  .op-head__actions {
+    justify-content: flex-start;
+  }
 }
 
 /* ============================================================
@@ -338,10 +436,19 @@
   transition: all var(--dur-slow) var(--ease-standard);
 }
 
-.boton-cerrar { color: var(--sand-400); transition: all var(--dur-normal) var(--ease-standard); }
-.boton-cerrar:hover { background-color: var(--surface-hover); color: var(--text-muted); }
+.boton-cerrar {
+  color: var(--sand-400);
+  transition: all var(--dur-normal) var(--ease-standard);
+}
 
-#icono-pago-modal { color: var(--brand-active); }
+.boton-cerrar:hover {
+  background-color: var(--surface-hover);
+  color: var(--text-muted);
+}
+
+#icono-pago-modal {
+  color: var(--brand-active);
+}
 
 #panel-eliminar h3, #panel-cancelar-operacion h3, #panel-pago h3 {
   font-weight: var(--weight-bold);
@@ -363,7 +470,9 @@
   transition: background-color var(--dur-normal) var(--ease-standard);
 }
 
-.boton-secundario:hover { background-color: var(--surface-hover); }
+.boton-secundario:hover {
+  background-color: var(--surface-hover);
+}
 
 #boton-confirmar-pago {
   background-color: var(--brand-secondary);
@@ -376,8 +485,14 @@
   transition: all var(--dur-normal) var(--ease-standard);
 }
 
-#boton-confirmar-pago:hover { background-color: var(--pine-950); }
-#boton-confirmar-pago:disabled { opacity: 0.7; cursor: not-allowed; }
+#boton-confirmar-pago:hover {
+  background-color: var(--pine-950);
+}
+
+#boton-confirmar-pago:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
 
 .btn-saldar-total {
   color: var(--brand-active);
@@ -386,7 +501,9 @@
   transition: all var(--dur-normal) var(--ease-standard);
 }
 
-.btn-saldar-total:hover { color: var(--honey-700); }
+.btn-saldar-total:hover {
+  color: var(--honey-700);
+}
 
 .input-edicion {
   border: 1px solid var(--border-subtle);
@@ -402,4 +519,6 @@
   box-shadow: var(--ring);
 }
 
-.campo-info label { color: var(--text-body); }
+.campo-info label {
+  color: var(--text-body);
+}

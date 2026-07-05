@@ -3,7 +3,6 @@
    Adaptacion del UI kit (ui_kits SHG/redesign) al stack Django,
    con todos los colores en oklch.
    ============================================================ */
-
 #area-trabajo {
   display: flex;
   flex-direction: column;

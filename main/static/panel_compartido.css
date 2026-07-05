@@ -5,14 +5,14 @@
    informacion_viaje.html conserven su aspecto y comportamiento.
    Usa la paleta original (slate / stone / brand-olive).
    ============================================================ */
-
 /* --- PANEL LATERAL (SLIDE-OVER) --- */
 #slide-over-chofer,
 #slide-over-viaje,
 #slide-over-vehiculo {
   position: fixed;
   inset: 0;
-  z-index: 1100; /* Por encima de la barra superior mobile (#mobile-top-bar: 1000) */
+  z-index: 1100;
+  /* Por encima de la barra superior mobile (#mobile-top-bar: 1000) */
   visibility: hidden;
   overflow: hidden;
   display: flex;
@@ -26,7 +26,8 @@
 #slide-over-vehiculo.slide-over-abierto {
   visibility: visible;
   pointer-events: auto;
-  transition: none; /* Al abrir no necesitamos delay */
+  transition: none;
+  /* Al abrir no necesitamos delay */
 }
 
 #slide-over-fondo {
@@ -55,7 +56,6 @@
   box-shadow: -10px 0 25px var(--color-sombra-1);
   transform: translateX(100%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
   /* MEJORAS DE ANIMACION IGUALES A PRODUCTOS */
   will-change: transform;
   backface-visibility: hidden;
@@ -106,7 +106,9 @@
   justify-content: center;
 }
 
-.icono-contenedor span { font-size: 22px; }
+.icono-contenedor span {
+  font-size: 22px;
+}
 
 .texto-cabecera h3 {
   color: var(--slate-900);
@@ -129,7 +131,9 @@
   transition: background 0.2s;
 }
 
-.boton-cerrar:hover { background-color: var(--color-sombra-1); }
+.boton-cerrar:hover {
+  background-color: var(--color-sombra-1);
+}
 
 /* CUERPO Y SCROLL */
 .panel-cuerpo {
@@ -141,7 +145,10 @@
   gap: 1.5rem;
 }
 
-.panel-cuerpo::-webkit-scrollbar { width: 5px; }
+.panel-cuerpo::-webkit-scrollbar {
+  width: 5px;
+}
+
 .panel-cuerpo::-webkit-scrollbar-thumb {
   background-color: var(--stone-200);
   border-radius: 10px;
@@ -209,7 +216,10 @@
   padding: 0 0.25rem;
 }
 
-.subtitulo-formulario span { color: var(--brand-olive); font-size: 16px; }
+.subtitulo-formulario span {
+  color: var(--brand-olive);
+  font-size: 16px;
+}
 
 .subtitulo-formulario h4 {
   color: var(--slate-900);
@@ -260,7 +270,10 @@
   box-shadow: 0 0 0 1px var(--brand-olive);
 }
 
-.input-con-icono { position: relative; }
+.input-con-icono {
+  position: relative;
+}
+
 .input-con-icono span {
   position: absolute;
   left: 0.875rem;
@@ -269,12 +282,17 @@
   font-size: 16px;
   color: var(--brand-olive);
 }
-.input-con-icono input { width: 100%; padding-left: 2.5rem; }
+
+.input-con-icono input {
+  width: 100%;
+  padding-left: 2.5rem;
+}
 
 /* VALIDACIONES PERSONALIZADAS */
 .mensaje-error {
   display: none;
-  color: var(--color-rojo-eliminacion); /* Rojo de error */
+  color: var(--color-rojo-eliminacion);
+  /* Rojo de error */
   font-size: 0.75rem;
   margin-top: 0.25rem;
   font-weight: 500;
@@ -282,8 +300,14 @@
 }
 
 @keyframes aparecer {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Cuando el input es requerido/inválido (todos se muestran rojos por defecto) */

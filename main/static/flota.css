@@ -196,7 +196,8 @@
 #slide-over-vehiculo {
   position: fixed;
   inset: 0;
-  z-index: 1100; /* Por encima de la barra superior mobile (#mobile-top-bar: 1000) */
+  z-index: 1100;
+  /* Por encima de la barra superior mobile (#mobile-top-bar: 1000) */
   visibility: hidden;
   overflow: hidden;
   display: flex;
@@ -236,7 +237,6 @@
   box-shadow: -12px 0 24px -8px var(--shadow-tint);
   transform: translateX(100%);
   transition: transform var(--dur-slow) var(--ease-standard);
-
   will-change: transform;
   backface-visibility: hidden;
   -webkit-font-smoothing: antialiased;
@@ -284,7 +284,9 @@
   justify-content: center;
 }
 
-.icono-contenedor span { font-size: 22px; }
+.icono-contenedor span {
+  font-size: 22px;
+}
 
 .texto-cabecera h3 {
   color: var(--text-strong);
@@ -327,7 +329,10 @@
   gap: 1.35rem;
 }
 
-.panel-cuerpo::-webkit-scrollbar { width: 5px; }
+.panel-cuerpo::-webkit-scrollbar {
+  width: 5px;
+}
+
 .panel-cuerpo::-webkit-scrollbar-thumb {
   background-color: var(--border-subtle);
   border-radius: var(--radius-pill);
@@ -414,8 +419,14 @@
 }
 
 @keyframes aparecer {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .grupo-input input:invalid:not(:placeholder-shown) {
@@ -457,8 +468,13 @@
   font-family: inherit;
 }
 
-.boton-primario:hover { background-color: var(--pine-950); }
-.boton-primario:active { transform: scale(0.98); }
+.boton-primario:hover {
+  background-color: var(--pine-950);
+}
+
+.boton-primario:active {
+  transform: scale(0.98);
+}
 
 .boton-secundario {
   background-color: var(--surface-card);
@@ -473,7 +489,9 @@
   font-family: inherit;
 }
 
-.boton-secundario:hover { background-color: var(--surface-hover); }
+.boton-secundario:hover {
+  background-color: var(--surface-hover);
+}
 
 /* --- MODAL CONFIRMAR ELIMINACIÓN --- */
 #modal-eliminar-flota {
@@ -607,11 +625,15 @@
 
 /* --- ADAPTACIÓN PARA PANTALLAS GRANDES --- */
 @media (min-width: 1440px) {
-  html { font-size: 18px; }
+  html {
+    font-size: 18px;
+  }
 }
 
 @media (min-width: 1920px) {
-  html { font-size: 20px; }
+  html {
+    font-size: 20px;
+  }
 }
 
 /* --- RESPONSIVE --- */
@@ -626,15 +648,12 @@
     width: 100%;
     border-radius: 0;
   }
-
   .panel-pie {
     flex-direction: column;
   }
-
   .panel-pie button {
     width: 100%;
   }
-
   .modal-eliminar-acciones {
     grid-template-columns: 1fr;
   }

@@ -5,12 +5,12 @@
    Aca solo va lo especifico del reparto: la variante de "perdida" en
    el total y el slide-over de edicion (#slide-over-reparto-editar).
    ============================================================ */
-
 /* --- Variante de "perdida" para la fila de ganancia neta --- */
 .vd-caja__row--total.vd-caja__row--loss {
   background-color: var(--danger-50);
   border-top: 1px solid var(--danger-500);
 }
+
 .vd-caja__row--total.vd-caja__row--loss .vd-caja__k,
 .vd-caja__row--total.vd-caja__row--loss .vd-caja__k .material-symbols-outlined,
 .vd-caja__row--total.vd-caja__row--loss .vd-caja__v {
@@ -29,7 +29,8 @@
 #slide-over-reparto-editar {
   position: fixed;
   inset: 0;
-  z-index: 1100; /* Por encima de la barra superior mobile (#mobile-top-bar: 1000) */
+  z-index: 1100;
+  /* Por encima de la barra superior mobile (#mobile-top-bar: 1000) */
   visibility: hidden;
   overflow: hidden;
   display: flex;
@@ -158,7 +159,9 @@
   transition: all var(--dur-normal) var(--ease-standard);
 }
 
-#slide-over-reparto-editar .grupo-input select { cursor: pointer; }
+#slide-over-reparto-editar .grupo-input select {
+  cursor: pointer;
+}
 
 #slide-over-reparto-editar .grupo-input input::placeholder {
   color: var(--text-subtle);
@@ -175,7 +178,9 @@
   color: var(--brand-active);
 }
 
-#slide-over-reparto-editar .input-con-icono input { padding-left: 2.25rem; }
+#slide-over-reparto-editar .input-con-icono input {
+  padding-left: 2.25rem;
+}
 
 /* Grid de dos columnas (costo empleado / valor del viaje) */
 #slide-over-reparto-editar .vje-grid2 {
@@ -207,11 +212,17 @@
   width: fit-content;
 }
 
-#slide-over-reparto-editar .vje-addbtn:hover { color: var(--honey-700); }
-#slide-over-reparto-editar .vje-addbtn .material-symbols-outlined { font-size: 18px; }
+#slide-over-reparto-editar .vje-addbtn:hover {
+  color: var(--honey-700);
+}
+
+#slide-over-reparto-editar .vje-addbtn .material-symbols-outlined {
+  font-size: 18px;
+}
 
 #slide-over-reparto-editar .vje-removebtn {
-  display: none; /* JS lo muestra como flex cuando hay mas de un destino */
+  display: none;
+  /* JS lo muestra como flex cuando hay mas de un destino */
   align-items: center;
   gap: 0.25rem;
   background: none;
@@ -225,7 +236,9 @@
   width: fit-content;
 }
 
-#slide-over-reparto-editar .vje-removebtn .material-symbols-outlined { font-size: 18px; }
+#slide-over-reparto-editar .vje-removebtn .material-symbols-outlined {
+  font-size: 18px;
+}
 
 /* Pie del panel */
 #slide-over-reparto-editar .panel-pie {
@@ -246,8 +259,14 @@
   font-family: inherit;
 }
 
-#slide-over-reparto-editar .boton-primario:hover { background-color: var(--pine-950); filter: none; }
-#slide-over-reparto-editar .boton-primario:active { transform: scale(0.98); }
+#slide-over-reparto-editar .boton-primario:hover {
+  background-color: var(--pine-950);
+  filter: none;
+}
+
+#slide-over-reparto-editar .boton-primario:active {
+  transform: scale(0.98);
+}
 
 #slide-over-reparto-editar .boton-secundario {
   background-color: var(--surface-card);
@@ -261,22 +280,21 @@
   font-family: inherit;
 }
 
-#slide-over-reparto-editar .boton-secundario:hover { background-color: var(--surface-hover); }
+#slide-over-reparto-editar .boton-secundario:hover {
+  background-color: var(--surface-hover);
+}
 
 @media (max-width: 600px) {
   #slide-over-reparto-editar #slide-over-panel {
     width: 100%;
     border-radius: 0;
   }
-
   #slide-over-reparto-editar .vje-grid2 {
     grid-template-columns: 1fr;
   }
-
   #slide-over-reparto-editar .panel-pie {
     flex-direction: column;
   }
-
   #slide-over-reparto-editar .panel-pie button {
     width: 100%;
   }

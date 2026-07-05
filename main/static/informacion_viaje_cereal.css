@@ -6,7 +6,6 @@
    los datos de la carga, la tarjeta de calculo del flete y el
    slide-over de edicion (#slide-over-cereal).
    ============================================================ */
-
 /* --- Datos de la carga (grilla 2x2 dentro de "Datos generales") --- */
 .vc-carga {
   display: grid;
@@ -34,7 +33,6 @@
 }
 
 /* --- Tarjeta "Calculo del flete" --- */
-
 /* Caption con el desglose de la facturacion (toneladas x precio) */
 .vc-cap {
   display: inline-flex;
@@ -96,7 +94,8 @@
 #slide-over-cereal {
   position: fixed;
   inset: 0;
-  z-index: 1100; /* Por encima de la barra superior mobile (#mobile-top-bar: 1000) */
+  z-index: 1100;
+  /* Por encima de la barra superior mobile (#mobile-top-bar: 1000) */
   visibility: hidden;
   overflow: hidden;
   display: flex;
@@ -225,7 +224,9 @@
   transition: all var(--dur-normal) var(--ease-standard);
 }
 
-#slide-over-cereal .grupo-input select { cursor: pointer; }
+#slide-over-cereal .grupo-input select {
+  cursor: pointer;
+}
 
 #slide-over-cereal .grupo-input input::placeholder {
   color: var(--text-subtle);
@@ -242,7 +243,9 @@
   color: var(--brand-active);
 }
 
-#slide-over-cereal .input-con-icono input { padding-left: 2.25rem; }
+#slide-over-cereal .input-con-icono input {
+  padding-left: 2.25rem;
+}
 
 /* Grid de dos columnas (toneladas / precio) */
 #slide-over-cereal .vje-grid2 {
@@ -274,11 +277,17 @@
   width: fit-content;
 }
 
-#slide-over-cereal .vje-addbtn:hover { color: var(--honey-700); }
-#slide-over-cereal .vje-addbtn .material-symbols-outlined { font-size: 18px; }
+#slide-over-cereal .vje-addbtn:hover {
+  color: var(--honey-700);
+}
+
+#slide-over-cereal .vje-addbtn .material-symbols-outlined {
+  font-size: 18px;
+}
 
 #slide-over-cereal .vje-removebtn {
-  display: none; /* JS lo muestra como flex cuando hay mas de un destino */
+  display: none;
+  /* JS lo muestra como flex cuando hay mas de un destino */
   align-items: center;
   gap: 0.25rem;
   background: none;
@@ -292,7 +301,9 @@
   width: fit-content;
 }
 
-#slide-over-cereal .vje-removebtn .material-symbols-outlined { font-size: 18px; }
+#slide-over-cereal .vje-removebtn .material-symbols-outlined {
+  font-size: 18px;
+}
 
 /* Pie del panel */
 #slide-over-cereal .panel-pie {
@@ -313,8 +324,14 @@
   font-family: inherit;
 }
 
-#slide-over-cereal .boton-primario:hover { background-color: var(--pine-950); filter: none; }
-#slide-over-cereal .boton-primario:active { transform: scale(0.98); }
+#slide-over-cereal .boton-primario:hover {
+  background-color: var(--pine-950);
+  filter: none;
+}
+
+#slide-over-cereal .boton-primario:active {
+  transform: scale(0.98);
+}
 
 #slide-over-cereal .boton-secundario {
   background-color: var(--surface-card);
@@ -328,22 +345,21 @@
   font-family: inherit;
 }
 
-#slide-over-cereal .boton-secundario:hover { background-color: var(--surface-hover); }
+#slide-over-cereal .boton-secundario:hover {
+  background-color: var(--surface-hover);
+}
 
 @media (max-width: 600px) {
   #slide-over-cereal #slide-over-panel {
     width: 100%;
     border-radius: 0;
   }
-
   #slide-over-cereal .vje-grid2 {
     grid-template-columns: 1fr;
   }
-
   #slide-over-cereal .panel-pie {
     flex-direction: column;
   }
-
   #slide-over-cereal .panel-pie button {
     width: 100%;
   }

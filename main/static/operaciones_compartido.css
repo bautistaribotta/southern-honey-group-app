@@ -5,21 +5,23 @@
    esa vista se extrajeron aqui para que informacion_viaje.html
    conserve su aspecto y comportamiento. Paleta original.
    ============================================================ */
-
 html {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
 
 #perfil-usuario-container {
-    display: none !important; /* Borro el logout */
+  display: none !important;
+  /* Borro el logout */
 }
 
 #cabecera-principal {
-    display: none !important; /* Elimino la cabecera para que el contenido suba */
+  display: none !important;
+  /* Elimino la cabecera para que el contenido suba */
 }
 
 #contenido-principal {
-    padding-top: 1.5rem !important; /* Reduzco el padding superior del contenedor base */
+  padding-top: 1.5rem !important;
+  /* Reduzco el padding superior del contenedor base */
 }
 
 .boton-volver {
@@ -41,47 +43,47 @@ html {
 }
 
 .cabecera-detalle {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
 }
 
 .info-principal {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .avatar-cliente {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background-color: var(--brand-olive);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-blanco);
-    font-size: 1.5rem;
-    font-weight: 700;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--brand-olive);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-blanco);
+  font-size: 1.5rem;
+  font-weight: 700;
 }
 
 .nombre-cliente-titulo {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--slate-900);
-    margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--slate-900);
+  margin: 0;
 }
 
 .id-cliente-subtitulo {
-    color: var(--slate-500);
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
+  color: var(--slate-500);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
 }
 
 .acciones-cliente {
-    display: flex;
-    gap: 0.75rem;
+  display: flex;
+  gap: 0.75rem;
 }
 
 .boton-accion {
@@ -116,12 +118,14 @@ html {
 
 .boton-cancelar {
   background-color: var(--color-blanco);
-  color: var(--color-rojo-eliminacion); /* Rojo */
+  color: var(--color-rojo-eliminacion);
+  /* Rojo */
   border-color: var(--color-rojo-eliminacion-transparente-30);
 }
 
 .boton-cancelar:hover:not(:disabled) {
-  background-color: var(--color-rojo-muy-claro); /* Fondo rojo muy claro */
+  background-color: var(--color-rojo-muy-claro);
+  /* Fondo rojo muy claro */
   border-color: var(--color-rojo-eliminacion);
 }
 
@@ -131,439 +135,443 @@ html {
 }
 
 /* --- TARJETA ÚNICA DE INFORMACIÓN --- */
-
 .tarjeta-info-unica {
-    background: var(--color-blanco);
-    border: 1px solid var(--stone-200);
-    border-radius: 0.75rem;
-    padding: 2rem;
-    box-shadow: 0 1px 2px var(--color-sombra-1);
-    margin-bottom: 2.5rem;
-    transition: border-color 0.3s;
+  background: var(--color-blanco);
+  border: 1px solid var(--stone-200);
+  border-radius: 0.75rem;
+  padding: 2rem;
+  box-shadow: 0 1px 2px var(--color-sombra-1);
+  margin-bottom: 2.5rem;
+  transition: border-color 0.3s;
 }
 
 .tarjeta-info-unica.editando {
-    border-color: var(--brand-olive);
-    box-shadow: 0 0 0 1px var(--brand-olive), 0 1px 2px var(--color-sombra-1);
+  border-color: var(--brand-olive);
+  box-shadow: 0 0 0 1px var(--brand-olive), 0 1px 2px var(--color-sombra-1);
 }
 
 /* --- EDICIÓN INLINE --- */
 .input-edicion {
-    width: 100%;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid var(--stone-200);
-    border-radius: 0.375rem;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--slate-900);
-    outline: none;
-    font-family: inherit;
-    transition: all 0.2s;
-    box-sizing: border-box;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--stone-200);
+  border-radius: 0.375rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--slate-900);
+  outline: none;
+  font-family: inherit;
+  transition: all 0.2s;
+  box-sizing: border-box;
 }
 
 .input-edicion:focus {
-    border-color: var(--brand-olive);
-    box-shadow: 0 0 0 1px var(--brand-olive);
+  border-color: var(--brand-olive);
+  box-shadow: 0 0 0 1px var(--brand-olive);
 }
 
 .switch.input-edicion {
-    width: 44px;
-    padding: 0;
-    border: none;
-    box-shadow: none;
-    background: none;
-    display: inline-block;
-    min-height: auto;
+  width: 44px;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  background: none;
+  display: inline-block;
+  min-height: auto;
 }
 
 /* --- VALIDACIONES DE EDICIÓN --- */
 .mensaje-error {
-    display: none;
-    color: var(--color-rojo-eliminacion);
-    font-size: 0.75rem;
-    margin-top: 0.35rem;
-    font-weight: 500;
-    animation: aparecer 0.3s ease;
+  display: none;
+  color: var(--color-rojo-eliminacion);
+  font-size: 0.75rem;
+  margin-top: 0.35rem;
+  font-weight: 500;
+  animation: aparecer 0.3s ease;
 }
 
 /* Regla de seguridad: Si no estamos editando, NUNCA mostrar errores */
 .tarjeta-info-unica:not(.editando) .mensaje-error {
-    display: none !important;
+  display: none !important;
 }
 
 @keyframes aparecer {
-    from { opacity: 0; transform: translateY(-5px); }
-    to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .campo-info .input-edicion:invalid:not(:placeholder-shown) {
-    border-color: var(--color-rojo-eliminacion) !important;
+  border-color: var(--color-rojo-eliminacion) !important;
 }
 
 .campo-info .input-edicion:invalid:not(:placeholder-shown):focus {
-    box-shadow: 0 0 0 1px var(--color-rojo-eliminacion) !important;
+  box-shadow: 0 0 0 1px var(--color-rojo-eliminacion) !important;
 }
 
 .campo-info .input-edicion:invalid:not(:placeholder-shown) ~ .mensaje-error,
 .campo-info .input-edicion:invalid:not(:placeholder-shown) + .mensaje-error {
-    display: block;
+  display: block;
 }
 
 .boton-accion.activo {
-    background-color: var(--brand-olive);
-    color: var(--color-blanco);
-    border-color: var(--brand-olive);
+  background-color: var(--brand-olive);
+  color: var(--color-blanco);
+  border-color: var(--brand-olive);
 }
 
 .acciones-edicion {
-    display: flex;
-    justify-content: center;
-    gap: 0.75rem;
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--stone-200);
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--stone-200);
 }
 
 .boton-guardar-edicion {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.625rem 1.25rem;
-    background-color: var(--brand-olive);
-    color: var(--color-blanco);
-    border: none;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: inherit;
-    box-shadow: 0 4px 6px -1px var(--color-verde-transparente-20);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background-color: var(--brand-olive);
+  color: var(--color-blanco);
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  box-shadow: 0 4px 6px -1px var(--color-verde-transparente-20);
 }
 
 .boton-guardar-edicion:hover {
-    background-color: var(--color-hover-boton);
+  background-color: var(--color-hover-boton);
 }
 
 .boton-cancelar-edicion {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.625rem 1.25rem;
-    background-color: var(--color-blanco);
-    color: var(--slate-700);
-    border: 1px solid var(--stone-200);
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background-color: var(--color-blanco);
+  color: var(--slate-700);
+  border: 1px solid var(--stone-200);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
 }
 
 .boton-cancelar-edicion:hover {
-    background-color: var(--color-gris-claro-hover);
+  background-color: var(--color-gris-claro-hover);
 }
 
 /* --- SWITCH TOGGLE (Factura) --- */
 .switch {
-    position: relative;
-    display: inline-block;
-    width: 44px;
-    height: 24px;
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
 }
 
 .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
+  opacity: 0;
+  width: 0;
+  height: 0;
 }
 
 .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--stone-200);
-    transition: all 0.3s;
-    border-radius: 9999px;
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--stone-200);
+  transition: all 0.3s;
+  border-radius: 9999px;
 }
 
 .slider::before {
-    content: "";
-    position: absolute;
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
-    background-color: var(--color-blanco);
-    transition: all 0.3s;
-    border-radius: 50%;
+  content: "";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--color-blanco);
+  transition: all 0.3s;
+  border-radius: 50%;
 }
 
 .switch input:checked + .slider {
-    background-color: var(--brand-olive);
+  background-color: var(--brand-olive);
 }
 
 .switch input:checked + .slider::before {
-    transform: translateX(20px);
+  transform: translateX(20px);
 }
 
 .seccion-info-header {
-    margin-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .seccion-info-header h4 {
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--slate-500);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--slate-500);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
 }
 
 .grid-datos-cliente {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.25rem 2rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem 2rem;
 }
 
 .subseccion-datos {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
 .campo-info label {
-    display: block;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--slate-500);
-    margin-bottom: 0.35rem;
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--slate-500);
+  margin-bottom: 0.35rem;
 }
 
 .campo-info p {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--slate-900);
-    margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--slate-900);
+  margin: 0;
 }
 
 .valor-con-icono {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--slate-900);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--slate-900);
 }
 
 .valor-con-icono .material-symbols-outlined {
-    font-size: 1.1rem;
-    color: var(--brand-olive);
+  font-size: 1.1rem;
+  color: var(--brand-olive);
 }
 
 /* --- OPERACIONES --- */
-
 .contenedor-operaciones {
-    margin-top: 2.5rem;
+  margin-top: 2.5rem;
 }
 
 .encabezado-operaciones {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
 }
 
 .encabezado-operaciones h4 {
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--slate-500);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--slate-500);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .boton-nuevo {
-    background-color: var(--brand-olive);
-    color: var(--color-blanco);
-    padding: 0.625rem 1.25rem;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    border: 1px solid transparent;
-    box-shadow: 0 1px 2px 0 var(--color-sombra-1);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.2s;
-    font-family: inherit;
-    text-decoration: none;
+  background-color: var(--brand-olive);
+  color: var(--color-blanco);
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  box-shadow: 0 1px 2px 0 var(--color-sombra-1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  font-family: inherit;
+  text-decoration: none;
 }
 
 .boton-nuevo:hover {
-    background-color: var(--color-hover-boton);
+  background-color: var(--color-hover-boton);
 }
 
 .boton-nuevo:active {
-    transform: scale(0.95);
+  transform: scale(0.95);
 }
 
 /* Agrupa los botones Nueva Compra / Nueva Venta */
 .grupo-botones-operacion {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 /* Igualo el ancho de los 4 botones (editar/eliminar y nueva compra/venta)
    para que los grupos midan lo mismo y queden perfectamente alineados */
 .acciones-cliente .boton-accion,
 .grupo-botones-operacion .boton-nuevo {
-    min-width: 12.5rem;
-    justify-content: center;
+  min-width: 12.5rem;
+  justify-content: center;
 }
 
 /* Botón de compra: estilo secundario para diferenciarlo de la venta (primaria) */
 .boton-nuevo-compra {
-    background-color: var(--color-blanco);
-    color: var(--slate-700);
-    border: 1px solid var(--stone-200);
-    box-shadow: 0 1px 2px var(--color-sombra-1);
+  background-color: var(--color-blanco);
+  color: var(--slate-700);
+  border: 1px solid var(--stone-200);
+  box-shadow: 0 1px 2px var(--color-sombra-1);
 }
 
 .boton-nuevo-compra:hover {
-    background-color: var(--color-gris-claro-hover);
+  background-color: var(--color-gris-claro-hover);
 }
 
 /* --- Barra superior de la tabla: pestañas a la izquierda, botones a la derecha --- */
 .barra-operaciones {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
 }
 
 /* --- Pestañas para filtrar operaciones (Todas / Ventas / Compras) --- */
 .tabs-operaciones {
-    display: flex;
-    gap: 0.25rem;
-    border-bottom: 1px solid var(--stone-200);
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--stone-200);
 }
 
 .tab-operacion {
-    padding: 0.625rem 1rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--slate-500);
-    text-decoration: none;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    transition: all 0.2s;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--slate-500);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.2s;
 }
 
 .tab-operacion:hover {
-    color: var(--slate-700);
+  color: var(--slate-700);
 }
 
 .tab-operacion.activa {
-    color: var(--brand-olive);
-    border-bottom-color: var(--brand-olive);
+  color: var(--brand-olive);
+  border-bottom-color: var(--brand-olive);
 }
 
 /* --- Badge de tipo de operacion en la tabla --- */
 .badge-tipo-operacion {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.125rem 0.625rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 .badge-tipo-operacion.venta {
-    background-color: var(--color-verde-claro-etiqueta);
-    color: var(--color-verde-texto-etiqueta);
-    border: 1px solid var(--color-verde-borde-etiqueta);
+  background-color: var(--color-verde-claro-etiqueta);
+  color: var(--color-verde-texto-etiqueta);
+  border: 1px solid var(--color-verde-borde-etiqueta);
 }
 
 .badge-tipo-operacion.compra {
-    background-color: var(--color-insumos-fondo-etiqueta);
-    color: var(--color-insumos-texto-etiqueta);
-    border: 1px solid var(--color-insumos-borde-etiqueta);
+  background-color: var(--color-insumos-fondo-etiqueta);
+  color: var(--color-insumos-texto-etiqueta);
+  border: 1px solid var(--color-insumos-borde-etiqueta);
 }
 
 .tabla-operaciones-container {
-    background: var(--color-blanco);
-    border: 1px solid var(--stone-200);
-    border-radius: 0.75rem;
-    overflow: hidden;
-    box-shadow: 0 1px 2px var(--color-sombra-1);
+  background: var(--color-blanco);
+  border: 1px solid var(--stone-200);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 1px 2px var(--color-sombra-1);
 }
 
 .tabla-operaciones {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
 }
 
 .tabla-operaciones th {
-    background-color: var(--color-gris-fondo-input-alt);
-    padding: 1rem 2rem;
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--slate-500);
-    letter-spacing: 0.05em;
-    border-bottom: 1px solid var(--stone-200);
+  background-color: var(--color-gris-fondo-input-alt);
+  padding: 1rem 2rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--slate-500);
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--stone-200);
 }
 
 .tabla-operaciones td {
-    padding: 1.25rem 2rem;
-    border-bottom: 1px solid var(--stone-200);
-    font-size: 0.875rem;
+  padding: 1.25rem 2rem;
+  border-bottom: 1px solid var(--stone-200);
+  font-size: 0.875rem;
 }
 
 .tabla-operaciones tr:last-child td {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 .tabla-operaciones tr:hover {
-    background-color: var(--color-gris-fondo-input-alt);
+  background-color: var(--color-gris-fondo-input-alt);
 }
 
 .fecha-operacion {
-    color: var(--slate-500);
-    font-weight: 500;
+  color: var(--slate-500);
+  font-weight: 500;
 }
 
 .detalle-principal {
-    color: var(--slate-500);
-    font-weight: 500;
+  color: var(--slate-500);
+  font-weight: 500;
 }
 
 .estado {
-    color: var(--brand-olive);
-    text-align: center;
+  color: var(--brand-olive);
+  text-align: center;
 }
 
 .monto-total {
-    text-align: right;
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: var(--slate-700);
+  text-align: right;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--slate-700);
 }
 
 .acciones-operacion {
@@ -647,10 +655,10 @@ html {
 }
 
 @media (max-width: 1024px) {
-    .grid-datos-cliente {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-    }
+  .grid-datos-cliente {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
 }
 
 /* Panel de eliminacion */
@@ -690,18 +698,17 @@ html {
 }
 
 #panel-eliminar, #panel-cancelar-operacion, #panel-pago {
-    position: relative;
-    background-color: var(--color-blanco);
-    border-radius: 12px;
-    border: 1px solid var(--color-verde-medio-transparente-10-alt);
-    padding: 2.5rem 2rem 2rem 2rem;
-    width: 90%;
-    max-width: 450px;
-    box-shadow: 0 20px 25px -5px var(--color-sombra-10);
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-
+  position: relative;
+  background-color: var(--color-blanco);
+  border-radius: 12px;
+  border: 1px solid var(--color-verde-medio-transparente-10-alt);
+  padding: 2.5rem 2rem 2rem 2rem;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 20px 25px -5px var(--color-sombra-10);
+  display: flex;
+  flex-direction: column;
+  text-align: center;
   opacity: 0;
   transform: scale(0.95);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -940,26 +947,21 @@ html {
     align-items: flex-start;
     gap: 1.5rem;
   }
-
   .acciones-cliente {
     width: 100%;
     flex-direction: column;
     gap: 0.5rem;
   }
-
   .boton-accion {
     width: 100%;
     justify-content: center;
   }
-
   .contenedor-tabla {
     overflow-x: auto;
   }
-
   .tabla-operaciones th, .tabla-operaciones td {
     padding: 0.875rem 1rem;
   }
-
   .acciones-modal {
     grid-template-columns: 1fr;
   }
@@ -970,23 +972,19 @@ html {
     width: 95%;
     padding: 1.5rem;
   }
-
   .info-principal {
     flex-direction: column;
     align-items: center;
     text-align: center;
     width: 100%;
   }
-
   .avatar-cliente {
     margin-bottom: 0.5rem;
   }
-
   .estadisticas-rapidas {
     flex-direction: column;
     gap: 1rem;
   }
-
   .separador-vertical {
     display: none;
   }

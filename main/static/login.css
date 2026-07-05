@@ -8,7 +8,8 @@ body {
   font-family: var(--font-main);
   background-color: var(--brand-cream);
   height: 100vh;
-  overflow: hidden; /* Para que no aparezca ninguna scroll-bar */
+  overflow: hidden;
+  /* Para que no aparezca ninguna scroll-bar */
   display: flex;
 }
 
@@ -81,11 +82,11 @@ body {
   gap: 0.75rem;
   background-color: var(--color-rosa-claro);
   border: 1px solid var(--color-borde-login);
-  padding: 0.6rem 1rem; 
+  padding: 0.6rem 1rem;
   border-radius: 0.5rem;
   margin-top: 1rem;
-  margin-bottom: 0; 
-  text-align: left; 
+  margin-bottom: 0;
+  text-align: left;
 }
 
 .icono-error {
@@ -242,13 +243,12 @@ body {
 @media (max-width: 1024px) {
   body {
     flex-direction: column;
-    overflow-y: auto; /* Permitir scroll si el contenido es muy largo en móvil */
+    overflow-y: auto;
+    /* Permitir scroll si el contenido es muy largo en móvil */
   }
-
   #pantalla-izquierda, #pantalla-derecha {
     width: 100%;
   }
-
   /* En móvil el panel izquierdo actúa como cabecera superior con el logo centrado */
   #pantalla-izquierda {
     padding: 2.5rem 2rem;
@@ -256,22 +256,19 @@ body {
     justify-content: center;
     align-items: center;
   }
-
   #logo-login {
     width: auto;
     max-width: 200px;
   }
-
   /* Ajustes del panel derecho (Formulario) */
   #pantalla-derecha {
     padding: 2.5rem 1.5rem;
-    align-items: flex-start; /* Que el form se quede arriba */
+    align-items: flex-start;
+    /* Que el form se quede arriba */
   }
-
   #encabezado-formulario h2 {
     font-size: 1.5rem;
   }
-  
   #contenedor-formulario {
     max-width: 100%;
   }
