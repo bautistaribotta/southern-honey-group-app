@@ -425,19 +425,38 @@ def get_cotizacion_dolar_oficial():
 def get_cotizaciones():
     """
     Obtiene todas las cotizaciones guardadas en la base de datos.
-    Retorna un diccionario con el formato {articulo_sanitizado: monto}
+    Retorna un diccionario con el formato {articulo_sanitizado: {"monto": x, "cantidad": y}}
     donde los caracteres especiales se reemplazan para facilitar su uso en templates.
+    La cantidad son los kilos disponibles a granel de ese articulo.
     """
     articulos_esperados = ["Miel 34mm", "Miel 50mm", "Miel +50mm", "Cera Operculo", "Cera Recupero"]
-    cotizaciones_db = {c.articulo: c.monto for c in Cotizaciones.objects.all()}
+    cotizaciones_db = {c.articulo: c for c in Cotizaciones.objects.all()}
 
     resultado = {}
     for art in articulos_esperados:
         # Sanitizar la clave para que sea un identificador válido en Django Templates
         clave = art.replace(" ", "_").replace("+", "plus")
-        resultado[clave] = cotizaciones_db.get(art, 0)
+        cotizacion = cotizaciones_db.get(art)
+        resultado[clave] = {
+            "monto": cotizacion.monto if cotizacion else 0,
+            "cantidad": cotizacion.cantidad if cotizacion else 0,
+        }
 
     return resultado
+
+
+def get_total_kilos_granel():
+    """
+    Suma los kilos a granel por familia de articulo para mostrar el total
+    de cada grupo (Miel / Cera) en la cabecera del tablero de inicio.
+    """
+    totales = {}
+    for grupo in ("Miel", "Cera"):
+        resultado = Cotizaciones.objects.filter(articulo__startswith=grupo).aggregate(
+            total=Sum("cantidad")
+        )["total"]
+        totales[grupo.lower()] = resultado if resultado is not None else 0
+    return totales
 
 
 def actualizar_cotizacion(articulo, monto):

@@ -50,6 +50,10 @@
           <span class="ini-group__glyph material-symbols-outlined">water_drop</span>
           <h3>Miel</h3>
           <span class="ini-group__count">3 articulos - por kilogramo</span>
+          <span class="ini-group__stock">
+            <span class="material-symbols-outlined">scale</span>
+            {{ totales_granel.miel|floatformat:"-2" }} kg a granel
+          </span>
         </div>
         <div class="ini-board">
           <article class="ini-tile" data-articulo="Miel 34mm">
@@ -61,9 +65,13 @@
             <div class="ini-tile__pricewrap">
               <div class="ini-tile__price">
                 <span class="ini-tile__prefix">$</span>
-                <span class="ini-tile__amount monto">{{ cotizaciones.Miel_34mm }}</span>
+                <span class="ini-tile__amount monto">{{ cotizaciones.Miel_34mm.monto }}</span>
                 <span class="ini-tile__unit">/kg</span>
               </div>
+            </div>
+            <div class="ini-tile__stock">
+              <span class="ini-tile__stocklabel">Disponible</span>
+              <span class="ini-tile__stockval">{{ cotizaciones.Miel_34mm.cantidad|floatformat:"-2" }} <i>kg</i></span>
             </div>
           </article>
 
@@ -76,9 +84,13 @@
             <div class="ini-tile__pricewrap">
               <div class="ini-tile__price">
                 <span class="ini-tile__prefix">$</span>
-                <span class="ini-tile__amount monto">{{ cotizaciones.Miel_50mm }}</span>
+                <span class="ini-tile__amount monto">{{ cotizaciones.Miel_50mm.monto }}</span>
                 <span class="ini-tile__unit">/kg</span>
               </div>
+            </div>
+            <div class="ini-tile__stock">
+              <span class="ini-tile__stocklabel">Disponible</span>
+              <span class="ini-tile__stockval">{{ cotizaciones.Miel_50mm.cantidad|floatformat:"-2" }} <i>kg</i></span>
             </div>
           </article>
 
@@ -91,9 +103,13 @@
             <div class="ini-tile__pricewrap">
               <div class="ini-tile__price">
                 <span class="ini-tile__prefix">$</span>
-                <span class="ini-tile__amount monto">{{ cotizaciones.Miel_plus50mm }}</span>
+                <span class="ini-tile__amount monto">{{ cotizaciones.Miel_plus50mm.monto }}</span>
                 <span class="ini-tile__unit">/kg</span>
               </div>
+            </div>
+            <div class="ini-tile__stock">
+              <span class="ini-tile__stocklabel">Disponible</span>
+              <span class="ini-tile__stockval">{{ cotizaciones.Miel_plus50mm.cantidad|floatformat:"-2" }} <i>kg</i></span>
             </div>
           </article>
         </div>
@@ -105,6 +121,10 @@
           <span class="ini-group__glyph material-symbols-outlined">hexagon</span>
           <h3>Cera</h3>
           <span class="ini-group__count">2 articulos - por kilogramo</span>
+          <span class="ini-group__stock">
+            <span class="material-symbols-outlined">scale</span>
+            {{ totales_granel.cera|floatformat:"-2" }} kg a granel
+          </span>
         </div>
         <div class="ini-board">
           <article class="ini-tile" data-articulo="Cera Operculo">
@@ -116,9 +136,13 @@
             <div class="ini-tile__pricewrap">
               <div class="ini-tile__price">
                 <span class="ini-tile__prefix">$</span>
-                <span class="ini-tile__amount monto">{{ cotizaciones.Cera_Operculo }}</span>
+                <span class="ini-tile__amount monto">{{ cotizaciones.Cera_Operculo.monto }}</span>
                 <span class="ini-tile__unit">/kg</span>
               </div>
+            </div>
+            <div class="ini-tile__stock">
+              <span class="ini-tile__stocklabel">Disponible</span>
+              <span class="ini-tile__stockval">{{ cotizaciones.Cera_Operculo.cantidad|floatformat:"-2" }} <i>kg</i></span>
             </div>
           </article>
 
@@ -131,15 +155,19 @@
             <div class="ini-tile__pricewrap">
               <div class="ini-tile__price">
                 <span class="ini-tile__prefix">$</span>
-                <span class="ini-tile__amount monto">{{ cotizaciones.Cera_Recupero }}</span>
+                <span class="ini-tile__amount monto">{{ cotizaciones.Cera_Recupero.monto }}</span>
                 <span class="ini-tile__unit">/kg</span>
               </div>
+            </div>
+            <div class="ini-tile__stock">
+              <span class="ini-tile__stocklabel">Disponible</span>
+              <span class="ini-tile__stockval">{{ cotizaciones.Cera_Recupero.cantidad|floatformat:"-2" }} <i>kg</i></span>
             </div>
           </article>
         </div>
       </div>
 
-      <p class="ini-foot">Valores expresados en pesos argentinos por kilogramo.</p>
+      <p class="ini-foot">Valores expresados en pesos argentinos por kilogramo. Los kilos disponibles corresponden al stock a granel.</p>
 
     </div>
   </section>
