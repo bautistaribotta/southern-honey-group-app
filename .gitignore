@@ -12,3 +12,6 @@ GEMINI.md
 .agents/skills/
 skills-lock.json
 .claude/
+servidor.log
+iniciar_servidor.bat
+iniciar_servidor_oculto.vbs
