@@ -241,7 +241,7 @@ class Vehiculo(models.Model):
 class Viaje(models.Model):
     chofer = models.ForeignKey(Chofer, on_delete=models.PROTECT, db_column="id_chofer")
     vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT, db_column="id_vehiculo")
-    inicio_caja = models.IntegerField(default=0)
+    inicio_caja = models.PositiveIntegerField(default=0)
     fecha_inicio = models.DateField()
     fecha_vuelta = models.DateField(null=True, blank=True)
     activo = models.BooleanField(default=True)
@@ -300,7 +300,7 @@ class GastoBase(models.Model):
     ]
     fecha = models.DateField(auto_now_add=True)
     gasto = models.CharField(choices=TIPO_GASTOS, max_length=25)
-    monto = models.IntegerField(default=0)
+    monto = models.PositiveIntegerField(default=0)
 
     class Meta:
         abstract = True
@@ -320,9 +320,9 @@ class ViajeReparto(models.Model):
     fecha_viaje_reparto = models.DateField()
     chofer = models.ForeignKey(Chofer, on_delete=models.PROTECT, db_column="id_chofer")
     vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT, db_column="id_vehiculo")
-    gasto_combustible_viaje_reparto = models.IntegerField(default=0)
-    costo_empleado = models.IntegerField(default=0)
-    valor_viaje = models.IntegerField(default=0)
+    gasto_combustible_viaje_reparto = models.PositiveIntegerField(default=0)
+    costo_empleado = models.PositiveIntegerField(default=0)
+    valor_viaje = models.PositiveIntegerField(default=0)
     activo = models.BooleanField(default=True)
 
     class Meta:
@@ -385,9 +385,9 @@ class ViajeCereal(models.Model):
     # El CTG es un codigo de hasta 15 digitos que puede tener ceros a la izquierda, por eso
     # lo guardo como texto: un IntegerField perderia esos ceros (00123456 -> 123456)
     codigo_trazabilidad_granos = models.CharField(max_length=15)
-    toneladas = models.IntegerField(default=0)
-    precio_tonelada = models.IntegerField(default=0)
-    porcentaje_chofer = models.IntegerField(default=0)
+    toneladas = models.PositiveIntegerField(default=0)
+    precio_tonelada = models.PositiveIntegerField(default=0)
+    porcentaje_chofer = models.PositiveIntegerField(default=0)
     activo = models.BooleanField(default=True)
 
     class Meta:
