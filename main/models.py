@@ -181,7 +181,10 @@ class Pago(models.Model):
 
 class Cotizaciones(models.Model):
     articulo = models.CharField(max_length=25, unique=True)
-    monto = models.IntegerField(default=1)
+    monto = models.PositiveIntegerField(default=1)
+    # Kilos disponibles a granel del articulo. Uso Decimal (no Float) para evitar
+    # ruido de precision al acumular pesadas fraccionadas, igual que DetalleOperacion
+    cantidad = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     class Meta:
         db_table = "cotizaciones"
