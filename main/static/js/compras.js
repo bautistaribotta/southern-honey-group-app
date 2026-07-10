@@ -6,9 +6,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const carritoVacio = document.getElementById('carrito-vacio');
     const contadorCarrito = document.getElementById('contador-carrito');
     const botonVaciar = document.getElementById('boton-vaciar-carrito');
+    const panelGranel = document.getElementById('panel-granel');
 
     // Formateador en formato argentino (separador de miles con punto)
     const formatoMoneda = new Intl.NumberFormat('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    // Los atributos data-* llegan con coma decimal por la localizacion de Django
+    function normalizarDecimal(valor) {
+        return parseFloat(String(valor).replace(',', '.')) || 0;
+    }
 
     // Clave en sessionStorage para persistir el carrito de compra
     const STORAGE_KEY = 'carrito_compra';
@@ -21,6 +27,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const filas = cuerpoCarrito.querySelectorAll('.cart-item');
         const items = [];
         filas.forEach(fila => {
+            if (fila.dataset.tipo === 'granel') {
+                items.push({
+                    tipo: 'granel',
+                    id: fila.dataset.granelId,
+                    nombre: fila.querySelector('.cart-item__name').textContent,
+                    kilos: fila.querySelector('.input-kilos').value,
+                    precio: fila.querySelector('.input-precio-item').value
+                });
+                return;
+            }
             items.push({
                 id: fila.dataset.id,
                 nombre: fila.querySelector('.cart-item__name').textContent,
@@ -45,6 +61,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const items = JSON.parse(datos);
         items.forEach(item => {
+            if (item.tipo === 'granel') {
+                crearFilaGranel(item.id, item.nombre, item.precio, item.kilos);
+                return;
+            }
             crearFilaCarrito(item.id, item.nombre, item.cantidad, item.precio);
         });
         actualizarTotal();
@@ -188,13 +208,118 @@ document.addEventListener('DOMContentLoaded', () => {
         fila.querySelector('.cart-item__subval').textContent = `$ ${formatoMoneda.format(subtotal)}`;
     }
 
+    // =============================================
+    //  ARTICULOS A GRANEL (kilos desde cotizaciones)
+    // =============================================
+
+    function vincularBotonesGranel() {
+        if (!panelGranel) return;
+        panelGranel.querySelectorAll('.boton-agregar-granel').forEach(boton => {
+            boton.addEventListener('click', function () {
+                const id = this.dataset.id;
+                const filaExistente = cuerpoCarrito.querySelector(`.cart-item[data-granel-id="${id}"]`);
+
+                if (filaExistente) {
+                    // Ya esta en el carrito: llevo el foco al input de kilos
+                    filaExistente.querySelector('.input-kilos').focus();
+                    return;
+                }
+
+                // El precio arranca precargado con la cotizacion del dia, pero es editable.
+                // Los kilos arrancan vacios: se cargan segun la pesada real.
+                crearFilaGranel(id, this.dataset.nombre, normalizarDecimal(this.dataset.precio), '');
+                actualizarTotal();
+                guardarCarrito();
+            });
+        });
+    }
+
+    function crearFilaGranel(idCotizacion, nombre, precio, kilos) {
+        const fila = document.createElement('div');
+        fila.className = 'cart-item cart-item--granel';
+        // Prefijo "granel-" en data-id para que nunca colisione con un id de producto
+        fila.dataset.id = `granel-${idCotizacion}`;
+        fila.dataset.granelId = idCotizacion;
+        fila.dataset.tipo = 'granel';
+
+        fila.innerHTML = `
+            <div class="cart-item__top">
+                <div>
+                    <div class="cart-item__name" title="${nombre}">${nombre}</div>
+                    <span class="granel-tag"><span class="material-symbols-outlined">scale</span>a granel</span>
+                </div>
+                <button type="button" class="cart-item__rm" title="Quitar">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="cart-item__ctrl">
+                <div class="cart-kg">
+                    <input type="number" class="input-kilos" placeholder="0" min="0.01" step="0.01" value="${kilos}">
+                    <span class="cart-kg__u">kg</span>
+                </div>
+                <div class="cart-priceedit">
+                    <span class="cart-priceedit__cur">$</span>
+                    <input type="number" class="input-precio-item" placeholder="0.00" min="0" step="0.01" value="${precio}">
+                    <span class="cart-priceedit__u">/kg</span>
+                </div>
+            </div>
+            <div class="cart-item__sub2">
+                <span class="cart-item__sublabel">Subtotal</span>
+                <span class="cart-item__subval">$ 0,00</span>
+            </div>
+        `;
+
+        const inputKilos = fila.querySelector('.input-kilos');
+        const inputPrecio = fila.querySelector('.input-precio-item');
+
+        function alCambiar() {
+            actualizarSubtotalGranel(fila);
+            actualizarTotal();
+            guardarCarrito();
+        }
+
+        function quitar() {
+            fila.remove();
+            actualizarTotal();
+            actualizarVistaResumen();
+            guardarCarrito();
+            const btnPanel = panelGranel ? panelGranel.querySelector(`.boton-agregar-granel[data-id="${idCotizacion}"]`) : null;
+            if (btnPanel) btnPanel.classList.remove('is-incart');
+        }
+
+        inputKilos.addEventListener('input', alCambiar);
+        inputPrecio.addEventListener('input', alCambiar);
+        fila.querySelector('.cart-item__rm').addEventListener('click', quitar);
+
+        cuerpoCarrito.appendChild(fila);
+        actualizarSubtotalGranel(fila);
+        actualizarVistaResumen();
+
+        const btnPanel = panelGranel ? panelGranel.querySelector(`.boton-agregar-granel[data-id="${idCotizacion}"]`) : null;
+        if (btnPanel) btnPanel.classList.add('is-incart');
+
+        // Foco directo al input de kilos para cargar la pesada sin clicks extra
+        inputKilos.focus();
+    }
+
+    function actualizarSubtotalGranel(fila) {
+        const kilos = parseFloat(fila.querySelector('.input-kilos').value) || 0;
+        const precio = parseFloat(fila.querySelector('.input-precio-item').value) || 0;
+        fila.querySelector('.cart-item__subval').textContent = `$ ${formatoMoneda.format(kilos * precio)}`;
+    }
+
     function actualizarTotal() {
         let total = 0;
         const filasCarrito = cuerpoCarrito.querySelectorAll('.cart-item');
 
         filasCarrito.forEach(fila => {
-            const cantidad = parseInt(fila.querySelector('.input-cantidad').value) || 0;
             const precio = parseFloat(fila.querySelector('.input-precio-item').value) || 0;
+            if (fila.dataset.tipo === 'granel') {
+                const kilos = parseFloat(fila.querySelector('.input-kilos').value) || 0;
+                total += kilos * precio;
+                return;
+            }
+            const cantidad = parseInt(fila.querySelector('.input-cantidad').value) || 0;
             total += cantidad * precio;
         });
 
@@ -207,6 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
         actualizarVistaResumen();
         guardarCarrito();
         contenedorTabla.querySelectorAll('.boton-agregar-producto').forEach(btn => btn.classList.remove('is-incart'));
+        if (panelGranel) panelGranel.querySelectorAll('.boton-agregar-granel').forEach(btn => btn.classList.remove('is-incart'));
     });
 
     // =============================================
@@ -312,16 +438,32 @@ document.addEventListener('DOMContentLoaded', () => {
         let cantidadInvalida = false;
 
         filas.forEach(fila => {
-            const cantidad = parseInt(fila.querySelector('.input-cantidad').value);
             const precioStr = fila.querySelector('.input-precio-item').value.trim();
             const precio = parseFloat(precioStr);
 
-            if (isNaN(cantidad) || cantidad < 1) {
-                cantidadInvalida = true;
-            }
-
             if (isNaN(precio) || precio <= 0) {
                 precioInvalido = true;
+            }
+
+            if (fila.dataset.tipo === 'granel') {
+                const kilos = parseFloat(fila.querySelector('.input-kilos').value);
+
+                if (isNaN(kilos) || kilos <= 0) {
+                    cantidadInvalida = true;
+                }
+
+                items.push({
+                    id_cotizacion: fila.dataset.granelId,
+                    cantidad: kilos,
+                    precio_unitario: precioStr
+                });
+                return;
+            }
+
+            const cantidad = parseInt(fila.querySelector('.input-cantidad').value);
+
+            if (isNaN(cantidad) || cantidad < 1) {
+                cantidadInvalida = true;
             }
 
             items.push({
@@ -332,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (cantidadInvalida) {
-            avisar('Revisá las cantidades: cada producto necesita un número válido mayor a 0.');
+            avisar('Revisá las cantidades: cada línea necesita un número válido mayor a 0.');
             return;
         }
 
@@ -395,5 +537,6 @@ document.addEventListener('DOMContentLoaded', () => {
     restaurarCarrito();
     actualizarVistaResumen();
     vincularBotonesAgregar();
+    vincularBotonesGranel();
     vincularPaginacion();
 });

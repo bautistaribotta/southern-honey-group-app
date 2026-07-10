@@ -148,7 +148,13 @@ class Operacion(models.Model):
 
 class DetalleOperacion(models.Model):
     operacion = models.ForeignKey(Operacion, on_delete=models.CASCADE, db_column="id_operacion")
-    producto = models.ForeignKey(Producto, on_delete=models.PROTECT, db_column="id_producto")
+    # Una linea de la operacion apunta a un producto envasado (venta por unidad) O a un
+    # articulo de cotizaciones (venta/compra a granel en kilos), nunca a los dos a la vez.
+    # La exclusion mutua la garantiza el CheckConstraint de abajo.
+    producto = models.ForeignKey(Producto, on_delete=models.PROTECT, db_column="id_producto",
+                                 null=True, blank=True)
+    cotizacion = models.ForeignKey("Cotizaciones", on_delete=models.PROTECT, db_column="id_cotizacion",
+                                   null=True, blank=True)
     cantidad = models.DecimalField(max_digits=10, decimal_places=2)
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
 
@@ -159,11 +165,33 @@ class DetalleOperacion(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["operacion", "producto"], name="unique_operacion_producto"
-            )
+            ),
+            models.UniqueConstraint(
+                fields=["operacion", "cotizacion"], name="unique_operacion_cotizacion"
+            ),
+            models.CheckConstraint(
+                condition=(
+                    models.Q(producto__isnull=False, cotizacion__isnull=True)
+                    | models.Q(producto__isnull=True, cotizacion__isnull=False)
+                ),
+                name="detalle_producto_o_cotizacion",
+            ),
         ]
 
+    @property
+    def es_granel(self):
+        return self.cotizacion_id is not None
+
+    @property
+    def nombre_item(self):
+        # Nombre unico para mostrar en listados, remito y detalle de operacion,
+        # sin que cada template tenga que ramificar entre producto y cotizacion
+        if self.es_granel:
+            return f"{self.cotizacion.articulo} (granel)"
+        return self.producto.nombre
+
     def __str__(self):
-        return f"{self.cantidad} de {self.producto} (Op: {self.operacion.id})"
+        return f"{self.cantidad} de {self.nombre_item} (Op: {self.operacion.id})"
 
 
 class Pago(models.Model):

@@ -6,10 +6,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const carritoVacio = document.getElementById('carrito-vacio');
     const contadorCarrito = document.getElementById('contador-carrito');
     const botonVaciar = document.getElementById('boton-vaciar-carrito');
+    const panelGranel = document.getElementById('panel-granel');
 
     // Formateadores en formato argentino (separador de miles con punto)
     const formatoMoneda = new Intl.NumberFormat('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const formatoCantidad = new Intl.NumberFormat('es-AR');
+    const formatoKilos = new Intl.NumberFormat('es-AR', { maximumFractionDigits: 2 });
+
+    // Los atributos data-* llegan con coma decimal por la localizacion de Django
+    function normalizarDecimal(valor) {
+        return parseFloat(String(valor).replace(',', '.')) || 0;
+    }
 
     // Clave en sessionStorage para persistir el carrito
     const STORAGE_KEY = 'carrito_operacion';
@@ -22,6 +29,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const filas = cuerpoCarrito.querySelectorAll('.cart-item');
         const items = [];
         filas.forEach(fila => {
+            if (fila.dataset.tipo === 'granel') {
+                items.push({
+                    tipo: 'granel',
+                    id: fila.dataset.granelId,
+                    nombre: fila.querySelector('.cart-item__name').textContent,
+                    kilos: fila.querySelector('.input-kilos').value,
+                    precio: fila.querySelector('.input-precio-item').value,
+                    stockOriginal: fila.dataset.stockOriginal
+                });
+                return;
+            }
             items.push({
                 id: fila.dataset.id,
                 precio: fila.dataset.precio,
@@ -47,6 +65,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const items = JSON.parse(datos);
         items.forEach(item => {
+            if (item.tipo === 'granel') {
+                crearFilaGranel(
+                    item.id,
+                    item.nombre,
+                    item.precio,
+                    item.kilos,
+                    normalizarDecimal(item.stockOriginal)
+                );
+                return;
+            }
             crearFilaCarrito(
                 item.id,
                 item.nombre,
@@ -98,6 +126,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function ajustarStockVisual() {
         const filasCarrito = cuerpoCarrito.querySelectorAll('.cart-item');
         filasCarrito.forEach(filaCarrito => {
+            if (filaCarrito.dataset.tipo === 'granel') {
+                const kilosEnCarrito = parseFloat(filaCarrito.querySelector('.input-kilos').value) || 0;
+                const kilosOriginales = normalizarDecimal(filaCarrito.dataset.stockOriginal);
+                actualizarStockGranel(filaCarrito.dataset.granelId, kilosOriginales - kilosEnCarrito);
+                return;
+            }
             const idProducto = filaCarrito.dataset.id;
             const cantidadEnCarrito = parseInt(filaCarrito.querySelector('.input-cantidad').value);
             const stockOriginal = parseInt(filaCarrito.dataset.stockOriginal);
@@ -105,6 +139,153 @@ document.addEventListener('DOMContentLoaded', () => {
 
             actualizarStockProducto(idProducto, stockDisponible);
         });
+    }
+
+    // =============================================
+    //  ARTICULOS A GRANEL (kilos desde cotizaciones)
+    // =============================================
+
+    function buscarGranelEnPanel(idCotizacion) {
+        if (!panelGranel) return null;
+        const boton = panelGranel.querySelector(`.boton-agregar-granel[data-id="${idCotizacion}"]`);
+        if (!boton) return null;
+        const stockCell = panelGranel.querySelector(`[data-granel-stock="${idCotizacion}"]`);
+        return { boton, stockCell };
+    }
+
+    function actualizarStockGranel(idCotizacion, kilosDisponibles) {
+        const articulo = buscarGranelEnPanel(idCotizacion);
+        if (!articulo) return;
+
+        const restante = Math.max(kilosDisponibles, 0);
+        articulo.stockCell.textContent = `${formatoKilos.format(restante)} kg`;
+
+        if (kilosDisponibles <= 0) {
+            articulo.boton.disabled = true;
+            articulo.boton.title = 'Sin kilos disponibles';
+            articulo.stockCell.classList.add('granel-item__stock--zero');
+        } else {
+            articulo.boton.disabled = false;
+            articulo.boton.title = 'Añadir a la venta';
+            articulo.stockCell.classList.remove('granel-item__stock--zero');
+        }
+    }
+
+    function vincularBotonesGranel() {
+        if (!panelGranel) return;
+        panelGranel.querySelectorAll('.boton-agregar-granel').forEach(boton => {
+            boton.addEventListener('click', function () {
+                const id = this.dataset.id;
+                const filaExistente = cuerpoCarrito.querySelector(`.cart-item[data-granel-id="${id}"]`);
+
+                if (filaExistente) {
+                    // Ya esta en el carrito: llevo el foco al input de kilos
+                    filaExistente.querySelector('.input-kilos').focus();
+                    return;
+                }
+
+                const stockOriginal = normalizarDecimal(this.dataset.stock);
+                if (stockOriginal <= 0) return;
+
+                // Los kilos arrancan vacios: se cargan segun la pesada real
+                crearFilaGranel(id, this.dataset.nombre, normalizarDecimal(this.dataset.precio), '', stockOriginal);
+                actualizarTotal();
+                guardarCarrito();
+            });
+        });
+    }
+
+    function crearFilaGranel(idCotizacion, nombre, precio, kilos, stockOriginal) {
+        const fila = document.createElement('div');
+        fila.className = 'cart-item cart-item--granel';
+        // Prefijo "granel-" en data-id para que nunca colisione con un id de producto
+        fila.dataset.id = `granel-${idCotizacion}`;
+        fila.dataset.granelId = idCotizacion;
+        fila.dataset.tipo = 'granel';
+        fila.dataset.stockOriginal = stockOriginal;
+
+        fila.innerHTML = `
+            <div class="cart-item__top">
+                <div>
+                    <div class="cart-item__name" title="${nombre}">${nombre}</div>
+                    <span class="granel-tag"><span class="material-symbols-outlined">scale</span>a granel</span>
+                </div>
+                <button type="button" class="cart-item__rm" title="Quitar">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="cart-item__ctrl">
+                <div class="cart-kg">
+                    <input type="number" class="input-kilos" placeholder="0" min="0.01" step="0.01" value="${kilos}">
+                    <span class="cart-kg__u">kg</span>
+                </div>
+                <div class="cart-priceedit">
+                    <span class="cart-priceedit__cur">$</span>
+                    <input type="number" class="input-precio-item" placeholder="0.00" min="0" step="0.01" value="${precio}">
+                    <span class="cart-priceedit__u">/kg</span>
+                </div>
+            </div>
+            <div class="cart-item__sub2">
+                <span class="cart-item__sublabel">Subtotal</span>
+                <span class="cart-item__subval">$ 0,00</span>
+            </div>
+            <div class="cart-item__overstock oculto">
+                <span class="material-symbols-outlined">warning</span>
+                <span class="cart-item__overstock-msg"></span>
+            </div>
+        `;
+
+        const inputKilos = fila.querySelector('.input-kilos');
+        const inputPrecio = fila.querySelector('.input-precio-item');
+
+        function quitar() {
+            fila.remove();
+            actualizarStockGranel(idCotizacion, stockOriginal);
+            actualizarTotal();
+            actualizarVistaResumen();
+            guardarCarrito();
+            const btnPanel = panelGranel ? panelGranel.querySelector(`.boton-agregar-granel[data-id="${idCotizacion}"]`) : null;
+            if (btnPanel) btnPanel.classList.remove('is-incart');
+        }
+
+        function alCambiar() {
+            actualizarFilaGranel(fila);
+            actualizarTotal();
+            guardarCarrito();
+        }
+
+        inputKilos.addEventListener('input', alCambiar);
+        inputPrecio.addEventListener('input', alCambiar);
+        fila.querySelector('.cart-item__rm').addEventListener('click', quitar);
+
+        cuerpoCarrito.appendChild(fila);
+        actualizarFilaGranel(fila);
+        actualizarVistaResumen();
+
+        const btnPanel = panelGranel ? panelGranel.querySelector(`.boton-agregar-granel[data-id="${idCotizacion}"]`) : null;
+        if (btnPanel) btnPanel.classList.add('is-incart');
+
+        // Foco directo al input de kilos para cargar la pesada sin clicks extra
+        inputKilos.focus();
+    }
+
+    function actualizarFilaGranel(fila) {
+        const kilos = parseFloat(fila.querySelector('.input-kilos').value) || 0;
+        const precio = parseFloat(fila.querySelector('.input-precio-item').value) || 0;
+        const stockOriginal = normalizarDecimal(fila.dataset.stockOriginal);
+
+        fila.querySelector('.cart-item__subval').textContent = `$ ${formatoMoneda.format(kilos * precio)}`;
+
+        // Aviso inline si la carga supera los kilos disponibles (la venta se bloquea al confirmar)
+        const excedido = kilos > stockOriginal;
+        fila.querySelector('.cart-item__overstock').classList.toggle('oculto', !excedido);
+        fila.querySelector('.cart-kg').classList.toggle('is-invalid', excedido);
+        if (excedido) {
+            fila.querySelector('.cart-item__overstock-msg').textContent =
+                `Supera los ${formatoKilos.format(stockOriginal)} kg disponibles`;
+        }
+
+        actualizarStockGranel(fila.dataset.granelId, stockOriginal - kilos);
     }
 
     // =============================================
@@ -265,6 +446,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const filasCarrito = cuerpoCarrito.querySelectorAll('.cart-item');
 
         filasCarrito.forEach(fila => {
+            if (fila.dataset.tipo === 'granel') {
+                const kilos = parseFloat(fila.querySelector('.input-kilos').value) || 0;
+                const precioKilo = parseFloat(fila.querySelector('.input-precio-item').value) || 0;
+                total += kilos * precioKilo;
+                return;
+            }
             const precio = parseFloat(fila.dataset.precio);
             const cantidad = parseInt(fila.querySelector('.input-cantidad').value) || 0;
             total += precio * cantidad;
@@ -275,14 +462,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     botonVaciar.addEventListener('click', function () {
         const filas = cuerpoCarrito.querySelectorAll('.cart-item');
-        filas.forEach(fila => actualizarStockProducto(fila.dataset.id, parseInt(fila.dataset.stockOriginal)));
+        filas.forEach(fila => {
+            if (fila.dataset.tipo === 'granel') {
+                actualizarStockGranel(fila.dataset.granelId, normalizarDecimal(fila.dataset.stockOriginal));
+            } else {
+                actualizarStockProducto(fila.dataset.id, parseInt(fila.dataset.stockOriginal));
+            }
+        });
         cuerpoCarrito.innerHTML = '';
         actualizarTotal();
         actualizarVistaResumen();
         guardarCarrito();
-        
+
         // Remover el highlight
         contenedorTabla.querySelectorAll('.boton-agregar-producto').forEach(btn => btn.classList.remove('is-incart'));
+        if (panelGranel) panelGranel.querySelectorAll('.boton-agregar-granel').forEach(btn => btn.classList.remove('is-incart'));
     });
 
     // =============================================
@@ -379,7 +573,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const items = [];
         let cantidadInvalida = false;
+        let granelInvalido = false;
+        let precioGranelInvalido = false;
+
         filas.forEach(fila => {
+            if (fila.dataset.tipo === 'granel') {
+                const kilos = parseFloat(fila.querySelector('.input-kilos').value);
+                const precioKilo = parseFloat(fila.querySelector('.input-precio-item').value);
+                const stockKilos = normalizarDecimal(fila.dataset.stockOriginal);
+
+                // Bloqueo duro: no se venden mas kilos de los que hay en deposito
+                if (isNaN(kilos) || kilos <= 0 || kilos > stockKilos) {
+                    granelInvalido = true;
+                }
+                if (isNaN(precioKilo) || precioKilo <= 0) {
+                    precioGranelInvalido = true;
+                }
+
+                items.push({
+                    id_cotizacion: fila.dataset.granelId,
+                    cantidad: kilos,
+                    precio_unitario: precioKilo,
+                });
+                return;
+            }
+
             const cantidad = parseInt(fila.querySelector('.input-cantidad').value);
             const stockOriginal = parseInt(fila.dataset.stockOriginal);
             if (isNaN(cantidad) || cantidad < 1 || cantidad > stockOriginal) {
@@ -390,6 +608,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (cantidadInvalida) {
             avisar('Revisá las cantidades: cada producto necesita un número válido y dentro del stock disponible.');
+            return;
+        }
+
+        if (granelInvalido) {
+            avisar('Revisá los kilos a granel: cada artículo necesita kilos mayores a 0 y dentro del stock disponible.');
+            return;
+        }
+
+        if (precioGranelInvalido) {
+            avisar('Cargá un precio por kilo mayor a 0 en todos los artículos a granel.');
             return;
         }
 
@@ -447,5 +675,6 @@ document.addEventListener('DOMContentLoaded', () => {
     restaurarCarrito();
     actualizarVistaResumen();
     vincularBotonesAgregar();
+    vincularBotonesGranel();
     vincularPaginacion();
 });

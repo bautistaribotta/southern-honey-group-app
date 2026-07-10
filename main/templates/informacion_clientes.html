@@ -195,7 +195,7 @@
                                 <ul style="list-style-type: none; padding: 0; margin: 0;">
                                     {% for detalle in operacion.detalleoperacion_set.all|slice:":2" %}
                                         <li style="font-size: 0.9em; color: var(--slate-600);">
-                                            {{ detalle.cantidad|floatformat:"0g" }}x {{ detalle.producto.nombre }}
+                                            {% if detalle.es_granel %}{{ detalle.cantidad|floatformat:"-2g" }} kg {{ detalle.nombre_item }}{% else %}{{ detalle.cantidad|floatformat:"0g" }}x {{ detalle.producto.nombre }}{% endif %}
                                         </li>
                                     {% empty %}
                                         <li style="font-size: 0.9em; color: var(--slate-400);">Sin productos</li>

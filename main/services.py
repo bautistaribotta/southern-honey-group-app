@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 import requests
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 from django.shortcuts import get_object_or_404
 from django.http import Http404
@@ -190,6 +190,51 @@ def buscar_clientes(q, limite=10):
     ]
 
 
+def _procesar_item_granel(operacion, item, tipo_operacion):
+    """
+    Procesa una linea a granel (miel o cera en kilos) dentro de crear_operacion.
+    El precio por kilo viene del item: la cotizacion del dia es solo el valor
+    precargado en el front y el usuario puede negociarlo linea por linea.
+    Debe llamarse dentro de transaction.atomic().
+    """
+    try:
+        kilos = Decimal(str(item.get("cantidad", 0)))
+        precio_unitario = Decimal(str(item.get("precio_unitario", 0)))
+    except InvalidOperation:
+        raise ValueError("La cantidad de kilos y el precio deben ser números válidos.")
+
+    if kilos <= 0:
+        raise ValueError("La cantidad de kilos debe ser mayor a 0.")
+    if precio_unitario <= 0:
+        raise ValueError("El precio por kilo debe ser mayor a 0.")
+
+    cotizacion = get_object_or_404(Cotizaciones, id=item.get("id_cotizacion"))
+
+    if tipo_operacion == "venta":
+        # Descuento condicional atomico, mismo patron que modificar_stock: el
+        # chequeo de kilos disponibles y la resta ocurren en una sola sentencia,
+        # asi dos ventas concurrentes no pueden sobrevender el mismo tambor
+        filas = Cotizaciones.objects.filter(
+            id=cotizacion.id, cantidad__gte=kilos
+        ).update(cantidad=F("cantidad") - kilos)
+
+        if filas == 0:
+            raise ValueError(
+                f"No hay kilos suficientes de {cotizacion.articulo} a granel."
+            )
+    else:
+        Cotizaciones.objects.filter(id=cotizacion.id).update(
+            cantidad=F("cantidad") + kilos
+        )
+
+    DetalleOperacion.objects.create(
+        operacion=operacion,
+        cotizacion=cotizacion,
+        cantidad=kilos,
+        precio_unitario=precio_unitario,
+    )
+
+
 def crear_operacion(cliente, items, metodo_pago, tipo_operacion, viaje=None):
     # Obtenemos las cotizaciones actuales antes de la transacción
     cotizacion_dolar = get_cotizacion_dolar_oficial()
@@ -211,7 +256,16 @@ def crear_operacion(cliente, items, metodo_pago, tipo_operacion, viaje=None):
         )
 
         for item in items:
+            # Item a granel: viene con id_cotizacion en vez de id_producto y la
+            # cantidad son kilos, por eso se parsea como Decimal (admite fracciones)
+            id_cotizacion = item.get("id_cotizacion")
+            if id_cotizacion:
+                _procesar_item_granel(operacion, item, tipo_operacion)
+                continue
+
             id_producto = item.get("id_producto")
+            # Los productos envasados se venden por unidad entera: la columna de
+            # stock es un entero, asi que la cantidad se mantiene como int
             cantidad = int(item.get("cantidad", 0))
 
             producto = get_object_or_404(Producto, id=id_producto, activo=True)
@@ -271,6 +325,26 @@ def servicio_cancelar_operacion(id_operacion):
 
         # Revertimos el stock de cada producto en el detalle según el tipo de operación
         for detalle in detalles:
+            # Lineas a granel: los kilos se revierten sobre la tabla de cotizaciones
+            if detalle.cotizacion_id:
+                if operacion.tipo_operacion == "venta":
+                    # Venta cancelada: los kilos vuelven al deposito
+                    Cotizaciones.objects.filter(id=detalle.cotizacion_id).update(
+                        cantidad=F("cantidad") + detalle.cantidad
+                    )
+                else:
+                    # Compra cancelada: quito los kilos, con el mismo chequeo
+                    # condicional atomico para no dejar el stock negativo
+                    filas = Cotizaciones.objects.filter(
+                        id=detalle.cotizacion_id, cantidad__gte=detalle.cantidad
+                    ).update(cantidad=F("cantidad") - detalle.cantidad)
+
+                    if filas == 0:
+                        raise ValueError(
+                            "No se puede cancelar la compra: los kilos a granel ya fueron vendidos."
+                        )
+                continue
+
             producto = detalle.producto
 
             if operacion.tipo_operacion == "venta":
@@ -443,6 +517,17 @@ def get_cotizaciones():
         }
 
     return resultado
+
+
+def get_articulos_granel():
+    """
+    Devuelve los articulos de cotizaciones en el orden semantico del tablero
+    (mieles por calibre y despues ceras), para el panel "A granel" de las
+    pantallas de venta y compra. Los articulos sin fila en la BD se omiten.
+    """
+    orden = ["Miel 34mm", "Miel 50mm", "Miel +50mm", "Cera Operculo", "Cera Recupero"]
+    articulos = {c.articulo: c for c in Cotizaciones.objects.all()}
+    return [articulos[art] for art in orden if art in articulos]
 
 
 def get_total_kilos_granel():

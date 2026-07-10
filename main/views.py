@@ -14,7 +14,7 @@ from django.db import transaction
 from .models import Cliente, Producto, Operacion, DetalleOperacion, Pago, Cotizaciones, Chofer, Vehiculo, Viaje, ViajeCereal, ViajeReparto
 from .pdf_services import Remito
 from .services import (nuevo_producto, editar_producto, eliminar_producto, nuevo_cliente, editar_cliente,
-                       eliminar_cliente, buscar_clientes, get_cotizacion_dolar_oficial, get_cotizaciones, get_total_kilos_granel, actualizar_cotizacion, obtener_datos_cliente,
+                       eliminar_cliente, buscar_clientes, get_cotizacion_dolar_oficial, get_cotizaciones, get_total_kilos_granel, get_articulos_granel, actualizar_cotizacion, obtener_datos_cliente,
                        obtener_datos_producto, modificar_stock, crear_operacion, servicio_cancelar_operacion,
                        obtener_listado_deudores, crear_chofer, crear_vehiculo, crear_viaje, obtener_choferes_activos,
                        obtener_vehiculos_activos, obtener_viajes, obtener_datos_viaje, editar_viaje, eliminar_viaje, crear_gasto,
@@ -316,7 +316,7 @@ def informacion_clientes(request, id_cliente):
         messages.success(request, "Cliente editado correctamente")
         return redirect("informacion_clientes", id_cliente=id_cliente)
 
-    operaciones_cliente = Operacion.objects.filter(cliente=cliente).con_totales().prefetch_related("detalleoperacion_set__producto", "pago_set").order_by("-fecha")
+    operaciones_cliente = Operacion.objects.filter(cliente=cliente).con_totales().prefetch_related("detalleoperacion_set__producto", "detalleoperacion_set__cotizacion", "pago_set").order_by("-fecha")
 
     # Filtro por tipo de operacion segun la pestaña activa (todas / venta / compra)
     tipo_actual = request.GET.get("tipo", "todas")
@@ -403,9 +403,14 @@ def generar_remito(request, id_operacion):
     # Armamos la lista estructurada de los productos para enviarlo al PDF
     lista_productos = []
     for d in detalles:
+        if d.es_granel:
+            # Los kilos se muestran sin ceros de mas y con la unidad explicita
+            cantidad = f"{d.cantidad:.2f}".rstrip("0").rstrip(".") + " kg"
+        else:
+            cantidad = d.cantidad
         lista_productos.append({
-            'cantidad': d.cantidad,
-            'detalle': d.producto.nombre,
+            'cantidad': cantidad,
+            'detalle': d.nombre_item,
         })
 
     pdf = Remito(
@@ -496,6 +501,7 @@ def nueva_operacion_venta(request, id_cliente):
         "q": q,
         "categoria": categoria_filtrada,
         "categorias": Producto.categorias,
+        "granel": get_articulos_granel(),
     }
 
     # Si es una petición AJAX, devuelvo solo la tabla parcial
@@ -571,6 +577,7 @@ def nueva_operacion_compra(request, id_cliente):
         "q": q,
         "categoria": categoria_filtrada,
         "categorias": Producto.categorias,
+        "granel": get_articulos_granel(),
     }
 
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
@@ -860,7 +867,7 @@ def informacion_viaje(request, id_viaje):
         viaje.operaciones
         .con_totales()
         .select_related("cliente")
-        .prefetch_related("detalleoperacion_set__producto", "pago_set")
+        .prefetch_related("detalleoperacion_set__producto", "detalleoperacion_set__cotizacion", "pago_set")
         .order_by("-fecha")
     )
 
