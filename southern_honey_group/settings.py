@@ -1,7 +1,6 @@
 from pathlib import Path
 import os
 
-from django.conf.global_settings import ALLOWED_HOSTS
 from dotenv import load_dotenv
 
 # Load .env file
@@ -18,19 +17,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # Si no encuentra la variable ENVIROMENT usa "development"
 ENVIRONMENT = os.getenv('ENVIRONMENT', 'development')
 
-if ENVIRONMENT == 'production':
-    DEBUG = False
-    ALLOWED_HOSTS = ['192.168.0.200', '100.82.236.64', 'localhost', '127.0.0.1']
-    # Para que Django no rechace los formularios
-    CSRF_TRUSTED_ORIGINS = [
-        'http://192.168.0.200:8000',
-        'http://100.82.236.64:8000',
-        'http://localhost:8000',
-        'http://127.0.0.1:8000',
-    ]
-
-
-elif ENVIRONMENT == "demonstration":
+if ENVIRONMENT == "demonstration":
     DEBUG = False
     ALLOWED_HOSTS = ['bautistaribotta.pythonanywhere.com']
 
@@ -141,22 +128,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
+# STATIC_ROOT es la carpeta donde collectstatic junta los estaticos
+# para que PythonAnywhere los sirva desde ahi
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# WhiteNoise solo se activa en el servidor local (production).
-# En PythonAnywhere (demonstration) los estaticos los sirve la plataforma,
-# asi que no hace falta y evita triplicar los archivos (original, .gz y .br).
-if ENVIRONMENT == 'production':
-    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
-    STORAGES = {
-        "default": {
-            "BACKEND": "django.core.files.storage.FileSystemStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-        },
-    }
 
 # Sirve para que sin importar desde donde se acceda
 # lleve a la url de inicio
