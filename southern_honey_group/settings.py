@@ -1,7 +1,6 @@
 from pathlib import Path
 import os
 
-from django.conf.global_settings import ALLOWED_HOSTS
 from dotenv import load_dotenv
 
 # Load .env file
@@ -28,6 +27,14 @@ if ENVIRONMENT == 'production':
         'http://localhost:8000',
         'http://127.0.0.1:8000',
     ]
+
+elif ENVIRONMENT == 'demonstration':
+    # PythonAnywhere: la app se publica en el subdominio de la cuenta y siempre
+    # por HTTPS, asi que el origen confiable para los formularios va con https://
+    # y sin puerto (a diferencia del servidor local, que escucha en el 8000).
+    DEBUG = False
+    ALLOWED_HOSTS = ['bautistaribotta.pythonanywhere.com']
+    CSRF_TRUSTED_ORIGINS = ['https://bautistaribotta.pythonanywhere.com']
 
 else:
     DEBUG = True
