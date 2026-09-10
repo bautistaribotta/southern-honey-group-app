@@ -24,8 +24,8 @@ body {
   width: 42%;
 }
 
-/* Lado izquierdo: foto del apicultor con el logo de Southern centrado encima.
-   Un velo con tinte pino parejo asegura que el logo blanco se lea sobre la imagen. */
+/* Lado izquierdo: foto del apicultor a sangre. El velo con tinte pino se
+   mantiene para bajarle el contraste y que no compita con el formulario. */
 #pantalla-izquierda {
   /* Fallback sRGB primero: Safari < 15.4 descarta la declaracion con oklch y usa esta */
   background-image:
@@ -42,13 +42,6 @@ body {
   padding: 4rem;
 }
 
-#logo-login {
-  width: 70%;
-  max-width: 320px;
-  height: auto;
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.45));
-  filter: drop-shadow(0 2px 8px oklch(0% 0 0 / 0.45));
-}
 
 /* Todo el contenido de la derecha */
 #pantalla-derecha {
@@ -259,16 +252,14 @@ body {
   #pantalla-izquierda, #pantalla-derecha {
     width: 100%;
   }
-  /* En móvil el panel izquierdo actúa como cabecera superior con el logo centrado */
+  /* En móvil el panel izquierdo actúa como cabecera superior. Va vacio, asi que
+     el alto lo fija min-height: sin el, quedaria reducido al padding. */
   #pantalla-izquierda {
     padding: 2.5rem 2rem;
     height: auto;
+    min-height: 180px;
     justify-content: center;
     align-items: center;
-  }
-  #logo-login {
-    width: auto;
-    max-width: 200px;
   }
   /* Ajustes del panel derecho (Formulario) */
   #pantalla-derecha {

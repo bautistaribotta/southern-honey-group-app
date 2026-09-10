@@ -301,41 +301,14 @@ body {
   flex: none;
 }
 
-/* Isologo (apaisado) e isotipo (la abeja, casi cuadrada). En escritorio se
-   intercambian segun la barra este desplegada o plegada; en mobile solo existe
-   el isologo, que es como se veia siempre. */
-#isologo-sidebar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
+/* Isotipo (la abeja, casi cuadrada): es la unica marca de la barra, se ve igual
+   plegada que desplegada y en mobile. El SVG viene en color, el filtro lo pasa
+   a blanco para que contraste con el pino del fondo. */
 #isotipo-sidebar {
-  display: none;
+  display: block;
+  height: 3.5rem;
   width: auto;
   filter: brightness(0) invert(1);
-}
-
-#logo-principal-sidebar {
-  height: 55px;
-  width: auto;
-  filter: brightness(0) invert(1);
-}
-
-#logos-secundarios-sidebar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  width: 100%;
-}
-
-.logo-secundario {
-  height: 14px;
-  width: auto;
-  filter: brightness(0) invert(1);
-  opacity: 0.65;
 }
 
 /* La lista toma el alto sobrante y scrollea sola, como ya hace #contenido-principal.
@@ -557,49 +530,21 @@ body {
     display: none;
   }
 
-  /* El isologo es apaisado y no entra en el riel: en su lugar va el isotipo y se
-     cruzan por opacidad. Los dos van absolutos y centrados sobre una cabecera de
-     alto fijo, para que el intercambio no mueva el menu de abajo. */
+  /* La abeja entra en el ancho del riel, asi que es la misma pieza plegada y
+     desplegada: no hay intercambio. La cabecera conserva el alto fijo para que
+     el menu de abajo no se mueva al abrir la barra. */
   #encabezado-sidebar {
-    position: relative;
     justify-content: center;
     height: 5.5rem;
   }
 
-  #isotipo-sidebar,
-  #isologo-sidebar {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    transition: opacity var(--dur-normal) var(--ease-standard);
-  }
-
   #isotipo-sidebar {
-    display: block;
     height: 2.6rem;
-  }
-
-  #isologo-sidebar {
-    width: max-content;
-    opacity: 0;
-  }
-
-  #barra-lateral:hover #isotipo-sidebar,
-  #barra-lateral:focus-within #isotipo-sidebar {
-    opacity: 0;
-  }
-
-  #barra-lateral:hover #isologo-sidebar,
-  #barra-lateral:focus-within #isologo-sidebar {
-    opacity: 1;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #barra-lateral,
-  #isotipo-sidebar,
-  #isologo-sidebar {
+  #barra-lateral {
     transition: none;
   }
 }
