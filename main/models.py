@@ -239,7 +239,7 @@ class ProductoPorKg(models.Model):
     Producto: la diferencia con esa tabla es la unidad de venta (kilos con
     decimales en vez de unidades enteras), no el rubro.
 
-    Los cinco articulos de ARTICULOS_COTIZACION son los historicos de miel y
+    Los articulos de ARTICULOS_COTIZACION son los historicos de miel y
     cera: su precio y su stock se gobiernan desde el tablero de cotizaciones y
     desde las operaciones, asi que en el inventario se muestran de solo lectura.
     El resto se administra como cualquier producto (alta, edicion, baja y ajuste
@@ -251,6 +251,7 @@ class ProductoPorKg(models.Model):
         "Miel mayor a 50 mm",
         "Cera Operculo",
         "Cera Recupero",
+        "Cera Borra de Operculo",
     )
 
     articulo = models.CharField(max_length=30, unique=True)
