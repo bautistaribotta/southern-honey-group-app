@@ -32,7 +32,14 @@ elif ENVIRONMENT == 'demonstration':
     # PythonAnywhere: la app se publica en el subdominio de la cuenta y siempre
     # por HTTPS, asi que el origen confiable para los formularios va con https://
     # y sin puerto (a diferencia del servidor local, que escucha en el 8000).
-    DEBUG = False
+    # Interruptor para diagnosticar en el server sin editar este archivo: editarlo
+    # a mano en PythonAnywhere haria conflicto con el proximo git pull. Se prende
+    # con DEBUG_TEMPORAL=1 en el .env y se apaga sacando la linea.
+    #
+    # No dejarlo prendido: la pagina de error de Django lista las variables de
+    # entorno (SECRET_KEY y las credenciales de la base incluidas) a cualquiera
+    # que provoque un error en el sitio, que es publico.
+    DEBUG = os.getenv('DEBUG_TEMPORAL') == '1'
     ALLOWED_HOSTS = ['bautistaribotta.pythonanywhere.com']
     CSRF_TRUSTED_ORIGINS = ['https://bautistaribotta.pythonanywhere.com']
 
