@@ -3,11 +3,20 @@ from .models import (
     Cliente, Producto, Operacion, DetalleOperacion, Pago, ProductoPorKg,
     Empleado, PagosEmpleados, Vehiculo, Viaje, DetalleViaje, Gasto,
     ViajeReparto, DetalleViajeReparto, DestinoViajeReparto, ViajeCereal, DetalleViajeCereal,
-    GastoViajeCereal, Casa, Contrato, PagoAlquiler, GastoCasa, EstacionDeServicio,
+    GastoViajeCereal, EstacionDeServicio,
     RegistroKilometraje, Seguro, VTV, Servis, ObservacionVehiculo,
-    Empresa, OperacionIva,
+    Empresa,
     Banco, CuentaCorriente, Cheque,
 )
+
+"""
+Alquileres (Casa, Contrato, PagoAlquiler, GastoCasa) y las operaciones de IVA
+(OperacionIva) no se registran en el admin a proposito: esas secciones no se
+publican en esta instalacion y tampoco tienen ruta en urls.py, asi que el admin
+seria la unica puerta que les quedaria abierta a un superusuario. Empresa sigue
+registrada porque tambien la usa Cheques (una cuenta corriente pertenece a una
+empresa), que si se publica. Los modelos y sus tablas quedan intactos.
+"""
 
 admin.site.register(Cliente)
 admin.site.register(Pago)
@@ -147,37 +156,6 @@ class ViajeCerealAdmin(admin.ModelAdmin):
 class GastoViajeCerealAdmin(admin.ModelAdmin):
     list_display = ('id', 'viaje_cereal', 'gasto', 'monto', 'fecha')
 
-class PagoAlquilerInline(admin.TabularInline):
-    model = PagoAlquiler
-    extra = 1
-
-class ContratoInline(admin.TabularInline):
-    model = Contrato
-    extra = 1
-
-class GastoCasaInline(admin.TabularInline):
-    model = GastoCasa
-    extra = 1
-
-@admin.register(Casa)
-class CasaAdmin(admin.ModelAdmin):
-    inlines = [ContratoInline, PagoAlquilerInline, GastoCasaInline]
-    list_display = ('id', 'nombre', 'localidad', 'direccion', 'activa')
-
-@admin.register(Contrato)
-class ContratoAdmin(admin.ModelAdmin):
-    list_display = ('id', 'casa', 'inicio', 'fin', 'monto_mensual', 'comision_inmobiliaria', 'nombre_inquilino')
-    list_filter = ('casa',)
-
-@admin.register(PagoAlquiler)
-class PagoAlquilerAdmin(admin.ModelAdmin):
-    list_display = ('id', 'casa', 'periodo', 'fecha', 'monto')
-
-@admin.register(GastoCasa)
-class GastoCasaAdmin(admin.ModelAdmin):
-    list_display = ('id', 'casa', 'fecha', 'categoria', 'detalle', 'monto')
-    list_filter = ('categoria', 'casa')
-
 @admin.register(EstacionDeServicio)
 class EstacionDeServicioAdmin(admin.ModelAdmin):
     list_display = ('id', 'nombre', 'activa')
@@ -185,21 +163,11 @@ class EstacionDeServicioAdmin(admin.ModelAdmin):
     search_fields = ('nombre',)
 
 
-class OperacionIvaInline(admin.TabularInline):
-    model = OperacionIva
-    extra = 1
-
 @admin.register(Empresa)
 class EmpresaAdmin(admin.ModelAdmin):
-    inlines = [OperacionIvaInline]
-    list_display = ('id', 'nombre', 'iva_debito', 'iva_credito', 'saldo_iva', 'activa')
+    list_display = ('id', 'nombre', 'activa')
     list_filter = ('activa',)
     search_fields = ('nombre',)
-
-@admin.register(OperacionIva)
-class OperacionIvaAdmin(admin.ModelAdmin):
-    list_display = ('id', 'empresa', 'tipo', 'fecha', 'monto_neto', 'alicuota', 'iva')
-    list_filter = ('tipo', 'empresa')
 
 
 class CuentaCorrienteInline(admin.TabularInline):
