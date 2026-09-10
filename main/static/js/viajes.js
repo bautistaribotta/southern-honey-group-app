@@ -4,19 +4,29 @@
  * -----------------------------------------------------------------------------
  */
 
-const inputBusqueda = document.getElementById('buscar-viaje');
 const filtroEstado = document.getElementById('filtro-estado');
 const contenedorTabla = document.getElementById('tabla-viajes-container');
+const filtroFechasViaje = document.getElementById('filtro-fechas');
 
 /**
- * Busca viajes aplicando texto y filtro de estado mediante AJAX, sin recargar
- * la página entera.
+ * Vuelca el rango de fechas aplicado (data-* del chip) en la URL, tanto en la
+ * busqueda como en la paginacion, para que el filtro sobreviva al paginar.
+ */
+const aplicarFechasViaje = (url) => {
+  const dd = filtroFechasViaje ? filtroFechasViaje.dataset.desde : '';
+  const hh = filtroFechasViaje ? filtroFechasViaje.dataset.hasta : '';
+  if (dd) url.searchParams.set('desde', dd); else url.searchParams.delete('desde');
+  if (hh) url.searchParams.set('hasta', hh); else url.searchParams.delete('hasta');
+};
+
+/**
+ * Busca viajes aplicando los filtros por entidad (empleado/vehiculo/destino), el
+ * estado y la fecha mediante AJAX, sin recargar la página entera.
  * @param {string|null} urlString - URL opcional (ej: para paginación).
  */
 const buscar = (urlString = null) => {
-  if (!inputBusqueda || !filtroEstado || !contenedorTabla) return;
+  if (!filtroEstado || !contenedorTabla) return;
 
-  const q = inputBusqueda.value;
   const estado = filtroEstado.value;
   let url;
 
@@ -24,7 +34,6 @@ const buscar = (urlString = null) => {
     url = new URL(urlString, window.location.origin);
   } else {
     url = new URL(window.location.href);
-    url.searchParams.set('q', q);
     if (estado) {
       url.searchParams.set('estado', estado);
     } else {
@@ -32,6 +41,11 @@ const buscar = (urlString = null) => {
     }
     url.searchParams.delete('page');
   }
+
+  // Los filtros por entidad y por fecha viven en sus chips (fuera de la tabla que
+  // reemplaza el AJAX); los vuelco en la URL tanto al buscar como al paginar.
+  if (typeof aplicarFiltrosEntidad === 'function') aplicarFiltrosEntidad(url);
+  aplicarFechasViaje(url);
 
   fetch(url, {
     headers: {
@@ -62,21 +76,14 @@ const vincularPaginacion = () => {
   });
 };
 
-if (inputBusqueda) inputBusqueda.addEventListener('input', () => buscar());
+// Los chips de filtro por entidad avisan por evento; recargo la tabla al cambiar.
+document.addEventListener('filtroentidad:cambio', () => buscar());
 
-// Chips de estado
-const chipsEstado = document.getElementById('chips-estado');
-if (chipsEstado) {
-  chipsEstado.addEventListener('click', (e) => {
-    const chip = e.target.closest('.prod-chip');
-    if (!chip) return;
+// El filtro de fecha avisa por evento; recargo la tabla con el rango aplicado.
+document.addEventListener('filtrofechas:cambio', () => buscar());
 
-    chipsEstado.querySelectorAll('.prod-chip').forEach((c) => c.classList.remove('is-active'));
-    chip.classList.add('is-active');
-
-    if (filtroEstado) filtroEstado.value = chip.dataset.estado;
-    buscar();
-  });
-}
+// La pildora de estado (filtro_estado_viaje.js) avisa por evento tras escribir el
+// nuevo valor en #filtro-estado; recargo la tabla con ese estado.
+document.addEventListener('filtroestado:cambio', () => buscar());
 
 vincularPaginacion();

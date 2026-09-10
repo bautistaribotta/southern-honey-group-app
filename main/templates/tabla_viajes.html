@@ -2,7 +2,7 @@
   <thead>
     <tr>
       <th class="alineado-izq">Vehículo</th>
-      <th class="alineado-izq">Chofer</th>
+      <th class="alineado-izq">Empleado</th>
       <th class="alineado-izq">Destinos</th>
       <th class="alineado-centro">Estado</th>
       <th class="alineado-centro">Inicio/Regreso</th>
@@ -13,7 +13,6 @@
     <tr class="fila-viaje" onclick="window.location.href='{% url 'informacion_viaje' viaje.id %}'">
       <td>
         <div class="vje-veh">
-          <span class="vje-veh__tile"><span class="material-symbols-outlined">local_shipping</span></span>
           <div>
             <div class="vehiculo-nombre">{{ viaje.vehiculo.nombre }}</div>
             <span class="vje-veh__pat">{{ viaje.vehiculo.patente }}</span>
@@ -21,9 +20,8 @@
         </div>
       </td>
       <td>
-        <div class="vje-chofer">
-          <span class="vje-avatar">{{ viaje.chofer.nombre|first|upper }}{{ viaje.chofer.apellido|first|upper }}</span>
-          <span class="vje-chofer__name">{{ viaje.chofer.nombre }} {{ viaje.chofer.apellido }}</span>
+        <div class="vje-empleado">
+          <span class="vje-empleado__name">{{ viaje.empleado.nombre }} {{ viaje.empleado.apellido }}</span>
         </div>
       </td>
       <td>
@@ -47,15 +45,15 @@
         {% endif %}
       </td>
       <td>
-        <span class="vje-fechas">
+        <span class="celda-fecha">
           {{ viaje.fecha_inicio|date:"d/m/y" }}
           <span class="material-symbols-outlined">arrow_forward</span>
-          {% if viaje.fecha_vuelta %}{{ viaje.fecha_vuelta|date:"d/m/y" }}{% else %}<span class="vje-fechas__open">No definido</span>{% endif %}
+          {% if viaje.fecha_vuelta %}{{ viaje.fecha_vuelta|date:"d/m/y" }}{% else %}<span class="celda-fecha__pendiente">No definido</span>{% endif %}
         </span>
       </td>
     </tr>
     {% empty %}
-    <tr>
+    <tr class="fila-vacia">
       <td colspan="5" class="celda-vacia">
         <span class="material-symbols-outlined">explore_off</span>
         No se encontraron viajes con esos filtros.
@@ -73,7 +71,7 @@
   </div>
   <div class="paginacion-botones">
     {% if page_obj.has_previous %}
-      <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if estado %}&estado={{ estado }}{% endif %}">
+      <a href="?page={{ page_obj.previous_page_number }}{% if empleado %}&empleado={{ empleado }}{% endif %}{% if vehiculo %}&vehiculo={{ vehiculo }}{% endif %}{% if destino %}&destino={{ destino|urlencode }}{% endif %}{% if estado %}&estado={{ estado }}{% endif %}{% if desde %}&desde={{ desde }}{% endif %}{% if hasta %}&hasta={{ hasta }}{% endif %}">
         <button class="boton-paginacion">Anterior</button>
       </a>
     {% else %}
@@ -81,7 +79,7 @@
     {% endif %}
 
     {% if page_obj.has_next %}
-      <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if estado %}&estado={{ estado }}{% endif %}">
+      <a href="?page={{ page_obj.next_page_number }}{% if empleado %}&empleado={{ empleado }}{% endif %}{% if vehiculo %}&vehiculo={{ vehiculo }}{% endif %}{% if destino %}&destino={{ destino|urlencode }}{% endif %}{% if estado %}&estado={{ estado }}{% endif %}{% if desde %}&desde={{ desde }}{% endif %}{% if hasta %}&hasta={{ hasta }}{% endif %}">
         <button class="boton-paginacion">Siguiente</button>
       </a>
     {% else %}

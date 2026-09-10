@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const carritoVacio = document.getElementById('carrito-vacio');
     const contadorCarrito = document.getElementById('contador-carrito');
     const botonVaciar = document.getElementById('boton-vaciar-carrito');
-    const panelGranel = document.getElementById('panel-granel');
 
     // Formateador en formato argentino (separador de miles con punto)
     const formatoMoneda = new Intl.NumberFormat('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -18,6 +17,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Clave en sessionStorage para persistir el carrito de compra
     const STORAGE_KEY = 'carrito_compra';
+
+    // Modo edición: el template inyecta los datos de la compra a editar
+    const scriptEdicion = document.getElementById('datos-edicion');
+    const edicion = scriptEdicion ? JSON.parse(scriptEdicion.textContent) : null;
+
+    // Precarga el carrito con los ítems de la compra que se está editando
+    function cargarEdicion() {
+        edicion.items.forEach(item => {
+            if (item.tipo === 'granel') {
+                crearFilaGranel(item.id, item.nombre, item.precio, item.cantidad);
+                return;
+            }
+            crearFilaCarrito(item.id, item.nombre, item.cantidad, item.precio, item.bloqueado);
+        });
+        actualizarTotal();
+        actualizarVistaResumen();
+    }
 
     // =============================================
     //  PERSISTENCIA DEL CARRITO (sessionStorage)
@@ -41,7 +57,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 id: fila.dataset.id,
                 nombre: fila.querySelector('.cart-item__name').textContent,
                 cantidad: parseInt(fila.querySelector('.input-cantidad').value),
-                precio: fila.querySelector('.input-precio-item').value
+                precio: fila.querySelector('.input-precio-item').value,
+                bloqueado: fila.dataset.bloqueado === '1'
             });
         });
         sessionStorage.setItem(STORAGE_KEY, JSON.stringify(items));
@@ -65,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 crearFilaGranel(item.id, item.nombre, item.precio, item.kilos);
                 return;
             }
-            crearFilaCarrito(item.id, item.nombre, item.cantidad, item.precio);
+            crearFilaCarrito(item.id, item.nombre, item.cantidad, item.precio, item.bloqueado);
         });
         actualizarTotal();
         actualizarVistaResumen();
@@ -118,15 +135,19 @@ document.addEventListener('DOMContentLoaded', () => {
         guardarCarrito();
     }
 
-    function crearFilaCarrito(id, nombre, cantidad, precio) {
+    function crearFilaCarrito(id, nombre, cantidad, precio, bloqueado = false) {
         const fila = document.createElement('div');
         fila.className = 'cart-item';
         fila.dataset.id = id;
+        // Producto dado de baja: la línea viaja igual pero queda congelada
+        // (sin cambiar cantidad ni precio, sin poder quitarla del carrito)
+        if (bloqueado) fila.dataset.bloqueado = '1';
 
         fila.innerHTML = `
             <div class="cart-item__top">
                 <div>
                     <div class="cart-item__name" title="${nombre}">${nombre}</div>
+                    ${bloqueado ? '<span class="cart-item__badge-baja"><span class="material-symbols-outlined">lock</span>Producto dado de baja</span>' : ''}
                 </div>
                 <button type="button" class="cart-item__rm" title="Quitar">
                     <span class="material-symbols-outlined">close</span>
@@ -153,6 +174,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const botonMenos = fila.querySelector('[data-step="menos"]');
         const botonMas = fila.querySelector('[data-step="mas"]');
         const inputPrecio = fila.querySelector('.input-precio-item');
+
+        if (bloqueado) {
+            fila.classList.add('cart-item--bloqueado');
+            inputCantidad.disabled = true;
+            inputPrecio.disabled = true;
+            botonMenos.disabled = true;
+            botonMas.disabled = true;
+            const botonQuitar = fila.querySelector('.cart-item__rm');
+            botonQuitar.disabled = true;
+            botonQuitar.title = 'Producto dado de baja: no se puede quitar';
+
+            cuerpoCarrito.appendChild(fila);
+            actualizarSubtotalFila(fila);
+            actualizarVistaResumen();
+            return;
+        }
 
         // Escritura libre: no forzamos el valor; la validación se hace al confirmar
         function alCambiar() {
@@ -213,8 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // =============================================
 
     function vincularBotonesGranel() {
-        if (!panelGranel) return;
-        panelGranel.querySelectorAll('.boton-agregar-granel').forEach(boton => {
+        contenedorTabla.querySelectorAll('.boton-agregar-granel').forEach(boton => {
             boton.addEventListener('click', function () {
                 const id = this.dataset.id;
                 const filaExistente = cuerpoCarrito.querySelector(`.cart-item[data-granel-id="${id}"]`);
@@ -246,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="cart-item__top">
                 <div>
                     <div class="cart-item__name" title="${nombre}">${nombre}</div>
-                    <span class="granel-tag"><span class="material-symbols-outlined">scale</span>a granel</span>
+                    <span class="granel-tag"><span class="material-symbols-outlined">scale</span>Por kg</span>
                 </div>
                 <button type="button" class="cart-item__rm" title="Quitar">
                     <span class="material-symbols-outlined">close</span>
@@ -283,8 +319,8 @@ document.addEventListener('DOMContentLoaded', () => {
             actualizarTotal();
             actualizarVistaResumen();
             guardarCarrito();
-            const btnPanel = panelGranel ? panelGranel.querySelector(`.boton-agregar-granel[data-id="${idCotizacion}"]`) : null;
-            if (btnPanel) btnPanel.classList.remove('is-incart');
+            const btnTabla = contenedorTabla.querySelector(`.boton-agregar-granel[data-id="${idCotizacion}"]`);
+            if (btnTabla) btnTabla.classList.remove('is-incart');
         }
 
         inputKilos.addEventListener('input', alCambiar);
@@ -295,8 +331,8 @@ document.addEventListener('DOMContentLoaded', () => {
         actualizarSubtotalGranel(fila);
         actualizarVistaResumen();
 
-        const btnPanel = panelGranel ? panelGranel.querySelector(`.boton-agregar-granel[data-id="${idCotizacion}"]`) : null;
-        if (btnPanel) btnPanel.classList.add('is-incart');
+        const btnTabla = contenedorTabla.querySelector(`.boton-agregar-granel[data-id="${idCotizacion}"]`);
+        if (btnTabla) btnTabla.classList.add('is-incart');
 
         // Foco directo al input de kilos para cargar la pesada sin clicks extra
         inputKilos.focus();
@@ -327,12 +363,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     botonVaciar.addEventListener('click', function () {
-        cuerpoCarrito.innerHTML = '';
+        // Las filas bloqueadas (productos dados de baja) no se pueden quitar
+        cuerpoCarrito.querySelectorAll('.cart-item').forEach(fila => {
+            if (fila.dataset.bloqueado !== '1') fila.remove();
+        });
         actualizarTotal();
         actualizarVistaResumen();
         guardarCarrito();
         contenedorTabla.querySelectorAll('.boton-agregar-producto').forEach(btn => btn.classList.remove('is-incart'));
-        if (panelGranel) panelGranel.querySelectorAll('.boton-agregar-granel').forEach(btn => btn.classList.remove('is-incart'));
+        contenedorTabla.querySelectorAll('.boton-agregar-granel').forEach(btn => btn.classList.remove('is-incart'));
     });
 
     // =============================================
@@ -365,13 +404,17 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(html => {
                 contenedorTabla.innerHTML = html;
                 vincularBotonesAgregar();
+                vincularBotonesGranel();
                 vincularPaginacion();
-                
-                // Highlight items already in cart
-                const idsCarrito = Array.from(cuerpoCarrito.querySelectorAll('.cart-item')).map(f => f.dataset.id);
-                idsCarrito.forEach(id => {
-                    const btn = contenedorTabla.querySelector(`.boton-agregar-producto[data-id="${id}"]`);
-                    if(btn) btn.classList.add('is-incart');
+
+                // Vuelvo a resaltar los botones de lo que ya esta en el carrito,
+                // tanto productos envasados como articulos a granel
+                cuerpoCarrito.querySelectorAll('.cart-item').forEach(fila => {
+                    const selector = fila.dataset.tipo === 'granel'
+                        ? `.boton-agregar-granel[data-id="${fila.dataset.granelId}"]`
+                        : `.boton-agregar-producto[data-id="${fila.dataset.id}"]`;
+                    const btn = contenedorTabla.querySelector(selector);
+                    if (btn) btn.classList.add('is-incart');
                 });
             })
             .catch(error => console.error('Error en la búsqueda:', error));
@@ -492,6 +535,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const metodoPago = metodoPagoSeleccionado.value;
 
+        // Fecha anterior a hoy sin cotizaciones de origen confirmadas: se
+        // reabre el modal en vez de mandar la compra incompleta
+        if (typeof faltanCotizacionesHistoricas === 'function' && faltanCotizacionesHistoricas()) {
+            abrirModalCotizacionesHistoricas();
+            return;
+        }
+
+        // Guardo el contenido original del boton ("Confirmar compra" o "Guardar cambios")
+        const textoBotonOriginal = botonConfirmar.innerHTML;
         botonConfirmar.disabled = true;
         botonConfirmar.innerHTML = 'Procesando...';
 
@@ -505,28 +557,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 items: items,
                 metodo_pago: metodoPago,
                 tipo_operacion: 'compra',
+                // null si la compra es de hoy; "YYYY-MM-DD" si se cargo una fecha distinta
+                fecha: typeof obtenerFechaOperacion === 'function' ? obtenerFechaOperacion() : null,
+                // valores de miel menor a 50 mm, dolar oficial y cera operculo de aquel
+                // dia; null salvo que la fecha sea anterior a hoy
+                cotizaciones_historicas: typeof obtenerCotizacionesHistoricas === 'function' ? obtenerCotizacionesHistoricas() : null,
+                // nota opcional que se imprime en el remito
+                observaciones: typeof obtenerObservacion === 'function' ? obtenerObservacion() : '',
+                // id de la compra a editar; null cuando se crea una nueva
+                editar: edicion ? edicion.id : null,
             }),
         })
             .then(response => response.json().then(data => ({ ok: response.ok, data })))
             .then(({ ok, data }) => {
                 if (ok && data.ok) {
                     limpiarCarritoStorage();
-                    if (data.id_viaje) {
+                    if (data.editada) {
+                        window.location.href = `/informacion_operacion/${data.id_operacion}/`;
+                    } else if (data.id_viaje) {
                         window.location.href = `/informacion_viaje/${data.id_viaje}/`;
                     } else {
                         window.location.href = `/informacion_clientes/${data.id_cliente}/`;
                     }
                 } else {
-                    avisar(data.error || 'Algo salió mal. Por favor, volvé a intentarlo.');
+                    notificarErrorModal(data.error || 'Algo salió mal. Por favor, volvé a intentarlo.');
                     botonConfirmar.disabled = false;
-                    botonConfirmar.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Confirmar compra';
+                    botonConfirmar.innerHTML = textoBotonOriginal;
                 }
             })
             .catch(error => {
                 console.error('Error en la petición:', error);
-                avisar('Algo salió mal. Por favor, volvé a intentarlo.');
+                notificarErrorModal('Algo salió mal. Por favor, volvé a intentarlo.');
                 botonConfirmar.disabled = false;
-                botonConfirmar.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Confirmar compra';
+                botonConfirmar.innerHTML = textoBotonOriginal;
             });
     });
 
@@ -534,7 +597,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cuerpoCarrito.querySelectorAll('.cart-item').length > 0) guardarCarrito();
     });
 
-    restaurarCarrito();
+    // En modo edición el carrito se precarga con la compra; si no, se
+    // restaura el que quedó en sessionStorage tras una recarga
+    if (edicion) {
+        cargarEdicion();
+    } else {
+        restaurarCarrito();
+    }
     actualizarVistaResumen();
     vincularBotonesAgregar();
     vincularBotonesGranel();

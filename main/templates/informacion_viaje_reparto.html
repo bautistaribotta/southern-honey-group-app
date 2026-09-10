@@ -7,12 +7,12 @@
 {% endblock %}
 
 {% block links %}
-<link rel="stylesheet" href="{% static 'autocompletado_ciudades.css' %}">
 <link rel="stylesheet" href="{% static 'panel_compartido.css' %}">
 <link rel="stylesheet" href="{% static 'operaciones_compartido.css' %}">
 <link rel="stylesheet" href="{% static 'informacion_operacion.css' %}">
 <link rel="stylesheet" href="{% static 'informacion_viaje.css' %}">
 <link rel="stylesheet" href="{% static 'informacion_viaje_reparto.css' %}">
+<link rel="stylesheet" href="{% static 'pago_viaje.css' %}">
 {% endblock %}
 
 {% block top-header %}
@@ -22,10 +22,17 @@
 {% block area-trabajo %}
 <section id="area-trabajo" class="vd-screen">
 
+  {% if volver_url %}
+  <a href="{{ volver_url }}" class="boton-volver">
+    <span class="material-symbols-outlined">arrow_back</span>
+    Volver a la estación
+  </a>
+  {% else %}
   <a href="{% url 'mercado_libre' %}" class="boton-volver">
     <span class="material-symbols-outlined">arrow_back</span>
     Volver a Repartos
   </a>
+  {% endif %}
 
   <!-- CABECERA -->
   <div class="op-head">
@@ -40,7 +47,7 @@
             <span class="material-symbols-outlined">event</span>
             {{ viaje_reparto.fecha_viaje_reparto|date:"d/m/Y"|default:"--" }}
           </span>
-          <span class="op-head__metaitem"><span class="material-symbols-outlined">person</span>{% if viaje_reparto.chofer %}{{ viaje_reparto.chofer.nombre }} {{ viaje_reparto.chofer.apellido }}{% else %}Sin chofer{% endif %}</span>
+          <span class="op-head__metaitem"><span class="material-symbols-outlined">person</span>{% if viaje_reparto.empleado %}{{ viaje_reparto.empleado.nombre }} {{ viaje_reparto.empleado.apellido }}{% else %}Sin empleado{% endif %}</span>
           <span class="op-head__metaitem"><span class="material-symbols-outlined">local_shipping</span>{% if viaje_reparto.vehiculo %}{{ viaje_reparto.vehiculo.nombre }}{% else %}Sin vehiculo{% endif %}</span>
         </div>
       </div>
@@ -58,7 +65,7 @@
   </div>
 
   <!-- DATOS GENERALES + RESULTADO DEL REPARTO -->
-  <div class="op-grid">
+  <div class="op-grid{% if not user.is_staff %} op-grid--solo{% endif %}">
 
     <!-- Datos generales -->
     <div class="op-card">
@@ -75,44 +82,44 @@
           </div>
         </div>
         <div class="vd-data__row">
-          <span class="vd-data__ico"><span class="material-symbols-outlined">local_shipping</span></span>
+          <span class="vd-data__ico"><span class="material-symbols-outlined">location_on</span></span>
           <div class="vd-data__meta">
-            <div class="vd-data__label">Vehiculo</div>
-            <div class="vd-data__value">{% if viaje_reparto.vehiculo %}{{ viaje_reparto.vehiculo.nombre }}<span class="vd-pat">{{ viaje_reparto.vehiculo.patente }}</span>{% else %}Vehiculo no especificado{% endif %}</div>
+            <div class="vd-data__label">Destino</div>
+            <div class="vd-data__value">{% if viaje_reparto.destino %}{{ viaje_reparto.destino.localidad_destino }}{% else %}Sin destino registrado{% endif %}</div>
           </div>
         </div>
         <div class="vd-data__row">
-          <span class="vd-avatar">{% if viaje_reparto.chofer %}{{ viaje_reparto.chofer.nombre|first|upper }}{{ viaje_reparto.chofer.apellido|first|upper }}{% else %}?{% endif %}</span>
+          <span class="vd-data__ico"><span class="material-symbols-outlined">local_shipping</span></span>
           <div class="vd-data__meta">
-            <div class="vd-data__label">Chofer</div>
-            <div class="vd-data__value">{% if viaje_reparto.chofer %}{{ viaje_reparto.chofer.nombre }} {{ viaje_reparto.chofer.apellido }}{% else %}Chofer no especificado{% endif %}</div>
+            <div class="vd-data__label">Vehículo</div>
+            <div class="vd-data__value">{% if viaje_reparto.vehiculo %}{{ viaje_reparto.vehiculo.nombre }}<span class="vd-pat">{{ viaje_reparto.vehiculo.patente }}</span>{% else %}Vehículo no especificado{% endif %}</div>
           </div>
         </div>
-      </div>
-      <div class="vd-journey">
-        <div class="vd-journey__label">Ruta de destinos</div>
-        {% if viaje_reparto.destinos.all %}
-        <div class="vd-stops">
-          {% for d in viaje_reparto.destinos.all %}
-          <div class="vd-stop">
-            <div class="vd-stop__rail">
-              <span class="vd-stop__dot"></span>
-              <span class="vd-stop__line"></span>
-            </div>
-            <div class="vd-stop__body">
-              <div class="vd-stop__city">{{ d.destinos_reparto }}</div>
-              <div class="vd-stop__tag">{% if forloop.first %}Primera parada{% elif forloop.last %}Destino final{% else %}Parada {{ forloop.counter }}{% endif %}</div>
+        <div class="vd-data__row">
+          <span class="avatar-iniciales avatar-iniciales--empleado">{% if viaje_reparto.empleado %}{{ viaje_reparto.empleado.nombre|first|upper }}{{ viaje_reparto.empleado.apellido|first|upper }}{% else %}?{% endif %}</span>
+          <div class="vd-data__meta">
+            <div class="vd-data__label">Empleado</div>
+            <div class="vd-data__value">{% if viaje_reparto.empleado %}{{ viaje_reparto.empleado.nombre }} {{ viaje_reparto.empleado.apellido }}{% else %}Empleado no especificado{% endif %}</div>
+          </div>
+        </div>
+        <div class="vd-data__row">
+          <span class="vd-data__ico"><span class="material-symbols-outlined">{% if viaje_reparto.pagado %}paid{% else %}schedule{% endif %}</span></span>
+          <div class="vd-data__meta">
+            <div class="vd-data__label">Estado de pago</div>
+            <div class="vd-data__value">
+              {% if viaje_reparto.pagado %}
+                Pagado{% if viaje_reparto.fecha_pago %}<span class="vd-pat">{{ viaje_reparto.fecha_pago|date:"d/m/Y H:i" }} hs</span>{% endif %}
+              {% else %}
+                Pendiente de cobro
+              {% endif %}
             </div>
           </div>
-          {% endfor %}
         </div>
-        {% else %}
-        <span class="vd-data__value">Sin destinos registrados</span>
-        {% endif %}
       </div>
     </div>
 
-    <!-- Resultado del reparto -->
+    <!-- Resultado del reparto (solo staff) -->
+    {% if user.is_staff %}
     <div class="op-card">
       <div class="op-card__head">
         <span class="material-symbols-outlined">payments</span>
@@ -125,46 +132,57 @@
       <div class="vd-caja">
         <div class="vd-caja__row vd-caja__row--head">
           <span class="vd-caja__k vd-caja__k--strong"><span class="material-symbols-outlined">request_quote</span>Valor del viaje</span>
-          <span class="vd-caja__v">${{ viaje_reparto.valor_viaje|intcomma }}</span>
+          <span class="vd-caja__v">${{ viaje_reparto.valor_viaje|floatformat:"-2g" }}</span>
         </div>
         <div class="vd-gastos">
-          <div class="vd-gasto">
+          {% comment %}
+            El combustible y el costo del empleado parecen gastos pero no lo son:
+            son campos del viaje. Igual son clickeables, porque nadie va a
+            adivinar que estas dos filas se tocan distinto que las de abajo. Van
+            al slide-over de edicion del viaje, que es donde viven esos numeros.
+          {% endcomment %}
+          <button type="button" class="vd-gasto vd-gasto--editable"
+                  onclick="abrirSlideOver('slide-over-reparto-editar')"
+                  aria-label="Editar el combustible del reparto">
             <span class="vd-gasto__ico"><span class="material-symbols-outlined">local_gas_station</span></span>
             <span class="vd-gasto__name">Combustible<span class="vd-gasto__date">{{ viaje_reparto.fecha_viaje_reparto|date:"d/m/Y" }}</span></span>
             <span class="vd-gasto__amt">-${{ viaje_reparto.gasto_combustible_viaje_reparto|intcomma }}</span>
-          </div>
-          <div class="vd-gasto">
+          </button>
+          <button type="button" class="vd-gasto vd-gasto--editable"
+                  onclick="abrirSlideOver('slide-over-reparto-editar')"
+                  aria-label="Editar el costo del empleado">
             <span class="vd-gasto__ico"><span class="material-symbols-outlined">badge</span></span>
             <span class="vd-gasto__name">Costo del empleado<span class="vd-gasto__date">{{ viaje_reparto.fecha_viaje_reparto|date:"d/m/Y" }}</span></span>
             <span class="vd-gasto__amt">-${{ viaje_reparto.costo_empleado|intcomma }}</span>
-          </div>
-          {% for gasto in viaje_reparto.detalle_gastos.all %}
-          <div class="vd-gasto">
-            <span class="vd-gasto__ico"><span class="material-symbols-outlined">{% if gasto.gasto == 'Comida' %}restaurant{% elif gasto.gasto == 'Combustible' %}local_gas_station{% elif gasto.gasto == 'Playa' %}local_parking{% elif gasto.gasto == 'Peaje' %}toll{% elif gasto.gasto == 'Hotel' %}hotel{% elif gasto.gasto == 'Viaticos personales' %}wallet{% else %}more_horiz{% endif %}</span></span>
-            <span class="vd-gasto__name">{{ gasto.gasto }}<span class="vd-gasto__date">{{ gasto.fecha|date:"d/m/Y" }}</span></span>
-            <span class="vd-gasto__amt">-${{ gasto.monto|intcomma }}</span>
-          </div>
-          {% endfor %}
+          </button>
+          {% include "gastos_viaje.html" with gastos=viaje_reparto.detalle_gastos.all %}
         </div>
         <div class="vd-caja__row vd-caja__row--total {% if viaje_reparto.ganancia < 0 %}vd-caja__row--loss{% endif %}">
           <span class="vd-caja__k"><span class="material-symbols-outlined">savings</span>Ganancia neta</span>
-          <span class="vd-caja__v">${{ viaje_reparto.ganancia|intcomma }}</span>
+          <span class="vd-caja__v">${{ viaje_reparto.ganancia|floatformat:"-2g" }}</span>
         </div>
       </div>
     </div>
+    {% endif %}
 
   </div>
 
 </section>
 
-<!-- Panel de Nuevo Gasto -->
-<form id="formulario-gasto" method="POST">
+<!-- Panel de gasto: sirve para registrar uno nuevo y para corregir uno cargado.
+     Las acciones del POST viajan en data-* porque cada vista de viaje usa las
+     suyas; el resto del modal es identico en los tres. -->
+<form id="formulario-gasto" method="POST"
+      data-accion-nuevo="nuevo_gasto_reparto"
+      data-accion-editar="editar_gasto_reparto"
+      data-accion-eliminar="eliminar_gasto_reparto">
   {% csrf_token %}
   <div id="contenedor-modal-gasto">
     <div id="contenedor-modal-fondo-gasto" onclick="cerrarModalGasto()"></div>
 
     <div id="panel-gasto">
-      <input type="hidden" name="accion" value="nuevo_gasto_reparto">
+      <input type="hidden" name="accion" id="gasto-accion" value="nuevo_gasto_reparto">
+      <input type="hidden" name="id_gasto" id="gasto-id">
 
       <button type="button" class="boton-cerrar" onclick="cerrarModalGasto()">
         <span class="material-symbols-outlined">close</span>
@@ -174,9 +192,10 @@
         <span class="material-symbols-outlined">payments</span>
       </div>
 
-      <h3>Registrar gasto</h3>
-      <p>Seleccioná el tipo de gasto e ingresá el monto. La ganancia neta se recalcula sola.</p>
+      <h3 id="gasto-titulo">Registrar gasto</h3>
+      <p id="gasto-bajada">Seleccioná el tipo de gasto e ingresá el monto. La ganancia neta se recalcula sola.</p>
 
+      <div id="gasto-campos">
       <div class="grupo-input">
         <label for="tipo-gasto">Tipo de gasto</label>
         <select id="tipo-gasto" name="tipo_gasto" required class="vd-select">
@@ -196,20 +215,40 @@
         <div class="input-con-icono">
           <span>$</span>
           <input
-            type="number"
+            type="text"
             id="monto-gasto"
             name="monto_gasto"
+            class="input-miles"
+            inputmode="numeric"
+            autocomplete="off"
             placeholder="0"
-            step="1"
-            min="1"
+            pattern="[1-9][0-9]{0,2}(\.[0-9]{3})*"
             required>
         </div>
-        <span class="vd-hint">Numero entero, sin puntos ni comas.</span>
+        <span class="vd-hint">Número entero. Los puntos se agregan solos.</span>
       </div>
 
-      <div class="acciones-modal">
-        <button type="submit" class="boton-primario">Guardar</button>
+      {% include 'campos_gasto_combustible.html' %}
+      </div>
+
+      <div class="acciones-modal" id="gasto-acciones">
+        <button type="submit" class="boton-primario" id="gasto-guardar">Guardar</button>
         <button type="button" class="boton-secundario" onclick="cerrarModalGasto()">Cancelar</button>
+      </div>
+
+      {% comment %}
+        Eliminar vive adentro del mismo modal de edicion, sin un segundo modal
+        de confirmacion: hay que mantener apretado el boton tres segundos, como
+        el resto de los borrados del sistema. La leyenda cambia mientras se
+        mantiene apretado.
+      {% endcomment %}
+      <div class="gasto-borrar" id="gasto-zona-borrar" hidden>
+        <button type="button" class="op-btn op-btn--danger gasto-borrar__btn" id="gasto-borrar">
+          <span class="gasto-borrar__label">
+            <span class="material-symbols-outlined">delete</span>
+            <span id="gasto-borrar-texto">Eliminar gasto</span>
+          </span>
+        </button>
       </div>
     </div>
   </div>
@@ -279,20 +318,20 @@
           </div>
 
           <div class="grupo-input">
-            <label for="chofer-reparto-editar">Chofer</label>
-            <select id="chofer-reparto-editar" name="id_chofer" class="select-estandar" required>
-              <option value="" disabled>Seleccione un chofer</option>
-              {% for chofer in choferes %}
-              <option value="{{ chofer.id }}" {% if viaje_reparto.chofer_id == chofer.id %}selected{% endif %}>{{ chofer.nombre }} {{ chofer.apellido }}</option>
+            <label for="empleado-reparto-editar">Empleado</label>
+            <select id="empleado-reparto-editar" name="id_empleado" class="select-estandar" required>
+              <option value="" disabled>Seleccione un empleado</option>
+              {% for empleado in empleados %}
+              <option value="{{ empleado.id }}" {% if viaje_reparto.empleado_id == empleado.id %}selected{% endif %}>{{ empleado.nombre }} {{ empleado.apellido }}</option>
               {% endfor %}
             </select>
-            <span class="mensaje-error">Por favor, seleccione un chofer de la lista.</span>
+            <span class="mensaje-error">Por favor, seleccione un empleado de la lista.</span>
           </div>
 
           <div class="grupo-input">
-            <label for="vehiculo-reparto-editar">Vehiculo</label>
+            <label for="vehiculo-reparto-editar">Vehículo</label>
             <select id="vehiculo-reparto-editar" name="id_vehiculo" class="select-estandar" required>
-              <option value="" disabled>Seleccione un vehiculo</option>
+              <option value="" disabled>Seleccione un vehículo</option>
               {% for vehiculo in vehiculos %}
               <option value="{{ vehiculo.id }}" {% if viaje_reparto.vehiculo_id == vehiculo.id %}selected{% endif %}>{{ vehiculo.nombre }} ({{ vehiculo.patente }})</option>
               {% endfor %}
@@ -308,42 +347,37 @@
             <h4>Recorrido</h4>
           </div>
 
-          <div class="grupo-input" id="contenedor-destinos-reparto-editar">
-            <label for="destino-reparto-editar">Destinos</label>
-            {% for destino in viaje_reparto.destinos.all %}
-            <input
-              type="text"
-              name="destino_reparto"
-              placeholder="Ej: Buenos Aires"
-              required
-              maxlength="30"
-              pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}"
-              value="{{ destino.destinos_reparto }}"
-              data-autocompletar-ciudad
-              {% if forloop.first %}id="destino-reparto-editar"{% endif %}>
-            {% empty %}
-            <input
-              type="text"
-              id="destino-reparto-editar"
-              name="destino_reparto"
-              placeholder="Ej: Buenos Aires"
-              required
-              maxlength="30"
-              pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}"
-              data-autocompletar-ciudad>
-            {% endfor %}
+          {% comment %}
+            Al cambiar de localidad, el JS pisa el valor del viaje con la tarifa del
+            destino nuevo (data-valor-objetivo). Si no se toca el selector, el monto
+            guardado queda como estaba.
 
-            <div class="vje-destacciones">
-              <button type="button" id="btn-agregar-destino-reparto-editar" class="vje-addbtn">
-                <span class="material-symbols-outlined">add_circle</span>
-                Añadir un destino
-              </button>
-              <button type="button" id="btn-quitar-destino-reparto-editar" class="vje-removebtn">
-                <span class="material-symbols-outlined">do_not_disturb_on</span>
-                Quitar destino
-              </button>
-            </div>
-            <span class="mensaje-error">Minimo 3 caracteres (Solo letras y numeros)</span>
+            La tarifa solo se ve si quien edita es staff: para el resto el destino es
+            apenas una localidad. Por eso el data-valor y el data-valor-objetivo
+            tambien quedan afuera, para que el monto no viaje en el HTML. Cuando un
+            no-staff cambia de localidad, la vista aplica la tarifa del destino nuevo.
+          {% endcomment %}
+          <div class="grupo-input">
+            <label for="destino-reparto-editar">Destino</label>
+            <select id="destino-reparto-editar" name="id_destino" class="select-estandar" required
+                    {% if user.is_staff %}data-valor-objetivo="valor-viaje-reparto-editar"{% endif %}>
+              <option value="" disabled {% if not viaje_reparto.destino %}selected{% endif %}>Seleccione un destino</option>
+              {% for destino in destinos %}
+              <option value="{{ destino.id }}"{% if user.is_staff %} data-valor="{{ destino.valor_viaje }}"{% endif %}
+                      {% if viaje_reparto.destino_id == destino.id %}selected{% endif %}>{{ destino.localidad_destino }}{% if user.is_staff %} · $ {{ destino.valor_viaje|floatformat:"-2g" }}{% endif %}</option>
+              {% endfor %}
+            </select>
+            {% comment %}
+              El atajo al catalogo es solo para staff. Si no hay ningun destino cargado
+              todos ven el aviso, porque explica por que el selector esta vacio.
+            {% endcomment %}
+            {% if not destinos or user.is_staff %}
+            <span class="vje-ayuda">
+              {% if not destinos %}Todavía no hay destinos cargados.{% elif user.is_staff %}¿Falta una localidad?{% endif %}
+              {% if user.is_staff %}<a href="{% url 'destinos_reparto' %}">Gestionar destinos</a>{% endif %}
+            </span>
+            {% endif %}
+            <span class="mensaje-error">Por favor, seleccione un destino de la lista.</span>
           </div>
         </section>
 
@@ -359,53 +393,85 @@
             <div class="input-con-icono">
               <span>$</span>
               <input
-                type="number"
+                type="text"
                 id="gasto-combustible-reparto-editar"
                 name="gasto_combustible_viaje_reparto"
+                class="input-miles"
+                inputmode="numeric"
+                autocomplete="off"
                 placeholder="0"
-                step="1"
-                min="1"
+                pattern="[1-9][0-9]{0,2}(\.[0-9]{3})*"
                 required
                 value="{{ viaje_reparto.gasto_combustible_viaje_reparto }}">
             </div>
             <span class="mensaje-error">Por favor, ingrese un monto valido.</span>
           </div>
 
-          <div class="vje-grid2">
+          {% comment %}
+            El valor del viaje es solo para el staff, igual que la tarjeta de
+            resultado del reparto: sin esa columna la grilla de dos queda con un
+            hueco, asi que la clase se aplica solo cuando hay algo que poner al lado.
+          {% endcomment %}
+          <div class="{% if user.is_staff %}vje-grid2{% endif %}">
             <div class="grupo-input">
               <label for="empleado-costo-reparto-editar">Costo empleado</label>
               <div class="input-con-icono">
                 <span>$</span>
                 <input
-                  type="number"
+                  type="text"
                   id="empleado-costo-reparto-editar"
                   name="costo_empleado"
+                  class="input-miles"
+                  inputmode="numeric"
+                  autocomplete="off"
                   placeholder="0"
-                  step="1"
-                  min="1"
+                  pattern="[1-9][0-9]{0,2}(\.[0-9]{3})*"
                   required
                   value="{{ viaje_reparto.costo_empleado }}">
               </div>
               <span class="mensaje-error">Por favor, ingrese un monto valido.</span>
             </div>
 
+            {% comment %}
+              Solo el staff ve y ajusta cuanto se cobra el viaje. Si el campo no
+              viaja en el POST, la vista conserva el monto ya guardado (o toma la
+              tarifa del catalogo cuando se cambio de destino).
+            {% endcomment %}
+            {% if user.is_staff %}
             <div class="grupo-input">
               <label for="valor-viaje-reparto-editar">Valor del viaje</label>
               <div class="input-con-icono">
                 <span>$</span>
                 <input
-                  type="number"
+                  type="text"
                   id="valor-viaje-reparto-editar"
                   name="valor_viaje"
+                  class="input-miles-decimal"
+                  inputmode="decimal"
+                  autocomplete="off"
                   placeholder="0"
-                  step="1"
-                  min="1"
+                  pattern="[1-9][0-9]{0,2}(\.[0-9]{3})*(,[0-9]{1,2})?|0,(0[1-9]|[1-9][0-9]?)"
                   required
                   value="{{ viaje_reparto.valor_viaje }}">
               </div>
               <span class="mensaje-error">Por favor, ingrese un monto valido.</span>
             </div>
+            {% endif %}
           </div>
+
+          {% if user.is_staff %}
+          <div class="pago-fila">
+            <div class="pago-fila__texto">
+              <span class="pago-fila__titulo">Reparto pagado</span>
+              <span class="pago-fila__sub">Activalo cuando el cobro ya entró. El cobro es total, no hay pagos parciales.</span>
+            </div>
+            <label class="pago-switch">
+              <input type="checkbox" id="pagado-reparto-editar" name="pagado"
+                     {% if viaje_reparto.pagado %}checked{% endif %}>
+              <span class="pago-switch__slider"></span>
+            </label>
+          </div>
+          {% endif %}
         </section>
 
         <!-- Seccion 4: Fecha -->
@@ -436,6 +502,6 @@
 {% endblock %}
 
 {% block codigo-javascript %}
-<script src="{% static 'js/autocompletado_ciudades.js' %}"></script>
-<script src="{% static 'js/informacion_viaje_reparto.js' %}"></script>
+<script src="{% static 'js/gastos_viaje.js' %}"></script>
+<script src="{% static 'js/destino_reparto.js' %}"></script>
 {% endblock %}

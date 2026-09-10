@@ -24,23 +24,7 @@ html {
   /* Reduzco el padding superior del contenedor base */
 }
 
-.boton-volver {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--slate-500);
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  text-decoration: none;
-  margin-bottom: 2rem;
-  letter-spacing: 0.05em;
-  transition: color 0.2s;
-}
-
-.boton-volver:hover {
-  color: var(--brand-olive);
-}
+/* Boton volver: estilos unificados en base.css (.boton-volver) */
 
 .cabecera-detalle {
   display: flex;
@@ -401,58 +385,7 @@ html {
   gap: 0.5rem;
 }
 
-.boton-nuevo {
-  background-color: var(--brand-olive);
-  color: var(--color-blanco);
-  padding: 0.625rem 1.25rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  border: 1px solid transparent;
-  box-shadow: 0 1px 2px 0 var(--color-sombra-1);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-  font-family: inherit;
-  text-decoration: none;
-}
-
-.boton-nuevo:hover {
-  background-color: var(--color-hover-boton);
-}
-
-.boton-nuevo:active {
-  transform: scale(0.95);
-}
-
-/* Agrupa los botones Nueva Compra / Nueva Venta */
-.grupo-botones-operacion {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-/* Igualo el ancho de los 4 botones (editar/eliminar y nueva compra/venta)
-   para que los grupos midan lo mismo y queden perfectamente alineados */
-.acciones-cliente .boton-accion,
-.grupo-botones-operacion .boton-nuevo {
-  min-width: 12.5rem;
-  justify-content: center;
-}
-
-/* Botón de compra: estilo secundario para diferenciarlo de la venta (primaria) */
-.boton-nuevo-compra {
-  background-color: var(--color-blanco);
-  color: var(--slate-700);
-  border: 1px solid var(--stone-200);
-  box-shadow: 0 1px 2px var(--color-sombra-1);
-}
-
-.boton-nuevo-compra:hover {
-  background-color: var(--color-gris-claro-hover);
-}
+/* Boton "Nuevo" (.boton-nuevo): estilos unificados en base.css */
 
 /* --- Barra superior de la tabla: pestañas a la izquierda, botones a la derecha --- */
 .barra-operaciones {
@@ -527,16 +460,7 @@ html {
   text-align: left;
 }
 
-.tabla-operaciones th {
-  background-color: var(--color-gris-fondo-input-alt);
-  padding: 1rem 2rem;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--slate-500);
-  letter-spacing: 0.05em;
-  border-bottom: 1px solid var(--stone-200);
-}
+/* Cabecera de tabla: estilos unificados en base.css */
 
 .tabla-operaciones td {
   padding: 1.25rem 2rem;
@@ -686,6 +610,7 @@ html {
   position: absolute;
   inset: 0;
   background-color: var(--color-slate-900-transparente-40);
+  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
@@ -844,51 +769,7 @@ html {
   filter: brightness(0.9);
 }
 
-/* --- PAGINACIÓN --- */
-.paginacion {
-  padding: 1rem 2rem;
-  border-top: 1px solid var(--stone-200);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: var(--color-blanco);
-}
-
-.paginacion-info {
-  font-size: 0.75rem;
-  color: var(--slate-500);
-}
-
-.paginacion-info span {
-  font-weight: 600;
-  color: var(--slate-700);
-}
-
-.paginacion-botones {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.boton-paginacion {
-  padding: 0.25rem 0.75rem;
-  border: 1px solid var(--stone-200);
-  border-radius: 0.25rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--slate-600);
-  background-color: var(--color-blanco);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.boton-paginacion:hover:not(:disabled) {
-  background-color: var(--stone-200);
-}
-
-.boton-paginacion:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+/* Paginacion: estilos unificados en base.css */
 
 /* Botón Registrar Pago */
 #boton-confirmar-pago {
@@ -987,5 +868,13 @@ html {
   }
   .separador-vertical {
     display: none;
+  }
+}
+
+/* fallback-oklch-autogenerado */
+/* Safari < 15.4 no soporta oklch(): redefinimos las variables en sRGB. */
+@supports not (color: oklch(0% 0 0)) {
+  :root {
+    --color-rojo-eliminacion: #dc2626;
   }
 }

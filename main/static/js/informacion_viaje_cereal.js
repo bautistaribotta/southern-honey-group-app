@@ -1,20 +1,7 @@
-// Modal de "Registrar gasto" del viaje de cereal.
-// La eliminacion reutiliza abrirPanelEliminar()/cerrarPanelEliminar() de paneles.js
-// (mismo markup #contenedor-panel-eliminar / #boton-confirmar-eliminar).
-
-function abrirModalGasto() {
-    document.getElementById('contenedor-modal-gasto').classList.add('abierto');
-    document.body.style.overflow = 'hidden';
-}
-
-function cerrarModalGasto() {
-    document.getElementById('contenedor-modal-gasto').classList.remove('abierto');
-    document.body.style.overflow = 'auto';
-    const formGasto = document.getElementById('formulario-gasto');
-    if (formGasto) {
-        formGasto.reset();
-    }
-}
+// Logica propia de la vista "Informacion del viaje de cereal".
+// La eliminacion del viaje reutiliza abrirPanelEliminar()/cerrarPanelEliminar()
+// de paneles.js (mismo markup #contenedor-panel-eliminar / #boton-confirmar-eliminar),
+// y el modal de gastos vive en gastos_viaje.js, compartido con los otros viajes.
 
 document.addEventListener('DOMContentLoaded', () => {
     // Logica para anadir y quitar dinamicamente multiples destinos en el slide-over de edicion
@@ -63,4 +50,18 @@ document.addEventListener('DOMContentLoaded', () => {
             btnQuitarDestino.style.display = 'flex';
         }
     }
+
+    // Dadora de carga: el markup ya llega con el estado correcto desde la vista;
+    // esto solo engancha el switch y la forma de cobro para las ediciones en vivo.
+    inicializarDadoraCarga({
+        toggle: 'dadora-toggle-cereal',
+        campos: 'dadora-campos-cereal',
+        nombre: 'dadora-nombre-cereal',
+        tipo: 'dadora-tipo-cereal',
+        valores: {
+            porcentaje: { grupo: 'dadora-pct-grupo-cereal', input: 'dadora-pct-cereal' },
+            tonelada: { grupo: 'dadora-ton-grupo-cereal', input: 'dadora-ton-cereal' },
+            efectivo: { grupo: 'dadora-efe-grupo-cereal', input: 'dadora-efe-cereal' },
+        },
+    });
 });

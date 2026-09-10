@@ -27,6 +27,21 @@
   border-bottom: none;
 }
 
+/* Carga sin el precio por tonelada (usuario no-staff): cereal, CTG y toneladas
+   entran en una unica fila de tres columnas, separadas solo en vertical */
+.vc-carga--solo {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.vc-carga.vc-carga--solo .vc-carga__cell {
+  border-bottom: none;
+  border-right: 1px solid var(--border-subtle);
+}
+
+.vc-carga.vc-carga--solo .vc-carga__cell:last-child {
+  border-right: none;
+}
+
 .vc-ctg {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.08em;
@@ -56,7 +71,7 @@
   border-bottom: 1px solid var(--border-subtle);
 }
 
-/* Insignia con el porcentaje que se lleva el chofer */
+/* Insignia con el porcentaje que se lleva el empleado */
 .vc-pct {
   display: inline-flex;
   align-items: center;
@@ -70,12 +85,12 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Monto que se reparte al chofer: se descuenta del subtotal */
+/* Monto que se reparte al empleado: se descuenta del subtotal */
 .vc-deduct {
   color: var(--text-muted);
 }
 
-/* El icono de "Pago del chofer" va en caja neutra (igual que los gastos), no con
+/* El icono de "Pago del empleado" va en caja neutra (igual que los gastos), no con
    el color de marca de los iconos de resumen. Gano especificidad a la regla
    .vd-caja__k .material-symbols-outlined de informacion_viaje.css. */
 .vd-caja__k .vd-gasto__ico .material-symbols-outlined {
@@ -362,5 +377,29 @@
   }
   #slide-over-cereal .panel-pie button {
     width: 100%;
+  }
+}
+
+/* --- Dadora de carga: fila forma-de-cobro + valor ---
+   Por defecto el select ocupa todo el ancho (1 columna). Cuando el JS revela un
+   input de valor a su lado, la fila pasa a 2 columnas iguales. */
+.dadora-fila-cobro {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+  margin-top: 1.15rem;
+}
+
+.dadora-fila-cobro [hidden] {
+  display: none !important;
+}
+
+.dadora-fila-cobro.dadora-fila-cobro--duo {
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 480px) {
+  .dadora-fila-cobro.dadora-fila-cobro--duo {
+    grid-template-columns: 1fr;
   }
 }

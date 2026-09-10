@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load static %}
+{% load static_version %}
+{% load humanize %}
+
+{% block nombre-pestaña %}
+  <title> Alquileres </title>
+{% endblock %}
+
+{% block links %}
+  {# La casilla de cobro de la primera columna es la misma de reparto y cereal #}
+  <link rel="stylesheet" href="{% static_v 'pago_viaje.css' %}">
+  <link rel="stylesheet" href="{% static_v 'alquileres.css' %}">
+{% endblock %}
+
+{% block cabecera %}
+  <div class="cabecera-seccion">
+    <span class="cabecera-seccion__tile">
+      <span class="material-symbols-outlined">key</span>
+    </span>
+    <div class="cabecera-seccion__texto">
+      <h2>Alquileres</h2>
+      <p>Controlá qué casas ya pagaron el alquiler de este mes</p>
+    </div>
+  </div>
+{% endblock %}
+
+{% block area-trabajo %}
+<section id="area-trabajo">
+  {% comment %}
+    El mes no es un filtro de la tabla: es el marco de toda la pantalla (los
+    totales de aca, el estado de cada fila y el mes que carga la casilla de
+    cobro cuelgan de el). Por eso el control vive en el titulo y no al lado de
+    los chips de estado, que si filtran la lista.
+
+    Las flechas son enlaces de verdad, asi que cambiar de mes anda sin
+    JavaScript y se puede abrir en otra pestaña. La grilla del selector la
+    monta alquileres.js encima.
+  {% endcomment %}
+  <section class="alq-mes">
+    <div class="alq-mes__periodo">
+      <p class="alq-mes__eyebrow">Cobranza de</p>
+
+      <div class="alq-nav" id="alq-nav"
+           data-mes-visto="{{ periodo|date:'Y-m' }}"
+           data-mes-actual="{{ mes_actual|date:'Y-m' }}"
+           data-estado="{{ estado }}">
+        <a class="alq-nav__paso"
+           href="?mes={{ periodo_anterior|date:'Y-m' }}{% if estado %}&amp;estado={{ estado }}{% endif %}"
+           title="{{ periodo_anterior|date:'F \d\e Y' }}" aria-label="Mes anterior">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </a>
+
+        <button type="button" class="alq-nav__mes" id="alq-nav-mes"
+                aria-haspopup="dialog" aria-expanded="false" aria-controls="alq-selector">
+          <span class="alq-nav__nombre">{{ periodo|date:"F" }}</span>
+          <span class="alq-nav__anio">{{ periodo|date:"Y" }}</span>
+          <span class="material-symbols-outlined alq-nav__flecha">expand_more</span>
+        </button>
+
+        <a class="alq-nav__paso"
+           href="?mes={{ periodo_siguiente|date:'Y-m' }}{% if estado %}&amp;estado={{ estado }}{% endif %}"
+           title="{{ periodo_siguiente|date:'F \d\e Y' }}" aria-label="Mes siguiente">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </a>
+
+        <div class="alq-selector" id="alq-selector" role="dialog" aria-label="Elegir mes" hidden>
+          <div class="alq-selector__anio">
+            <button type="button" class="alq-selector__paso" data-paso="-1" aria-label="Año anterior">
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            <span class="alq-selector__valor" id="alq-selector-anio"></span>
+            <button type="button" class="alq-selector__paso" data-paso="1" aria-label="Año siguiente">
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+          </div>
+          <div class="alq-selector__grilla" id="alq-selector-grilla"></div>
+        </div>
+      </div>
+
+      {% comment %}
+        Mirando otro mes, el camino de vuelta tiene que estar a la vista: sin
+        esto hay que contar flechas para volver, y cargar un pago creyendo que
+        se esta en el mes en curso es justo el error que hay que evitar.
+
+        El enlace se renderiza siempre para que la cabecera mantenga su alto
+        constante: cuando estamos en el mes actual se oculta con visibility
+        para que siga ocupando espacio sin ser visible ni accesible.
+      {% endcomment %}
+      <a class="alq-mes__volver{% if es_mes_actual %} es-oculto{% endif %}"
+         href="{% url 'alquileres' %}{% if estado %}?estado={{ estado }}{% endif %}"
+         {% if es_mes_actual %}aria-hidden="true" tabindex="-1"{% endif %}>
+        <span class="material-symbols-outlined">undo</span>
+        <span class="alq-mes__volver-texto">Volver a {{ mes_actual|date:"F" }}</span>
+      </a>
+    </div>
+
+    <div class="alq-mes__cifras">
+      <p class="alq-cifra alq-cifra--cobrado">
+        <span class="alq-cifra__valor">${{ resumen.cobrado|floatformat:"0"|intcomma }}</span>
+        <span class="alq-cifra__rotulo">cobrado</span>
+      </p>
+      <p class="alq-cifra{% if not resumen.pendientes %} es-cero{% endif %}">
+        <span class="alq-cifra__valor">${{ resumen.monto_pendiente|floatformat:"0"|intcomma }}</span>
+        <span class="alq-cifra__rotulo">
+          falta cobrar
+          {% if resumen.pendientes %}
+            <span class="alq-cifra__casas">· {{ resumen.pendientes }} casa{{ resumen.pendientes|pluralize }}</span>
+          {% endif %}
+        </span>
+      </p>
+    </div>
+  </section>
+
+  <!-- CONTROLES: filtros y alta -->
+  <div class="barra-herramientas">
+    <div class="alq-chips" id="alq-chips" role="group" aria-label="Filtrar casas por estado del mes">
+      <button type="button" class="alq-chip{% if not estado %} es-activo{% endif %}" data-estado="">Todas</button>
+      <button type="button" class="alq-chip{% if estado == 'pendientes' %} es-activo{% endif %}" data-estado="pendientes">Pendientes de cobro</button>
+      <button type="button" class="alq-chip{% if estado == 'cobradas' %} es-activo{% endif %}" data-estado="cobradas">Cobradas</button>
+      <button type="button" class="alq-chip{% if estado == 'libres' %} es-activo{% endif %}" data-estado="libres">Sin alquilar</button>
+    </div>
+
+    <button type="button" class="boton-nuevo" id="boton-nueva-casa">
+      <span class="material-symbols-outlined">add_home</span>
+      Nueva casa
+    </button>
+  </div>
+
+  <div class="contenedor-tabla" id="tabla-alquileres-container">
+    {% include "tabla_alquileres.html" %}
+  </div>
+</section>
+
+{% comment %}
+  Los paneles de casa, contrato y eliminacion son los mismos del perfil de una
+  casa, asi que viven en un include compartido.
+{% endcomment %}
+{% include "paneles_alquileres.html" %}
+{% endblock %}
+
+{% block codigo-javascript %}
+  <script src="{% static_v 'js/pago_viaje.js' %}"></script>
+  <script src="{% static_v 'js/paneles_alquileres.js' %}"></script>
+  <script src="{% static_v 'js/alquileres.js' %}"></script>
+{% endblock %}

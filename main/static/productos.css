@@ -131,34 +131,15 @@
   background-color: var(--color-rojo-texto-etiqueta);
 }
 
+.prod-chip__dot--tambores-vacios {
+  background-color: var(--slate-500);
+}
+
 .prod-chip__dot--otros {
   background-color: var(--color-gris-texto-etiqueta);
 }
 
-.boton-nuevo {
-  background-color: var(--brand-secondary);
-  color: var(--text-on-inverse);
-  padding: 0.625rem 1.25rem;
-  border-radius: var(--radius-md);
-  font-size: 0.875rem;
-  font-weight: var(--weight-bold);
-  border: none;
-  box-shadow: var(--shadow-md);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-  font-family: inherit;
-}
-
-.boton-nuevo:hover {
-  background-color: var(--pine-950);
-}
-
-.boton-nuevo:active {
-  transform: scale(0.95);
-}
+/* Boton "Nuevo" (.boton-nuevo): estilos unificados en base.css */
 
 /* --- TABLA DE PRODUCTOS --- */
 .contenedor-tabla {
@@ -178,17 +159,7 @@
 
 /* Mayor especificidad que la regla unificada de cabeceras en base.css
    (.tabla-productos th), para lograr la cabecera clara/hundida del kit. */
-.contenedor-tabla .tabla-productos th {
-  padding: 0.9rem 1.5rem;
-  font-size: var(--text-xs);
-  font-weight: var(--weight-bold);
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-wide);
-  background-color: var(--surface-sunken);
-  border-bottom: 1px solid var(--border-subtle);
-  white-space: nowrap;
-}
+/* Cabecera de tabla: estilos unificados en base.css */
 
 .tabla-productos th.texto-derecha {
   text-align: right;
@@ -299,10 +270,98 @@
   border: 1px solid var(--color-rojo-borde-etiqueta);
 }
 
+.etiqueta-tambores-vacios {
+  background-color: var(--color-azul-claro);
+  color: var(--slate-700);
+  border: 1px solid var(--color-gris-borde-etiqueta);
+}
+
 .etiqueta-otros {
   background-color: var(--color-gris-claro-etiqueta);
   color: var(--color-gris-texto-etiqueta);
   border: 1px solid var(--border-default);
+}
+
+/* --- Filas de productos que se venden por kilo --- */
+/* Banda hundida uniforme + acento lateral del color de la categoria: la fila se
+   lee distinta de la del producto por unidad sin depender solo del color, y el
+   subtitulo "Venta por kilo" lo dice con palabras. */
+.fila-granel {
+  --granel-accent: var(--color-gris-texto-etiqueta);
+}
+
+.fila-granel--miel {
+  --granel-accent: var(--honey-500);
+}
+
+.fila-granel--alimento {
+  --granel-accent: var(--color-verde-texto-etiqueta);
+}
+
+.fila-granel--cera {
+  --granel-accent: var(--color-cera-texto-etiqueta);
+}
+
+.fila-granel--madera {
+  --granel-accent: var(--color-madera-texto-etiqueta);
+}
+
+.fila-granel--estampado {
+  --granel-accent: var(--text-muted);
+}
+
+.fila-granel--insumos {
+  --granel-accent: var(--color-insumos-texto-etiqueta);
+}
+
+.fila-granel--medicamentos {
+  --granel-accent: var(--color-rojo-texto-etiqueta);
+}
+
+.fila-granel--tambores-vacios {
+  --granel-accent: var(--slate-500);
+}
+
+.fila-granel--otros {
+  --granel-accent: var(--color-gris-texto-etiqueta);
+}
+
+.tabla-productos tbody tr.fila-granel,
+.tabla-productos tbody tr.fila-granel:hover {
+  background-color: var(--surface-sunken);
+}
+
+.fila-granel td {
+  background-color: var(--surface-sunken);
+}
+
+.fila-granel td:first-child {
+  box-shadow: inset 4px 0 0 0 var(--granel-accent);
+}
+
+.granel-sub {
+  color: var(--granel-accent);
+  font-weight: var(--weight-semibold);
+}
+
+.granel-unidad {
+  margin-left: 0.1rem;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--text-subtle);
+}
+
+/* Solo lectura: el stock a granel no se edita aca, se gestiona en cotizaciones. */
+.granel-solo-lectura {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem;
+  color: var(--text-subtle);
+}
+
+.granel-solo-lectura .material-symbols-outlined {
+  font-size: 18px;
 }
 
 /* --- Celda de stock: cantidad + unidad + badge de estado --- */
@@ -374,7 +433,8 @@
   background-color: var(--color_verde-semi-oliva);
 }
 
-.boton-icono.editar:hover {
+.boton-icono.editar:hover,
+.boton-icono.editar-precio-granel:hover {
   color: var(--brand-active);
   background-color: var(--color_verde-semi-oliva);
 }
@@ -384,51 +444,7 @@
   background-color: var(--color-rosa-claro);
 }
 
-/* --- PAGINACIÓN --- */
-.paginacion {
-  padding: 1rem 1.5rem;
-  border-top: 1px solid var(--border-subtle);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: var(--color-blanco);
-}
-
-.paginacion-info {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-.paginacion-info span {
-  font-weight: 600;
-  color: var(--text-body);
-}
-
-.paginacion-botones {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.boton-paginacion {
-  padding: 0.25rem 0.75rem;
-  border: 1px solid var(--border-subtle);
-  border-radius: 0.25rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--text-muted);
-  background-color: var(--color-blanco);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.boton-paginacion:hover:not(:disabled) {
-  background-color: var(--border-subtle);
-}
-
-.boton-paginacion:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+/* Paginacion: estilos unificados en base.css */
 
 /* --- PANEL LATERAL (SLIDE-OVER) --- */
 #contenedor-slide-over {
@@ -454,6 +470,7 @@
   position: fixed;
   inset: 0;
   background-color: var(--overlay-ink);
+  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
@@ -611,6 +628,107 @@
   padding-left: 1.75rem;
 }
 
+/* --- Selector de unidad de venta (por unidad / por kilo) --- */
+/* Es la decision que cambia el significado de los dos campos que siguen (precio
+   y stock), asi que pesa mas que un desplegable: dos tarjetas que se eligen de
+   un toque y dicen como se cuenta el stock en cada caso. */
+.campo-formulario .etiqueta-campo {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-body);
+}
+
+.selector-venta {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.625rem;
+}
+
+/* El radio queda invisible pero enfocable: el foco del teclado se dibuja sobre
+   la tarjeta. Lo dejo al pie del selector, no fuera de pantalla, para que el
+   aviso de campo obligatorio del navegador salga apuntando a las tarjetas. */
+.selector-venta input[type="radio"] {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.campo-formulario .opcion-venta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background-color: var(--color-blanco);
+  box-shadow: 0 1px 2px var(--color-sombra-1);
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s, color 0.2s;
+}
+
+.opcion-venta__icono {
+  font-size: 22px;
+  color: var(--text-subtle);
+  transition: color 0.2s;
+}
+
+.opcion-venta__titulo {
+  font-size: 0.875rem;
+  font-weight: var(--weight-semibold);
+  color: var(--text-strong);
+}
+
+.opcion-venta__detalle {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.selector-venta input[type="radio"]:checked + .opcion-venta {
+  border-color: var(--brand);
+  background-color: var(--honey-tint-10);
+}
+
+.selector-venta input[type="radio"]:checked + .opcion-venta .opcion-venta__icono {
+  color: var(--brand-active);
+}
+
+.selector-venta input[type="radio"]:focus-visible + .opcion-venta {
+  border-color: var(--brand);
+  box-shadow: var(--ring);
+}
+
+/* Al editar, la unidad de venta ya no se toca: el producto vive en una tabla o
+   en la otra. La opcion elegida queda visible y la otra se apaga. */
+.selector-venta input[type="radio"]:disabled + .opcion-venta {
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.selector-venta input[type="radio"]:disabled:not(:checked) + .opcion-venta {
+  opacity: 0.45;
+}
+
+.nota-venta {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+/* Campos bloqueados del slide-over (nombre y categoria al editar el precio de
+   un articulo a granel): el cursor deja claro que no se pueden modificar. */
+#form-producto .input-estandar:disabled,
+#form-producto .select-estandar:disabled {
+  cursor: not-allowed;
+}
+
 /* VALIDACIONES PERSONALIZADAS */
 .mensaje-error {
   display: none;
@@ -729,6 +847,7 @@
   position: absolute;
   inset: 0;
   background-color: var(--overlay-ink);
+  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
@@ -892,6 +1011,7 @@
   position: absolute;
   inset: 0;
   background-color: var(--overlay-ink);
+  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
@@ -1105,14 +1225,15 @@
   background-color: var(--pine-950);
 }
 
+/* Selectores con prefijo del contenedor para ganarle a la regla unificada de base.css */
 @media (max-width: 1200px) {
-  .boton-nuevo {
+  .barra-herramientas .boton-nuevo {
     padding: 0.625rem 1rem;
   }
-  .boton-nuevo .texto-boton {
+  .barra-herramientas .boton-nuevo .texto-boton {
     font-size: 0;
   }
-  .boton-nuevo .texto-boton::before {
+  .barra-herramientas .boton-nuevo .texto-boton::before {
     content: "Nuevo";
     font-size: 0.875rem;
   }
@@ -1130,13 +1251,13 @@
   .contenedor-input-busqueda {
     width: 100%;
   }
-  .boton-nuevo {
+  .barra-herramientas .boton-nuevo {
     width: 100%;
     height: auto;
     justify-content: center;
     padding: 0.75rem;
   }
-  .boton-nuevo .texto-boton {
+  .barra-herramientas .boton-nuevo .texto-boton {
     display: inline;
   }
   #panel-eliminar, #panel-actualizar-cotizacion, #panel-actualizar-stock {
@@ -1146,7 +1267,8 @@
   .acciones-modal {
     grid-template-columns: 1fr;
   }
-  .tabla-productos th, .tabla-productos td {
+  /* Mas especificidad que la cabecera unificada de base.css */
+  .contenedor-tabla .tabla-productos th, .contenedor-tabla .tabla-productos td {
     padding: 0.875rem 1rem;
   }
   /* Permite que la tabla haga scroll horizontal en móviles */
@@ -1176,5 +1298,13 @@
   /* Ocultar columnas menos importantes en móviles muy pequeños */
   .columna-ocultable-movil {
     display: none;
+  }
+}
+
+/* fallback-oklch-autogenerado */
+/* Safari < 15.4 no soporta oklch(): redefinimos las variables en sRGB. */
+@supports not (color: oklch(0% 0 0)) {
+  :root {
+    --color-rojo-eliminacion: #dc2626;
   }
 }

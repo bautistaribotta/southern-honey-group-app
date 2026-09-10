@@ -29,7 +29,13 @@
                 <p class="id-cliente-subtitulo">ID: {{ cliente.id }}</p>
             </div>
         </div>
-        <div class="acciones-cliente" style="display: flex; gap: 0.75rem;">
+        <div class="acciones-cliente">
+            {% if user.is_staff %}
+            <button type="button" class="boton-accion boton-resumen" id="btn-resumen-cuenta">
+                <span class="material-symbols-outlined">receipt_long</span>
+                Imprimir cuenta
+            </button>
+            {% endif %}
             <button type="button" class="boton-accion boton-editar" id="btn-editar-cliente">
                 <span class="material-symbols-outlined">edit</span>
                 Editar Cliente
@@ -123,16 +129,16 @@
                 <div class="campo-info">
                     <label>Teléfono</label>
                     <p class="valor-vista">{{ cliente.telefono|default:"N/A" }}</p>
-                    <input 
-                        type="text" 
-                        name="telefono" 
-                        class="input-edicion" 
-                        value="{{ cliente.telefono|default:'' }}" 
-                        required 
-                        style="display: none;" 
-                        maxlength="16" 
-                        pattern="[\d]{6,}">
-                    <span class="mensaje-error">Mínimo 6 números, sin letras ni símbolos</span>
+                    <input
+                        type="tel"
+                        name="telefono"
+                        class="input-edicion"
+                        value="{{ cliente.telefono|default:'' }}"
+                        required
+                        style="display: none;"
+                        maxlength="20"
+                        pattern="[\d\-/. ]{5,}">
+                    <span class="mensaje-error">Mínimo 5 caracteres: números, guiones, barras, puntos o espacios</span>
                 </div>
             </div>
 
@@ -155,13 +161,18 @@
             <h4><span class="material-symbols-outlined">history</span> Operaciones Realizadas</h4>
         </div>
         <div class="barra-operaciones">
+            {% comment %}
+              Cambiar de pestaña vuelve a la primera pagina de operaciones (page=None
+              la saca de la URL), pero conserva el resto de los parametros: la tabla
+              de viajes de cereal de mas abajo no tiene por que moverse.
+            {% endcomment %}
             <div class="tabs-operaciones">
-                <a href="?tipo=todas#seccion-operaciones" class="tab-operacion {% if tipo_actual == 'todas' %}activa{% endif %}">Todas</a>
-                <a href="?tipo=compra#seccion-operaciones" class="tab-operacion {% if tipo_actual == 'compra' %}activa{% endif %}">Compras</a>
-                <a href="?tipo=venta#seccion-operaciones" class="tab-operacion {% if tipo_actual == 'venta' %}activa{% endif %}">Ventas</a>
+                <a href="{% querystring tipo='todas' page=None %}#seccion-operaciones" class="tab-operacion {% if tipo_actual == 'todas' %}activa{% endif %}">Todas</a>
+                <a href="{% querystring tipo='compra' page=None %}#seccion-operaciones" class="tab-operacion {% if tipo_actual == 'compra' %}activa{% endif %}">Compras</a>
+                <a href="{% querystring tipo='venta' page=None %}#seccion-operaciones" class="tab-operacion {% if tipo_actual == 'venta' %}activa{% endif %}">Ventas</a>
             </div>
             <div class="grupo-botones-operacion">
-                <a href="{% url 'nueva_operacion_compra' cliente.id %}" class="boton-nuevo boton-nuevo-compra" data-id="{{ cliente.id }}">
+                <a href="{% url 'nueva_operacion_compra' cliente.id %}" class="boton-nuevo secundario" data-id="{{ cliente.id }}">
                     <span class="material-symbols-outlined">shopping_bag</span>
                     Nueva Compra
                 </a>
@@ -173,15 +184,17 @@
         </div>
         <div class="tabla-operaciones-container">
             {% if operaciones %}
-            <table class="tabla-operaciones">
+            <table class="tabla-operaciones{% if not user.is_staff %} tabla-operaciones--reducida{% endif %}">
                 <thead>
                     <tr>
                         <th style="padding-left: 2.75rem;">Fecha</th>
                         <th>Detalle de Operación</th>
                         <th style="text-align: center;">Tipo</th>
+                        {% if user.is_staff %}
                         <th style="text-align: center;">Estado</th>
                         <th style="text-align: right;">Monto Total</th>
                         <th style="text-align: center;">Acciones</th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
@@ -215,6 +228,7 @@
                                 <span class="badge-tipo-operacion venta">Venta</span>
                             {% endif %}
                         </td>
+                        {% if user.is_staff %}
                         <td class="estado" style="text-align: center;">
                             {% if operacion.estado_pago == 'Pagada' %}
                                 <span class="pildora-estado pagada">Pagada</span>
@@ -241,6 +255,7 @@
                                 </button>
                             </div>
                         </td>
+                        {% endif %}
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -253,7 +268,7 @@
               </div>
               <div class="paginacion-botones">
                 {% if operaciones.has_previous %}
-                  <a href="?page={{ operaciones.previous_page_number }}&tipo={{ tipo_actual }}#seccion-operaciones">
+                  <a href="{% querystring page=operaciones.previous_page_number %}#seccion-operaciones">
                     <button class="boton-paginacion">Anterior</button>
                   </a>
                 {% else %}
@@ -261,7 +276,7 @@
                 {% endif %}
 
                 {% if operaciones.has_next %}
-                  <a href="?page={{ operaciones.next_page_number }}&tipo={{ tipo_actual }}#seccion-operaciones">
+                  <a href="{% querystring page=operaciones.next_page_number %}#seccion-operaciones">
                     <button class="boton-paginacion">Siguiente</button>
                   </a>
                 {% else %}
@@ -274,6 +289,111 @@
                 <span class="material-symbols-outlined">history_toggle_off</span>
                 <h4>No hay movimientos</h4>
                 <p>Este cliente no posee operaciones registradas.</p>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    {% comment %}
+      Fletes de cereal hechos a nombre del cliente. Conviven en la misma URL que
+      las operaciones de arriba, por eso cada tabla pagina con su propio parametro
+      (page / page_cereal) y los links se arman con {% templatetag openblock %} querystring {% templatetag closeblock %}: ese tag parte de
+      los parametros actuales y solo cambia el que se le pasa, asi avanzar en una
+      tabla no reinicia la otra ni pierde la pestaña activa. El ancla devuelve el
+      scroll a la seccion en la que estabas.
+
+      Sin columnas de plata: el flete se le factura al cliente aparte y lo que
+      importa aca es el historial de viajes, no el dinero.
+    {% endcomment %}
+    <section id="seccion-viajes-cereal" class="contenedor-viajes-cereal">
+        <div class="encabezado-viajes-cereal">
+            <h4><span class="material-symbols-outlined">agriculture</span> Viajes de Cereal Realizados</h4>
+        </div>
+        <div class="tabla-viajes-cereal-container">
+            {% if viajes_cereal %}
+            <table class="tabla-viajes-cereal">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Cereal</th>
+                        <th>Ruta</th>
+                        <th class="vcc-columna-toneladas">Toneladas</th>
+                        <th class="vcc-columna-monto">Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for viaje in viajes_cereal %}
+                    {% comment %}
+                      ?origen=cliente: el detalle del viaje lo usa para que el boton
+                      "Volver" traiga de nuevo a este perfil en vez de al listado de
+                      cereales, que no es de donde salio el usuario.
+                    {% endcomment %}
+                    <tr class="fila-viaje-cereal" onclick="window.location.href='{% url 'informacion_viaje_cereal' viaje.id %}?origen=cliente'">
+                        <td>
+                            <span class="celda-fecha">
+                                <span class="material-symbols-outlined">event</span>
+                                {{ viaje.fecha_viaje_cereal|date:"d/m/Y" }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="cereal-pill cereal-pill--{{ viaje.tipo_cereal|lower }}">
+                                <span class="cereal-pill__dot"></span>{{ viaje.get_tipo_cereal_display }}
+                            </span>
+                        </td>
+                        {% comment %}
+                          Las paradas van encadenadas con una flecha en el medio: el
+                          orden de los destinos es el recorrido del camion, asi que la
+                          ruta se lee de corrido en vez de como una lista suelta.
+                        {% endcomment %}
+                        <td>
+                            <div class="vcc-ruta">
+                                {% for parada in viaje.destinos.all %}
+                                {% if not forloop.first %}<span class="material-symbols-outlined vcc-ruta__flecha">arrow_forward</span>{% endif %}
+                                <span class="vcc-ruta__parada">{{ parada.destino }}</span>
+                                {% empty %}
+                                <span class="vcc-ruta__vacia">Sin destinos cargados</span>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td class="vcc-toneladas">
+                            {{ viaje.toneladas|floatformat:"-2g" }}<span class="vcc-toneladas__unidad">t</span>
+                        </td>
+                        <td class="vcc-monto">
+                            <span class="vcc-monto__signo">$</span>{{ viaje.total_bruto|floatformat:"-2g" }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <!-- Paginación de Viajes de Cereal -->
+            <div class="paginacion">
+              <div class="paginacion-info">
+                Mostrando <span>{{ viajes_cereal.start_index }}-{{ viajes_cereal.end_index }}</span>
+                de <span>{{ viajes_cereal.paginator.count }}</span> viajes
+              </div>
+              <div class="paginacion-botones">
+                {% if viajes_cereal.has_previous %}
+                  <a href="{% querystring page_cereal=viajes_cereal.previous_page_number %}#seccion-viajes-cereal">
+                    <button class="boton-paginacion">Anterior</button>
+                  </a>
+                {% else %}
+                  <button class="boton-paginacion" disabled>Anterior</button>
+                {% endif %}
+
+                {% if viajes_cereal.has_next %}
+                  <a href="{% querystring page_cereal=viajes_cereal.next_page_number %}#seccion-viajes-cereal">
+                    <button class="boton-paginacion">Siguiente</button>
+                  </a>
+                {% else %}
+                  <button class="boton-paginacion" disabled>Siguiente</button>
+                {% endif %}
+              </div>
+            </div>
+            {% else %}
+            <div class="estado-vacio">
+                <span class="material-symbols-outlined">agriculture</span>
+                <h4>No hay viajes de cereal</h4>
+                <p>Este cliente no tiene fletes de cereal registrados.</p>
             </div>
             {% endif %}
         </div>
@@ -340,6 +460,65 @@
   </div>
 </form>
 
+{% if user.is_staff %}
+<!-- Modal para imprimir el resumen de cuenta corriente -->
+<div id="contenedor-modal-resumen">
+    <div id="contenedor-modal-fondo-resumen" onclick="cerrarModalResumen()"></div>
+    <div id="panel-resumen">
+        <button type="button" class="boton-cerrar" onclick="cerrarModalResumen()">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+
+        <div id="icono-resumen-modal">
+            <span class="material-symbols-outlined">receipt_long</span>
+        </div>
+
+        <h3>Imprimir resumen de cuenta</h3>
+        <p>Cuenta corriente de <strong>{{ cliente.nombre }}{% if cliente.apellido and cliente.apellido != 'None' %} {{ cliente.apellido }}{% endif %}</strong></p>
+
+        <!-- GET directo al PDF: el navegador lo abre en otra pestaña y esta vista
+             queda intacta. El JS solo maneja los atajos de periodo y el conteo. -->
+        <form id="form-resumen-cuenta"
+              action="{% url 'generar_resumen_cuenta' cliente.id %}"
+              method="GET"
+              target="_blank"
+              data-url-conteo="{% url 'contar_movimientos_cuenta' cliente.id %}">
+
+            <p class="rc-titulo-campo">Período</p>
+            <div class="rc-atajos" id="resumen-atajos">
+                <button type="button" class="rc-atajo" data-periodo="mes">Este mes</button>
+                <button type="button" class="rc-atajo" data-periodo="mes-anterior">Mes anterior</button>
+                <button type="button" class="rc-atajo" data-periodo="trimestre">Últimos 3 meses</button>
+                <button type="button" class="rc-atajo" data-periodo="anio">Este año</button>
+            </div>
+
+            <div class="rc-rango">
+                <label class="rc-campo">
+                    <span class="rc-campo__lbl">Desde</span>
+                    <input type="date" class="rc-campo__input" id="resumen-desde" name="desde" required>
+                </label>
+                <label class="rc-campo">
+                    <span class="rc-campo__lbl">Hasta</span>
+                    <input type="date" class="rc-campo__input" id="resumen-hasta" name="hasta" required>
+                </label>
+            </div>
+
+            <p class="rc-conteo" id="resumen-conteo" data-estado="cargando" aria-live="polite">
+                Buscando movimientos...
+            </p>
+
+            <div class="acciones-modal">
+                <button type="submit" class="rc-boton-imprimir" id="boton-imprimir-resumen">
+                    <span class="material-symbols-outlined">print</span>
+                    Imprimir
+                </button>
+                <button type="button" class="boton-secundario" onclick="cerrarModalResumen()">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
 <!-- Modal para Añadir Pago -->
 <div id="contenedor-modal-pago">
     <div id="contenedor-modal-fondo-pago" onclick="cerrarModalPago()"></div>
@@ -366,7 +545,7 @@
                 </div>
                 <div style="position: relative; display: block;">
                     <span style="position: absolute; left: 0.75rem; top: 0.6rem; color: var(--slate-500); font-weight: 600; pointer-events: none;">$</span>
-                    <input type="number" id="input-monto-pago" class="input-edicion" style="padding-left: 1.75rem; width: 100%; box-sizing: border-box;" min="0.01" step="0.01" required placeholder=" ">
+                    <input type="text" id="input-monto-pago" class="input-edicion input-miles-decimal" style="padding-left: 1.75rem; width: 100%; box-sizing: border-box;" inputmode="decimal" autocomplete="off" pattern="[1-9][0-9]{0,2}(\.[0-9]{3})*(,[0-9]{1,2})?|0,(0[1-9]|[1-9][0-9]?)" required placeholder=" ">
                     <span class="mensaje-error" style="margin-top: 0.5rem;">Ingrese un monto válido y menor o igual al restante</span>
                 </div>
             </div>

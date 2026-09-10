@@ -1,0 +1,85 @@
+<table class="tabla-empleados">
+  <thead>
+    <tr id="encabezado-tabla-empleados">
+      <th> Empleados </th>
+      <th> Vencimiento carnet </th>
+      <th class="texto-derecha"> Acciones </th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for empleado in empleados %}
+      <tr class="fila-empleado" data-id="{{ empleado.id }}">
+        <td class="td-enlace">
+          <a href="{% url 'informacion_empleado' empleado.id %}" class="enlace-fila">
+            <div class="emp-empleado">
+              <span class="avatar-iniciales avatar-iniciales--empleado">{{ empleado.nombre|first|upper }}{{ empleado.apellido|first|upper }}</span>
+              <div>
+                <div class="empleado-nombre"> {{ empleado.nombre }} {{ empleado.apellido }} </div>
+                <div class="empleado-id"> ID: {{ empleado.id }} </div>
+              </div>
+            </div>
+          </a>
+        </td>
+        <td class="celda-carnet">
+          {% comment %}
+            Vencimiento del carnet con su semaforo (mismo lenguaje que los
+            vencimientos de vehiculos). Sin fecha cargada queda "Sin cargar".
+          {% endcomment %}
+          {% if empleado.estado_carnet %}
+            <span class="chip-carnet chip-carnet--{{ empleado.estado_carnet.nivel }}">
+              <span class="chip-carnet__dot"></span>
+              {{ empleado.estado_carnet.fecha|date:"d/m/Y" }}
+            </span>
+          {% else %}
+            <span class="chip-carnet chip-carnet--sin-dato">Sin cargar</span>
+          {% endif %}
+        </td>
+        <td>
+          <div class="acciones-tabla">
+            <button class="boton-icono editar" title="Editar" data-id="{{ empleado.id }}">
+              <span class="material-symbols-outlined">edit</span>
+            </button>
+            <button class="boton-icono eliminar" 
+                    title="Eliminar" 
+                    data-id="{{ empleado.id }}"
+                    data-nombre="{{ empleado.nombre }} {{ empleado.apellido }}">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </div>
+        </td>
+      </tr>
+    {% empty %}
+      <tr class="fila-vacia">
+        <td colspan="3" class="celda-vacia">
+          <span class="material-symbols-outlined">badge</span>
+          {% if q %}No se encontraron empleados con esos filtros.{% else %}No hay empleados registrados.{% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Paginacion -->
+<div class="paginacion">
+  <div class="paginacion-info">
+    Mostrando <span>{{ empleados.start_index }}-{{ empleados.end_index }}</span>
+    de <span>{{ empleados.paginator.count }}</span> empleados
+  </div>
+  <div class="paginacion-botones">
+    {% if empleados.has_previous %}
+      <a href="?page={{ empleados.previous_page_number }}{% if q %}&q={{ q }}{% endif %}">
+        <button class="boton-paginacion">Anterior</button>
+      </a>
+    {% else %}
+      <button class="boton-paginacion" disabled>Anterior</button>
+    {% endif %}
+
+    {% if empleados.has_next %}
+      <a href="?page={{ empleados.next_page_number }}{% if q %}&q={{ q }}{% endif %}">
+        <button class="boton-paginacion">Siguiente</button>
+      </a>
+    {% else %}
+      <button class="boton-paginacion" disabled>Siguiente</button>
+    {% endif %}
+  </div>
+</div>

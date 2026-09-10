@@ -1,0 +1,214 @@
+{% load humanize %}
+{% comment %}
+  Cuenta corriente del empleado. Se renderiza en la pagina y tambien se devuelve
+  suelto ante frag=pagos, para refrescarlo por AJAX al navegar el mes con las
+  flechas.
+
+  Formato de cuenta corriente: una sola lista cronologica (viejo -> nuevo) con el
+  saldo corrido calculado fila a fila. El sueldo se devenga por semana (sueldo/4)
+  y suma a favor del empleado; las comisiones y los pagos lo adelantan/cubren y
+  restan. Arriba y abajo del mes van el saldo inicial (arrastre) y el final.
+
+  Se muestran todos los movimientos del mes, agrupados por semana (lunes a
+  domingo) con una franja divisoria que abre cada semana.
+
+  Las comisiones (fila-pago--comision) siguen abriendo el detalle del viaje al
+  hacer click; los pagos reales conservan editar y eliminar.
+{% endcomment %}
+<div class="pagos-barra">
+  <h4 class="pagos-barra__titulo">
+    <span class="material-symbols-outlined">account_balance</span>
+    Cuenta corriente
+  </h4>
+
+  <div class="pagos-nav">
+    <a class="pagos-nav__paso" data-pagos-ancla="{{ pagos_ancla_anterior|date:'Y-m-d' }}"
+       href="?pagos_ancla={{ pagos_ancla_anterior|date:'Y-m-d' }}#seccion-pagos"
+       aria-label="Mes anterior">
+      <span class="material-symbols-outlined">chevron_left</span>
+    </a>
+
+    <div class="pagos-nav__centro">
+      <span class="pagos-nav__label">{{ pagos_label }}</span>
+      {% comment %}
+        Atajo al mes actual: mismo diseño que el de alquileres. Refresca el bloque
+        por AJAX como las flechas (comparte el data-pagos-ancla). Se renderiza
+        siempre para que la barra no cambie de alto; en el mes actual se oculta
+        con visibility (es-oculto) y queda fuera del recorrido de teclado.
+      {% endcomment %}
+      <a class="pagos-hoy{% if pagos_es_mes_actual %} es-oculto{% endif %}"
+         data-pagos-ancla="{{ pagos_mes_actual|date:'Y-m-d' }}"
+         href="?pagos_ancla={{ pagos_mes_actual|date:'Y-m-d' }}#seccion-pagos"
+         {% if pagos_es_mes_actual %}aria-hidden="true" tabindex="-1"{% endif %}>
+        <span class="material-symbols-outlined">undo</span>
+        <span class="pagos-hoy__texto">Volver al mes actual</span>
+      </a>
+    </div>
+
+    <a class="pagos-nav__paso" data-pagos-ancla="{{ pagos_ancla_siguiente|date:'Y-m-d' }}"
+       href="?pagos_ancla={{ pagos_ancla_siguiente|date:'Y-m-d' }}#seccion-pagos"
+       aria-label="Mes siguiente">
+      <span class="material-symbols-outlined">chevron_right</span>
+    </a>
+  </div>
+</div>
+
+<div class="panel-pagos">
+  {% if not cuenta.activa %}
+    <div class="cuenta-sin-sueldo">
+      <span class="material-symbols-outlined">account_balance_wallet</span>
+      <p>Fijá un sueldo para empezar a llevar la cuenta corriente del empleado.</p>
+    </div>
+  {% else %}
+    <div class="tabla-pagos-contenedor">
+      <table class="tabla-pagos tabla-cuenta">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Detalle</th>
+            <th class="texto-derecha">Monto</th>
+            <th class="texto-derecha celda-acciones-th">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% comment %}
+            Arrastre del mes pasado: arranca la tabla con un aviso, arriba de todo.
+            A favor (se pagó de más) ya suma a lo pagado del mes; en contra (se le
+            debe) se suma al objetivo del mes.
+          {% endcomment %}
+          {% if cuenta.arrastre.a_favor %}
+          <tr class="fila-arrastre fila-arrastre--favor">
+            <td colspan="4">
+              <span class="fila-arrastre__texto">
+                <span class="material-symbols-outlined fila-arrastre__icono">savings</span>
+                El mes pasado le diste <strong>${{ cuenta.arrastre.abs|floatformat:"0"|intcomma }}</strong> de más con respecto al sueldo. Figura ahora en lo pagado de este mes.
+              </span>
+            </td>
+          </tr>
+          {% elif cuenta.arrastre.en_contra %}
+          <tr class="fila-arrastre fila-arrastre--deuda">
+            <td colspan="4">
+              <span class="fila-arrastre__texto">
+                <span class="material-symbols-outlined fila-arrastre__icono">warning</span>
+                Le debés <strong>${{ cuenta.arrastre.abs|floatformat:"0"|intcomma }}</strong> del mes pasado con respecto al sueldo. Se suma al objetivo de este mes.
+              </span>
+            </td>
+          </tr>
+          {% endif %}
+          {% for fila in pagos %}
+            {% comment %}
+              Franja que abre cada semana del mes. ifchanged la dispara cuando
+              cambia el lunes de la fila (las filas ya vienen en orden cronologico),
+              asi el mes queda partido en semanas sin repetir el encabezado.
+            {% endcomment %}
+            {% ifchanged fila.semana_inicio %}
+            <tr class="fila-semana-franja">
+              <td colspan="4">
+                <span class="franja-semana__rotulo">
+                  <span class="material-symbols-outlined">calendar_view_week</span>
+                  Semana del {{ fila.semana_inicio|date:"j M" }} al {{ fila.semana_fin|date:"j M" }}
+                </span>
+              </td>
+            </tr>
+            {% endifchanged %}
+            {% if fila.tipo == "comision" %}
+            <tr class="fila-cuenta fila-pago--comision" data-url="{% url 'informacion_viaje_cereal' fila.viaje_id %}?origen=empleado">
+              <td class="celda-fecha-pago">{{ fila.fecha|date:"d/m/Y" }}</td>
+              <td class="celda-observacion">
+                <span class="etiqueta-mov etiqueta-mov--comision">
+                  <span class="material-symbols-outlined">agriculture</span>
+                  Comisión
+                </span>
+                <span class="mov-detalle">Viaje de cereal #{{ fila.viaje_id }}</span>
+                <span class="comision-porcentaje">{{ fila.porcentaje }}%</span>
+              </td>
+              <td class="texto-derecha celda-monto-mov">${{ fila.monto_abs|floatformat:"0"|intcomma }}</td>
+              {% comment %} La comision sale de un viaje: no se edita ni se borra desde aca. {% endcomment %}
+              <td class="celda-acciones-pago"></td>
+            </tr>
+
+            {% else %}
+            {% comment %}
+              Un pago de devolucion (el chofer se quedo con parte del sobrante de
+              la caja de un viaje) se muestra con badge y acento propios, aunque se
+              edita y borra igual que cualquier pago. Un pago comun va sin acento.
+            {% endcomment %}
+            <tr class="fila-cuenta{% if fila.es_devolucion %} fila-pago--devolucion{% endif %}">
+              <td class="celda-fecha-pago">{{ fila.fecha|date:"d/m/Y" }}</td>
+              <td class="celda-observacion">
+                {% if fila.es_devolucion %}
+                <span class="etiqueta-mov etiqueta-mov--devolucion">
+                  <span class="material-symbols-outlined">wallet</span>
+                  Devolución
+                </span>
+                <span class="mov-detalle">Sobrante de caja{% if fila.viaje_devolucion_id %} · viaje #{{ fila.viaje_devolucion_id }}{% endif %}</span>
+                {% else %}
+                <span class="etiqueta-mov etiqueta-mov--pago">
+                  <span class="material-symbols-outlined">payments</span>
+                  Pago
+                </span>
+                <span class="mov-detalle">{{ fila.observaciones|default:"Sin observación" }}</span>
+                {% endif %}
+              </td>
+              <td class="texto-derecha celda-monto-mov">${{ fila.monto_abs|floatformat:"0"|intcomma }}</td>
+              <td class="celda-acciones-pago">
+                <div class="acciones-tabla">
+                  <button type="button" class="boton-icono editar pago-editar" title="Editar pago"
+                          data-id="{{ fila.pago_id }}"
+                          data-monto="{{ fila.pago_monto }}"
+                          data-fecha="{{ fila.fecha|date:'Y-m-d' }}"
+                          data-observaciones="{{ fila.observaciones }}">
+                    <span class="material-symbols-outlined">edit</span>
+                  </button>
+                  <button type="button" class="boton-icono eliminar pago-eliminar" title="Eliminar pago"
+                          data-id="{{ fila.pago_id }}">
+                    <span class="material-symbols-outlined">delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% endif %}
+          {% empty %}
+          <tr class="fila-vacia">
+            <td colspan="4" class="celda-vacia">
+              <span class="material-symbols-outlined">receipt_long</span>
+              No hay pagos ni comisiones en este mes.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% comment %}
+      Cierre del mes: el objetivo (su sueldo), lo efectivamente pagado y la
+      diferencia. La diferencia manda el color: a favor (se pago de mas) en pino,
+      en contra (se pago de menos) en rojo, al dia apagada.
+    {% endcomment %}
+    <div class="cuenta-cierre">
+      <div class="cuenta-cierre__cifra">
+        <span class="cuenta-cierre__rotulo">Objetivo del mes</span>
+        <span class="cuenta-cierre__valor">${{ cuenta.objetivo|floatformat:"0"|intcomma }}</span>
+      </div>
+
+      <span class="cuenta-cierre__sep" aria-hidden="true"></span>
+
+      <div class="cuenta-cierre__cifra">
+        <span class="cuenta-cierre__rotulo">Pagado</span>
+        <span class="cuenta-cierre__valor">${{ cuenta.alcanzado|floatformat:"0"|intcomma }}</span>
+      </div>
+
+      <span class="cuenta-cierre__sep" aria-hidden="true"></span>
+
+      <div class="cuenta-cierre__cifra cuenta-cierre__cifra--dif">
+        <span class="cuenta-cierre__rotulo">
+          {% if cuenta.diferencia.a_favor %}A favor tuyo{% elif cuenta.diferencia.en_contra %}Le debés{% else %}Al día{% endif %}
+        </span>
+        <span class="cuenta-cierre__valor cuenta-cierre__valor--dif{% if cuenta.diferencia.a_favor %} cuenta-cierre__valor--favor{% elif cuenta.diferencia.en_contra %} cuenta-cierre__valor--contra{% endif %}">
+          {% if cuenta.diferencia.a_favor %}+{% elif cuenta.diferencia.en_contra %}&minus;{% endif %}${{ cuenta.diferencia.abs|floatformat:"0"|intcomma }}
+        </span>
+      </div>
+    </div>
+
+  {% endif %}
+</div>

@@ -1,0 +1,228 @@
+{% load humanize %}
+{% comment %}
+  Tabla de casas. Es el fragmento que devuelve la vista por AJAX cuando cambian
+  el buscador, los chips o la pagina, asi que no puede depender de nada que viva
+  fuera de este archivo.
+
+  Las filas llegan ordenadas por urgencia desde el servicio (pendientes de cobro
+  primero), no alfabeticamente: la pregunta que trae al usuario a esta pantalla
+  es que falta cobrar este mes.
+{% endcomment %}
+<table class="tabla-alquileres">
+  <thead>
+    <tr>
+      <th class="pago-col">Pago</th>
+      <th>Casa</th>
+      <th>Localidad</th>
+      <th class="alq-col-monto">Alquiler</th>
+      <th class="alq-col-estado">Estado</th>
+      <th class="alq-col-acciones">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for casa in casas %}
+      {% comment %}
+        La fila entera lleva al perfil de la casa (lo resuelve alquileres.js:
+        un <a> no puede envolver un <tr> ni contener la casilla y los botones).
+        El mes y el filtro viajan con ella para que el enlace de vuelta del
+        perfil devuelva a la pantalla exacta de la que se salio.
+
+        La casa dada de baja no tiene perfil: aparece solo como registro del
+        pago de ese mes, y el perfil solo trabaja con casas vigentes.
+      {% endcomment %}
+      <tr {% if casa.activa %}class="alq-fila-perfil" data-perfil="{% url 'informacion_alquileres' casa.id %}?mes={{ periodo|date:'Y-m' }}{% if estado %}&amp;estado={{ estado }}{% endif %}"{% endif %}>
+        {% comment %}
+          Unica via de carga del cobro: tildar guarda el alquiler entero al precio
+          de la casa con fecha de hoy, y destildar lo borra.
+
+          No hay nada que resetear cada primero de mes: el tilde sale de si
+          existe un pago del periodo que se esta mirando, asi que al cambiar el
+          mes la casilla aparece vacia sola.
+
+          Se deshabilita para CREAR un pago que la casilla no puede armar sola: sin
+          contrato que cubra el mes no hay monto que cobrar ni con que respaldarlo.
+          En cambio un pago que ya existe siempre se puede sacar, porque borrarlo
+          no necesita ese dato. Lo unico intocable es la casa dada de baja, que
+          aparece solo como registro del mes.
+        {% endcomment %}
+        <td class="pago-celda">
+          <input
+            type="checkbox"
+            class="pago-check"
+            data-pago-url="{% url 'marcar_pago_alquiler' casa.id periodo|date:'Y-m' %}"
+            data-pago-entidad="Alquiler"
+            title="{% if not casa.activa %}La casa está dada de baja{% elif casa.cobrada_en_el_periodo %}Cobrado. Destildá para borrar el pago{% elif casa.fin_contrato_anterior %}El contrato venció el {{ casa.fin_contrato_anterior|date:'d/m/Y' }}. Cargá el nuevo para poder cobrar{% elif not casa.alquilada %}La casa no tiene contrato en este mes{% else %}Marcar el alquiler de {{ periodo|date:'F' }} como cobrado{% endif %}"
+            aria-label="Alquiler de {{ periodo|date:'F \d\e Y' }} de {{ casa.nombre|default:'la casa sin nombre' }}"
+            {% if not casa.activa %}disabled{% elif casa.cobrada_en_el_periodo %}{% elif not casa.alquilada %}disabled{% endif %}
+            {% if casa.cobrada_en_el_periodo %}checked{% endif %}>
+        </td>
+
+        <td>
+          <div class="alq-casa">
+            <span class="alq-casa__icono material-symbols-outlined">home_work</span>
+            <div class="alq-casa__datos">
+              <span class="alq-casa__nombre">
+                {% comment %}
+                  El nombre es un enlace de verdad y no solo la fila clickeable:
+                  sin el, al perfil no se llega con el teclado ni se puede abrir
+                  en otra pestaña.
+                {% endcomment %}
+                {% if casa.activa %}
+                  <a class="alq-casa__enlace"
+                     href="{% url 'informacion_alquileres' casa.id %}?mes={{ periodo|date:'Y-m' }}{% if estado %}&amp;estado={{ estado }}{% endif %}">{{ casa.nombre|default:"Sin nombre" }}</a>
+                {% else %}
+                  {{ casa.nombre|default:"Sin nombre" }}
+                {% endif %}
+                {% comment %}
+                  Una casa dada de baja solo aparece en los meses que tienen pago
+                  cargado, para que esa plata no se pierda del total. Sin avisarlo
+                  parece que la baja no funciono.
+                {% endcomment %}
+                {% if not casa.activa %}
+                  <span class="alq-baja" title="Dada de baja. Aparece porque este mes tiene un pago cargado.">dada de baja</span>
+                {% comment %}
+                  Sin esta marca la casa dice "Sin alquilar" y no se entiende por
+                  que: el inquilino puede seguir viviendo ahi y lo que falta es
+                  cargar el contrato nuevo. Y distingue el vencimiento de la casa
+                  que nunca estuvo alquilada, que es otra cosa.
+                {% endcomment %}
+                {% elif not casa.alquilada and casa.fin_contrato_anterior %}
+                  <span class="alq-vencido" title="El contrato venció el {{ casa.fin_contrato_anterior|date:'d/m/Y' }}. Hasta que cargues el nuevo no se le reclama el alquiler.">contrato vencido</span>
+                {% endif %}
+              </span>
+              {% if casa.direccion %}
+                <span class="alq-casa__direccion">{{ casa.direccion }}</span>
+              {% endif %}
+            </div>
+          </div>
+        </td>
+
+        <td>
+          {% if casa.localidad %}
+            {{ casa.localidad }}
+          {% else %}
+            <span class="alq-vacio">—</span>
+          {% endif %}
+        </td>
+
+        {% comment %}
+          El alquiler manda y la comision con el neto bajan en chico, uno por
+          linea: son el mismo dato leido de tres maneras y separarlos en tres
+          columnas obligaba a cruzar la vista para entender cuanto queda.
+        {% endcomment %}
+        <td class="alq-col-monto">
+          {% if casa.precio %}
+            <span class="alq-precio"><span class="alq-precio__signo">$</span>{{ casa.precio|floatformat:"0"|intcomma }}</span>
+            {% if casa.comision_inmobiliaria %}
+              <span class="alq-neto">−{{ casa.comision_inmobiliaria }}% inmobiliaria</span>
+              <span class="alq-neto">Total neto ${{ casa.neto_mensual|floatformat:"0"|intcomma }}</span>
+            {% endif %}
+          {% else %}
+            <span class="alq-vacio">Sin precio</span>
+          {% endif %}
+        </td>
+
+        {% comment %}
+          Tres estados y ninguno intermedio: el alquiler se cobra completo, asi
+          que la pildora sola ya lo dice todo y no necesita el monto al lado.
+        {% endcomment %}
+        <td class="alq-col-estado">
+          {% if casa.estado_mes == "Cobrado" %}
+            <span class="alq-pildora alq-pildora--cobrada">
+              <span class="alq-pildora__punto"></span>Cobrado
+            </span>
+          {% elif casa.estado_mes == "Pendiente de cobro" %}
+            <span class="alq-pildora alq-pildora--pendiente">
+              <span class="alq-pildora__punto"></span>Pendiente de cobro
+            </span>
+          {% else %}
+            <span class="alq-pildora alq-pildora--libre">
+              <span class="alq-pildora__punto"></span>Sin alquilar
+            </span>
+          {% endif %}
+        </td>
+
+        <td class="alq-col-acciones">
+          <div class="alq-acciones">
+            {% comment %}
+              El contrato va primero porque es de donde sale todo lo demas: sin
+              el, la casa no tiene precio ni se le puede cobrar el mes.
+
+              Con un contrato corriendo el boton se bloquea: no hay nada nuevo que
+              cargar y el que se cargara se solaparia. Se habilita solo cuando el
+              vigente se vence, que es cuando toca renovar. Ojo que mira la fecha
+              de hoy y no el mes que se este viendo en pantalla: el contrato que
+              carga es siempre el que sigue al de hoy.
+            {% endcomment %}
+            <button type="button" class="alq-boton-icono contrato"
+                    title="{% if not casa.activa %}La casa está dada de baja{% elif casa.tiene_contrato_vigente %}Ya tiene un contrato vigente{% else %}Cargar contrato{% endif %}"
+                    {% if not casa.activa or casa.tiene_contrato_vigente %}disabled{% endif %}
+                    data-id="{{ casa.id }}">
+              <span class="material-symbols-outlined">contract</span>
+            </button>
+
+            {% comment %}
+              Sobre una casa dada de baja no hay nada que hacer: la fila esta
+              solo como registro del pago de ese mes.
+            {% endcomment %}
+            <button type="button" class="alq-boton-icono editar"
+                    title="{% if casa.activa %}Editar casa{% else %}La casa está dada de baja{% endif %}"
+                    {% if not casa.activa %}disabled{% endif %}
+                    data-id="{{ casa.id }}">
+              <span class="material-symbols-outlined">edit</span>
+            </button>
+
+            <button type="button" class="alq-boton-icono eliminar"
+                    title="{% if casa.activa %}Eliminar casa{% else %}La casa ya está dada de baja{% endif %}"
+                    {% if not casa.activa %}disabled{% endif %}
+                    data-id="{{ casa.id }}"
+                    data-nombre="{{ casa.nombre|default:'Sin nombre' }}">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </div>
+        </td>
+      </tr>
+    {% empty %}
+      <tr class="fila-vacia">
+        <td colspan="6" class="celda-vacia">
+          <span class="material-symbols-outlined">key</span>
+          {% if estado %}
+            No hay casas en ese estado.
+          {% else %}
+            Todavía no hay casas cargadas. Empezá con el botón "Nueva casa".
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Paginacion -->
+<div class="paginacion">
+  <div class="paginacion-info">
+    Mostrando <span>{{ casas.start_index }}-{{ casas.end_index }}</span>
+    de <span>{{ casas.paginator.count }}</span> casas
+  </div>
+  {% comment %}
+    El href relativo reemplaza la query entera, no la completa, asi que el mes
+    que se esta mirando tiene que viajar en cada enlace o paginar te devuelve
+    al mes en curso.
+  {% endcomment %}
+  <div class="paginacion-botones">
+    {% if casas.has_previous %}
+      <a href="?page={{ casas.previous_page_number }}&amp;mes={{ periodo|date:'Y-m' }}{% if estado %}&amp;estado={{ estado }}{% endif %}">
+        <button class="boton-paginacion">Anterior</button>
+      </a>
+    {% else %}
+      <button class="boton-paginacion" disabled>Anterior</button>
+    {% endif %}
+
+    {% if casas.has_next %}
+      <a href="?page={{ casas.next_page_number }}&amp;mes={{ periodo|date:'Y-m' }}{% if estado %}&amp;estado={{ estado }}{% endif %}">
+        <button class="boton-paginacion">Siguiente</button>
+      </a>
+    {% else %}
+      <button class="boton-paginacion" disabled>Siguiente</button>
+    {% endif %}
+  </div>
+</div>

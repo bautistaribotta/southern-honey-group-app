@@ -1,4 +1,5 @@
 {% load static %}
+{% load static_version %}
 <!DOCTYPE html>
 <html lang="es">
   <head>
@@ -13,13 +14,18 @@
 
     {% endblock %}
 
-    <link rel="stylesheet" href="{% static 'base.css' %}">
-    <script src="{% static 'js/notifications.js' %}"></script>
-    <script src="{% static 'js/paneles.js' %}"></script>
-    
+    {% comment %}
+      static_v en los estaticos compartidos: son los que mas se editan y, sin la
+      version, el navegador reusa la copia cacheada hasta un Ctrl+F5.
+    {% endcomment %}
+    <link rel="stylesheet" href="{% static_v 'base.css' %}">
+    <script src="{% static_v 'js/notifications.js' %}"></script>
+    <script src="{% static_v 'js/paneles.js' %}"></script>
+    <script src="{% static_v 'js/formato_miles.js' %}"></script>
+
     <link rel="icon" type="image/svg+xml" href="{% static 'icons/abeja_southern_honey_group.svg' %}">
 
-    <link rel="stylesheet" href="{% static 'fonts.css' %}">
+    <link rel="stylesheet" href="{% static_v 'fonts.css' %}">
   </head>
 
   <body>
@@ -28,11 +34,19 @@
 
     <!-- BARRA LATERAL -->
     <nav id="barra-lateral">
+      {% comment %}
+        La abeja es la marca cuando la barra esta plegada: el isologo es apaisado
+        y no entra en el ancho de un icono. Va sin alt y oculta a lectores de
+        pantalla porque no agrega nada: el isologo de al lado ya nombra la marca.
+      {% endcomment %}
       <div id="encabezado-sidebar">
-        <img src="{% static 'icons/southern_honey_group.svg' %}" alt="Southern Honey Group" id="logo-principal-sidebar">
-        <div id="logos-secundarios-sidebar">
-          <img src="{% static 'icons/mrm_acopio.svg' %}" alt="MRM Acopio de Miel y Cera" class="logo-secundario">
-          <img src="{% static 'icons/del_sur_distribuciones.svg' %}" alt="Del Sur Distribuciones y Transporte" class="logo-secundario">
+        <img src="{% static 'icons/abeja_southern_honey_group.svg' %}" alt="" aria-hidden="true" id="isotipo-sidebar">
+        <div id="isologo-sidebar">
+          <img src="{% static 'icons/mrm_acopio.svg' %}" alt="MRM Acopio de Miel y Cera" id="logo-principal-sidebar">
+          <div id="logos-secundarios-sidebar">
+            <img src="{% static 'icons/del_sur_distribuciones.svg' %}" alt="Del Sur Distribuciones y Transporte" class="logo-secundario">
+            <img src="{% static 'icons/southern_honey_group.svg' %}" alt="Southern Honey Group" class="logo-secundario">
+          </div>
         </div>
       </div>
 
@@ -50,38 +64,140 @@
           </a>
         </li>
         <li>
-          <a href="{% url 'clientes'%}" class="item-menu {% if request.resolver_match.url_name == 'clientes' or request.resolver_match.url_name == 'informacion_clientes' or request.resolver_match.url_name == 'nueva_operacion_venta' or request.resolver_match.url_name == 'nueva_operacion_compra' or request.resolver_match.url_name == 'informacion_operacion' and request.GET.origen != 'viaje' %} activo {% endif %}">
+          <a href="{% url 'clientes'%}" class="item-menu {% if request.resolver_match.url_name == 'clientes' or request.resolver_match.url_name == 'informacion_clientes' or request.resolver_match.url_name == 'nueva_operacion_venta' or request.resolver_match.url_name == 'nueva_operacion_compra' or request.resolver_match.url_name == 'informacion_operacion' and request.GET.origen != 'viaje' and request.GET.origen != 'operaciones' or request.resolver_match.url_name == 'informacion_viaje_cereal' and request.GET.origen == 'cliente' %} activo {% endif %}">
             <span class="material-symbols-outlined">groups</span>
             Clientes
           </a>
         </li>
+        {% if user.is_staff %}
         <li>
-          <a href="{% url 'viajes' %}" class="item-menu {% if request.resolver_match.url_name == 'viajes' or request.resolver_match.url_name == 'informacion_viaje' or request.resolver_match.url_name == 'flota' and request.GET.origen != 'cereales' and request.GET.origen != 'reparto' or request.resolver_match.url_name == 'informacion_operacion' and request.GET.origen == 'viaje' %} activo {% endif %}">
+          <a href="{% url 'empleados' %}" class="item-menu {% if request.resolver_match.url_name == 'empleados' or request.resolver_match.url_name == 'informacion_empleado' %} activo {% endif %}">
+            <span class="material-symbols-outlined">badge</span>
+            Empleados
+          </a>
+        </li>
+        {% endif %}
+        {% comment %}
+          Operaciones es de solo lectura y la ve cualquier usuario logueado (por eso
+          va fuera del bloque is_staff de Empleados). Se resalta tambien al abrir el
+          detalle de una operacion desde este listado (?origen=operaciones).
+        {% endcomment %}
+        <li>
+          <a href="{% url 'operaciones' %}" class="item-menu {% if request.resolver_match.url_name == 'operaciones' or request.resolver_match.url_name == 'informacion_operacion' and request.GET.origen == 'operaciones' %} activo {% endif %}">
+            <span class="material-symbols-outlined">receipt_long</span>
+            Operaciones
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'flota' %}" class="item-menu {% if request.resolver_match.url_name == 'flota' or request.resolver_match.url_name == 'informacion_vehiculo' %} activo {% endif %}">
             <span class="material-symbols-outlined">local_shipping</span>
+            Vehículos
+          </a>
+        </li>
+        {% comment %}
+          Repartos cuelga su catalogo de Destinos como sub-item de la barra, en vez
+          de repetir el mismo boton en el area de trabajo de la vista.
+
+          El submenu que se ve es siempre el de la seccion en la que ya estas: no
+          hay toggle ni hover. Por eso alcanza con el <ul> hermano del item activo
+          (.item-menu.activo + .nav-sub en base.css) y la condicion de la seccion
+          se sigue escribiendo una sola vez, la misma de antes.
+        {% endcomment %}
+        <li>
+          <a href="{% url 'viajes' %}" class="item-menu {% if request.resolver_match.url_name == 'viajes' or request.resolver_match.url_name == 'informacion_viaje' or request.resolver_match.url_name == 'informacion_operacion' and request.GET.origen == 'viaje' %} activo {% endif %}">
+            <span class="material-symbols-outlined">hive</span>
             Viajes Miel/Cera
           </a>
         </li>
         <li>
-          <a href="{% url 'mercado_libre' %}" class="item-menu {% if request.resolver_match.url_name == 'mercado_libre' or request.resolver_match.url_name == 'informacion_viaje_reparto' or request.resolver_match.url_name == 'flota' and request.GET.origen == 'reparto' %} activo {% endif %}">
+          <a href="{% url 'mercado_libre' %}" class="item-menu {% if request.resolver_match.url_name == 'mercado_libre' or request.resolver_match.url_name == 'informacion_viaje_reparto' or request.resolver_match.url_name == 'destinos_reparto' %} activo {% endif %}">
             <span class="material-symbols-outlined">inventory</span>
             Viajes repartos
           </a>
+          {% comment %}
+            El catalogo de destinos define cuanto se cobra cada reparto, asi que lo
+            maneja solo el personal administrativo. La vista tambien valida el permiso.
+          {% endcomment %}
+          {% if user.is_staff %}
+          <ul class="nav-sub">
+            <li>
+              <a href="{% url 'destinos_reparto' %}" class="item-sub {% if request.resolver_match.url_name == 'destinos_reparto' %} activo {% endif %}">
+                Destinos
+              </a>
+            </li>
+          </ul>
+          {% endif %}
         </li>
         <li>
-          <a href="{% url 'viajes_cereales' %}" class="item-menu {% if request.resolver_match.url_name == 'viajes_cereales' or request.resolver_match.url_name == 'informacion_viaje_cereal' or request.resolver_match.url_name == 'flota' and request.GET.origen == 'cereales' %} activo {% endif %}">
+          <a href="{% url 'viajes_cereales' %}" class="item-menu {% if request.resolver_match.url_name == 'viajes_cereales' or request.resolver_match.url_name == 'informacion_viaje_cereal' and request.GET.origen != 'cliente' %} activo {% endif %}">
             <span class="material-symbols-outlined">agriculture</span>
             Viajes cereales
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'combustible' %}" class="item-menu {% if request.resolver_match.url_name == 'combustible' or request.resolver_match.url_name == 'informacion_estacion' %} activo {% endif %}">
+            <span class="material-symbols-outlined">local_gas_station</span>
+            Combustible
           </a>
         </li>
         {% if user.is_staff %}
         <li>
           <a href="{% url 'deudores' %}" class="item-menu {% if request.resolver_match.url_name == 'deudores' %} activo {% endif %}">
             <span class="material-symbols-outlined">payments</span>
-            Deudores
+            Deudas
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'alquileres' %}" class="item-menu {% if request.resolver_match.url_name == 'alquileres' or request.resolver_match.url_name == 'informacion_alquileres' %} activo {% endif %}">
+            <span class="material-symbols-outlined">key</span>
+            Alquileres
+          </a>
+        </li>
+        {% comment %}
+          El catalogo de bancos no cuelga de la barra: se entra desde un boton en
+          la vista de Cheques (barra de herramientas). Igual mantengo 'bancos' en la
+          condicion de activo para que el item de Cheques quede resaltado ahi.
+        {% endcomment %}
+        <li>
+          <a href="{% url 'cheques' %}" class="item-menu {% if request.resolver_match.url_name == 'cheques' or request.resolver_match.url_name == 'informacion_empresa_cheques' or request.resolver_match.url_name == 'bancos' %} activo {% endif %}">
+            <span class="material-symbols-outlined">account_balance</span>
+            Cheques
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'iva' %}" class="item-menu {% if request.resolver_match.url_name == 'iva' or request.resolver_match.url_name == 'informacion_empresa' %} activo {% endif %}">
+            <span class="material-symbols-outlined">receipt_long</span>
+            IVA
           </a>
         </li>
         {% endif %}
       </ul>
+
+      {% comment %}
+        Navegar recarga la pagina entera, asi que el <ul> nace de cero y el scroll
+        vuelve a arriba: si el item activo estaba abajo de todo, queda fuera de
+        vista justo despues de clickearlo. Lo reposiciono sobre el item activo.
+
+        Va inline y pegado al <ul> a proposito: corre apenas se parsea la lista,
+        antes del primer pintado, asi no se ve el salto. Toco solo scrollTop de la
+        lista (y no scrollIntoView) para no arrastrar ningun otro contenedor: en
+        mobile la barra vive en left:-320px y scrollIntoView querria traerla a
+        cuadro moviendo el documento.
+      {% endcomment %}
+      <script>
+        (function () {
+          var lista = document.getElementById('menu-navegacion');
+          var activo = lista && lista.querySelector('.item-menu.activo');
+          if (!activo) return;
+          var item = activo.getBoundingClientRect();
+          var caja = lista.getBoundingClientRect();
+          if (item.bottom > caja.bottom) {
+            lista.scrollTop += item.bottom - caja.bottom;
+          } else if (item.top < caja.top) {
+            lista.scrollTop -= caja.top - item.top;
+          }
+        })();
+      </script>
     </nav>
 
     <!-- BARRA SUPERIOR MÓVIL -->
@@ -121,13 +237,14 @@
       {% endblock %}
 
       <!-- CONTENEDOR DE NOTIFICACIONES TOAST (centralizado) -->
+      <!-- Los errores NO se muestran como toast: se juntan mas abajo y van al modal central -->
       <div id="contenedor-toast" class="contenedor-toast">
         {% if messages %}
           {% for message in messages %}
+            {% if message.tags != 'error' %}
             <div class="toast {{ message.tags }}">
               <span class="material-symbols-outlined">
                 {% if message.tags == 'success' %}check_circle
-                {% elif message.tags == 'error' %}error
                 {% else %}info{% endif %}
               </span>
               <div class="toast-contenido">
@@ -138,15 +255,44 @@
               </button>
               <div class="toast-progress"></div>
             </div>
+            {% endif %}
           {% endfor %}
         {% endif %}
       </div>
+
+      <!-- Errores del servidor: no van como toast, notifications.js los recoge y los muestra en el modal central -->
+      {% if messages %}
+        <div id="errores-servidor" hidden>
+          {% for message in messages %}
+            {% if message.tags == 'error' %}<p>{{ message }}</p>{% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
 
       <!-- ÁREA DE TRABAJO -->
       {% block area-trabajo %}
       
       {% endblock %}
     </main>
+
+    <!-- MODAL DE ERROR (global, disponible en todas las vistas) -->
+    <!-- Solo se cierra con el botón "Entendido": el fondo no tiene onclick a propósito -->
+    <div id="contenedor-modal-error">
+      <div id="modal-error-fondo"></div>
+
+      <div id="modal-error">
+        <div id="icono-error-modal">
+          <span class="material-symbols-outlined">error</span>
+        </div>
+
+        <h3>Ocurrió un error</h3>
+        <p id="texto-modal-error"></p>
+
+        <div id="acciones-modal-error">
+          <button type="button" id="boton-entendido-error" onclick="cerrarModalError()">Entendido</button>
+        </div>
+      </div>
+    </div>
 
     {% block codigo-javascript %}
 
@@ -165,7 +311,10 @@
       document.addEventListener('click', function(event) {
         const userDetails = document.getElementById('perfil-usuario-container');
         const summary = document.getElementById('perfil-usuario');
-        
+
+        // En paginas que ocultan la cabecera el elemento no existe
+        if (!userDetails) return;
+
         // Si el menú está abierto y el clic no fue dentro del contenedor
         if (userDetails.open && !userDetails.contains(event.target)) {
           userDetails.removeAttribute('open');

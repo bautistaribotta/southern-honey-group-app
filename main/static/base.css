@@ -94,6 +94,8 @@
   /* anillo de foco */
   --blanco-transparente-6: oklch(100% 0 0 / 0.06);
   /* hover item */
+  --blanco-transparente-12: oklch(100% 0 0 / 0.12);
+  /* rama del submenu de la barra */
   /* ============================================================
      Sistema de diseno: escala de marca completa (oklch)
      Nombres alineados al design system para reutilizar en vistas.
@@ -112,6 +114,23 @@
   --danger-600: oklch(54.818% 0.1821 25.563);
   --danger-500: oklch(59.655% 0.1818 24.512);
   --danger-50: oklch(95.794% 0.0163 17.441);
+  /* ---- Paleta de la pildora de cereal, derivada del propio grano ----
+     Maiz: dorado miel (reusa la familia honey).
+     Soja: verde (reusa la familia success).
+     Trigo: ambar tostado, tono propio para diferenciarlo del dorado del maiz.
+     Mani: marron tostado, tono propio para diferenciarlo del trigo. */
+  --cereal-maiz-bg: var(--honey-50);
+  --cereal-maiz-fg: var(--honey-700);
+  --cereal-maiz-dot: var(--honey-500);
+  --cereal-soja-bg: var(--success-50);
+  --cereal-soja-fg: var(--success-600);
+  --cereal-soja-dot: var(--success-500);
+  --cereal-trigo-bg: oklch(95.5% 0.040 74);
+  --cereal-trigo-fg: oklch(48% 0.085 60);
+  --cereal-trigo-dot: oklch(70% 0.120 66);
+  --cereal-mani-bg: oklch(94% 0.035 55);
+  --cereal-mani-fg: oklch(45% 0.070 45);
+  --cereal-mani-dot: oklch(63% 0.100 48);
   /* ---- Aliases semanticos ---- */
   --surface-app: var(--sand-50);
   --surface-card: var(--color-blanco);
@@ -168,6 +187,15 @@
   --tracking-tight: -0.02em;
   --tracking-normal: 0;
   --tracking-wide: 0.05em;
+  /* ---- Barra lateral ---- */
+  --ancho-barra: 280px;
+  /* ancho desplegada */
+  --ancho-riel: 4.4rem;
+  /* ancho plegada: entra solo el icono */
+  --pad-barra: 1.5rem;
+  /* padding lateral de la barra */
+  --pad-item: 1.1rem;
+  /* padding lateral de cada item */
   /* ---- Movimiento ---- */
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --dur-fast: 0.15s;
@@ -181,21 +209,86 @@
   box-sizing: border-box;
 }
 
+/* ============================================================
+   Normalizacion de campos de formulario en WebKit (Safari / iOS / iPadOS).
+   Safari les impone un aspecto nativo (sombra interior, alto fijo, esquinas y
+   alineacion propias, sobre todo en los type="date") que pisa parte del estilo
+   que define cada vista; en Chrome y Brave (Chromium) esto no pasa, por eso ahi
+   se ven bien. Cada hoja ya declara borde, fondo, radio y padding de sus campos,
+   asi que solo apagamos el appearance nativo para que ese estilo se respete
+   tambien en Safari. No tocamos checkbox, radio ni select (tienen su flecha
+   nativa). Baja especificidad a proposito: cualquier regla propia de una vista
+   le gana sin esfuerzo. */
+input[type="text"],
+input[type="search"],
+input[type="email"],
+input[type="url"],
+input[type="tel"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="week"],
+input[type="time"],
+textarea {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* El texto de los type="date"/type="time" arranca en Safari con un margen y una
+   alineacion propios que lo descuelgan del padding del campo; lo devolvemos al
+   flujo normal para que quede alineado igual que un input de texto. */
+input[type="date"]::-webkit-date-and-time-value,
+input[type="datetime-local"]::-webkit-date-and-time-value,
+input[type="month"]::-webkit-date-and-time-value,
+input[type="week"]::-webkit-date-and-time-value,
+input[type="time"]::-webkit-date-and-time-value {
+  text-align: left;
+  margin: 0;
+}
+
+input[type="date"]::-webkit-datetime-edit,
+input[type="datetime-local"]::-webkit-datetime-edit,
+input[type="month"]::-webkit-datetime-edit,
+input[type="week"]::-webkit-datetime-edit,
+input[type="time"]::-webkit-datetime-edit {
+  padding: 0;
+}
+
+/* En iOS/iPadOS, Safari hace zoom automatico al enfocar cualquier campo cuya
+   fuente sea menor a 16px (el diseno usa 14px en la mayoria de los inputs).
+   Fijamos un piso de 16px solo en dispositivos tactiles (pointer: coarse) para
+   cortar ese salto molesto; en desktop (pointer: fine, incluido Safari de Mac)
+   se conserva el tamano de diseno. El !important es necesario porque cada vista
+   fija su font-size con selectores de clase que cargan despues de base.css. */
+@media (pointer: coarse) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
 body {
   font-family: var(--font-main);
   background-color: var(--brand-cream);
   height: 100vh;
+  /* En Safari iOS/iPadOS la barra de direcciones dinamica hace que 100vh sea mas
+     alto que lo visible y corta el contenido inferior; dvh sigue al viewport real.
+     Los navegadores sin soporte descartan esta linea y conservan el 100vh. */
+  height: 100dvh;
   overflow: hidden;
   display: flex;
 }
 
 #barra-lateral {
-  width: 280px;
+  width: var(--ancho-barra);
   background-color: var(--pine-900);
   color: var(--sand-50);
   display: flex;
   flex-direction: column;
-  padding: 2.5rem 1.5rem;
+  padding: 2.5rem var(--pad-barra);
 }
 
 #encabezado-sidebar {
@@ -204,6 +297,24 @@ body {
   align-items: center;
   gap: 8px;
   margin-bottom: 2rem;
+  /* Ancla de marca: queda fijo arriba y no se comprime cuando el menu scrollea */
+  flex: none;
+}
+
+/* Isologo (apaisado) e isotipo (la abeja, casi cuadrada). En escritorio se
+   intercambian segun la barra este desplegada o plegada; en mobile solo existe
+   el isologo, que es como se veia siempre. */
+#isologo-sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+#isotipo-sidebar {
+  display: none;
+  width: auto;
+  filter: brightness(0) invert(1);
 }
 
 #logo-principal-sidebar {
@@ -227,11 +338,31 @@ body {
   opacity: 0.65;
 }
 
+/* La lista toma el alto sobrante y scrollea sola, como ya hace #contenido-principal.
+   Scrollea solo el <ul>: si scrollease la barra entera se iria el logo de pantalla.
+   min-height:0 es imprescindible: en un flex en columna los hijos arrancan con
+   min-height:auto y se niegan a achicarse por debajo de su contenido, asi que sin
+   esto el overflow no llega a activarse nunca. */
 #menu-navegacion {
   list-style: none;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  /* Con la barra plegada el texto de cada item desborda a la derecha y lo recorta
+     esta lista; sin el hidden aparece una barra de scroll horizontal. */
+  overflow-x: hidden;
+  /* El ::before del item activo sobresale hasta el borde de la barra, y overflow
+     recorta al borde del padding box. Corro la lista hasta ese borde y devuelvo el
+     espacio como padding para que el indicador quede adentro del area visible; los
+     items no se mueven. */
+  margin-left: calc(-1 * var(--pad-barra));
+  padding-left: var(--pad-barra);
+  /* Barra de scroll discreta sobre el pino, en vez de la clara del sistema */
+  scrollbar-width: thin;
+  scrollbar-color: var(--blanco-transparente-6) transparent;
 }
 
 .item-menu {
@@ -239,17 +370,21 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0.8rem 1.1rem;
+  padding: 0.8rem var(--pad-item);
   color: var(--sand-300);
   text-decoration: none;
   font-size: 1rem;
   font-weight: 500;
   border-radius: 0.75rem;
+  /* Plegada el item mide lo que el icono: el texto no puede partirse en dos
+     renglones ni empujar, tiene que salirse para que la lista lo recorte. */
+  white-space: nowrap;
   transition: background-color 0.2s, color 0.2s;
 }
 
 .item-menu .material-symbols-outlined {
   font-size: 1.4rem;
+  flex: none;
 }
 
 .item-menu:hover {
@@ -270,13 +405,203 @@ body {
 .item-menu.activo::before {
   content: "";
   position: absolute;
-  left: -1.5rem;
+  left: calc(-1 * var(--pad-barra));
   top: 50%;
   transform: translateY(-50%);
   width: 4px;
   height: 1.4rem;
   border-radius: 0 9999px 9999px 0;
   background-color: var(--honey-500);
+}
+
+/* --- SUB-ITEMS DE SECCION ---
+   Paginas de apoyo de una seccion (Flota, Destinos). Solo se despliegan las de la
+   seccion en la que ya estas: el hermano adyacente del item activo alcanza, no hace
+   falta ni JS ni :has(). Sin toggle ni hover, no hay estado que recordar entre
+   navegaciones ni disparos accidentales al mover el mouse por la barra. */
+.nav-sub {
+  display: none;
+  list-style: none;
+  flex-direction: column;
+  gap: 0.1rem;
+  /* La rama nace bajo el centro del icono del padre: el padding del item mas
+     media caja del icono de 1.4rem. */
+  margin: 0.35rem 0 0.15rem calc(var(--pad-item) + 0.7rem);
+  padding-left: 0.7rem;
+  border-left: 1px solid var(--blanco-transparente-12);
+}
+
+.item-menu.activo + .nav-sub {
+  display: flex;
+}
+
+/* Ademas de la seccion activa, la rama se despliega al pasar el mouse por el
+   item padre. El hover se toma sobre el <li> entero (no solo el .item-menu) para
+   que al bajar el cursor hacia el submenu no se cierre en el hueco intermedio. */
+#menu-navegacion li:hover > .nav-sub {
+  display: flex;
+}
+
+.item-sub {
+  position: relative;
+  display: block;
+  /* 0.75rem de padding sobre los 2.5rem donde arranca la lista: el texto cae
+     alineado con el del item padre, y la sangria la marca la rama. */
+  padding: 0.45rem 0.75rem;
+  border-radius: 0.5rem;
+  color: var(--sand-300);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  opacity: 0.75;
+  transition: background-color 0.2s, color 0.2s, opacity 0.2s;
+}
+
+.item-sub:hover {
+  background-color: var(--blanco-transparente-6);
+  color: var(--sand-50);
+  opacity: 1;
+}
+
+.item-sub:focus-visible {
+  outline: 2px solid var(--honey-500);
+  outline-offset: 2px;
+}
+
+.item-sub.activo {
+  color: var(--brand-cream);
+  font-weight: 600;
+  opacity: 1;
+}
+
+/* La rama se enciende en miel a la altura de la pagina abierta. Marca donde estas
+   sin repetir el fondo dorado que ya lleva la seccion, que sigue activa arriba. */
+.item-sub.activo::before {
+  content: "";
+  position: absolute;
+  left: -0.7rem;
+  margin-left: -1px;
+  top: 0.3rem;
+  bottom: 0.3rem;
+  width: 2px;
+  border-radius: 9999px;
+  background-color: var(--honey-500);
+}
+
+/* --- BARRA PLEGADA A RIEL DE ICONOS (ESCRITORIO) ---
+   En escritorio la barra queda como un riel de iconos y se despliega sola al
+   pasar el mouse, o al tabular adentro (:focus-within), asi el teclado llega a
+   los mismos items sin depender del hover.
+
+   Se saca del flujo y se apoya encima del contenido: si empujara el layout,
+   cada hover recalcularia el ancho de toda la pagina y las tablas saltarian.
+   El contenido reserva el ancho del riel con un margen fijo.
+
+   Los paddings del riel dejan el icono centrado en su ancho: --pad-barra +
+   --pad-item + media caja del icono (0.7rem) = --ancho-riel / 2. Valen igual
+   desplegada, asi los iconos no se mueven al abrir; lo unico que entra es el
+   texto, que hasta entonces recorta el overflow de la lista.
+
+   Debajo de 1325px no aplica nada de esto: ahi manda el sidebar movil que se
+   abre con la hamburguesa. El corte se adelanto 300px respecto del 1024/1025
+   original para que las tablets grandes tactiles caigan en el modo hamburguesa
+   (la barra fija de escritorio es casi incontrolable con el dedo). */
+@media (min-width: 1325px) {
+  #barra-lateral {
+    --pad-barra: 0.75rem;
+    --pad-item: 0.75rem;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: var(--ancho-riel);
+    z-index: 900;
+    overflow: hidden;
+    transition: width var(--dur-slow) var(--ease-standard),
+                box-shadow var(--dur-slow) var(--ease-standard);
+  }
+
+  #barra-lateral:hover,
+  #barra-lateral:focus-within {
+    width: var(--ancho-barra);
+    box-shadow: var(--shadow-xl);
+  }
+
+  #contenido-principal {
+    margin-left: var(--ancho-riel);
+  }
+
+  /* Plegada, la etiqueta se esconde entera en vez de asomar un pedacito recortada
+     al borde del riel (lo que se veia "entrecortado"). Un nodo de texto suelto no
+     acepta opacity, asi que la escondo con font-size 0 y la animo: crece junto con
+     el ancho de la barra, con la misma duracion, y el texto entra de corrido en vez
+     de aparecer de golpe. El icono no se achica porque tiene su propio font-size. */
+  .item-menu {
+    transition: background-color 0.2s, color 0.2s,
+                font-size var(--dur-slow) var(--ease-standard);
+  }
+
+  #barra-lateral:not(:hover):not(:focus-within) .item-menu {
+    font-size: 0;
+  }
+
+  /* Plegada no hay lugar para la barra de scroll al lado de los iconos. La
+     rueda sigue scrolleando la lista igual. */
+  #barra-lateral:not(:hover):not(:focus-within) #menu-navegacion {
+    scrollbar-width: none;
+  }
+
+  /* Los sub-items son solo texto: plegada no quedaria mas que la rama vertical
+     colgando, asi que la seccion se abre recien con la barra desplegada. */
+  #barra-lateral:not(:hover):not(:focus-within) .item-menu.activo + .nav-sub {
+    display: none;
+  }
+
+  /* El isologo es apaisado y no entra en el riel: en su lugar va el isotipo y se
+     cruzan por opacidad. Los dos van absolutos y centrados sobre una cabecera de
+     alto fijo, para que el intercambio no mueva el menu de abajo. */
+  #encabezado-sidebar {
+    position: relative;
+    justify-content: center;
+    height: 5.5rem;
+  }
+
+  #isotipo-sidebar,
+  #isologo-sidebar {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transition: opacity var(--dur-normal) var(--ease-standard);
+  }
+
+  #isotipo-sidebar {
+    display: block;
+    height: 2.6rem;
+  }
+
+  #isologo-sidebar {
+    width: max-content;
+    opacity: 0;
+  }
+
+  #barra-lateral:hover #isotipo-sidebar,
+  #barra-lateral:focus-within #isotipo-sidebar {
+    opacity: 0;
+  }
+
+  #barra-lateral:hover #isologo-sidebar,
+  #barra-lateral:focus-within #isologo-sidebar {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #barra-lateral,
+  #isotipo-sidebar,
+  #isologo-sidebar {
+    transition: none;
+  }
 }
 
 #contenido-principal {
@@ -296,17 +621,50 @@ body {
   border-bottom: 1px solid var(--border-subtle);
 }
 
-#titulos-cabecera h2 {
+/* --- CABECERA DE SECCION (tile con icono + titulo y subtitulo) ---
+   Componente compartido por todas las vistas de la barra de navegacion: el
+   mismo icono que la seccion muestra en el menu, en un tile pino, a la izquierda
+   del titulo. Antes vivia duplicado en flota.css e iva.css. */
+.cabecera-seccion {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.cabecera-seccion__tile {
+  width: 52px;
+  height: 52px;
+  flex: none;
+  border-radius: var(--radius-md);
+  background-color: var(--brand-secondary);
+  color: var(--sand-100);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cabecera-seccion__tile .material-symbols-outlined {
+  font-size: 1.7rem;
+}
+
+.cabecera-seccion__texto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.cabecera-seccion h2 {
   font-size: var(--text-3xl);
   font-weight: var(--weight-extra);
   letter-spacing: var(--tracking-tight);
   color: var(--text-strong);
-  margin-bottom: 0.35rem;
+  margin: 0;
 }
 
-#titulos-cabecera p {
-  color: var(--text-muted);
+.cabecera-seccion__texto p {
   font-size: var(--text-sm);
+  color: var(--text-muted);
+  margin: 0;
 }
 
 /* --- ESTILOS DEL MENÚ DE USUARIO (DROPDOWN) --- */
@@ -539,6 +897,151 @@ body {
   }
 }
 
+/* --- MODAL DE ERROR GLOBAL --- */
+/* Mismos estilos que los paneles de eliminación, pero con un solo botón centrado
+   y sin cierre por fondo ni por icono */
+#contenedor-modal-error {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  visibility: hidden;
+  transition: visibility var(--dur-slow);
+  /* Permite que la animación de salida termine antes de ocultar */
+}
+
+#contenedor-modal-error.abierto {
+  visibility: visible;
+  transition: none;
+  /* Aparece al instante para dejar que los hijos se animen */
+}
+
+#modal-error-fondo {
+  position: absolute;
+  inset: 0;
+  background-color: var(--overlay-ink);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity var(--dur-slow) var(--ease-standard);
+}
+
+#contenedor-modal-error.abierto #modal-error-fondo {
+  opacity: 1;
+}
+
+#modal-error {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--surface-card);
+  border-radius: 16px;
+  border: 1px solid var(--border-subtle);
+  padding: 2rem 2.5rem 1.75rem;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: var(--shadow-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  /* Animación de entrada: escala y opacidad */
+  opacity: 0;
+  transform: scale(0.95);
+  transition: all var(--dur-slow) var(--ease-standard);
+}
+
+#contenedor-modal-error.abierto #modal-error {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* El badge circular con halo concéntrico es la firma del modal:
+   da masa al icono y llena el vacío vertical */
+#icono-error-modal {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background-color: var(--color-rojo-muy-claro);
+  color: var(--color-rojo-eliminacion);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 8px var(--color-rojo-eliminacion-transparente-30);
+  animation: pulso-halo-error 2.4s var(--ease-standard) infinite;
+}
+
+#icono-error-modal span {
+  font-size: 2.5rem;
+  font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 40;
+}
+
+@keyframes pulso-halo-error {
+  0%, 100% {
+    box-shadow: 0 0 0 8px var(--color-rojo-eliminacion-transparente-30);
+  }
+  50% {
+    box-shadow: 0 0 0 12px transparent;
+  }
+}
+
+#modal-error h3 {
+  font-size: 1.375rem;
+  font-weight: var(--weight-bold);
+  color: var(--text-strong);
+  letter-spacing: var(--tracking-tight);
+  margin-bottom: 0.5rem;
+}
+
+#modal-error p {
+  font-size: var(--text-base);
+  color: var(--text-muted);
+  line-height: 1.5;
+  white-space: pre-line;
+  max-width: 42ch;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+  width: 100%;
+}
+
+#acciones-modal-error {
+  display: flex;
+  width: 100%;
+}
+
+#boton-entendido-error {
+  flex: 1;
+  background-color: var(--brand-secondary);
+  color: var(--text-on-inverse);
+  border: none;
+  padding: 0.875rem;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--dur-normal) var(--ease-standard);
+}
+
+#boton-entendido-error:hover {
+  filter: brightness(1.25);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+#boton-entendido-error:active {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #icono-error-modal {
+    animation: none;
+  }
+}
+
 /* --- ADAPTACIÓN PARA MÓVILES Y TABLETS --- */
 #mobile-top-bar {
   display: none;
@@ -548,7 +1051,7 @@ body {
   display: none;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1324px) {
   body {
     flex-direction: column;
   }
@@ -591,6 +1094,7 @@ body {
     position: fixed;
     inset: 0;
     background-color: var(--color-sombra-oscuro);
+    -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
     z-index: 1500;
     opacity: 0;
@@ -604,16 +1108,22 @@ body {
   #contenido-principal {
     padding: 1.5rem 1rem;
   }
+  #modal-error {
+    padding: 2rem 1.5rem;
+    width: 95%;
+  }
 }
 
 /* --- ADAPTACIÓN PARA PANTALLAS GRANDES --- */
+/* El ancho va por variable y no por width: el width de la barra lo maneja el
+   riel (plegada mide --ancho-riel), asi que aca solo se agranda el desplegado. */
 @media (min-width: 1440px) {
   html {
     font-size: 18px;
     /* Aumenta el tamaño base de la fuente (1rem = 18px) */
   }
-  #barra-lateral {
-    width: 320px;
+  :root {
+    --ancho-barra: 320px;
     /* Expande la barra lateral para mantener proporción */
   }
 }
@@ -623,30 +1133,516 @@ body {
     font-size: 20px;
     /* Aumenta el tamaño base para monitores Full HD (1rem = 20px) */
   }
-  #barra-lateral {
-    width: 360px;
+  :root {
+    --ancho-barra: 360px;
   }
 }
 
 /* --- ADAPTACIÓN PARA MÓVILES (600px) --- */
 @media (max-width: 600px) {
-  #titulos-cabecera p {
+  .cabecera-seccion__texto p {
     display: none;
   }
 }
 
 /* --- CABECERA UNIFICADA PARA TODAS LAS TABLAS --- */
-/* Mismo estilo de "head" oscuro de marca con texto claro en todo el sistema.
+/* Estilo compartido de cabecera: fondo crema hundido con texto en mayusculas.
    base.css se carga despues de los CSS de cada pagina, por lo que esta regla
-   tiene prioridad sobre el color de cabecera definido en cada tabla. */
+   pisa cualquier copia local; las desviaciones intencionales (densidad de
+   flota e informacion de cliente) viven en el CSS de cada pagina con un
+   selector mas especifico. Las tablas compactas de paneles (cart-table,
+   op-table) mantienen su propia densidad. */
+.tabla-viajes th,
 .tabla-clientes th,
 .tabla-deudores th,
-.tabla-operaciones th,
 .tabla-productos th,
-.tabla-carrito th,
-.tabla-viajes th,
 .tabla-flota th,
-.tabla-productos-disponibles th {
-  background-color: var(--brand-olive);
-  color: var(--color-blanco);
+.tabla-operaciones th,
+.tabla-operaciones-iva th,
+.tabla-viajes-cereal th,
+.tabla-estaciones th,
+.tabla-cargas th,
+#tabla-viajes-meli th {
+  padding: 0.9rem 1.5rem;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  background-color: var(--surface-sunken);
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+}
+
+/* --- CELDA DE FECHA UNIFICADA PARA TODAS LAS TABLAS --- */
+/* Toma el tratamiento de la tabla de cereales: numeros tabulares para que los
+   digitos queden en columna de una fila a la otra, semibold para que la fecha
+   pese mas que el resto de la celda, y el icono en un tono apagado para que
+   acompañe sin competir. Sirve tanto para una fecha suelta (cereales, repartos)
+   como para un rango con flecha en el medio (miel/cera). */
+.celda-fecha {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--weight-semibold);
+  color: var(--text-body);
+  white-space: nowrap;
+}
+
+.celda-fecha .material-symbols-outlined {
+  font-size: 1.05rem;
+  color: var(--sand-400);
+}
+
+/* Fecha todavia sin definir (ej: el regreso de un viaje en curso): no es un
+   dato, asi que baja de tono y pierde el peso del resto de la celda. */
+.celda-fecha__pendiente {
+  color: var(--text-subtle);
+  font-weight: var(--weight-medium);
+}
+
+/* --- PILDORA DE TIPO DE CEREAL UNIFICADA --- */
+/* Cada grano tiene su color, asi el tipo se reconoce de un vistazo sin leer.
+   Vive aca y no en viajes_cereales.css porque la usan tres vistas: el listado de
+   viajes de cereal, el detalle del viaje y la tabla de fletes del cliente. */
+.cereal-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+}
+
+.cereal-pill__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.cereal-pill--maiz {
+  background-color: var(--cereal-maiz-bg);
+  color: var(--cereal-maiz-fg);
+}
+
+.cereal-pill--maiz .cereal-pill__dot {
+  background-color: var(--cereal-maiz-dot);
+}
+
+.cereal-pill--soja {
+  background-color: var(--cereal-soja-bg);
+  color: var(--cereal-soja-fg);
+}
+
+.cereal-pill--soja .cereal-pill__dot {
+  background-color: var(--cereal-soja-dot);
+}
+
+.cereal-pill--trigo {
+  background-color: var(--cereal-trigo-bg);
+  color: var(--cereal-trigo-fg);
+}
+
+.cereal-pill--trigo .cereal-pill__dot {
+  background-color: var(--cereal-trigo-dot);
+}
+
+.cereal-pill--mani {
+  background-color: var(--cereal-mani-bg);
+  color: var(--cereal-mani-fg);
+}
+
+.cereal-pill--mani .cereal-pill__dot {
+  background-color: var(--cereal-mani-dot);
+}
+
+/* Fallback neutro por si llegara un tipo sin estilo asignado */
+.cereal-pill:not([class*="cereal-pill--"]),
+.cereal-pill--otro {
+  background-color: var(--surface-sunken);
+  color: var(--text-muted);
+}
+
+.cereal-pill--otro .cereal-pill__dot {
+  background-color: var(--sand-400);
+}
+
+/* --- AVATAR DE INICIALES UNIFICADO --- */
+/* Dos variantes semanticas: empleado (paleta miel, como la tabla de viajes)
+   y cliente (paleta pino, como la tabla de clientes). */
+.avatar-iniciales {
+  flex: none;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--weight-extra);
+  letter-spacing: 0.02em;
+}
+
+.avatar-iniciales--empleado {
+  width: 32px;
+  height: 32px;
+  background-color: var(--honey-50);
+  border: 1px solid var(--honey-200);
+  color: var(--brand-active);
+  font-size: 0.72rem;
+}
+
+.avatar-iniciales--cliente {
+  width: 36px;
+  height: 36px;
+  background-color: var(--brand-secondary);
+  border: 1px solid var(--brand-secondary);
+  color: var(--text-on-inverse);
+  font-size: 0.78rem;
+}
+
+/* --- BOTON "NUEVO" UNIFICADO --- */
+/* Boton primario de cabecera de seccion (Nuevo cliente, Nuevo viaje, etc.).
+   Los ajustes responsive por pagina viven en el CSS de cada una con un
+   selector mas especifico (.barra-herramientas .boton-nuevo). */
+.boton-nuevo {
+  background-color: var(--brand-secondary);
+  color: var(--text-on-inverse);
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  border: none;
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all var(--dur-normal) var(--ease-standard);
+  font-family: inherit;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.boton-nuevo:hover {
+  background-color: var(--pine-950);
+}
+
+.boton-nuevo:active {
+  transform: scale(0.95);
+}
+
+/* Variante secundaria: claro con borde (Gestionar flota, Nueva compra) */
+.boton-nuevo.secundario {
+  background-color: var(--surface-card);
+  color: var(--text-body);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 1px 2px var(--color-sombra-1);
+}
+
+.boton-nuevo.secundario:hover {
+  background-color: var(--surface-hover);
+  border-color: var(--sand-400);
+}
+
+/* --- BOTON "VOLVER" UNIFICADO --- */
+/* Enlace de regreso con efecto hover tipo pastilla (fondo tenue + texto fuerte).
+   Se usa tanto en el header global (perfil de empleado, flota, destinos) como
+   arriba del area de trabajo (perfiles de cliente/operacion y viajes). */
+.boton-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  align-self: flex-start;
+  padding: 0.5rem 0.875rem;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-muted);
+  text-transform: none;
+  letter-spacing: normal;
+  text-decoration: none;
+  transition: background-color var(--dur-normal) var(--ease-standard),
+              color var(--dur-normal) var(--ease-standard);
+}
+
+.boton-volver:hover {
+  background-color: var(--surface-hover);
+  color: var(--text-strong);
+}
+
+.boton-volver .material-symbols-outlined {
+  font-size: 1.25rem;
+}
+
+/* Cuando el back-link no vive en el header global, compenso el padding
+   izquierdo para que el texto quede alineado con la columna de contenido
+   (la pastilla del hover se extiende hacia la izquierda). La separacion
+   inferior la aporta el gap del contenedor flex de cada vista. */
+:not(#cabecera-principal) > .boton-volver {
+  margin-left: -0.875rem;
+}
+
+/* --- ESTADO VACIO UNIFICADO PARA TODAS LAS TABLAS --- */
+/* Mismo diseño que la tabla de viajes miel/cera: icono grande arriba y
+   texto corto centrado. Cada tabla elige su icono en el template. */
+.celda-vacia {
+  text-align: center;
+  color: var(--text-subtle);
+  padding: 3rem 1.5rem !important;
+  font-size: var(--text-sm);
+}
+
+.celda-vacia .material-symbols-outlined {
+  display: block;
+  font-size: 2.5rem;
+  color: var(--sand-400);
+  margin: 0 auto 0.5rem;
+}
+
+/* La fila vacia no es clickeable: anulo hover y cursor de las filas normales */
+tbody tr.fila-vacia,
+tbody tr.fila-vacia:hover,
+tbody tr.fila-vacia:active {
+  pointer-events: none;
+  background-color: transparent;
+  cursor: default;
+}
+
+/* Variante "rica" para paneles de detalle (movimientos de viaje/cliente):
+   icono + titulo + descripcion */
+.estado-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 3.5rem 1.5rem;
+  text-align: center;
+}
+
+.estado-vacio span.material-symbols-outlined {
+  font-size: 2.5rem;
+  color: var(--sand-400);
+  margin-bottom: 0.25rem;
+}
+
+.estado-vacio h4 {
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: var(--weight-bold);
+  color: var(--text-strong);
+}
+
+.estado-vacio p {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  max-width: 320px;
+}
+
+/* --- SECCION EN CONSTRUCCION --- */
+/* Cartel de las secciones que todavia no tienen contenido. El borde punteado es
+   lo que la separa de una tarjeta real: marca que el espacio esta reservado, no
+   que la consulta no trajo datos (ese caso ya lo cubre .estado-vacio). */
+.en-obra {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.4rem;
+  padding: 4rem 1.5rem;
+  background-color: var(--surface-card);
+  border: 1px dashed var(--border-default);
+  border-radius: var(--radius-lg);
+}
+
+/* Selector de elemento + clase (igual que .estado-vacio) para ganarle a la regla
+   .material-symbols-outlined de fonts.css, que se carga despues de esta hoja y con
+   la misma especificidad impone display:inline-block y font-size:24px. Sin esto el
+   glifo no se centra dentro del circulo. */
+.en-obra span.en-obra__icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-bottom: 0.6rem;
+  border-radius: var(--radius-pill);
+  background-color: var(--surface-sunken);
+  color: var(--sand-500);
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.en-obra__titulo {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--text-strong);
+}
+
+.en-obra__detalle {
+  margin: 0;
+  max-width: 34ch;
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+/* --- PAGINACION UNIFICADA --- */
+.paginacion {
+  padding: 0.9rem 1.5rem;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--surface-card);
+}
+
+.paginacion-info {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.paginacion-info span {
+  font-weight: var(--weight-bold);
+  color: var(--text-body);
+}
+
+.paginacion-botones {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.paginacion-botones a {
+  text-decoration: none;
+}
+
+.boton-paginacion {
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--text-muted);
+  background-color: var(--surface-card);
+  cursor: pointer;
+  transition: all var(--dur-normal) var(--ease-standard);
+  font-family: inherit;
+}
+
+.boton-paginacion:hover:not(:disabled) {
+  background-color: var(--surface-hover);
+}
+
+.boton-paginacion:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* fallback-oklch-autogenerado */
+/* Safari < 15.4 no soporta oklch(): redefinimos las variables en sRGB. */
+@supports not (color: oklch(0% 0 0)) {
+  :root {
+    /* Sombras compuestas (agregadas a mano: el script solo convierte valores oklch puros) */
+    --shadow-xs: 0 1px 2px rgba(10, 27, 21, 0.06);
+    --shadow-sm: 0 1px 3px rgba(10, 27, 21, 0.09), 0 1px 2px rgba(10, 27, 21, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(10, 27, 21, 0.09), 0 2px 4px -2px rgba(10, 27, 21, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(10, 27, 21, 0.11), 0 4px 6px -4px rgba(10, 27, 21, 0.07);
+    --shadow-xl: 0 20px 25px -5px rgba(10, 27, 21, 0.13), 0 8px 10px -6px rgba(10, 27, 21, 0.08);
+    --shadow-honey: 0 6px 16px -4px rgba(255, 181, 4, 0.40);
+    --color-toast-success: #15803d;
+    --brand-cream: #fdfcf8;
+    --stone-900: #0c0a09;
+    --slate-900: #0f172a;
+    --slate-700: #334155;
+    --slate-600: #475569;
+    --slate-500: #64748b;
+    --slate-400: #94a3b8;
+    --stone-300: #d6d3d1;
+    --stone-200: #e7e5e4;
+    --color-rojo-eliminacion-transparente-30: rgba(220, 38, 38, 0.3);
+    --color-rojo-eliminacion: #dc2626;
+    --color-rojo-muy-claro: #ffebe6;
+    --color-rojo-claro-etiqueta: #ffe4e6;
+    --color-rojo-texto-etiqueta: #991b1b;
+    --color-rojo-borde-etiqueta: #fecdd3;
+    --color-rosa-claro: #fef2f2;
+    --color-blanco: #ffffff;
+    --color-gris-claro-hover: #f1f5f9;
+    --color-gris-fondo-input: #f8fafc;
+    --color-azul-claro: #e2e8f0;
+    --color-gris-fondo-input-alt: #f9fafb;
+    --color-verde-claro-etiqueta: #f7fee7;
+    --color-gris-borde-etiqueta: #cbd5e1;
+    --color-cera-fondo-etiqueta: #fefce8;
+    --color-amarillo-claro-etiqueta: #fffbeb;
+    --color-gris-claro-etiqueta: #f5f5f4;
+    --color-morado-claro-fondo: #eff6ff;
+    --color-madera-fondo-etiqueta: #fff7ed;
+    --color-madera-borde-etiqueta: #ffedd5;
+    --color-insumos-fondo-etiqueta: #e0e7ff;
+    --color-insumos-borde-etiqueta: #c7d2fe;
+    --color-borde-login: #fecaca;
+    --color-gris-fondo-input-transparente-50: rgba(248, 250, 252, 0.5);
+    --color-crema-transparente: rgba(253, 252, 248, 0.101961);
+    --color-sombra-1: rgba(0, 0, 0, 0.01);
+    --color-sombra-5: rgba(0, 0, 0, 0.05);
+    --color-sombra-10: rgba(0, 0, 0, 0.1);
+    --color-sombra-oscuro: rgba(0, 0, 0, 0.3);
+    --color-verde-transparente-20: rgba(15, 40, 32, 0.2);
+    --color-verde-transparente-20-alt: rgba(15, 40, 32, 0.203922);
+    --color-slate-900-transparente-40: rgba(15, 23, 42, 0.4);
+    --color-verde-medio-transparente-10: rgba(15, 40, 32, 0.1);
+    --color-verde-medio-transparente-10-alt: rgba(15, 40, 32, 0.101961);
+    --color-verde-texto-etiqueta: #4d7c0f;
+    --color-verde-borde-etiqueta: #d9f99d;
+    --color-amarillo-texto-etiqueta: #b45309;
+    --color-amarillo-borde-etiqueta: #fde68a;
+    --color-gris-texto-etiqueta: #57534e;
+    --color-morado-texto: #3b82f6;
+    --color-morado-oscuro-texto: #2563eb;
+    --color-cera-texto-etiqueta: #a16207;
+    --color-cera-borde-etiqueta: #fef08a;
+    --color-madera-texto-etiqueta: #c2410c;
+    --color-insumos-texto-etiqueta: #3730a3;
+    --color-slate-400-transparente-10: rgba(148, 163, 184, 0.1);
+    --color-verde-transparente-5: rgba(15, 40, 32, 0.05);
+    --color-verde-transparente-10: rgba(15, 40, 32, 0.1);
+    --color-verde-transparente-30: rgba(15, 40, 32, 0.3);
+    --color-verde-transparente-40: rgba(15, 40, 32, 0.4);
+    --pine-900: #0f2820;
+    --pine-950: #0a1b15;
+    --honey-500: #ffb504;
+    --honey-600: #e09a00;
+    --sand-50: #fcf9f1;
+    --sand-300: #dbd1bb;
+    --sand-200: #ece5d4;
+    --sand-500: #94886c;
+    --sand-600: #6f6549;
+    --sand-700: #4d452f;
+    --sand-800: #322c1d;
+    --honey-tint-10: rgba(255, 181, 4, 0.12);
+    --honey-tint-20: rgba(255, 181, 4, 0.22);
+    --blanco-transparente-6: rgba(255, 255, 255, 0.06);
+    --blanco-transparente-12: rgba(255, 255, 255, 0.12);
+    --honey-50: #fff8e6;
+    --honey-200: #ffe08a;
+    --honey-300: #ffd24f;
+    --honey-700: #b87a02;
+    --sand-100: #f6f1e4;
+    --sand-400: #bcaf92;
+    --success-600: #2e8b57;
+    --success-500: #38a169;
+    --success-50: #eaf6ef;
+    --success-200: #bfe3cd;
+    --danger-600: #c53434;
+    --danger-500: #d64545;
+    --danger-50: #fceded;
+    --shadow-tint: rgba(10, 27, 21, 0.12);
+    --overlay-ink: rgba(10, 27, 21, 0.5);
+  }
 }

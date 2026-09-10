@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="{% static 'informacion_viaje.css' %}">
 <link rel="stylesheet" href="{% static 'viajes_cereales.css' %}">
 <link rel="stylesheet" href="{% static 'informacion_viaje_cereal.css' %}">
+<link rel="stylesheet" href="{% static 'pago_viaje.css' %}">
 {% endblock %}
 
 {% block top-header %}
@@ -23,10 +24,28 @@
 {% block area-trabajo %}
 <section id="area-trabajo" class="vd-screen">
 
+  <!-- Volver: el destino depende del origen de navegacion (?origen= / ?volver_estacion=) -->
+  {% if volver_url %}
+  <a href="{{ volver_url }}" class="boton-volver">
+    <span class="material-symbols-outlined">arrow_back</span>
+    Volver a la estación
+  </a>
+  {% elif request.GET.origen == 'cliente' and viaje_cereal.cliente %}
+  <a href="{% url 'informacion_clientes' viaje_cereal.cliente.id %}" class="boton-volver">
+    <span class="material-symbols-outlined">arrow_back</span>
+    Volver al perfil de {{ viaje_cereal.cliente.nombre }} {{ viaje_cereal.cliente.apellido|default:"" }}
+  </a>
+  {% elif request.GET.origen == 'empleado' and viaje_cereal.empleado %}
+  <a href="{% url 'informacion_empleado' viaje_cereal.empleado.id %}" class="boton-volver">
+    <span class="material-symbols-outlined">arrow_back</span>
+    Volver al perfil de {{ viaje_cereal.empleado.nombre }} {{ viaje_cereal.empleado.apellido|default:"" }}
+  </a>
+  {% else %}
   <a href="{% url 'viajes_cereales' %}" class="boton-volver">
     <span class="material-symbols-outlined">arrow_back</span>
     Volver a Viajes de cereales
   </a>
+  {% endif %}
 
   <!-- CABECERA -->
   <div class="op-head">
@@ -45,7 +64,7 @@
             {{ viaje_cereal.fecha_viaje_cereal|date:"d/m/Y"|default:"--" }}
           </span>
           <span class="op-head__metaitem"><span class="material-symbols-outlined">store</span>{% if viaje_cereal.cliente %}{{ viaje_cereal.cliente.nombre }} {{ viaje_cereal.cliente.apellido|default:"" }}{% else %}Sin cliente{% endif %}</span>
-          <span class="op-head__metaitem"><span class="material-symbols-outlined">person</span>{% if viaje_cereal.chofer %}{{ viaje_cereal.chofer.nombre }} {{ viaje_cereal.chofer.apellido }}{% else %}Sin chofer{% endif %}</span>
+          <span class="op-head__metaitem"><span class="material-symbols-outlined">person</span>{% if viaje_cereal.empleado %}{{ viaje_cereal.empleado.nombre }} {{ viaje_cereal.empleado.apellido }}{% else %}Sin empleado{% endif %}</span>
           <span class="op-head__metaitem"><span class="material-symbols-outlined">local_shipping</span>{% if viaje_cereal.vehiculo %}{{ viaje_cereal.vehiculo.nombre }}{% else %}Sin vehiculo{% endif %}</span>
         </div>
       </div>
@@ -63,7 +82,7 @@
   </div>
 
   <!-- DATOS GENERALES + CALCULO DEL FLETE -->
-  <div class="op-grid">
+  <div class="op-grid{% if not user.is_staff %} op-grid--solo{% endif %}">
 
     <!-- Datos generales -->
     <div class="op-card">
@@ -82,19 +101,41 @@
         <div class="vd-data__row">
           <span class="vd-data__ico"><span class="material-symbols-outlined">local_shipping</span></span>
           <div class="vd-data__meta">
-            <div class="vd-data__label">Vehiculo</div>
-            <div class="vd-data__value">{% if viaje_cereal.vehiculo %}{{ viaje_cereal.vehiculo.nombre }}<span class="vd-pat">{{ viaje_cereal.vehiculo.patente }}</span>{% else %}Vehiculo no especificado{% endif %}</div>
+            <div class="vd-data__label">Vehículo</div>
+            <div class="vd-data__value">{% if viaje_cereal.vehiculo %}{{ viaje_cereal.vehiculo.nombre }}<span class="vd-pat">{{ viaje_cereal.vehiculo.patente }}</span>{% else %}Vehículo no especificado{% endif %}</div>
           </div>
         </div>
         <div class="vd-data__row">
-          <span class="vd-avatar">{% if viaje_cereal.chofer %}{{ viaje_cereal.chofer.nombre|first|upper }}{{ viaje_cereal.chofer.apellido|first|upper }}{% else %}?{% endif %}</span>
+          <span class="avatar-iniciales avatar-iniciales--empleado">{% if viaje_cereal.empleado %}{{ viaje_cereal.empleado.nombre|first|upper }}{{ viaje_cereal.empleado.apellido|first|upper }}{% else %}?{% endif %}</span>
           <div class="vd-data__meta">
-            <div class="vd-data__label">Chofer</div>
-            <div class="vd-data__value">{% if viaje_cereal.chofer %}{{ viaje_cereal.chofer.nombre }} {{ viaje_cereal.chofer.apellido }}{% else %}Chofer no especificado{% endif %}</div>
+            <div class="vd-data__label">Empleado</div>
+            <div class="vd-data__value">{% if viaje_cereal.empleado %}{{ viaje_cereal.empleado.nombre }} {{ viaje_cereal.empleado.apellido }}{% else %}Empleado no especificado{% endif %}</div>
           </div>
         </div>
+        <div class="vd-data__row">
+          <span class="vd-data__ico"><span class="material-symbols-outlined">{% if viaje_cereal.pagado %}paid{% else %}schedule{% endif %}</span></span>
+          <div class="vd-data__meta">
+            <div class="vd-data__label">Estado de pago</div>
+            <div class="vd-data__value">
+              {% if viaje_cereal.pagado %}
+                Pagado{% if viaje_cereal.fecha_pago %}<span class="vd-pat">{{ viaje_cereal.fecha_pago|date:"d/m/Y H:i" }} hs</span>{% endif %}
+              {% else %}
+                Pendiente de cobro
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% if viaje_cereal.tiene_dadora %}
+        <div class="vd-data__row">
+          <span class="vd-data__ico"><span class="material-symbols-outlined">handshake</span></span>
+          <div class="vd-data__meta">
+            <div class="vd-data__label">Dadora de carga</div>
+            <div class="vd-data__value">{{ viaje_cereal.dadora_carga }}{% if user.is_staff %}<span class="vd-pat">{% if viaje_cereal.dadora_tipo_cobro == 'porcentaje' %}{{ viaje_cereal.dadora_valor }}%{% elif viaje_cereal.dadora_tipo_cobro == 'tonelada' %}{{ viaje_cereal.dadora_valor|intcomma }} t{% else %}${{ viaje_cereal.dadora_valor|intcomma }} efectivo{% endif %}</span>{% endif %}</div>
+          </div>
+        </div>
+        {% endif %}
         <!-- Datos de la carga -->
-        <div class="vc-carga">
+        <div class="vc-carga{% if not user.is_staff %} vc-carga--solo{% endif %}">
           <div class="vc-carga__cell">
             <div class="vd-data__label">Cereal</div>
             <div class="vd-data__value">{{ viaje_cereal.tipo_cereal }}</div>
@@ -104,13 +145,19 @@
             <div class="vd-data__value vc-ctg">{{ viaje_cereal.codigo_trazabilidad_granos }}</div>
           </div>
           <div class="vc-carga__cell">
+            <div class="vd-data__label">Factura</div>
+            <div class="vd-data__value vc-ctg">{{ viaje_cereal.numero_factura|default:"--" }}</div>
+          </div>
+          <div class="vc-carga__cell">
             <div class="vd-data__label">Toneladas</div>
             <div class="vd-data__value">{{ viaje_cereal.toneladas|intcomma }} t</div>
           </div>
+          {% if user.is_staff %}
           <div class="vc-carga__cell">
             <div class="vd-data__label">Precio / tonelada</div>
             <div class="vd-data__value">${{ viaje_cereal.precio_tonelada|intcomma }}</div>
           </div>
+          {% endif %}
         </div>
       </div>
       <div class="vd-journey">
@@ -136,7 +183,8 @@
       </div>
     </div>
 
-    <!-- Calculo del flete -->
+    <!-- Calculo del flete (solo staff) -->
+    {% if user.is_staff %}
     <div class="op-card">
       <div class="op-card__head">
         <span class="material-symbols-outlined">calculate</span>
@@ -155,16 +203,18 @@
           </span>
           <span class="vd-caja__v">${{ viaje_cereal.total_bruto|intcomma }}</span>
         </div>
+        {% if viaje_cereal.tiene_dadora %}
+        <div class="vd-caja__row">
+          <span class="vd-caja__k">
+            <span class="vd-gasto__ico"><span class="material-symbols-outlined">handshake</span></span>
+            Dadora de carga
+            <span class="vc-pct">{% if viaje_cereal.dadora_tipo_cobro == 'porcentaje' %}{{ viaje_cereal.dadora_valor }}%{% elif viaje_cereal.dadora_tipo_cobro == 'tonelada' %}{{ viaje_cereal.dadora_valor|intcomma }} t{% else %}Efectivo{% endif %}</span>
+          </span>
+          <span class="vd-caja__v vc-deduct">-${{ viaje_cereal.costo_dadora|floatformat:0|intcomma }}</span>
+        </div>
+        {% endif %}
         <div class="vd-gastos">
-          {% for gasto in viaje_cereal.detalle_gastos.all %}
-          <div class="vd-gasto">
-            <span class="vd-gasto__ico"><span class="material-symbols-outlined">{% if gasto.gasto == 'Comida' %}restaurant{% elif gasto.gasto == 'Combustible' %}local_gas_station{% elif gasto.gasto == 'Playa' %}local_parking{% elif gasto.gasto == 'Peaje' %}toll{% elif gasto.gasto == 'Hotel' %}hotel{% elif gasto.gasto == 'Viaticos personales' %}wallet{% else %}more_horiz{% endif %}</span></span>
-            <span class="vd-gasto__name">{{ gasto.gasto }}<span class="vd-gasto__date">{{ gasto.fecha|date:"d/m/Y" }}</span></span>
-            <span class="vd-gasto__amt">-${{ gasto.monto|intcomma }}</span>
-          </div>
-          {% empty %}
-          <div class="vd-gastos__empty">Sin gastos registrados.</div>
-          {% endfor %}
+          {% include "gastos_viaje.html" with gastos=viaje_cereal.detalle_gastos.all vacio="Sin gastos registrados." %}
         </div>
         <div class="vd-caja__row vc-row--sub">
           <span class="vd-caja__k vd-caja__k--strong"><span class="material-symbols-outlined">functions</span>Subtotal</span>
@@ -173,10 +223,10 @@
         <div class="vd-caja__row">
           <span class="vd-caja__k">
             <span class="vd-gasto__ico"><span class="material-symbols-outlined">badge</span></span>
-            Pago del chofer
-            <span class="vc-pct">{{ viaje_cereal.porcentaje_chofer }}%</span>
+            Pago del empleado
+            <span class="vc-pct">{{ viaje_cereal.porcentaje_empleado }}%</span>
           </span>
-          <span class="vd-caja__v vc-deduct">-${{ viaje_cereal.pago_chofer|floatformat:0|intcomma }}</span>
+          <span class="vd-caja__v vc-deduct">-${{ viaje_cereal.pago_empleado|floatformat:0|intcomma }}</span>
         </div>
         <div class="vd-caja__row vd-caja__row--total">
           <span class="vd-caja__k"><span class="material-symbols-outlined">savings</span>Ganancia neta</span>
@@ -184,19 +234,26 @@
         </div>
       </div>
     </div>
+    {% endif %}
 
   </div>
 
 </section>
 
-<!-- Panel de Nuevo Gasto -->
-<form id="formulario-gasto" method="POST">
+<!-- Panel de gasto: sirve para registrar uno nuevo y para corregir uno cargado.
+     Las acciones del POST viajan en data-* porque cada vista de viaje usa las
+     suyas; el resto del modal es identico en los tres. -->
+<form id="formulario-gasto" method="POST"
+      data-accion-nuevo="nuevo_gasto_cereal"
+      data-accion-editar="editar_gasto_cereal"
+      data-accion-eliminar="eliminar_gasto_cereal">
   {% csrf_token %}
   <div id="contenedor-modal-gasto">
     <div id="contenedor-modal-fondo-gasto" onclick="cerrarModalGasto()"></div>
 
     <div id="panel-gasto">
-      <input type="hidden" name="accion" value="nuevo_gasto_cereal">
+      <input type="hidden" name="accion" id="gasto-accion" value="nuevo_gasto_cereal">
+      <input type="hidden" name="id_gasto" id="gasto-id">
 
       <button type="button" class="boton-cerrar" onclick="cerrarModalGasto()">
         <span class="material-symbols-outlined">close</span>
@@ -206,9 +263,10 @@
         <span class="material-symbols-outlined">payments</span>
       </div>
 
-      <h3>Registrar gasto</h3>
-      <p>Seleccioná el tipo de gasto e ingresá el monto. El subtotal y el pago del chofer se recalculan solos.</p>
+      <h3 id="gasto-titulo">Registrar gasto</h3>
+      <p id="gasto-bajada">Seleccioná el tipo de gasto e ingresá el monto. El subtotal y el pago del empleado se recalculan solos.</p>
 
+      <div id="gasto-campos">
       <div class="grupo-input">
         <label for="tipo-gasto">Tipo de gasto</label>
         <select id="tipo-gasto" name="tipo_gasto" required class="vd-select">
@@ -228,20 +286,40 @@
         <div class="input-con-icono">
           <span>$</span>
           <input
-            type="number"
+            type="text"
             id="monto-gasto"
             name="monto_gasto"
+            class="input-miles"
+            inputmode="numeric"
+            autocomplete="off"
             placeholder="0"
-            step="1"
-            min="1"
+            pattern="[1-9][0-9]{0,2}(\.[0-9]{3})*"
             required>
         </div>
-        <span class="vd-hint">Numero entero, sin puntos ni comas.</span>
+        <span class="vd-hint">Número entero. Los puntos se agregan solos.</span>
       </div>
 
-      <div class="acciones-modal">
-        <button type="submit" class="boton-primario">Guardar</button>
+      {% include 'campos_gasto_combustible.html' %}
+      </div>
+
+      <div class="acciones-modal" id="gasto-acciones">
+        <button type="submit" class="boton-primario" id="gasto-guardar">Guardar</button>
         <button type="button" class="boton-secundario" onclick="cerrarModalGasto()">Cancelar</button>
+      </div>
+
+      {% comment %}
+        Eliminar vive adentro del mismo modal de edicion, sin un segundo modal
+        de confirmacion: hay que mantener apretado el boton tres segundos, como
+        el resto de los borrados del sistema. La leyenda cambia mientras se
+        mantiene apretado.
+      {% endcomment %}
+      <div class="gasto-borrar" id="gasto-zona-borrar" hidden>
+        <button type="button" class="op-btn op-btn--danger gasto-borrar__btn" id="gasto-borrar">
+          <span class="gasto-borrar__label">
+            <span class="material-symbols-outlined">delete</span>
+            <span id="gasto-borrar-texto">Eliminar gasto</span>
+          </span>
+        </button>
       </div>
     </div>
   </div>
@@ -324,20 +402,20 @@
           </div>
 
           <div class="grupo-input">
-            <label for="chofer-cereal">Chofer</label>
-            <select id="chofer-cereal" name="id_chofer" class="select-estandar" required>
-              <option value="" disabled>Seleccione un chofer</option>
-              {% for chofer in choferes %}
-              <option value="{{ chofer.id }}" {% if viaje_cereal.chofer_id == chofer.id %}selected{% endif %}>{{ chofer.nombre }} {{ chofer.apellido }}</option>
+            <label for="empleado-cereal">Empleado</label>
+            <select id="empleado-cereal" name="id_empleado" class="select-estandar" required>
+              <option value="" disabled>Seleccione un empleado</option>
+              {% for empleado in empleados %}
+              <option value="{{ empleado.id }}" {% if viaje_cereal.empleado_id == empleado.id %}selected{% endif %}>{{ empleado.nombre }} {{ empleado.apellido }}</option>
               {% endfor %}
             </select>
-            <span class="mensaje-error">Por favor, seleccione un chofer de la lista.</span>
+            <span class="mensaje-error">Por favor, seleccione un empleado de la lista.</span>
           </div>
 
           <div class="grupo-input">
-            <label for="vehiculo-cereal">Vehiculo</label>
+            <label for="vehiculo-cereal">Vehículo</label>
             <select id="vehiculo-cereal" name="id_vehiculo" class="select-estandar" required>
-              <option value="" disabled>Seleccione un vehiculo</option>
+              <option value="" disabled>Seleccione un vehículo</option>
               {% for vehiculo in vehiculos %}
               <option value="{{ vehiculo.id }}" {% if viaje_cereal.vehiculo_id == vehiculo.id %}selected{% endif %}>{{ vehiculo.nombre }} ({{ vehiculo.patente }})</option>
               {% endfor %}
@@ -379,19 +457,33 @@
             <span class="mensaje-error">Solo números, hasta 15 dígitos.</span>
           </div>
 
+          <div class="grupo-input">
+            <label for="factura-cereal">Número de factura</label>
+            <input
+              type="text"
+              id="factura-cereal"
+              name="numero_factura"
+              placeholder="Opcional (ej: 00012345)"
+              maxlength="20"
+              inputmode="numeric"
+              pattern="[0-9]{1,20}"
+              value="{{ viaje_cereal.numero_factura|default:'' }}">
+            <span class="mensaje-error">Solo números, hasta 20 dígitos.</span>
+          </div>
+
           <div class="vje-grid2">
             <div class="grupo-input">
               <label for="toneladas-cereal">Toneladas</label>
               <input
-                type="number"
+                type="text"
                 id="toneladas-cereal"
                 name="toneladas"
-                placeholder="0"
-                min="1"
-                step="1"
+                placeholder="Ej: 12,5"
                 required
+                inputmode="decimal"
+                pattern="[0-9]+([.,][0-9]{1,2})?"
                 value="{{ viaje_cereal.toneladas }}">
-              <span class="mensaje-error">Ingrese un entero mayor a 0.</span>
+              <span class="mensaje-error">Ingrese un número mayor a 0, hasta 2 decimales (ej: 12,5).</span>
             </div>
 
             <div class="grupo-input">
@@ -399,12 +491,14 @@
               <div class="input-con-icono">
                 <span>$</span>
                 <input
-                  type="number"
+                  type="text"
                   id="precio-cereal"
                   name="precio_tonelada"
+                  class="input-miles"
+                  inputmode="numeric"
+                  autocomplete="off"
                   placeholder="0"
-                  min="1"
-                  step="1"
+                  pattern="[1-9][0-9]{0,2}(\.[0-9]{3})*"
                   required
                   value="{{ viaje_cereal.precio_tonelada }}">
               </div>
@@ -413,16 +507,16 @@
           </div>
 
           <div class="grupo-input">
-            <label for="porcentaje-cereal">Porcentaje del chofer (%)</label>
+            <label for="porcentaje-cereal">Porcentaje del empleado (%)</label>
             <input
               type="number"
               id="porcentaje-cereal"
-              name="porcentaje_chofer"
+              name="porcentaje_empleado"
               placeholder="Opcional"
               min="1"
               max="100"
               step="1"
-              value="{% if viaje_cereal.porcentaje_chofer %}{{ viaje_cereal.porcentaje_chofer }}{% endif %}">
+              value="{% if viaje_cereal.porcentaje_empleado %}{{ viaje_cereal.porcentaje_empleado }}{% endif %}">
             <span class="mensaje-error">Debe ser un numero entre 1 y 100.</span>
           </div>
         </section>
@@ -487,6 +581,120 @@
             <span class="mensaje-error">Por favor, seleccione una fecha valida.</span>
           </div>
         </section>
+
+        <!-- Seccion 5: Dadora de carga -->
+        <section class="seccion-bloque">
+          <div class="subtitulo-formulario">
+            <span class="material-symbols-outlined">handshake</span>
+            <h4>Dadora de carga</h4>
+          </div>
+
+          <div class="pago-fila">
+            <div class="pago-fila__texto">
+              <span class="pago-fila__titulo">Tiene dadora de carga</span>
+              <span class="pago-fila__sub">Activalo si alguien le consiguió el viaje al cliente y cobra una comisión.</span>
+            </div>
+            <label class="pago-switch">
+              <input type="checkbox" id="dadora-toggle-cereal" {% if viaje_cereal.dadora_carga %}checked{% endif %}>
+              <span class="pago-switch__slider"></span>
+            </label>
+          </div>
+
+          <div id="dadora-campos-cereal" {% if not viaje_cereal.dadora_carga %}hidden{% endif %}>
+            <div class="grupo-input">
+              <label for="dadora-nombre-cereal">Nombre de la dadora</label>
+              <input
+                type="text"
+                id="dadora-nombre-cereal"
+                name="dadora_carga"
+                placeholder="Ej: Juan Pérez"
+                maxlength="60"
+                pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}"
+                value="{{ viaje_cereal.dadora_carga }}"
+                {% if not viaje_cereal.dadora_carga %}required disabled{% else %}required{% endif %}>
+              <span class="mensaje-error">Mínimo 3 caracteres (solo letras y números).</span>
+            </div>
+
+            <div class="dadora-fila-cobro{% if viaje_cereal.dadora_tipo_cobro %} dadora-fila-cobro--duo{% endif %}">
+              <div class="grupo-input">
+                <label for="dadora-tipo-cereal">Forma de cobro</label>
+                <select id="dadora-tipo-cereal" name="dadora_tipo_cobro" class="select-estandar"
+                        {% if not viaje_cereal.dadora_carga %}required disabled{% else %}required{% endif %}>
+                  <option value="" disabled {% if not viaje_cereal.dadora_tipo_cobro %}selected{% endif %}>Seleccione</option>
+                  <option value="porcentaje" {% if viaje_cereal.dadora_tipo_cobro == 'porcentaje' %}selected{% endif %}>Porcentaje</option>
+                  <option value="tonelada" {% if viaje_cereal.dadora_tipo_cobro == 'tonelada' %}selected{% endif %}>Por tonelada</option>
+                  <option value="efectivo" {% if viaje_cereal.dadora_tipo_cobro == 'efectivo' %}selected{% endif %}>Efectivo</option>
+                </select>
+                <span class="mensaje-error">Seleccione cómo cobra la dadora.</span>
+              </div>
+
+              <div class="grupo-input" id="dadora-pct-grupo-cereal" {% if viaje_cereal.dadora_tipo_cobro != 'porcentaje' %}hidden{% endif %}>
+                <label for="dadora-pct-cereal">Porcentaje (%)</label>
+                <input
+                  type="number"
+                  id="dadora-pct-cereal"
+                  name="dadora_valor"
+                  min="1"
+                  max="100"
+                  step="1"
+                  placeholder="Ej: 5"
+                  value="{% if viaje_cereal.dadora_tipo_cobro == 'porcentaje' %}{{ viaje_cereal.dadora_valor }}{% endif %}"
+                  {% if viaje_cereal.dadora_tipo_cobro == 'porcentaje' %}required{% else %}disabled{% endif %}>
+                <span class="mensaje-error">Debe ser un número entre 1 y 100.</span>
+              </div>
+
+              <div class="grupo-input" id="dadora-ton-grupo-cereal" {% if viaje_cereal.dadora_tipo_cobro != 'tonelada' %}hidden{% endif %}>
+                <label for="dadora-ton-cereal">Cant. de toneladas</label>
+                <input
+                  type="number"
+                  id="dadora-ton-cereal"
+                  name="dadora_valor"
+                  min="1"
+                  step="1"
+                  placeholder="Ej: 1"
+                  value="{% if viaje_cereal.dadora_tipo_cobro == 'tonelada' %}{{ viaje_cereal.dadora_valor }}{% endif %}"
+                  {% if viaje_cereal.dadora_tipo_cobro == 'tonelada' %}required{% else %}disabled{% endif %}>
+                <span class="mensaje-error">Ingrese una cantidad de toneladas mayor a 0.</span>
+              </div>
+
+              <div class="grupo-input" id="dadora-efe-grupo-cereal" {% if viaje_cereal.dadora_tipo_cobro != 'efectivo' %}hidden{% endif %}>
+                <label for="dadora-efe-cereal">Monto en efectivo</label>
+                <div class="input-con-icono">
+                  <span>$</span>
+                  <input
+                    type="text"
+                    id="dadora-efe-cereal"
+                    name="dadora_valor"
+                    class="input-miles"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    placeholder="0"
+                    pattern="[1-9][0-9]{0,2}(\.[0-9]{3})*"
+                    value="{% if viaje_cereal.dadora_tipo_cobro == 'efectivo' %}{{ viaje_cereal.dadora_valor }}{% endif %}"
+                    {% if viaje_cereal.dadora_tipo_cobro == 'efectivo' %}required{% else %}disabled{% endif %}>
+                </div>
+                <span class="mensaje-error">Ingrese un monto válido mayor a 0.</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Seccion 6: Estado de pago (ultimo del formulario) -->
+        {% if user.is_staff %}
+        <section class="seccion-bloque">
+          <div class="pago-fila">
+            <div class="pago-fila__texto">
+              <span class="pago-fila__titulo">Viaje pagado</span>
+              <span class="pago-fila__sub">Activalo cuando el cobro ya entró. El cobro es total, no hay pagos parciales.</span>
+            </div>
+            <label class="pago-switch">
+              <input type="checkbox" id="pagado-cereal" name="pagado"
+                     {% if viaje_cereal.pagado %}checked{% endif %}>
+              <span class="pago-switch__slider"></span>
+            </label>
+          </div>
+        </section>
+        {% endif %}
       </main>
 
       <!-- 3. Pie del panel -->
@@ -503,5 +711,7 @@
 {% block codigo-javascript %}
 <script src="{% static 'js/autocompletado_ciudades.js' %}"></script>
 <script src="{% static 'js/autocompletado_clientes.js' %}"></script>
+<script src="{% static 'js/gastos_viaje.js' %}"></script>
+<script src="{% static 'js/dadora_carga.js' %}"></script>
 <script src="{% static 'js/informacion_viaje_cereal.js' %}"></script>
 {% endblock %}

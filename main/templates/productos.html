@@ -1,18 +1,24 @@
 {% extends "base.html" %}
 {% load static %}
+{% load static_version %}
 
 {% block nombre-pestaña %}
 <title> Productos </title>
 {% endblock %}
 
 {% block links %}
-<link rel="stylesheet" href="{% static 'productos.css' %}">
+<link rel="stylesheet" href="{% static_v 'productos.css' %}">
 {% endblock %}
 
 {% block cabecera %}
-<div id="titulos-cabecera">
-  <h2> Inventario de Productos </h2>
-  <p> Gestione el stock aquí, agregue, edite o elimine productos </p>
+<div class="cabecera-seccion">
+  <span class="cabecera-seccion__tile">
+    <span class="material-symbols-outlined">inventory_2</span>
+  </span>
+  <div class="cabecera-seccion__texto">
+    <h2>Inventario de Productos</h2>
+    <p>Gestione el stock aquí, agregue, edite o elimine productos</p>
+  </div>
 </div>
 {% endblock %}
 
@@ -60,6 +66,9 @@
     <button type="button" class="prod-chip {% if categoria == 'Medicamentos' %}is-active{% endif %}" data-categoria="Medicamentos">
       <span class="prod-chip__dot prod-chip__dot--medicamentos"></span>Medicamentos
     </button>
+    <button type="button" class="prod-chip {% if categoria == 'Tambores Vacios' %}is-active{% endif %}" data-categoria="Tambores Vacios">
+      <span class="prod-chip__dot prod-chip__dot--tambores-vacios"></span>Tambores Vacíos
+    </button>
     <button type="button" class="prod-chip {% if categoria == 'Otros' %}is-active{% endif %}" data-categoria="Otros">
       <span class="prod-chip__dot prod-chip__dot--otros"></span>Otros
     </button>
@@ -94,7 +103,8 @@
 
     <!-- Cuerpo del Panel (Formulario) -->
     <div class="panel-cuerpo">
-      <form class="formulario-producto" id="form-producto" method="POST" autocomplete="off">
+      <form class="formulario-producto" id="form-producto" method="POST" autocomplete="off"
+            data-url-cotizacion="{% url 'actualizar_cotizacion' %}">
         {% csrf_token %}
         <input type="hidden" id="id_producto" name="id_producto">
         <div class="campo-formulario">
@@ -123,26 +133,53 @@
             <option value="Estampado">Estampado</option>
             <option value="Insumos">Insumos</option>
             <option value="Medicamentos">Medicamentos</option>
+            <option value="Tambores Vacios">Tambores Vacíos</option>
             <option value="Otros">Otros</option>
           </select>
         </div>
+        <!-- Unidad de venta: decide en que tabla vive el producto (unidades enteras
+             o kilos con decimales). Se elige en el alta y queda fija al editar. -->
         <div class="campo-formulario">
-          <label for="precio">Precio Unitario</label>
+          <span class="etiqueta-campo" id="etiqueta-unidad-venta">Cómo se vende</span>
+          <input type="hidden" id="unidad_venta" name="unidad_venta" value="">
+          <div class="selector-venta" id="selector-venta" role="radiogroup" aria-labelledby="etiqueta-unidad-venta">
+            <input type="radio" id="venta-por-unidad" name="opcion_unidad_venta" value="unidad" required>
+            <label for="venta-por-unidad" class="opcion-venta">
+              <span class="material-symbols-outlined opcion-venta__icono">inventory_2</span>
+              <span class="opcion-venta__titulo">Por unidad</span>
+              <span class="opcion-venta__detalle">Se cuenta de a uno</span>
+            </label>
+
+            <input type="radio" id="venta-por-kilo" name="opcion_unidad_venta" value="kg" required>
+            <label for="venta-por-kilo" class="opcion-venta">
+              <span class="material-symbols-outlined opcion-venta__icono">scale</span>
+              <span class="opcion-venta__titulo">Por kilo</span>
+              <span class="opcion-venta__detalle">Se pesa, admite decimales</span>
+            </label>
+          </div>
+          <p class="nota-venta" id="nota-venta" hidden>La unidad de venta se define en el alta y no se puede cambiar.</p>
+        </div>
+
+        <div class="campo-formulario">
+          <label for="precio" id="etiqueta-precio">Precio Unitario</label>
           <div class="contenedor-input-prefijo">
             <span class="prefijo-input">$</span>
-            <input 
-              type="number" 
-              step="1" id="precio" 
-              name="precio" 
-              class="input-estandar input-con-prefijo" 
-              placeholder="0" 
+            <input
+              type="text"
+              id="precio"
+              name="precio"
+              class="input-estandar input-con-prefijo input-miles"
+              inputmode="numeric"
+              autocomplete="off"
+              placeholder="0"
+              pattern="[1-9][0-9]{0,2}(\.[0-9]{3})*"
               required>
           </div>
           <span class="mensaje-error">Por favor, ingrese un precio válido.</span>
         </div>
 
         <div class="campo-formulario" id="campo-stock-container">
-          <label for="stock">Stock Inicial (Opcional)</label>
+          <label for="stock" id="etiqueta-stock">Stock Inicial (Opcional)</label>
           <input 
             type="number" 
             step="1" 
@@ -177,6 +214,9 @@
       <!-- Le indico a Django: el input se llamada "accion" y vale un str "eliminar" -->
       <input type="hidden" name="accion" value="eliminar">
 
+      <!-- Unidad de venta del producto: dice de que tabla darlo de baja -->
+      <input type="hidden" id="unidad_venta_eliminar" name="unidad_venta" value="unidad">
+
       <button type="button" class="boton-cerrar-panel" id="icono-cerrar-panel-eliminar" onclick="cerrarPanelEliminar()">
         <span class="material-symbols-outlined">close</span>
       </button>
@@ -207,6 +247,9 @@
       <input type="hidden" id="id_producto_stock" name="id_producto_stock" value="">
       <input type="hidden" name="accion" value="modificar_stock">
 
+      <!-- Unidad de venta del producto: dice sobre que tabla ajustar el stock -->
+      <input type="hidden" id="unidad_venta_stock" name="unidad_venta" value="unidad">
+
       <button type="button" class="boton-cerrar-panel" id="cerrar-modal-stock" onclick="cerrarModalStock()">
         <span class="material-symbols-outlined">close</span>
       </button>
@@ -216,7 +259,7 @@
       
       <div class="info-stock-actual">
         <label>Stock actual:</label>
-        <span id="cantidad-stock-actual">0</span>
+        <span id="cantidad-stock-actual">0 uds</span>
       </div>
 
       <div class="controles-stock">
@@ -238,8 +281,8 @@
         <div class="input-cantidad-container">
           <label for="cantidad-modificar" class="label-accion-stock">Cantidad a modificar</label>
           <div class="input-wrapper">
-            <input type="number" id="cantidad-modificar" name="cantidad" class="input-estandar texto-centrado" min="1" value="1" required>
-            <span class="unidad-medida">uds</span>
+            <input type="number" id="cantidad-modificar" name="cantidad" class="input-estandar texto-centrado" min="1" step="1" value="1" required>
+            <span class="unidad-medida" id="unidad-medida-stock">uds</span>
           </div>
         </div>
       </div>
@@ -255,5 +298,5 @@
 
 {% block codigo-javascript %}
 <script src="{% static 'js/paneles.js' %}"></script>
-<script src="{% static 'js/productos.js' %}"></script>
+<script src="{% static_v 'js/productos.js' %}"></script>
 {% endblock %}

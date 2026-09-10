@@ -15,16 +15,23 @@
 
     <!-- Volver: el destino depende del origen de navegacion (?origen=) -->
     {% if request.GET.origen == 'deudores' %}
-    <a href="{% url 'deudores' %}" class="boton-volver">
+    {# Reconstruyo la URL de deudas con los mismos filtros con que se llego (viajan en request.GET), asi al volver el listado queda filtrado igual. La vista de deudas ignora 'origen'. #}
+    <a href="{% url 'deudores' %}?{{ request.GET.urlencode }}" class="boton-volver">
         <span class="material-symbols-outlined">arrow_back</span>
         Volver a Deudores
+    </a>
+    {% elif request.GET.origen == 'operaciones' %}
+    {# Reconstruyo la URL del listado con los mismos filtros con que se llego (viajan en request.GET), asi al volver la tabla queda filtrada igual. La vista de operaciones ignora 'origen'. #}
+    <a href="{% url 'operaciones' %}?{{ request.GET.urlencode }}" class="boton-volver">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Volver a Operaciones
     </a>
     {% elif request.GET.origen == 'cliente' %}
     <a href="{% url 'informacion_clientes' operacion.cliente.id %}" class="boton-volver">
         <span class="material-symbols-outlined">arrow_back</span>
         Volver al perfil de {{ operacion.cliente.nombre }} {{ operacion.cliente.apellido|default:"" }}
     </a>
-    {% elif operacion.viaje %}
+    {% elif operacion.viaje and operacion.viaje.activo %}
     <a href="{% url 'informacion_viaje' operacion.viaje.id %}" class="boton-volver">
         <span class="material-symbols-outlined">arrow_back</span>
         Volver al viaje #{{ operacion.viaje.id }}
@@ -47,25 +54,45 @@
                 <div class="op-head__meta">
                     <span class="op-head__metaitem"><span class="material-symbols-outlined">event</span>{{ operacion.fecha|date:"d/m/Y" }}</span>
                     <span class="op-head__metaitem"><span class="material-symbols-outlined">person</span>{{ operacion.cliente.nombre }} {{ operacion.cliente.apellido|default:"" }}</span>
-                    {% if operacion.viaje %}
+                    {% if operacion.viaje and operacion.viaje.activo %}
                     <a href="{% url 'informacion_viaje' operacion.viaje.id %}" class="op-viaje">
                         <span class="material-symbols-outlined">local_shipping</span>
                         Realizada en el viaje #{{ operacion.viaje.id }}
                     </a>
+                    {% elif operacion.viaje %}
+                    <span class="op-viaje op-viaje--eliminado" title="El viaje fue eliminado">
+                        <span class="material-symbols-outlined">local_shipping</span>
+                        Realizada en el viaje #{{ operacion.viaje.id }} (eliminado)
+                    </span>
                     {% endif %}
                 </div>
+                {% if operacion.observaciones %}
+                <p class="op-head__obs" title="{{ operacion.observaciones }}">
+                    <span class="material-symbols-outlined">sticky_note_2</span>
+                    <span class="op-head__obstext">{{ operacion.observaciones|truncatechars:120 }}</span>
+                </p>
+                {% endif %}
             </div>
         </div>
         <div class="op-head__actions">
+            {% if user.is_staff %}
             <button class="op-btn op-btn--dark"
                 {% if operacion.estado_pago == 'Cancelada' or operacion.estado_pago == 'Pagada' %}disabled{% else %}onclick="abrirModalPago('{{ operacion.id }}', '{{ operacion.monto_total|default_if_none:0|stringformat:'f' }}', '{{ operacion.total_pagado|default_if_none:0|stringformat:'f' }}');"{% endif %}>
                 <span class="material-symbols-outlined">payments</span>
                 Añadir pago
             </button>
+            {% endif %}
             <a href="{% url 'generar_remito' operacion.id %}" target="_blank" class="op-btn op-btn--secondary">
                 <span class="material-symbols-outlined">download</span>
                 Imprimir remito
             </a>
+            {% if request.user.is_staff and operacion.activa %}
+            <a href="{% if operacion.tipo_operacion == 'compra' %}{% url 'nueva_operacion_compra' operacion.cliente.id %}{% else %}{% url 'nueva_operacion_venta' operacion.cliente.id %}{% endif %}?editar={{ operacion.id }}"
+               class="op-btn op-btn--secondary">
+                <span class="material-symbols-outlined">edit</span>
+                Editar operación
+            </a>
+            {% endif %}
             <button class="op-btn op-btn--danger"
                 {% if operacion.estado_pago == 'Cancelada' %}disabled{% else %}onclick="abrirModalCancelarOperacion('{{ operacion.id }}', '{{ operacion.tipo_operacion }}');"{% endif %}>
                 <span class="material-symbols-outlined">delete</span>
@@ -75,24 +102,26 @@
     </div>
 
     <!-- Totales -->
+    {% if user.is_staff %}
     <div class="op-totals">
         <div class="op-total">
             <span class="op-total__k"><span class="material-symbols-outlined">receipt</span>Total operación</span>
             <span class="op-total__v">$ {{ operacion.monto_total|floatformat:"-2g" }}</span>
         </div>
-        <div class="op-total op-total--paid">
-            <span class="op-total__k"><span class="material-symbols-outlined">paid</span>Pagado</span>
+        <div class="op-total {% if operacion.tipo_operacion == 'compra' %}op-total--rest{% else %}op-total--paid{% endif %}">
+            <span class="op-total__k"><span class="material-symbols-outlined">paid</span>{% if operacion.tipo_operacion == 'venta' %}Cobrado{% else %}Pagado{% endif %}</span>
             <span class="op-total__v">$ {{ total_pagado|floatformat:"-2g" }}</span>
-            <div class="op-total__bar"><div class="op-total__barfill" style="width: {{ pct_pagado|floatformat:0 }}%"></div></div>
+            <div class="op-total__bar"><div class="op-total__barfill {% if operacion.tipo_operacion == 'compra' %}op-total__barfill--compra{% endif %}" style="width: {{ pct_pagado|floatformat:0 }}%"></div></div>
         </div>
-        <div class="op-total {% if restante > 0 %}op-total--rest{% else %}op-total--paid{% endif %}">
-            <span class="op-total__k"><span class="material-symbols-outlined">{% if restante > 0 %}schedule{% else %}check_circle{% endif %}</span>Restante a pagar</span>
+        <div class="op-total {% if operacion.tipo_operacion == 'compra' %}{% if restante > 0 %}op-total--paid{% else %}op-total--rest{% endif %}{% else %}{% if restante > 0 %}op-total--rest{% else %}op-total--paid{% endif %}{% endif %}">
+            <span class="op-total__k"><span class="material-symbols-outlined">{% if restante > 0 %}schedule{% else %}check_circle{% endif %}</span>{% if operacion.tipo_operacion == 'venta' %}Restante a cobrar{% else %}Restante a pagar{% endif %}</span>
             <span class="op-total__v">$ {{ restante|floatformat:"-2g" }}</span>
         </div>
     </div>
+    {% endif %}
 
     <!-- Productos + Pagos -->
-    <div class="op-grid">
+    <div class="op-grid{% if not user.is_staff %} op-grid--solo{% endif %}">
 
         <!-- Productos -->
         <div class="op-card">
@@ -101,13 +130,15 @@
                 <h4>{% if operacion.tipo_operacion == 'compra' %}Productos comprados{% else %}Productos vendidos{% endif %}</h4>
                 <span class="op-card__count">{{ detalles|length }} ítem{{ detalles|length|pluralize }}</span>
             </div>
-            <table class="op-table">
+            <table class="op-table{% if not user.is_staff %} op-table--reducida{% endif %}">
                 <thead>
                     <tr>
                         <th>Producto</th>
                         <th class="c">Cantidad</th>
+                        {% if user.is_staff %}
                         <th class="r">Precio unit.</th>
                         <th class="r">Subtotal</th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
@@ -115,23 +146,33 @@
                     <tr>
                         <td><div class="op-prod__name">{{ detalle.nombre_item }}</div></td>
                         <td class="c">{% if detalle.es_granel %}{{ detalle.cantidad|floatformat:"-2g" }} kg{% else %}{{ detalle.cantidad|floatformat:"0g" }}{% endif %}</td>
+                        {% if user.is_staff %}
                         <td class="r">$ {{ detalle.precio_unitario|floatformat:"-2g" }}</td>
                         <td class="r op-sub">$ {{ detalle.subtotal|floatformat:"-2g" }}</td>
+                        {% endif %}
                     </tr>
                     {% empty %}
-                    <tr><td colspan="4" class="op-empty">No hay productos registrados.</td></tr>
+                    <tr class="fila-vacia">
+                      <td colspan="{% if user.is_staff %}4{% else %}2{% endif %}" class="celda-vacia">
+                        <span class="material-symbols-outlined">inventory_2</span>
+                        No hay productos registrados.
+                      </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
+                {% if user.is_staff %}
                 <tfoot class="op-table__foot">
                     <tr>
                         <td colspan="3">Total</td>
                         <td class="r">$ {{ operacion.monto_total|floatformat:"-2g" }}</td>
                     </tr>
                 </tfoot>
+                {% endif %}
             </table>
         </div>
 
         <!-- Historial de pagos -->
+        {% if user.is_staff %}
         <div class="op-card">
             <div class="op-card__head">
                 <span class="material-symbols-outlined">payments</span>
@@ -152,21 +193,27 @@
                         <td class="r op-pago__amt">+$ {{ pago.monto|floatformat:"-2g" }}</td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="2" class="op-empty">Todavía no se registraron pagos.</td></tr>
+                    <tr class="fila-vacia">
+                      <td colspan="2" class="celda-vacia">
+                        <span class="material-symbols-outlined">payments</span>
+                        Todavía no se registraron pagos.
+                      </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
                 <tfoot class="op-table__foot">
                     <tr>
-                        <td>Total pagado</td>
+                        <td>{% if operacion.tipo_operacion == 'venta' %}Total cobrado{% else %}Total pagado{% endif %}</td>
                         <td class="r">$ {{ total_pagado|floatformat:"-2g" }}</td>
                     </tr>
                     <tr class="op-foot-rest">
-                        <td>Restante a pagar</td>
+                        <td>{% if operacion.tipo_operacion == 'venta' %}Restante a cobrar{% else %}Restante a pagar{% endif %}</td>
                         <td class="r">$ {{ restante|floatformat:"-2g" }}</td>
                     </tr>
                 </tfoot>
             </table>
         </div>
+        {% endif %}
 
     </div>
 
@@ -207,7 +254,7 @@
         </div>
 
         <h3 id="titulo-modal-pago">Añadir pago</h3>
-        <p id="texto-info-pago">Monto restante a pagar: <strong id="monto-restante-pago">$0.00</strong></p>
+        <p id="texto-info-pago">Monto restante a {% if operacion.tipo_operacion == 'venta' %}cobrar{% else %}pagar{% endif %}: <strong id="monto-restante-pago">$0.00</strong></p>
 
         <form id="form-registrar-pago" onsubmit="event.preventDefault(); procesarPago();">
             <input type="hidden" id="id_operacion_pago" value="">
@@ -220,7 +267,7 @@
                 </div>
                 <div style="position: relative; display: block;">
                     <span style="position: absolute; left: 0.75rem; top: 0.6rem; color: var(--slate-500); font-weight: 600; pointer-events: none;">$</span>
-                    <input type="number" id="input-monto-pago" class="input-edicion" style="padding-left: 1.75rem; width: 100%; box-sizing: border-box;" min="0.01" step="0.01" required placeholder=" ">
+                    <input type="text" id="input-monto-pago" class="input-edicion input-miles-decimal" style="padding-left: 1.75rem; width: 100%; box-sizing: border-box;" inputmode="decimal" autocomplete="off" pattern="[1-9][0-9]{0,2}(\.[0-9]{3})*(,[0-9]{1,2})?|0,(0[1-9]|[1-9][0-9]?)" required placeholder=" ">
                     <span class="mensaje-error" style="margin-top: 0.5rem;">Ingrese un monto válido y menor o igual al restante</span>
                 </div>
             </div>

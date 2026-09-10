@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const carritoVacio = document.getElementById('carrito-vacio');
     const contadorCarrito = document.getElementById('contador-carrito');
     const botonVaciar = document.getElementById('boton-vaciar-carrito');
-    const panelGranel = document.getElementById('panel-granel');
 
     // Formateadores en formato argentino (separador de miles con punto)
     const formatoMoneda = new Intl.NumberFormat('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -20,6 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Clave en sessionStorage para persistir el carrito
     const STORAGE_KEY = 'carrito_operacion';
+
+    // Modo edición: el template inyecta los datos de la operación a editar
+    const scriptEdicion = document.getElementById('datos-edicion');
+    const edicion = scriptEdicion ? JSON.parse(scriptEdicion.textContent) : null;
 
     // =============================================
     //  PERSISTENCIA DEL CARRITO (sessionStorage)
@@ -42,13 +45,40 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             items.push({
                 id: fila.dataset.id,
-                precio: fila.dataset.precio,
+                precio: fila.querySelector('.input-precio-item').value,
                 nombre: fila.querySelector('.cart-item__name').textContent,
                 cantidad: parseInt(fila.querySelector('.input-cantidad').value),
-                stockOriginal: parseInt(fila.dataset.stockOriginal)
+                stockOriginal: parseInt(fila.dataset.stockOriginal),
+                bloqueado: fila.dataset.bloqueado === '1'
             });
         });
         sessionStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }
+
+    // Precarga el carrito con los ítems de la operación que se está editando
+    function cargarEdicion() {
+        edicion.items.forEach(item => {
+            if (item.tipo === 'granel') {
+                crearFilaGranel(
+                    item.id,
+                    item.nombre,
+                    item.precio,
+                    item.cantidad,
+                    normalizarDecimal(item.stock)
+                );
+                return;
+            }
+            crearFilaCarrito(
+                item.id,
+                item.nombre,
+                item.precio,
+                item.cantidad,
+                parseInt(item.stock),
+                item.bloqueado
+            );
+        });
+        actualizarTotal();
+        ajustarStockVisual();
     }
 
     function restaurarCarrito() {
@@ -78,9 +108,10 @@ document.addEventListener('DOMContentLoaded', () => {
             crearFilaCarrito(
                 item.id,
                 item.nombre,
-                parseFloat(item.precio),
+                item.precio,
                 item.cantidad,
-                item.stockOriginal
+                item.stockOriginal,
+                item.bloqueado
             );
         });
         actualizarTotal();
@@ -141,39 +172,49 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Tras refrescar la tabla (busqueda/filtro/paginacion) vuelvo a resaltar los
+    // botones de lo que ya esta en el carrito, sean productos o articulos a granel.
+    function marcarBotonesEnCarrito() {
+        cuerpoCarrito.querySelectorAll('.cart-item').forEach(fila => {
+            const selector = fila.dataset.tipo === 'granel'
+                ? `.boton-agregar-granel[data-id="${fila.dataset.granelId}"]`
+                : `.boton-agregar-producto[data-id="${fila.dataset.id}"]`;
+            const btn = contenedorTabla.querySelector(selector);
+            if (btn) btn.classList.add('is-incart');
+        });
+    }
+
     // =============================================
     //  ARTICULOS A GRANEL (kilos desde cotizaciones)
     // =============================================
 
-    function buscarGranelEnPanel(idCotizacion) {
-        if (!panelGranel) return null;
-        const boton = panelGranel.querySelector(`.boton-agregar-granel[data-id="${idCotizacion}"]`);
+    function buscarGranelEnTabla(idCotizacion) {
+        const boton = contenedorTabla.querySelector(`.boton-agregar-granel[data-id="${idCotizacion}"]`);
         if (!boton) return null;
-        const stockCell = panelGranel.querySelector(`[data-granel-stock="${idCotizacion}"]`);
+        const stockCell = contenedorTabla.querySelector(`[data-granel-stock="${idCotizacion}"]`);
         return { boton, stockCell };
     }
 
     function actualizarStockGranel(idCotizacion, kilosDisponibles) {
-        const articulo = buscarGranelEnPanel(idCotizacion);
+        const articulo = buscarGranelEnTabla(idCotizacion);
         if (!articulo) return;
 
         const restante = Math.max(kilosDisponibles, 0);
-        articulo.stockCell.textContent = `${formatoKilos.format(restante)} kg`;
+        articulo.stockCell.innerHTML = `${formatoKilos.format(restante)}<span class="cart-stock__u"> kg</span>`;
 
         if (kilosDisponibles <= 0) {
             articulo.boton.disabled = true;
             articulo.boton.title = 'Sin kilos disponibles';
-            articulo.stockCell.classList.add('granel-item__stock--zero');
+            articulo.stockCell.classList.add('cart-stock--zero');
         } else {
             articulo.boton.disabled = false;
             articulo.boton.title = 'Añadir a la venta';
-            articulo.stockCell.classList.remove('granel-item__stock--zero');
+            articulo.stockCell.classList.remove('cart-stock--zero');
         }
     }
 
     function vincularBotonesGranel() {
-        if (!panelGranel) return;
-        panelGranel.querySelectorAll('.boton-agregar-granel').forEach(boton => {
+        contenedorTabla.querySelectorAll('.boton-agregar-granel').forEach(boton => {
             boton.addEventListener('click', function () {
                 const id = this.dataset.id;
                 const filaExistente = cuerpoCarrito.querySelector(`.cart-item[data-granel-id="${id}"]`);
@@ -208,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="cart-item__top">
                 <div>
                     <div class="cart-item__name" title="${nombre}">${nombre}</div>
-                    <span class="granel-tag"><span class="material-symbols-outlined">scale</span>a granel</span>
+                    <span class="granel-tag"><span class="material-symbols-outlined">scale</span>Por kg</span>
                 </div>
                 <button type="button" class="cart-item__rm" title="Quitar">
                     <span class="material-symbols-outlined">close</span>
@@ -244,8 +285,8 @@ document.addEventListener('DOMContentLoaded', () => {
             actualizarTotal();
             actualizarVistaResumen();
             guardarCarrito();
-            const btnPanel = panelGranel ? panelGranel.querySelector(`.boton-agregar-granel[data-id="${idCotizacion}"]`) : null;
-            if (btnPanel) btnPanel.classList.remove('is-incart');
+            const btnTabla = contenedorTabla.querySelector(`.boton-agregar-granel[data-id="${idCotizacion}"]`);
+            if (btnTabla) btnTabla.classList.remove('is-incart');
         }
 
         function alCambiar() {
@@ -262,8 +303,8 @@ document.addEventListener('DOMContentLoaded', () => {
         actualizarFilaGranel(fila);
         actualizarVistaResumen();
 
-        const btnPanel = panelGranel ? panelGranel.querySelector(`.boton-agregar-granel[data-id="${idCotizacion}"]`) : null;
-        if (btnPanel) btnPanel.classList.add('is-incart');
+        const btnTabla = contenedorTabla.querySelector(`.boton-agregar-granel[data-id="${idCotizacion}"]`);
+        if (btnTabla) btnTabla.classList.add('is-incart');
 
         // Foco directo al input de kilos para cargar la pesada sin clicks extra
         inputKilos.focus();
@@ -342,17 +383,21 @@ document.addEventListener('DOMContentLoaded', () => {
         guardarCarrito();
     }
 
-    function crearFilaCarrito(id, nombre, precio, cantidad, stockOriginal) {
+    function crearFilaCarrito(id, nombre, precio, cantidad, stockOriginal, bloqueado = false) {
         const fila = document.createElement('div');
         fila.className = 'cart-item';
         fila.dataset.id = id;
         fila.dataset.precio = precio;
         fila.dataset.stockOriginal = stockOriginal;
+        // Producto dado de baja: la línea viaja igual pero queda congelada
+        // (sin cambiar cantidad ni precio, sin poder quitarla del carrito)
+        if (bloqueado) fila.dataset.bloqueado = '1';
 
         fila.innerHTML = `
             <div class="cart-item__top">
                 <div>
                     <div class="cart-item__name" title="${nombre}">${nombre}</div>
+                    ${bloqueado ? '<span class="cart-item__badge-baja"><span class="material-symbols-outlined">lock</span>Producto dado de baja</span>' : ''}
                 </div>
                 <button type="button" class="cart-item__rm" title="Quitar">
                     <span class="material-symbols-outlined">close</span>
@@ -364,17 +409,38 @@ document.addEventListener('DOMContentLoaded', () => {
                     <input type="number" class="input-cantidad" value="${cantidad}" min="1" max="${stockOriginal}">
                     <button type="button" data-step="mas" title="Sumar"><span class="material-symbols-outlined">add</span></button>
                 </div>
-                <span class="cart-pricestatic">$ <strong>${formatoMoneda.format(precio)}</strong> c/u</span>
+                <div class="cart-priceedit">
+                    <span class="cart-priceedit__cur">$</span>
+                    <input type="number" class="input-precio-item" placeholder="0.00" min="0" step="0.01" value="${precio}">
+                    <span class="cart-priceedit__u">c/u</span>
+                </div>
             </div>
             <div class="cart-item__sub2">
                 <span class="cart-item__sublabel">Subtotal</span>
-                <span class="cart-item__subval">$ ${formatoMoneda.format(precio * cantidad)}</span>
+                <span class="cart-item__subval">$ 0,00</span>
             </div>
         `;
 
         const inputCantidad = fila.querySelector('.input-cantidad');
         const botonMenos = fila.querySelector('[data-step="menos"]');
         const botonMas = fila.querySelector('[data-step="mas"]');
+        const inputPrecio = fila.querySelector('.input-precio-item');
+
+        if (bloqueado) {
+            fila.classList.add('cart-item--bloqueado');
+            inputCantidad.disabled = true;
+            inputPrecio.disabled = true;
+            botonMenos.disabled = true;
+            botonMas.disabled = true;
+            const botonQuitar = fila.querySelector('.cart-item__rm');
+            botonQuitar.disabled = true;
+            botonQuitar.title = 'Producto dado de baja: no se puede quitar';
+
+            cuerpoCarrito.appendChild(fila);
+            actualizarFila(fila);
+            actualizarVistaResumen();
+            return;
+        }
 
         // Quita el producto del carrito y restaura el stock y el resaltado
         function quitar() {
@@ -389,6 +455,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Escritura libre: no forzamos el valor; la validación se hace al confirmar
         inputCantidad.addEventListener('input', function () {
+            actualizarFila(fila);
+            actualizarTotal();
+            guardarCarrito();
+        });
+
+        // El precio se autocompleta con el del producto pero se puede editar
+        inputPrecio.addEventListener('input', function () {
             actualizarFila(fila);
             actualizarTotal();
             guardarCarrito();
@@ -430,13 +503,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function actualizarFila(fila) {
-        const precio = parseFloat(fila.dataset.precio);
+        const precio = parseFloat(fila.querySelector('.input-precio-item').value) || 0;
         const stockOriginal = parseInt(fila.dataset.stockOriginal);
         const cantidad = parseInt(fila.querySelector('.input-cantidad').value) || 0;
 
         fila.querySelector('.cart-item__subval').textContent = `$ ${formatoMoneda.format(precio * cantidad)}`;
-        // El boton mas se frena al llegar al stock; el menos nunca se deshabilita (en 1 saca el producto)
-        fila.querySelector('[data-step="mas"]').disabled = cantidad >= stockOriginal;
+        // El boton mas se frena al llegar al stock; el menos nunca se deshabilita (en 1 saca el producto).
+        // Fila bloqueada (producto dado de baja): el mas queda deshabilitado siempre
+        fila.querySelector('[data-step="mas"]').disabled = fila.dataset.bloqueado === '1' || cantidad >= stockOriginal;
 
         actualizarStockProducto(fila.dataset.id, stockOriginal - cantidad);
     }
@@ -452,7 +526,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 total += kilos * precioKilo;
                 return;
             }
-            const precio = parseFloat(fila.dataset.precio);
+            const precio = parseFloat(fila.querySelector('.input-precio-item').value) || 0;
             const cantidad = parseInt(fila.querySelector('.input-cantidad').value) || 0;
             total += precio * cantidad;
         });
@@ -463,20 +537,22 @@ document.addEventListener('DOMContentLoaded', () => {
     botonVaciar.addEventListener('click', function () {
         const filas = cuerpoCarrito.querySelectorAll('.cart-item');
         filas.forEach(fila => {
+            // Las filas bloqueadas (productos dados de baja) no se pueden quitar
+            if (fila.dataset.bloqueado === '1') return;
             if (fila.dataset.tipo === 'granel') {
                 actualizarStockGranel(fila.dataset.granelId, normalizarDecimal(fila.dataset.stockOriginal));
             } else {
                 actualizarStockProducto(fila.dataset.id, parseInt(fila.dataset.stockOriginal));
             }
+            fila.remove();
         });
-        cuerpoCarrito.innerHTML = '';
         actualizarTotal();
         actualizarVistaResumen();
         guardarCarrito();
 
         // Remover el highlight
         contenedorTabla.querySelectorAll('.boton-agregar-producto').forEach(btn => btn.classList.remove('is-incart'));
-        if (panelGranel) panelGranel.querySelectorAll('.boton-agregar-granel').forEach(btn => btn.classList.remove('is-incart'));
+        contenedorTabla.querySelectorAll('.boton-agregar-granel').forEach(btn => btn.classList.remove('is-incart'));
     });
 
     // =============================================
@@ -509,8 +585,10 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(html => {
                 contenedorTabla.innerHTML = html;
                 vincularBotonesAgregar();
+                vincularBotonesGranel();
                 vincularPaginacion();
                 ajustarStockVisual();
+                marcarBotonesEnCarrito();
             })
             .catch(error => console.error('Error en la búsqueda:', error));
     }
@@ -573,6 +651,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const items = [];
         let cantidadInvalida = false;
+        let precioInvalido = false;
         let granelInvalido = false;
         let precioGranelInvalido = false;
 
@@ -600,14 +679,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const cantidad = parseInt(fila.querySelector('.input-cantidad').value);
             const stockOriginal = parseInt(fila.dataset.stockOriginal);
+            const precioStr = fila.querySelector('.input-precio-item').value.trim();
+            const precio = parseFloat(precioStr);
             if (isNaN(cantidad) || cantidad < 1 || cantidad > stockOriginal) {
                 cantidadInvalida = true;
             }
-            items.push({ id_producto: fila.dataset.id, cantidad: cantidad });
+            if (isNaN(precio) || precio <= 0) {
+                precioInvalido = true;
+            }
+            items.push({ id_producto: fila.dataset.id, cantidad: cantidad, precio_unitario: precioStr });
         });
 
         if (cantidadInvalida) {
             avisar('Revisá las cantidades: cada producto necesita un número válido y dentro del stock disponible.');
+            return;
+        }
+
+        if (precioInvalido) {
+            avisar('Cargá un precio mayor a 0 en todos los productos.');
             return;
         }
 
@@ -630,6 +719,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const metodoPago = metodoPagoSeleccionado.value;
 
+        // Fecha anterior a hoy sin cotizaciones de origen confirmadas: se
+        // reabre el modal en vez de mandar la operación incompleta
+        if (typeof faltanCotizacionesHistoricas === 'function' && faltanCotizacionesHistoricas()) {
+            abrirModalCotizacionesHistoricas();
+            return;
+        }
+
+        // Guardo el contenido original del boton ("Confirmar venta" o "Guardar cambios")
+        const textoBotonOriginal = botonConfirmar.innerHTML;
         botonConfirmar.disabled = true;
         botonConfirmar.innerHTML = 'Procesando...';
 
@@ -643,28 +741,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 items: items,
                 metodo_pago: metodoPago,
                 tipo_operacion: 'venta',
+                // null si la operacion es de hoy; "YYYY-MM-DD" si se cargo una fecha distinta
+                fecha: typeof obtenerFechaOperacion === 'function' ? obtenerFechaOperacion() : null,
+                // valores de miel menor a 50 mm, dolar oficial y cera operculo de aquel
+                // dia; null salvo que la fecha sea anterior a hoy
+                cotizaciones_historicas: typeof obtenerCotizacionesHistoricas === 'function' ? obtenerCotizacionesHistoricas() : null,
+                // nota opcional que se imprime en el remito
+                observaciones: typeof obtenerObservacion === 'function' ? obtenerObservacion() : '',
+                // id de la operacion a editar; null cuando se crea una nueva
+                editar: edicion ? edicion.id : null,
             }),
         })
             .then(response => response.json().then(data => ({ ok: response.ok, data })))
             .then(({ ok, data }) => {
                 if (ok && data.ok) {
                     limpiarCarritoStorage();
-                    if (data.id_viaje) {
+                    if (data.editada) {
+                        window.location.href = `/informacion_operacion/${data.id_operacion}/`;
+                    } else if (data.id_viaje) {
                         window.location.href = `/informacion_viaje/${data.id_viaje}/`;
                     } else {
                         window.location.href = `/informacion_clientes/${data.id_cliente}/`;
                     }
                 } else {
-                    avisar(data.error || 'Algo salió mal. Por favor, volvé a intentarlo.');
+                    notificarErrorModal(data.error || 'Algo salió mal. Por favor, volvé a intentarlo.');
                     botonConfirmar.disabled = false;
-                    botonConfirmar.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Confirmar venta';
+                    botonConfirmar.innerHTML = textoBotonOriginal;
                 }
             })
             .catch(error => {
                 console.error('Error en la petición:', error);
-                avisar('Algo salió mal. Por favor, volvé a intentarlo.');
+                notificarErrorModal('Algo salió mal. Por favor, volvé a intentarlo.');
                 botonConfirmar.disabled = false;
-                botonConfirmar.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Confirmar venta';
+                botonConfirmar.innerHTML = textoBotonOriginal;
             });
     });
 
@@ -672,7 +781,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cuerpoCarrito.querySelectorAll('.cart-item').length > 0) guardarCarrito();
     });
 
-    restaurarCarrito();
+    // En modo edición el carrito se precarga con la operación; si no, se
+    // restaura el que quedó en sessionStorage tras una recarga
+    if (edicion) {
+        cargarEdicion();
+    } else {
+        restaurarCarrito();
+    }
     actualizarVistaResumen();
     vincularBotonesAgregar();
     vincularBotonesGranel();

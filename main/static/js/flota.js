@@ -1,28 +1,59 @@
 // =============================================
-//  GESTIÓN DE CHOFERES Y VEHÍCULOS (FLOTA)
+//  GESTIÓN DE VEHÍCULOS (FLOTA)
 //  Reusa los slide-overs (paneles.js) para alta y edición,
 //  cambiando la accion/titulo/campos segun el caso.
+//  Los empleados se gestionan desde la vista de empleados.
 // =============================================
 
-// ---------- CHOFER ----------
+// ---------- BUSQUEDA (filtro por nombre, client-side) ----------
 
-function abrirNuevoChofer() {
-    document.getElementById('accion-chofer').value = 'nuevo_chofer';
-    document.getElementById('id-chofer-input').value = '';
-    document.getElementById('nombre-chofer').value = '';
-    document.getElementById('apellido-chofer').value = '';
-    document.getElementById('titulo-chofer').textContent = 'Nuevo Chofer';
-    abrirSlideOver('slide-over-chofer');
+function filtrarVehiculos() {
+    const input = document.getElementById('buscar-vehiculo');
+    if (!input) return;
+
+    const termino = input.value.trim().toLowerCase();
+    const filas = document.querySelectorAll('#cuerpo-flota .fila-vehiculo');
+
+    let visibles = 0;
+    filas.forEach((fila) => {
+        const coincide = fila.dataset.nombre.includes(termino);
+        fila.hidden = !coincide;
+        if (coincide) visibles++;
+    });
+
+    // Muestro el aviso de "sin resultados" solo cuando hay filas pero ninguna
+    // coincide con la busqueda (no cuando la tabla esta vacia de entrada).
+    const sinResultados = document.getElementById('flota-sin-resultados');
+    if (sinResultados) sinResultados.hidden = !(filas.length && visibles === 0);
+
+    // Reflejo en el footer cuantas filas quedan a la vista tras el filtro.
+    const contador = document.getElementById('flota-visibles');
+    if (contador) contador.textContent = visibles;
 }
 
-function abrirEditarChofer(boton) {
-    document.getElementById('accion-chofer').value = 'editar_chofer';
-    document.getElementById('id-chofer-input').value = boton.dataset.id;
-    document.getElementById('nombre-chofer').value = boton.dataset.nombre;
-    document.getElementById('apellido-chofer').value = boton.dataset.apellido;
-    document.getElementById('titulo-chofer').textContent = 'Editar Chofer';
-    abrirSlideOver('slide-over-chofer');
+document.getElementById('buscar-vehiculo')?.addEventListener('input', filtrarVehiculos);
+
+// ---------- NAVEGACION AL PERFIL (click en la fila) ----------
+// La fila entera lleva al perfil del vehiculo, pero la ultima columna tiene los
+// botones de editar/eliminar: ahi el click hace lo suyo y no navega.
+
+function irAlPerfilVehiculo(fila) {
+    const destino = fila.dataset.href;
+    if (destino) window.location.href = destino;
 }
+
+document.getElementById('cuerpo-flota')?.addEventListener('click', (evento) => {
+    const fila = evento.target.closest('.fila-vehiculo');
+    if (!fila || evento.target.closest('.flota-acciones')) return;
+    irAlPerfilVehiculo(fila);
+});
+
+document.getElementById('cuerpo-flota')?.addEventListener('keydown', (evento) => {
+    if (evento.key !== 'Enter') return;
+    const fila = evento.target.closest('.fila-vehiculo');
+    if (!fila || evento.target !== fila) return;
+    irAlPerfilVehiculo(fila);
+});
 
 // ---------- VEHÍCULO ----------
 
@@ -44,33 +75,35 @@ function abrirEditarVehiculo(boton) {
     abrirSlideOver('slide-over-vehiculo');
 }
 
+// ---------- VENCIMIENTOS DE CARNET (modal de solo lectura) ----------
+
+function abrirModalCarnets() {
+    document.getElementById('modal-carnets').classList.add('abierto');
+    document.body.style.overflow = 'hidden';
+}
+
+function cerrarModalCarnets() {
+    document.getElementById('modal-carnets').classList.remove('abierto');
+    document.body.style.overflow = 'auto';
+}
+
+document.addEventListener('keydown', (evento) => {
+    if (evento.key !== 'Escape') return;
+    const modal = document.getElementById('modal-carnets');
+    if (modal?.classList.contains('abierto')) cerrarModalCarnets();
+});
+
 // ---------- ELIMINAR (modal de confirmación) ----------
 
-function abrirEliminarFlota(tipo, boton) {
+function abrirEliminarFlota(boton) {
     const id = boton.dataset.id;
     const nombre = boton.dataset.nombre;
 
-    const inputChofer = document.getElementById('id-eliminar-chofer');
-    const inputVehiculo = document.getElementById('id-eliminar-vehiculo');
+    document.getElementById('accion-eliminar-flota').value = 'eliminar_vehiculo';
+    document.getElementById('id-eliminar-vehiculo').value = id;
 
-    // Dejo habilitado solo el campo del tipo correspondiente (los disabled no se envian)
-    if (tipo === 'chofer') {
-        document.getElementById('accion-eliminar-flota').value = 'eliminar_chofer';
-        inputChofer.disabled = false;
-        inputChofer.value = id;
-        inputVehiculo.disabled = true;
-        inputVehiculo.value = '';
-    } else {
-        document.getElementById('accion-eliminar-flota').value = 'eliminar_vehiculo';
-        inputVehiculo.disabled = false;
-        inputVehiculo.value = id;
-        inputChofer.disabled = true;
-        inputChofer.value = '';
-    }
-
-    const etiqueta = tipo === 'chofer' ? 'al chofer' : 'el vehículo';
     document.getElementById('texto-eliminar-flota').innerHTML =
-        `¿Seguro que quiere eliminar ${etiqueta} <b>${nombre}</b>? Dejará de estar disponible para nuevos viajes.`;
+        `¿Seguro que quiere eliminar el vehículo <b>${nombre}</b>? Dejará de estar disponible para nuevos viajes.`;
 
     document.getElementById('modal-eliminar-flota').classList.add('abierto');
     document.body.style.overflow = 'hidden';

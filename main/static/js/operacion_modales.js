@@ -135,20 +135,12 @@ async function ejecutarCancelacionOperacion(id) {
             window.location.reload();
         } else {
             const data = await response.json().catch(() => ({}));
-            if (typeof notificarError === 'function') {
-                notificarError(data.error || "Hubo un error al cancelar la operación.");
-            } else {
-                alert(data.error || "Hubo un error al cancelar la operación.");
-            }
+            notificarErrorModal(data.error || "Hubo un error al cancelar la operación.");
             cerrarModalCancelarOperacion();
         }
     } catch (error) {
         console.error("Error:", error);
-        if (typeof notificarError === 'function') {
-            notificarError("Ocurrió un error inesperado al cancelar la operación.");
-        } else {
-            alert("Ocurrió un error inesperado al cancelar la operación.");
-        }
+        notificarErrorModal("Ocurrió un error inesperado al cancelar la operación.");
         cerrarModalCancelarOperacion();
     }
 }
@@ -188,7 +180,8 @@ function abrirModalPago(idOperacion, montoTotalStr, totalPagadoStr) {
 function completarPagoTotal() {
     const inputMonto = document.getElementById('input-monto-pago');
     if (inputMonto && inputMonto.max) {
-        inputMonto.value = inputMonto.max;
+        // El max esta guardado sin formato, lo escribo con separador de miles
+        ponerValorMiles(inputMonto, inputMonto.max);
         inputMonto.focus();
     }
 }
@@ -201,7 +194,9 @@ function cerrarModalPago() {
 
 function procesarPago() {
     const idOperacion = document.getElementById('id_operacion_pago').value;
-    const monto = document.getElementById('input-monto-pago').value;
+    // El pago no sale por submit sino en un JSON armado a mano, asi que el
+    // valor hay que pelarlo aca: "1.500,50" -> "1500.50"
+    const monto = leerMiles(document.getElementById('input-monto-pago'));
     const maxPermitido = document.getElementById('input-monto-pago').max;
 
     if (!monto || isNaN(monto) || parseFloat(monto) <= 0) {
@@ -241,8 +236,7 @@ function procesarPago() {
             window.location.reload();
         } else {
             const err = data.error || "Hubo un error al registrar el pago.";
-            if (typeof notificarError === 'function') notificarError(err);
-            else alert(err);
+            notificarErrorModal(err);
             btn.disabled = false;
             btn.innerHTML = spanOriginal;
         }
@@ -250,8 +244,7 @@ function procesarPago() {
     .catch(err => {
         console.error("Error al procesar pago:", err);
         const msg = "Error de conexión. Intente nuevamente.";
-        if (typeof notificarError === 'function') notificarError(msg);
-        else alert(msg);
+        notificarErrorModal(msg);
         btn.disabled = false;
         btn.innerHTML = spanOriginal;
     });

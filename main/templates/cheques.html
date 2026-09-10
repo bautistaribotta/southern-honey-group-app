@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% comment %}
+  Listado de empresas / sociedades de las que se manejan los cheques. Cada una es
+  una tarjeta (mismo lenguaje que IVA y la flota): identidad + el saldo neto como
+  numero protagonista y, debajo, sus dos componentes: total a cobrar y total a
+  pagar. Toda la tarjeta lleva a la ficha de cheques de la empresa. El alta y la
+  edicion usan el slide-over. La baja de empresa se hace desde IVA (misma entidad),
+  asi que aca no se ofrece.
+
+  Reutiliza iva.css: el band de totales, la tarjeta, el slide-over y los inputs son
+  los mismos componentes; cheques.css solo agrega los detalles propios.
+{% endcomment %}
+
+{% block nombre-pestaña %}
+  <title> Cheques </title>
+{% endblock %}
+
+{% block links %}
+  <link rel="stylesheet" href="{% static 'iva.css' %}">
+  <link rel="stylesheet" href="{% static 'selector_entidad.css' %}">
+  <link rel="stylesheet" href="{% static 'cheques.css' %}">
+{% endblock %}
+
+{% block cabecera %}
+  <div class="cabecera-seccion">
+    <span class="cabecera-seccion__tile">
+      <span class="material-symbols-outlined">account_balance</span>
+    </span>
+    <div class="cabecera-seccion__texto">
+      <h2>Cheques</h2>
+      <p>Cheques a pagar de cada empresa y sociedad</p>
+    </div>
+  </div>
+{% endblock %}
+
+{% block area-trabajo %}
+<section id="area-trabajo">
+
+  {% comment %}
+    Band de totales de cheques: el total a pagar de TODAS las empresas y sociedades
+    juntas EN EL PERIODO. A la izquierda, el periodo navegable con flechas y el
+    toggle Mes / Año (arranca en el mes en curso porque los cheques son flujo
+    mensual; ?mes=YYYY-MM o ?anio=YYYY). Cada cheque cae en el periodo por su fecha
+    de cobro. Los cheques son siempre a pagar, asi que hay una sola cifra
+    protagonista, sin saldo neto ni semaforo.
+  {% endcomment %}
+  <section class="iva-totales cheque-totales saldo--a_pagar">
+    <div class="iva-totales__periodo">
+      <p class="iva-totales__eyebrow">Cheques a pagar de todas las empresas</p>
+
+      <div class="iva-nav">
+        <a class="iva-nav__paso" href="{{ cheque_url_anterior }}"
+           aria-label="{% if cheque_modo == 'mes' %}Mes anterior{% else %}Año anterior{% endif %}">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </a>
+        <p class="iva-totales__fecha">
+          {% if cheque_modo == 'mes' %}
+            <span class="iva-totales__nombre">{{ cheque_periodo|date:"F" }}</span>
+            <span class="iva-totales__anio">{{ cheque_periodo|date:"Y" }}</span>
+          {% else %}
+            <span class="iva-totales__nombre">{{ cheque_anio }}</span>
+          {% endif %}
+        </p>
+        <a class="iva-nav__paso" href="{{ cheque_url_siguiente }}"
+           aria-label="{% if cheque_modo == 'mes' %}Mes siguiente{% else %}Año siguiente{% endif %}">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </a>
+      </div>
+
+      <!-- Granularidad: totalizar por mes o por año -->
+      <div class="iva-granularidad" role="group" aria-label="Ver el total por mes o por año">
+        <a class="iva-granularidad__opcion {% if cheque_modo == 'mes' %}is-active{% endif %}"
+           href="{{ cheque_url_mes }}"{% if cheque_modo == 'mes' %} aria-current="true"{% endif %}>Mes</a>
+        <a class="iva-granularidad__opcion {% if cheque_modo == 'anio' %}is-active{% endif %}"
+           href="{{ cheque_url_anio }}"{% if cheque_modo == 'anio' %} aria-current="true"{% endif %}>Año</a>
+      </div>
+    </div>
+
+    <div class="iva-totales__cifras">
+      <p class="iva-cifra iva-cifra--saldo">
+        <span class="iva-cifra__valor">${{ totales.a_pagar|floatformat:"0g" }}</span>
+        <span class="iva-cifra__rotulo">total a pagar</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- Controles superiores: pildora de empresa + alta -->
+  <div class="barra-herramientas">
+    {% comment %}
+      Pildora selectora de empresa (reemplaza al buscador de texto). Abre el modal
+      para elegir de la lista; el estado aplicado (id + nombre) vive en data-* y lo
+      lee cheques.js para recargar preservando el periodo. La "×" limpia el filtro.
+    {% endcomment %}
+    <div class="che-empresa" id="che-empresa"
+         data-filtro-id="{{ empresa_filtro }}" data-filtro-nombre="{{ empresa_filtro_nombre }}">
+      <button type="button"
+              class="che-chip che-empresa__trigger {% if empresa_filtro %}is-active{% endif %}"
+              id="che-empresa-trigger" aria-haspopup="dialog" aria-expanded="false">
+        <span class="material-symbols-outlined">domain</span>
+        <span class="che-empresa__label" id="che-empresa-label">{{ empresa_filtro_nombre|default:"Empresa" }}</span>
+        {% if empresa_filtro %}
+          <span class="material-symbols-outlined che-empresa__clear" id="che-empresa-clear"
+                role="button" tabindex="0" aria-label="Quitar filtro de empresa">close</span>
+        {% endif %}
+      </button>
+    </div>
+
+    <div class="acciones-herramientas">
+      <button type="button" class="boton-nuevo" onclick="abrirNuevaEmpresa()">
+        <span class="material-symbols-outlined">add</span>
+        <span class="texto-boton">Nueva empresa</span>
+      </button>
+      {% comment %}
+        Bancos es la sub-seccion de Cheques: su catalogo alimenta las cuentas
+        corrientes. Se entra desde aca (boton secundario), no desde la barra lateral.
+      {% endcomment %}
+      <a href="{% url 'bancos' %}" class="boton-nuevo secundario">
+        <span class="material-symbols-outlined">account_balance</span>
+        <span class="texto-boton">Bancos</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Grilla de empresas: una tarjeta por empresa, clickeable a la ficha -->
+  <div class="grilla-iva" id="grilla-iva">
+    {% for empresa in empresas %}
+    <article class="tarjeta-empresa" data-nombre="{{ empresa.nombre|lower }}"
+             data-href="{% url 'informacion_empresa_cheques' empresa.id %}"
+             role="link" tabindex="0"
+             aria-label="Ver los cheques de {{ empresa.nombre }}">
+
+      <!-- Identidad: icono + nombre; accion al margen -->
+      <header class="tarjeta-empresa__cabecera">
+        <span class="tarjeta-empresa__icono">
+          <span class="material-symbols-outlined">domain</span>
+        </span>
+        <div class="tarjeta-empresa__identidad">
+          <h3 class="tarjeta-empresa__nombre">{{ empresa.nombre }}</h3>
+          <span class="tarjeta-empresa__rotulo">Empresa / Sociedad</span>
+        </div>
+        <div class="tarjeta-empresa__acciones">
+          <button type="button" class="boton-accion-iva editar"
+                  title="Editar empresa"
+                  data-id="{{ empresa.id }}"
+                  data-nombre="{{ empresa.nombre }}"
+                  onclick="abrirEditarEmpresa(this)">
+            <span class="material-symbols-outlined">edit</span>
+          </button>
+          <button type="button" class="boton-accion-iva eliminar"
+                  title="Eliminar empresa"
+                  data-id="{{ empresa.id }}"
+                  data-nombre="{{ empresa.nombre }}"
+                  onclick="abrirEliminarEmpresa(this)">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Total a pagar: el unico numero, en tono de marca (los cheques son a pagar) -->
+      <div class="tarjeta-empresa__saldo saldo--a_pagar">
+        <span class="tarjeta-empresa__saldo-rotulo">Cheques a pagar</span>
+        <div class="tarjeta-empresa__saldo-linea">
+          <span class="tarjeta-empresa__saldo-valor">${{ empresa.cheques_a_pagar|floatformat:"0g" }}</span>
+        </div>
+      </div>
+    </article>
+    {% empty %}
+    <div class="iva-vacia">
+      <span class="material-symbols-outlined">domain</span>
+      No hay empresas registradas.
+    </div>
+    {% endfor %}
+  </div>
+
+  {% comment %}
+    Modal selector de empresa (chip -> modal). Lista todas las empresas activas;
+    cheques.js escucha 'selector-entidad:elegir' y recarga con ?empresa=ID.
+  {% endcomment %}
+  {% include "selector_entidad.html" with selector_id="selector-empresa-cheque" icono="domain" titulo="Elegir empresa" descripcion="Filtrá los cheques por la empresa o sociedad que elijas de la lista." placeholder="Buscar por nombre" items=empresas_selector sin_items="No hay empresas registradas." %}
+
+</section>
+
+<!-- PANEL LATERAL NUEVA/EDITAR EMPRESA (SLIDE-OVER) -->
+<div id="contenedor-slide-over">
+  <div id="slide-over-fondo" onclick="cerrarSlideOver()"></div>
+
+  <div id="slide-over-panel">
+    <header class="panel-cabecera">
+      <div class="panel-titulo-fila">
+        <div class="icono-contenedor">
+          <span class="material-symbols-outlined">domain</span>
+        </div>
+        <div class="texto-cabecera">
+          <h3 id="titulo-empresa">Nueva empresa / sociedad</h3>
+          <p id="subtitulo-empresa">Registra una empresa o sociedad</p>
+        </div>
+      </div>
+      <button type="button" class="boton-cerrar-panel" onclick="cerrarSlideOver()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </header>
+
+    <div class="panel-cuerpo">
+      <form class="formulario-empresa" id="form-empresa" method="POST" autocomplete="off">
+        {% csrf_token %}
+        <input type="hidden" name="accion" id="accion-empresa" value="nueva_empresa">
+        <input type="hidden" name="id_empresa" id="id-empresa-input">
+        <div class="campo-formulario">
+          <label for="nombre-empresa">Nombre de la empresa o sociedad</label>
+          <input type="text" id="nombre-empresa" name="nombre" class="input-estandar"
+                 placeholder="Ej: MRM Acopio S.A." maxlength="60" required minlength="2">
+          <span class="mensaje-error">Escribí un nombre de al menos 2 caracteres.</span>
+        </div>
+      </form>
+    </div>
+
+    <div class="panel-pie">
+      <button type="submit" form="form-empresa" class="boton-primario" id="boton-guardar-empresa">Guardar empresa</button>
+      <button type="button" class="boton-secundario" onclick="cerrarSlideOver()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR ELIMINACIÓN DE EMPRESA -->
+<form id="formulario-eliminar" method="POST">
+  {% csrf_token %}
+  <input type="hidden" name="accion" value="eliminar_empresa">
+  <div id="contenedor-panel-eliminar">
+    <div id="contenedor-panel-fondo" onclick="cerrarPanelEliminar()"></div>
+
+    <div id="panel-eliminar">
+      <input type="hidden" id="id_eliminar" name="id_empresa" value="">
+
+      <button type="button" class="boton-cerrar-panel" id="icono-cerrar-panel-eliminar" onclick="cerrarPanelEliminar()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+
+      <div id="icono-advertencia">
+        <span class="material-symbols-outlined">warning</span>
+      </div>
+
+      <h3>Confirmar eliminación</h3>
+      <p id="texto-confirmacion-eliminar">¿Está seguro que quiere eliminar esta empresa?</p>
+
+      <div class="acciones-modal">
+        <button type="button" class="boton-secundario" onclick="cerrarPanelEliminar()">No, mantener</button>
+        <button type="button" class="boton-primario-eliminar" id="boton-confirmar-eliminar"><span>Sí, eliminar</span></button>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% block codigo-javascript %}
+  <script src="{% static 'js/selector_entidad.js' %}"></script>
+  <script src="{% static 'js/cheques.js' %}"></script>
+{% endblock %}

@@ -1,19 +1,28 @@
 {% extends "base.html" %}
 {% load static %}
+{% load static_version %}
 
 {% block nombre-pestaña %}
 <title>Viajes</title>
 {% endblock %}
 
 {% block links %}
-<link rel="stylesheet" href="{% static 'viajes.css' %}">
-<link rel="stylesheet" href="{% static 'autocompletado_ciudades.css' %}">
+<link rel="stylesheet" href="{% static_v 'viajes.css' %}">
+<link rel="stylesheet" href="{% static_v 'filtro_fechas.css' %}">
+<link rel="stylesheet" href="{% static_v 'filtro_entidad.css' %}">
+<link rel="stylesheet" href="{% static_v 'selector_entidad.css' %}">
+<link rel="stylesheet" href="{% static_v 'autocompletado_ciudades.css' %}">
 {% endblock %}
 
 {% block cabecera %}
-<div id="titulos-cabecera">
-  <h2>Viajes</h2>
-  <p>Seguí el estado de los viajes, sus choferes y la flota disponible</p>
+<div class="cabecera-seccion">
+  <span class="cabecera-seccion__tile">
+    <span class="material-symbols-outlined">hive</span>
+  </span>
+  <div class="cabecera-seccion__texto">
+    <h2>Viajes</h2>
+    <p>Seguí el estado de los viajes, sus empleados y la flota disponible</p>
+  </div>
 </div>
 {% endblock %}
 
@@ -24,36 +33,29 @@
     <!-- Controles Superiores: Buscador y Botones -->
     <div class="barra-herramientas">
       <div class="grupo-busqueda">
-        <div class="contenedor-input-busqueda">
-          <span class="material-symbols-outlined icono-busqueda">search</span>
-          <input type="text" id="buscar-viaje" class="input-busqueda" placeholder="Buscar por chofer, vehículo o destino" value="{{ q|default:'' }}">
+        {% comment %}
+          Filtros por entidad: en vez de un buscador de texto, un chip por dimension
+          (empleado, vehiculo, destino) que abre su modal para elegir de la lista.
+          Se combinan entre si y con el filtro de fecha.
+        {% endcomment %}
+        <div class="filtros-entidad">
+          {% include "chip_filtro_entidad.html" with chip_id="chip-empleado" param="empleado" modal_id="selector-empleado-viaje" icono="person" etiqueta="Empleado" valor_id=empleado valor_nombre=empleado_nombre %}
+          {% include "chip_filtro_entidad.html" with chip_id="chip-vehiculo" param="vehiculo" modal_id="selector-vehiculo-viaje" icono="local_shipping" etiqueta="Vehículo" valor_id=vehiculo valor_nombre=vehiculo_nombre %}
+          {% include "chip_filtro_entidad.html" with chip_id="chip-destino" param="destino" modal_id="selector-destino-viaje" icono="location_on" etiqueta="Destino" valor_id=destino valor_nombre=destino_nombre %}
         </div>
+        {% include 'filtro_fechas.html' with modos="dia,mes,rango" %}
+        {% comment %} El estado aplicado vive en este hidden que lee viajes.js para la busqueda AJAX. {% endcomment %}
+        <input type="hidden" id="filtro-estado" value="{{ estado|default:'' }}">
+        {% include 'filtro_estado_viaje.html' %}
       </div>
 
+      <!-- Flota se llega desde la barra lateral, como sub-item de esta seccion -->
       <div class="grupo-botones">
-        <a class="boton-nuevo secundario" id="btn-gestionar-flota" href="{% url 'flota' %}?origen=viajes">
-          <span class="material-symbols-outlined">groups</span>
-          <span class="texto-boton">Choferes y Vehículos</span>
-        </a>
         <button class="boton-nuevo" id="btn-nuevo-viaje" onclick="abrirSlideOver('slide-over-viaje')">
           <span class="material-symbols-outlined">add</span>
           <span class="texto-boton">Nuevo Viaje</span>
         </button>
       </div>
-    </div>
-
-    <!-- Filtros de estado como pildoras -->
-    <input type="hidden" id="filtro-estado" value="{{ estado|default:'' }}">
-    <div class="prod-chips" id="chips-estado">
-      <button type="button" class="prod-chip {% if not estado %}is-active{% endif %}" data-estado="">
-        Todos <span class="vje-chipcount">{{ count_total }}</span>
-      </button>
-      <button type="button" class="prod-chip {% if estado == 'En curso' %}is-active{% endif %}" data-estado="En curso">
-        <span class="prod-chip__dot prod-chip__dot--encurso"></span>En curso <span class="vje-chipcount">{{ count_en_curso }}</span>
-      </button>
-      <button type="button" class="prod-chip {% if estado == 'Finalizado' %}is-active{% endif %}" data-estado="Finalizado">
-        <span class="prod-chip__dot prod-chip__dot--finalizado"></span>Finalizado <span class="vje-chipcount">{{ count_finalizado }}</span>
-      </button>
     </div>
 
     <!-- Tabla de Viajes -->
@@ -62,6 +64,11 @@
     </div>
 
   </section>
+
+  {% comment %} Modales de los chips de filtro (empleado, vehiculo, destino). {% endcomment %}
+  {% include "selector_entidad.html" with selector_id="selector-empleado-viaje" icono="person" titulo="Elegir empleado" descripcion="Filtrá los viajes por el empleado que elijas de la lista." placeholder="Buscar por nombre" items=empleados_filtro sin_items="No hay empleados activos." %}
+  {% include "selector_entidad.html" with selector_id="selector-vehiculo-viaje" icono="local_shipping" titulo="Elegir vehículo" descripcion="Filtrá los viajes por el vehículo que elijas de la lista." placeholder="Buscar por nombre o patente" items=vehiculos_filtro sin_items="No hay vehículos activos." %}
+  {% include "selector_entidad.html" with selector_id="selector-destino-viaje" icono="location_on" titulo="Elegir destino" descripcion="Filtrá los viajes por el destino que elijas de la lista." placeholder="Buscar por destino" items=destinos_filtro sin_items="Todavía no hay destinos en los viajes." %}
 
   <!-- PANEL LATERAL NUEVO VIAJE (SLIDE-OVER) -->
   <div id="slide-over-viaje">
@@ -97,14 +104,14 @@
             </div>
 
             <div class="grupo-input">
-              <label for="chofer-viaje">Chofer</label>
-              <select id="chofer-viaje" name="id_chofer" class="select-estandar" required>
-                <option value="" disabled selected>Seleccione un chofer</option>
-                {% for chofer in choferes %}
-                <option value="{{ chofer.id }}">{{ chofer.nombre }} {{ chofer.apellido }}</option>
+              <label for="empleado-viaje">Empleado</label>
+              <select id="empleado-viaje" name="id_empleado" class="select-estandar" required>
+                <option value="" disabled selected>Seleccione un empleado</option>
+                {% for empleado in empleados %}
+                <option value="{{ empleado.id }}">{{ empleado.nombre }} {{ empleado.apellido }}</option>
                 {% endfor %}
               </select>
-              <span class="mensaje-error">Por favor, seleccione un chofer de la lista.</span>
+              <span class="mensaje-error">Por favor, seleccione un empleado de la lista.</span>
             </div>
 
             <div class="grupo-input">
@@ -163,15 +170,20 @@
               <label for="inicio-caja">Inicio de Caja</label>
               <div class="input-con-icono">
                 <span>$</span>
+                {% comment %}
+                  Este acepta 0, por eso el pattern no es el mismo que el de los
+                  montos que tienen que ser mayores a cero.
+                {% endcomment %}
                 <input
-                  type="number"
+                  type="text"
                   id="inicio-caja"
                   name="inicio_caja"
+                  class="input-miles"
+                  inputmode="numeric"
+                  autocomplete="off"
                   placeholder="0"
-                  step="1"
-                  min="0"
-                  required
-                  pattern="[0-9+]">
+                  pattern="0|[1-9][0-9]{0,2}(\.[0-9]{3})*"
+                  required>
               </div>
               <span class="mensaje-error">Por favor, ingrese un monto válido.</span>
             </div>
@@ -209,8 +221,12 @@
   </div>
 {% endblock %}
 {% block codigo-javascript %}
-<script src="{% static 'js/autocompletado_ciudades.js' %}"></script>
-<script src="{% static 'js/viajes.js' %}"></script>
+<script src="{% static_v 'js/autocompletado_ciudades.js' %}"></script>
+<script src="{% static_v 'js/filtro_fechas.js' %}"></script>
+<script src="{% static_v 'js/selector_entidad.js' %}"></script>
+<script src="{% static_v 'js/filtros_entidad.js' %}"></script>
+<script src="{% static_v 'js/filtro_estado_viaje.js' %}"></script>
+<script src="{% static_v 'js/viajes.js' %}"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     // Autocompletar la fecha de inicio con la fecha actual al cargar la página

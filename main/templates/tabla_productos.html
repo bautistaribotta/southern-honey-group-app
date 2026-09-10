@@ -1,3 +1,4 @@
+{% load l10n %}
 <table class="tabla-productos">
   <thead>
     <tr id="encabezado-tabla-productos">
@@ -9,6 +10,71 @@
     </tr>
   </thead>
   <tbody>
+    {% if granel %}
+      {% for articulo in granel %}
+        {% with categoria_slug=articulo.categoria|slugify %}
+        <tr class="fila-granel fila-granel--{{ categoria_slug }}" data-articulo="{{ articulo.articulo }}">
+          <td>
+            <div class="producto-info"> {{ articulo.articulo }} </div>
+            <div class="producto-id granel-sub"> Venta por kilo </div>
+          </td>
+          <td class="texto-centrado categoria-valor">
+            <span class="etiqueta etiqueta-{{ categoria_slug }}">
+              {{ articulo.categoria }}
+            </span>
+          </td>
+          <td class="stock-valor texto-centrado">
+            {% if articulo.cantidad <= 0 %}
+              <span class="badge-estado badge-estado--danger">
+                <span class="material-symbols-outlined">warning</span> Sin stock
+              </span>
+            {% else %}
+              <span class="prod-stock">
+                <strong>{{ articulo.cantidad|floatformat:"-2g" }}</strong> kg
+              </span>
+            {% endif %}
+          </td>
+          <td class="precio-valor"> $ {{ articulo.monto|floatformat:"-2g" }}<span class="granel-unidad">/kg</span> </td>
+          <td>
+            <div class="acciones-tabla">
+              {% if articulo.es_cotizacion %}
+                {% if user.is_staff %}
+                  <button class="boton-icono editar-precio-granel" title="Editar precio"
+                          data-articulo="{{ articulo.articulo }}"
+                          data-categoria="{{ articulo.categoria }}"
+                          data-precio="{{ articulo.monto|unlocalize }}">
+                    <span class="material-symbols-outlined">edit</span>
+                  </button>
+                {% else %}
+                  <span class="granel-solo-lectura" title="Stock gestionado desde cotizaciones">
+                    <span class="material-symbols-outlined">lock</span>
+                  </span>
+                {% endif %}
+              {% else %}
+                <button class="boton-icono agregar-stock" title="Agregar Stock"
+                        data-id="{{ articulo.id }}"
+                        data-unidad="kg"
+                        data-nombre="{{ articulo.articulo }}"
+                        data-stock="{{ articulo.cantidad|unlocalize }}">
+                  <span class="material-symbols-outlined">add</span>
+                </button>
+                <button class="boton-icono editar" title="Editar" data-id="{{ articulo.id }}" data-unidad="kg">
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+                <button class="boton-icono eliminar"
+                        title="Eliminar"
+                        data-id="{{ articulo.id }}"
+                        data-unidad="kg"
+                        data-nombre="{{ articulo.articulo }}">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endwith %}
+      {% endfor %}
+    {% endif %}
     {% for producto in productos %}
       <tr class="fila-producto" data-id="{{ producto.id }}">
         <td>
@@ -16,7 +82,7 @@
           <div class="producto-id"> ID: {{ producto.id }} </div>
         </td>
         <td class="texto-centrado categoria-valor">
-          <span class="etiqueta etiqueta-{{ producto.categoria|lower }}">
+          <span class="etiqueta etiqueta-{{ producto.categoria|slugify }}">
             {{ producto.categoria }}
           </span>
         </td>
@@ -34,46 +100,51 @@
         <td class="precio-valor"> $ {{ producto.precio|floatformat:"-2g" }} </td>
         <td>
           <div class="acciones-tabla">
-            <button class="boton-icono agregar-stock" title="Agregar Stock" data-id="{{ producto.id }}" data-nombre="{{ producto.nombre }}" data-stock="{{ producto.cantidad|floatformat:0 }}">
+            <button class="boton-icono agregar-stock" title="Agregar Stock" data-id="{{ producto.id }}" data-unidad="unidad" data-nombre="{{ producto.nombre }}" data-stock="{{ producto.cantidad|floatformat:0 }}">
               <span class="material-symbols-outlined">add</span>
             </button>
-            <button class="boton-icono editar" title="Editar" data-id="{{ producto.id }}">
+            <button class="boton-icono editar" title="Editar" data-id="{{ producto.id }}" data-unidad="unidad">
               <span class="material-symbols-outlined">edit</span>
             </button>
             <button class="boton-icono eliminar" 
                     title="Eliminar" 
-                    data-id="{{ producto.id }}" 
+                    data-id="{{ producto.id }}"
+                    data-unidad="unidad"
                     data-nombre="{{ producto.nombre }}">
               <span class="material-symbols-outlined">delete</span>
             </button>
           </div>
         </td>
       </tr>
-    {% empty %}
-      <tr>
-        <td colspan="5" style="text-align: center;"> No hay productos registrados. </td>
-      </tr>
     {% endfor %}
+    {% if not granel and not productos %}
+      <tr class="fila-vacia">
+        <td colspan="5" class="celda-vacia">
+          <span class="material-symbols-outlined">inventory_2</span>
+          {% if q or categoria %}No se encontraron productos con esos filtros.{% else %}No hay productos registrados.{% endif %}
+        </td>
+      </tr>
+    {% endif %}
   </tbody>
 </table>
 
 <!-- Paginación -->
 <div class="paginacion">
   <div class="paginacion-info">
-    Mostrando <span>{{ productos.start_index }}-{{ productos.end_index }}</span>
-    de <span>{{ productos.paginator.count }}</span> productos
+    Mostrando <span>{{ pagina.start_index }}-{{ pagina.end_index }}</span>
+    de <span>{{ pagina.paginator.count }}</span> productos
   </div>
   <div class="paginacion-botones">
-    {% if productos.has_previous %}
-      <a href="?page={{ productos.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if categoria %}&categoria={{ categoria }}{% endif %}">
+    {% if pagina.has_previous %}
+      <a href="?page={{ pagina.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if categoria %}&categoria={{ categoria }}{% endif %}">
         <button class="boton-paginacion">Anterior</button>
       </a>
     {% else %}
       <button class="boton-paginacion" disabled>Anterior</button>
     {% endif %}
 
-    {% if productos.has_next %}
-      <a href="?page={{ productos.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if categoria %}&categoria={{ categoria }}{% endif %}">
+    {% if pagina.has_next %}
+      <a href="?page={{ pagina.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if categoria %}&categoria={{ categoria }}{% endif %}">
         <button class="boton-paginacion">Siguiente</button>
       </a>
     {% else %}

@@ -1,0 +1,617 @@
+{% extends "base.html" %}
+{% load static %}
+{% load static_version %}
+{% load l10n %}
+
+{% comment %}
+  Ficha de cheques de una empresa / sociedad: su total a pagar, sus cuentas
+  corrientes con el total desglosado por cada una, y el historial de cheques. Un
+  cheque cuelga de una cuenta corriente (banco + numero) y es siempre a pagar (la
+  empresa no recibe cheques). Reutiliza iva.css e informacion_empresa.css
+  (slide-over, modal, tabla); cheques.css agrega lo propio.
+{% endcomment %}
+
+{% block nombre-pestaña %}
+  <title> {{ empresa.nombre }} · Cheques </title>
+{% endblock %}
+
+{% block links %}
+  <link rel="stylesheet" href="{% static_v 'iva.css' %}">
+  <link rel="stylesheet" href="{% static_v 'informacion_empresa.css' %}">
+  <link rel="stylesheet" href="{% static_v 'pago_viaje.css' %}">
+  <link rel="stylesheet" href="{% static_v 'filtro_fechas.css' %}">
+  <link rel="stylesheet" href="{% static_v 'cheques.css' %}">
+{% endblock %}
+
+{% block cabecera %}
+  <a href="{% url 'cheques' %}" class="boton-volver">
+    <span class="material-symbols-outlined">arrow_back</span>
+    Volver a Cheques
+  </a>
+{% endblock %}
+
+{% block area-trabajo %}
+<section id="area-trabajo">
+
+  <!-- Identidad de la empresa + accion principal -->
+  <div class="cabecera-empresa">
+    <div class="identidad-empresa">
+      <span class="identidad-empresa__tile material-symbols-outlined">domain</span>
+      <div class="identidad-empresa__datos">
+        <h2 class="identidad-empresa__nombre">{{ empresa.nombre }}</h2>
+        <span class="identidad-empresa__meta">
+          <span class="material-symbols-outlined">account_balance</span>
+          {% if total_cheques == 1 %}1 cheque{% else %}{{ total_cheques }} cheques{% endif %}
+        </span>
+      </div>
+    </div>
+
+    <div class="acciones-empresa">
+      <button type="button" class="boton-accion boton-editar"
+              data-nombre="{{ empresa.nombre }}" onclick="prepararEditarEmpresa()">
+        <span class="material-symbols-outlined">edit</span>
+        Editar empresa
+      </button>
+      <button type="button" class="boton-accion boton-cancelar" onclick="prepararEliminarEmpresa()">
+        <span class="material-symbols-outlined">delete</span>
+        Eliminar empresa
+      </button>
+    </div>
+  </div>
+
+  <!-- Resumen: el total a pagar en cheques de la empresa, cifra unica de marca -->
+  <section class="resumen-cheques">
+    <span class="resumen-cheques__rotulo">
+      <span class="material-symbols-outlined">payments</span>
+      Total a pagar en cheques
+    </span>
+    <span class="resumen-cheques__valor">${{ empresa.cheques_a_pagar|floatformat:"2g" }}</span>
+    <span class="resumen-cheques__ayuda">Suma de todos los cheques cargados en sus cuentas corrientes</span>
+  </section>
+
+  <!-- Cuentas corrientes de la empresa, cada una con su saldo de cheques -->
+  <section class="bloque-cuentas">
+    <header class="bloque-operaciones__cabecera">
+      <div class="bloque-operaciones__titulo">
+        <span class="material-symbols-outlined">account_balance</span>
+        <h3>Cuentas corrientes</h3>
+      </div>
+      <button type="button" class="boton-nuevo" onclick="prepararNuevaCuenta()">
+        <span class="material-symbols-outlined">add</span>
+        Nueva cuenta corriente
+      </button>
+    </header>
+
+    <div class="contenedor-tabla">
+      <table class="tabla-operaciones-iva tabla-cuentas">
+        <thead>
+          <tr>
+            <th>Banco</th>
+            <th>Número de cuenta</th>
+            <th class="texto-derecha">A pagar</th>
+            <th class="texto-derecha">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cuenta in cuentas %}
+          <tr class="op-fila" data-cuenta="{{ cuenta.id }}">
+            <td class="cuenta-banco">{{ cuenta.banco.nombre }}</td>
+            <td class="cuenta-numero">N.º {{ cuenta.numero }}</td>
+            <td class="texto-derecha op-iva cuenta-a-pagar">${{ cuenta.cheques_a_pagar|floatformat:"2g" }}</td>
+            <td class="texto-derecha">
+              <div class="acciones-tabla">
+                <button type="button" class="boton-icono editar" title="Editar cuenta corriente"
+                        data-id="{{ cuenta.id }}" data-banco="{{ cuenta.banco_id }}"
+                        data-numero="{{ cuenta.numero }}" onclick="prepararEditarCuenta(this)">
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+                <button type="button" class="boton-icono eliminar" title="Eliminar cuenta corriente"
+                        data-id="{{ cuenta.id }}"
+                        data-descripcion="la cuenta {{ cuenta.numero }} de {{ cuenta.banco.nombre }}"
+                        onclick="prepararEliminarCuenta(this)">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4">
+              <div class="estado-vacio">
+                <span class="material-symbols-outlined">account_balance</span>
+                <h4>Sin cuentas corrientes</h4>
+                <p>Creá una para empezar a cargar cheques.</p>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Historial de cheques -->
+  <section class="bloque-operaciones">
+    <header class="bloque-operaciones__cabecera">
+      <div class="bloque-operaciones__titulo">
+        <span class="material-symbols-outlined">receipt_long</span>
+        <h3>Cheques a pagar</h3>
+      </div>
+      {% comment %}
+        El alta baja al encabezado de la tabla que alimenta: la accion queda al lado
+        del listado sobre el que opera, alineada con la barra de filtros de abajo.
+      {% endcomment %}
+      <button type="button" class="boton-nuevo" onclick="prepararNuevoCheque()">
+        <span class="material-symbols-outlined">add</span>
+        Nuevo cheque
+      </button>
+    </header>
+
+    {% comment %}
+      Barra de filtros, alineada a la izquierda bajo la leyenda:
+        - Estado de cobro (pildora + menu): por defecto muestra los pendientes, y
+          permite ver los cobrados o todos. Lo administra informacion_empresa_cheques.js.
+        - Fecha de cobro (chip + popover, reutilizado de deudas): al aplicar o limpiar,
+          el mismo JS recarga preservando el estado en la URL. Cada cheque cae en el
+          rango por su fecha de cobro, igual que el listado.
+    {% endcomment %}
+    <div class="cheques-filtros">
+      <div class="che-estado" id="filtro-estado" data-estado="{{ estado_cheques }}">
+        <button type="button"
+                class="che-estado__trigger {% if estado_cheques != 'todos' %}is-active{% endif %}"
+                id="filtro-estado-trigger" aria-haspopup="menu" aria-expanded="false">
+          <span class="material-symbols-outlined">filter_alt</span>
+          <span class="che-estado__label">{{ estado_label }}</span>
+          <span class="material-symbols-outlined che-estado__caret">expand_more</span>
+        </button>
+
+        <div class="che-estado__pop" id="filtro-estado-pop" role="menu"
+             aria-label="Filtrar cheques por estado de cobro" hidden>
+          <button type="button" class="che-estado__opt {% if estado_cheques == 'pendientes' %}is-active{% endif %}"
+                  data-estado="pendientes" role="menuitemradio"
+                  aria-checked="{% if estado_cheques == 'pendientes' %}true{% else %}false{% endif %}">
+            <span class="material-symbols-outlined che-estado__opt-ico">schedule</span>
+            <span class="che-estado__opt-txt">Pendientes</span>
+            <span class="material-symbols-outlined che-estado__opt-check">check</span>
+          </button>
+          <button type="button" class="che-estado__opt {% if estado_cheques == 'cobrados' %}is-active{% endif %}"
+                  data-estado="cobrados" role="menuitemradio"
+                  aria-checked="{% if estado_cheques == 'cobrados' %}true{% else %}false{% endif %}">
+            <span class="material-symbols-outlined che-estado__opt-ico">task_alt</span>
+            <span class="che-estado__opt-txt">Cobrados</span>
+            <span class="material-symbols-outlined che-estado__opt-check">check</span>
+          </button>
+          <button type="button" class="che-estado__opt {% if estado_cheques == 'todos' %}is-active{% endif %}"
+                  data-estado="todos" role="menuitemradio"
+                  aria-checked="{% if estado_cheques == 'todos' %}true{% else %}false{% endif %}">
+            <span class="material-symbols-outlined che-estado__opt-ico">list</span>
+            <span class="che-estado__opt-txt">Todos</span>
+            <span class="material-symbols-outlined che-estado__opt-check">check</span>
+          </button>
+        </div>
+      </div>
+
+      {% include 'filtro_fechas.html' with modos="dia,mes,rango" %}
+    </div>
+
+    <div class="contenedor-tabla" id="cheques-tabla-cont">
+      <table class="tabla-operaciones-iva tabla-cheques">
+        <thead>
+          <tr>
+            <th class="pago-col">Cobrado</th>
+            <th>N.º cheque</th>
+            <th>Cuenta</th>
+            <th>Concepto</th>
+            <th>Cobro</th>
+            <th class="texto-derecha">Importe</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cheque in cheques %}
+          {% comment %}
+            La fila entera abre el detalle (toda la info del cheque + editar/eliminar).
+            La celda de la casilla corta el click para que marcar el cobro no lo abra.
+          {% endcomment %}
+          <tr class="op-fila cheque-fila{% if cheque.cobrado %} cheque-fila--cobrado{% elif cheque.vencido %} cheque-fila--vencido{% endif %}"
+              data-id="{{ cheque.id }}"
+              onclick="abrirDetalleCheque({{ cheque.id }})"
+              onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirDetalleCheque({{ cheque.id }})}"
+              role="button" tabindex="0"
+              aria-label="Ver el detalle del cheque {% if cheque.numero %}N.º {{ cheque.numero }}{% else %}sin número{% endif %} por ${{ cheque.importe|floatformat:'2g' }}">
+            <td class="pago-celda" onclick="event.stopPropagation()">
+              <input type="checkbox" class="pago-check"
+                     data-pago-url="{% url 'marcar_cobrado_cheque' cheque.id %}"
+                     data-pago-entidad="Cheque"
+                     aria-label="Marcar como cobrado el cheque {% if cheque.numero %}N.º {{ cheque.numero }}{% else %}sin número{% endif %}"
+                     {% if cheque.cobrado %}checked{% endif %}>
+            </td>
+            <td class="cheque-numero-cel">
+              {% if cheque.numero %}N.º {{ cheque.numero }}{% else %}<span class="cheque-sin-numero">Sin número</span>{% endif %}
+            </td>
+            <td class="cheque-cuenta">
+              <span class="cheque-cuenta__banco">{{ cheque.cuenta_corriente.banco.nombre }}</span>
+              <span class="cheque-cuenta__numero">N.º {{ cheque.cuenta_corriente.numero }}</span>
+            </td>
+            <td class="cheque-concepto" title="{{ cheque.concepto }}">{{ cheque.concepto }}</td>
+            <td class="cheque-cobro" data-vencido="{{ cheque.vencido|yesno:'1,0' }}" data-vence="{{ cheque.vencimiento|date:'d/m/Y' }}">
+              <span class="op-fecha">{{ cheque.fecha_cobro|date:"d/m/Y" }}</span>
+              {% if cheque.cobrado %}
+                <span class="cheque-badge cheque-badge--cobrado">Cobrado</span>
+              {% elif cheque.vencido %}
+                <span class="cheque-badge cheque-badge--vencido" title="Venció el {{ cheque.vencimiento|date:'d/m/Y' }}">Vencido</span>
+              {% else %}
+                <span class="cheque-vence">Vence {{ cheque.vencimiento|date:"d/m/Y" }}</span>
+              {% endif %}
+            </td>
+            <td class="texto-derecha op-iva cheque-importe-cel">${{ cheque.importe|floatformat:"2g" }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6">
+              <div class="estado-vacio">
+                <span class="material-symbols-outlined">receipt_long</span>
+                {% if desde or hasta %}
+                  <h4>Sin cheques en el rango</h4>
+                  <p>No hay cheques con fecha de cobro en el período elegido.</p>
+                {% elif estado_cheques == 'pendientes' %}
+                  <h4>Sin cheques pendientes</h4>
+                  <p>No hay cheques pendientes de cobro. Cambiá el filtro de estado para ver los cobrados.</p>
+                {% elif estado_cheques == 'cobrados' %}
+                  <h4>Sin cheques cobrados</h4>
+                  <p>Todavía no se cobró ningún cheque de esta empresa.</p>
+                {% else %}
+                  <h4>Sin cheques</h4>
+                  <p>Cargá un cheque a pagar para empezar.</p>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <!-- PAGINACION: de a 8 cheques -->
+      <div class="paginacion">
+        <div class="paginacion-info">
+          Mostrando <span>{{ page_obj.start_index|default:"0" }}-{{ page_obj.end_index|default:"0" }}</span>
+          de <span>{{ page_obj.paginator.count|default:"0" }}</span> {% if page_obj.paginator.count == 1 %}cheque{% else %}cheques{% endif %}
+        </div>
+        <div class="paginacion-botones">
+          {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if estado_cheques != 'pendientes' %}&estado={{ estado_cheques }}{% endif %}{% if desde %}&desde={{ desde }}{% endif %}{% if hasta %}&hasta={{ hasta }}{% endif %}">
+              <button class="boton-paginacion">Anterior</button>
+            </a>
+          {% else %}
+            <button class="boton-paginacion" disabled>Anterior</button>
+          {% endif %}
+
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if estado_cheques != 'pendientes' %}&estado={{ estado_cheques }}{% endif %}{% if desde %}&desde={{ desde }}{% endif %}{% if hasta %}&hasta={{ hasta }}{% endif %}">
+              <button class="boton-paginacion">Siguiente</button>
+            </a>
+          {% else %}
+            <button class="boton-paginacion" disabled>Siguiente</button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- PANEL LATERAL NUEVO/EDITAR CHEQUE (SLIDE-OVER) -->
+<div id="contenedor-slide-over">
+  <div id="slide-over-fondo" onclick="cerrarSlideOver()"></div>
+
+  <div id="slide-over-panel">
+    <header class="panel-cabecera">
+      <div class="panel-titulo-fila">
+        <div class="icono-contenedor">
+          <span class="material-symbols-outlined">receipt_long</span>
+        </div>
+        <div class="texto-cabecera">
+          <h3 id="titulo-cheque">Nuevo cheque</h3>
+          <p id="subtitulo-cheque">Registra un cheque a pagar</p>
+        </div>
+      </div>
+      <button type="button" class="boton-cerrar-panel" onclick="cerrarSlideOver()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </header>
+
+    <div class="panel-cuerpo">
+      <form class="formulario-empresa" id="form-cheque" method="POST" autocomplete="off">
+        {% csrf_token %}
+        <input type="hidden" name="accion" id="accion-cheque" value="nuevo_cheque">
+        <input type="hidden" name="id_registro" id="id-registro-cheque">
+
+        <!-- Banco: filtra las cuentas corrientes (client-side, sin recargar) -->
+        <div class="campo-formulario">
+          <label for="cheque-banco">Banco</label>
+          <select id="cheque-banco" class="input-estandar"></select>
+        </div>
+
+        <div class="campo-formulario">
+          <label for="cheque-cuenta">Cuenta corriente</label>
+          <select id="cheque-cuenta" name="id_cuenta_corriente" class="input-estandar" required>
+            {% for cuenta in cuentas %}
+              <option value="{{ cuenta.id }}"
+                      data-banco="{{ cuenta.banco_id }}"
+                      data-banco-nombre="{{ cuenta.banco.nombre }}">{{ cuenta.banco.nombre }} · N.º {{ cuenta.numero }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="campo-formulario">
+          <label for="cheque-numero">Número de cheque</label>
+          <input type="text" id="cheque-numero" name="numero" class="input-estandar"
+                 inputmode="numeric" autocomplete="off" placeholder="Ej: 00123456"
+                 maxlength="20" pattern="[0-9]{1,20}" required>
+        </div>
+
+        <div class="campo-formulario">
+          <label for="cheque-fecha-emision">Fecha de emisión</label>
+          <input type="date" id="cheque-fecha-emision" name="fecha_emision" class="input-estandar" required>
+        </div>
+
+        <!-- Plazo: 30/60/90 dias autocalcula la fecha de cobro; "Otra fecha" la libera -->
+        <div class="campo-formulario">
+          <label for="cheque-plazo">Plazo</label>
+          <select id="cheque-plazo" class="input-estandar">
+            <option value="30">A 30 días</option>
+            <option value="60">A 60 días</option>
+            <option value="90">A 90 días</option>
+            <option value="otra">Otra fecha</option>
+          </select>
+        </div>
+
+        <div class="campo-formulario">
+          <label for="cheque-fecha-cobro">Fecha de cobro</label>
+          <input type="date" id="cheque-fecha-cobro" name="fecha_cobro" class="input-estandar" required>
+        </div>
+
+        <div class="campo-formulario">
+          <label for="cheque-concepto">Concepto</label>
+          <textarea id="cheque-concepto" name="concepto" class="input-estandar cheque-textarea"
+                    placeholder="Ej: Pago factura 0001-00012345" maxlength="250" rows="3" required minlength="2"></textarea>
+          <span class="cheque-contador"><span id="cheque-concepto-conteo">0</span>/250</span>
+        </div>
+
+        <div class="campo-formulario">
+          <label for="cheque-importe">Importe <span class="opcional">(en pesos)</span></label>
+          <input type="text" id="cheque-importe" name="importe"
+                 class="input-estandar input-miles-decimal" inputmode="decimal"
+                 autocomplete="off" placeholder="Ej: 100.000,00" required
+                 pattern="[1-9][0-9]{0,2}(\.[0-9]{3})*(,[0-9]{1,2})?|0,(0[1-9]|[1-9][0-9]?)">
+        </div>
+
+        <!-- Vencimiento calculado: 30 dias despues de la fecha de cobro -->
+        <div class="preview-iva" id="preview-vencimiento">
+          <span class="preview-iva__rotulo">Vence el</span>
+          <span class="preview-iva__valor" id="preview-vencimiento-valor">—</span>
+        </div>
+      </form>
+    </div>
+
+    <div class="panel-pie">
+      <button type="submit" form="form-cheque" class="boton-primario" id="boton-guardar-cheque">Guardar cheque</button>
+      <button type="button" class="boton-secundario" onclick="cerrarSlideOver()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL LATERAL NUEVA/EDITAR CUENTA CORRIENTE (SLIDE-OVER) -->
+<div id="contenedor-slide-over-cuenta">
+  <div id="slide-over-fondo-cuenta" onclick="cerrarSlideOver('contenedor-slide-over-cuenta')"></div>
+
+  <div id="slide-over-panel-cuenta" class="slide-over-panel-base">
+    <header class="panel-cabecera">
+      <div class="panel-titulo-fila">
+        <div class="icono-contenedor">
+          <span class="material-symbols-outlined">account_balance</span>
+        </div>
+        <div class="texto-cabecera">
+          <h3 id="titulo-cuenta">Nueva cuenta corriente</h3>
+          <p id="subtitulo-cuenta">Registra una cuenta en un banco</p>
+        </div>
+      </div>
+      <button type="button" class="boton-cerrar-panel" onclick="cerrarSlideOver('contenedor-slide-over-cuenta')">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </header>
+
+    <div class="panel-cuerpo">
+      <form class="formulario-empresa" id="form-cuenta" method="POST" autocomplete="off">
+        {% csrf_token %}
+        <input type="hidden" name="accion" id="accion-cuenta" value="nueva_cuenta">
+        <input type="hidden" name="id_registro" id="id-registro-cuenta">
+
+        <div class="campo-formulario">
+          <label for="cuenta-banco">Banco</label>
+          <select id="cuenta-banco" name="id_banco" class="input-estandar" required>
+            {% for banco in bancos %}
+              <option value="{{ banco.id }}">{{ banco.nombre }}</option>
+            {% empty %}
+              <option value="" disabled selected>No hay bancos cargados</option>
+            {% endfor %}
+          </select>
+          {% if not bancos %}
+            <span class="cuenta-hint">Creá un banco primero en la sección <a href="{% url 'bancos' %}">Bancos</a>.</span>
+          {% endif %}
+        </div>
+
+        <div class="campo-formulario">
+          <label for="cuenta-numero">Número de cuenta corriente</label>
+          <input type="text" id="cuenta-numero" name="numero" class="input-estandar"
+                 placeholder="Ej: 0290-12345678-9" maxlength="40" required>
+        </div>
+      </form>
+    </div>
+
+    <div class="panel-pie">
+      <button type="submit" form="form-cuenta" class="boton-primario" id="boton-guardar-cuenta">Guardar cuenta</button>
+      <button type="button" class="boton-secundario" onclick="cerrarSlideOver('contenedor-slide-over-cuenta')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL LATERAL EDITAR EMPRESA (SLIDE-OVER) -->
+<div id="contenedor-slide-over-empresa">
+  <div id="slide-over-fondo-empresa" onclick="cerrarSlideOver('contenedor-slide-over-empresa')"></div>
+
+  <div id="slide-over-panel-empresa" class="slide-over-panel-base">
+    <header class="panel-cabecera">
+      <div class="panel-titulo-fila">
+        <div class="icono-contenedor">
+          <span class="material-symbols-outlined">domain</span>
+        </div>
+        <div class="texto-cabecera">
+          <h3>Editar empresa / sociedad</h3>
+          <p>Modifica los datos de la empresa o sociedad</p>
+        </div>
+      </div>
+      <button type="button" class="boton-cerrar-panel" onclick="cerrarSlideOver('contenedor-slide-over-empresa')">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </header>
+
+    <div class="panel-cuerpo">
+      <form class="formulario-empresa" id="form-empresa" method="POST" autocomplete="off">
+        {% csrf_token %}
+        <input type="hidden" name="accion" value="editar_empresa">
+        <div class="campo-formulario">
+          <label for="nombre-empresa">Nombre de la empresa o sociedad</label>
+          <input type="text" id="nombre-empresa" name="nombre" class="input-estandar"
+                 placeholder="Ej: MRM Acopio S.A." maxlength="60" required minlength="2">
+          <span class="mensaje-error">Escribí un nombre de al menos 2 caracteres.</span>
+        </div>
+      </form>
+    </div>
+
+    <div class="panel-pie">
+      <button type="submit" form="form-empresa" class="boton-primario">Actualizar empresa</button>
+      <button type="button" class="boton-secundario" onclick="cerrarSlideOver('contenedor-slide-over-empresa')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE AVISO: no se puede cargar un cheque sin una cuenta corriente -->
+<div id="contenedor-modal-aviso">
+  <div id="modal-aviso-fondo" onclick="cerrarModalSinCuenta()"></div>
+
+  <div id="modal-aviso">
+    <button type="button" class="boton-cerrar-panel" id="icono-cerrar-modal-aviso" onclick="cerrarModalSinCuenta()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+
+    <div id="modal-aviso__icono">
+      <span class="material-symbols-outlined">account_balance</span>
+    </div>
+
+    <h3>Falta una cuenta corriente</h3>
+    <p>Esta empresa todavía no tiene una cuenta corriente. Un cheque siempre cuelga
+       de una cuenta, así que primero creá una para poder cargarlo.</p>
+
+    <div class="acciones-modal">
+      <button type="button" class="boton-primario" onclick="crearCuentaDesdeAviso()">Crear cuenta corriente</button>
+      <button type="button" class="boton-secundario" onclick="cerrarModalSinCuenta()">Ahora no</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE ELIMINACION (sirve para cheques y cuentas: la accion la fija el JS) -->
+<form id="formulario-eliminar" method="POST">
+  {% csrf_token %}
+  <input type="hidden" name="accion" id="accion-eliminar" value="eliminar_cheque">
+  <div id="contenedor-panel-eliminar">
+    <div id="contenedor-panel-fondo" onclick="cerrarPanelEliminar()"></div>
+
+    <div id="panel-eliminar">
+      <input type="hidden" id="id_registro_eliminar" name="id_registro" value="">
+
+      <button type="button" class="boton-cerrar-panel" id="icono-cerrar-panel-eliminar" onclick="cerrarPanelEliminar()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+
+      <div id="icono-advertencia">
+        <span class="material-symbols-outlined">warning</span>
+      </div>
+
+      <h3>Confirmar eliminación</h3>
+      <p id="texto-confirmacion-eliminar">¿Confirma que quiere eliminar este cheque?</p>
+
+      <div class="acciones-modal">
+        <button type="button" class="boton-secundario" onclick="cerrarPanelEliminar()">No, mantener</button>
+        <button type="button" class="boton-primario-eliminar" id="boton-confirmar-eliminar"><span>Sí, eliminar</span></button>
+      </div>
+    </div>
+  </div>
+</form>
+
+<!-- MODAL DE DETALLE DEL CHEQUE (toda la info + editar / eliminar) -->
+<div id="contenedor-modal-cheque">
+  <div id="modal-cheque-fondo" onclick="cerrarDetalleCheque()"></div>
+
+  <div id="modal-cheque" role="dialog" aria-modal="true" aria-labelledby="det-cheque-titulo">
+    <button type="button" class="boton-cerrar-panel" id="det-cheque-cerrar" onclick="cerrarDetalleCheque()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+
+    <header class="det-cheque__head">
+      <span class="det-cheque__tile"><span class="material-symbols-outlined">receipt_long</span></span>
+      <div class="det-cheque__id">
+        <h3 id="det-cheque-titulo">Cheque</h3>
+        <span class="det-cheque__estado" id="det-cheque-estado">Pendiente</span>
+      </div>
+    </header>
+
+    <div class="det-cheque__importe">
+      <span class="det-cheque__importe-rotulo">Importe</span>
+      <span class="det-cheque__importe-valor" id="det-cheque-importe">$0,00</span>
+    </div>
+
+    <dl class="det-cheque__grid">
+      <div class="det-cheque__row">
+        <dt>Cuenta corriente</dt>
+        <dd id="det-cheque-cuenta">—</dd>
+      </div>
+      <div class="det-cheque__row">
+        <dt>Emisión</dt>
+        <dd id="det-cheque-emision">—</dd>
+      </div>
+      <div class="det-cheque__row">
+        <dt>Cobro</dt>
+        <dd id="det-cheque-cobro">—</dd>
+      </div>
+      <div class="det-cheque__row">
+        <dt>Vencimiento</dt>
+        <dd id="det-cheque-vencimiento">—</dd>
+      </div>
+      <div class="det-cheque__row det-cheque__row--full">
+        <dt>Concepto</dt>
+        <dd id="det-cheque-concepto">—</dd>
+      </div>
+    </dl>
+
+    <div class="det-cheque__acciones">
+      <button type="button" class="boton-secundario det-cheque__editar" id="det-cheque-editar">
+        <span class="material-symbols-outlined">edit</span>
+        Editar
+      </button>
+      {% comment %}
+        Eliminar sin modal de confirmacion: se mantiene apretado 2s (barra .manteniendo)
+        y recien ahi envia el borrado. El gesto largo reemplaza al "¿confirma?".
+      {% endcomment %}
+      <button type="button" class="det-cheque__eliminar" id="det-cheque-eliminar">
+        <span class="material-symbols-outlined det-cheque__eliminar-ico">delete</span>
+        <span class="det-cheque__eliminar-texto">Eliminar</span>
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block codigo-javascript %}
+<script src="{% static_v 'js/pago_viaje.js' %}"></script>
+<script src="{% static_v 'js/filtro_fechas.js' %}"></script>
+<script src="{% static_v 'js/informacion_empresa_cheques.js' %}"></script>
+{% endblock %}

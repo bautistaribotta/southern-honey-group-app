@@ -1,66 +1,81 @@
 {% extends "base.html" %}
 {% load static %}
+{% load static_version %}
 
 {% block nombre-pestaña %}
 <title>Viajes de cereales</title>
 {% endblock %}
 
 {% block links %}
-<link rel="stylesheet" href="{% static 'viajes.css' %}">
-<link rel="stylesheet" href="{% static 'viajes_cereales.css' %}">
-<link rel="stylesheet" href="{% static 'autocompletado_ciudades.css' %}">
+<link rel="stylesheet" href="{% static_v 'viajes.css' %}">
+<link rel="stylesheet" href="{% static_v 'viajes_cereales.css' %}">
+<link rel="stylesheet" href="{% static_v 'filtro_fechas.css' %}">
+<link rel="stylesheet" href="{% static_v 'filtro_pago.css' %}">
+<link rel="stylesheet" href="{% static_v 'filtro_entidad.css' %}">
+<link rel="stylesheet" href="{% static_v 'filtro_factura.css' %}">
+<link rel="stylesheet" href="{% static_v 'selector_entidad.css' %}">
+<link rel="stylesheet" href="{% static_v 'autocompletado_ciudades.css' %}">
+<link rel="stylesheet" href="{% static_v 'pago_viaje.css' %}">
 {% endblock %}
 
 {% block cabecera %}
-<div id="titulos-cabecera">
-  <h2>Viajes de cereales</h2>
-  <p>Seguí los viajes de transporte de cereales, sus choferes y la flota disponible</p>
+<div class="cabecera-seccion">
+  <span class="cabecera-seccion__tile">
+    <span class="material-symbols-outlined">agriculture</span>
+  </span>
+  <div class="cabecera-seccion__texto">
+    <h2>Viajes de cereales</h2>
+    <p>Seguí los viajes de transporte de cereales, sus empleados y la flota disponible</p>
+  </div>
 </div>
 {% endblock %}
 
 {% block area-trabajo %}
 <section id="area-trabajo">
 
+  <!-- Tarjetas de resumen. Reflejan los filtros aplicados (texto/fecha); el JS
+       refresca esta region por AJAX junto con la tabla. Los usuarios no
+       administrativos no ven los totales, asi que se omite el contenedor -->
+  {% if user.is_staff %}
+  {% comment %}
+    Encabezado del resumen: etiqueta + segmentado de estado de cobro (Por cobrar /
+    Todas) en la esquina superior derecha, mismo lugar y diseno que el interruptor
+    de valuacion de Deudas. Va FUERA de #vjc-stats-region para conservar su estado
+    y listeners entre refrescos AJAX.
+  {% endcomment %}
+  <div class="filtro-pago-fila">
+    <span class="filtro-pago-fila__label">Estado de cobro</span>
+    {% include 'filtro_pago.html' %}
+  </div>
+  <div class="vjc-stats" id="vjc-stats-region">
+    {% include 'tarjetas_cereal.html' %}
+  </div>
+  {% endif %}
+
   <!-- Controles superiores: buscador y boton -->
   <div class="barra-herramientas">
     <div class="grupo-busqueda">
-      <div class="contenedor-input-busqueda">
-        <span class="material-symbols-outlined icono-busqueda">search</span>
-        <input type="text" id="buscar-viaje-cereal" class="input-busqueda"
-               placeholder="Buscar por chofer, vehículo, cereal o destino" value="{{ q|default:'' }}">
+      {% comment %}
+        Filtros por entidad: un chip por dimension (empleado, vehiculo, destino) que
+        abre su modal para elegir de la lista. Se combinan entre si y con la fecha.
+      {% endcomment %}
+      <div class="filtros-entidad">
+        {% include "chip_filtro_entidad.html" with chip_id="chip-empleado" param="empleado" modal_id="selector-empleado-cereal" icono="person" etiqueta="Empleado" valor_id=empleado valor_nombre=empleado_nombre %}
+        {% include "chip_filtro_entidad.html" with chip_id="chip-vehiculo" param="vehiculo" modal_id="selector-vehiculo-cereal" icono="local_shipping" etiqueta="Vehículo" valor_id=vehiculo valor_nombre=vehiculo_nombre %}
+        {% include "chip_filtro_entidad.html" with chip_id="chip-destino" param="destino" modal_id="selector-destino-cereal" icono="location_on" etiqueta="Destino" valor_id=destino valor_nombre=destino_nombre %}
       </div>
+      {% include 'filtro_fechas.html' with modos="dia,mes,rango" %}
+      {% comment %} Pildora de busqueda por numero de factura (a la derecha de Fechas). {% endcomment %}
+      {% include 'filtro_factura.html' %}
     </div>
 
+    <!-- Flota se llega desde la barra lateral, como sub-item de esta seccion -->
     <div class="grupo-botones">
-      <a class="boton-nuevo secundario" id="btn-gestionar-flota" href="{% url 'flota' %}?origen=cereales">
-        <span class="material-symbols-outlined">groups</span>
-        <span class="texto-boton">Choferes y Vehículos</span>
-      </a>
       <button class="boton-nuevo" id="btn-nuevo-acopio" onclick="abrirSlideOver('slide-over-acopio')">
         <span class="material-symbols-outlined">add</span>
         <span class="texto-boton">Nuevo acopio</span>
       </button>
     </div>
-  </div>
-
-  <!-- Filtros por tipo de cereal como pildoras -->
-  <input type="hidden" id="filtro-cereal" value="{{ cereal|default:'' }}">
-  <div class="prod-chips" id="chips-cereal">
-    <button type="button" class="prod-chip {% if not cereal %}is-active{% endif %}" data-cereal="">
-      Todos <span class="vje-chipcount">{{ count_total }}</span>
-    </button>
-    <button type="button" class="prod-chip {% if cereal == 'Maiz' %}is-active{% endif %}" data-cereal="Maiz">
-      <span class="prod-chip__dot prod-chip__dot--maiz"></span>Maíz <span class="vje-chipcount">{{ counts_cereal.Maiz }}</span>
-    </button>
-    <button type="button" class="prod-chip {% if cereal == 'Soja' %}is-active{% endif %}" data-cereal="Soja">
-      <span class="prod-chip__dot prod-chip__dot--soja"></span>Soja <span class="vje-chipcount">{{ counts_cereal.Soja }}</span>
-    </button>
-    <button type="button" class="prod-chip {% if cereal == 'Trigo' %}is-active{% endif %}" data-cereal="Trigo">
-      <span class="prod-chip__dot prod-chip__dot--trigo"></span>Trigo <span class="vje-chipcount">{{ counts_cereal.Trigo }}</span>
-    </button>
-    <button type="button" class="prod-chip {% if cereal == 'Mani' %}is-active{% endif %}" data-cereal="Mani">
-      <span class="prod-chip__dot prod-chip__dot--mani"></span>Maní <span class="vje-chipcount">{{ counts_cereal.Mani }}</span>
-    </button>
   </div>
 
   <!-- Tabla de viajes de cereales -->
@@ -69,6 +84,11 @@
   </div>
 
 </section>
+
+{% comment %} Modales de los chips de filtro (empleado, vehiculo, destino). {% endcomment %}
+{% include "selector_entidad.html" with selector_id="selector-empleado-cereal" icono="person" titulo="Elegir empleado" descripcion="Filtrá los viajes por el empleado que elijas de la lista." placeholder="Buscar por nombre" items=empleados_filtro sin_items="No hay empleados activos." %}
+{% include "selector_entidad.html" with selector_id="selector-vehiculo-cereal" icono="local_shipping" titulo="Elegir vehículo" descripcion="Filtrá los viajes por el vehículo que elijas de la lista." placeholder="Buscar por nombre o patente" items=vehiculos_filtro sin_items="No hay vehículos activos." %}
+{% include "selector_entidad.html" with selector_id="selector-destino-cereal" icono="location_on" titulo="Elegir destino" descripcion="Filtrá los viajes por el destino que elijas de la lista." placeholder="Buscar por destino" items=destinos_filtro sin_items="Todavía no hay destinos en los viajes." %}
 
 <!-- PANEL LATERAL NUEVO ACOPIO (SLIDE-OVER) -->
 <div id="slide-over-acopio">
@@ -118,14 +138,14 @@
           </div>
 
           <div class="grupo-input">
-            <label for="chofer-acopio">Chofer</label>
-            <select id="chofer-acopio" name="id_chofer" class="select-estandar" required>
-              <option value="" disabled selected>Seleccione un chofer</option>
-              {% for chofer in choferes %}
-              <option value="{{ chofer.id }}">{{ chofer.nombre }} {{ chofer.apellido }}</option>
+            <label for="empleado-acopio">Empleado</label>
+            <select id="empleado-acopio" name="id_empleado" class="select-estandar" required>
+              <option value="" disabled selected>Seleccione un empleado</option>
+              {% for empleado in empleados %}
+              <option value="{{ empleado.id }}">{{ empleado.nombre }} {{ empleado.apellido }}</option>
               {% endfor %}
             </select>
-            <span class="mensaje-error">Por favor, seleccione un chofer de la lista.</span>
+            <span class="mensaje-error">Por favor, seleccione un empleado de la lista.</span>
           </div>
 
           <div class="grupo-input">
@@ -172,18 +192,31 @@
             <span class="mensaje-error">Solo números, hasta 15 dígitos.</span>
           </div>
 
+          <div class="grupo-input">
+            <label for="factura-acopio">Número de factura</label>
+            <input
+              type="text"
+              id="factura-acopio"
+              name="numero_factura"
+              placeholder="Opcional (ej: 00012345)"
+              maxlength="20"
+              inputmode="numeric"
+              pattern="[0-9]{1,20}">
+            <span class="mensaje-error">Solo números, hasta 20 dígitos.</span>
+          </div>
+
           <div class="vje-grid2">
             <div class="grupo-input">
               <label for="toneladas-acopio">Toneladas</label>
               <input
-                type="number"
+                type="text"
                 id="toneladas-acopio"
                 name="toneladas"
-                placeholder="0"
-                min="1"
-                step="1"
-                required>
-              <span class="mensaje-error">Ingrese un entero mayor a 0.</span>
+                placeholder="Ej: 12,5"
+                required
+                inputmode="decimal"
+                pattern="[0-9]+([.,][0-9]{1,2})?">
+              <span class="mensaje-error">Ingrese un número mayor a 0, hasta 2 decimales (ej: 12,5).</span>
             </div>
 
             <div class="grupo-input">
@@ -191,12 +224,14 @@
               <div class="input-con-icono">
                 <span>$</span>
                 <input
-                  type="number"
+                  type="text"
                   id="precio-acopio"
                   name="precio_tonelada"
+                  class="input-miles"
+                  inputmode="numeric"
+                  autocomplete="off"
                   placeholder="0"
-                  min="1"
-                  step="1"
+                  pattern="[1-9][0-9]{0,2}(\.[0-9]{3})*"
                   required>
               </div>
               <span class="mensaje-error">Ingrese un monto válido mayor a 0.</span>
@@ -204,11 +239,11 @@
           </div>
 
           <div class="grupo-input">
-            <label for="porcentaje-acopio">Porcentaje del chofer (%)</label>
+            <label for="porcentaje-acopio">Porcentaje del empleado (%)</label>
             <input
               type="number"
               id="porcentaje-acopio"
-              name="porcentaje_chofer"
+              name="porcentaje_empleado"
               placeholder="Opcional"
               min="1"
               max="100"
@@ -263,6 +298,114 @@
             <span class="mensaje-error">Por favor, seleccione una fecha válida.</span>
           </div>
         </section>
+
+        <!-- Seccion 5: Dadora de carga -->
+        <section class="seccion-bloque">
+          <div class="subtitulo-formulario">
+            <span class="material-symbols-outlined">handshake</span>
+            <h4>Dador de carga</h4>
+          </div>
+
+          <div class="pago-fila">
+            <div class="pago-fila__texto">
+              <span class="pago-fila__titulo">Tiene dador de carga</span>
+              <span class="pago-fila__sub">Activalo si alguien le consiguió el viaje al cliente y cobra una comisión.</span>
+            </div>
+            <label class="pago-switch">
+              <input type="checkbox" id="dadora-toggle-acopio">
+              <span class="pago-switch__slider"></span>
+            </label>
+          </div>
+
+          <div id="dadora-campos-acopio" hidden>
+            <div class="grupo-input">
+              <label for="dadora-nombre-acopio">Nombre del dador</label>
+              <input
+                type="text"
+                id="dadora-nombre-acopio"
+                name="dadora_carga"
+                placeholder="Ej: Juan Pérez"
+                maxlength="60"
+                pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}"
+                disabled>
+              <span class="mensaje-error">Mínimo 3 caracteres (solo letras y números).</span>
+            </div>
+
+            <div class="dadora-fila-cobro">
+              <div class="grupo-input">
+                <label for="dadora-tipo-acopio">Forma de cobro</label>
+                <select id="dadora-tipo-acopio" name="dadora_tipo_cobro" class="select-estandar" disabled>
+                  <option value="" disabled selected>Seleccione</option>
+                  <option value="porcentaje">Porcentaje</option>
+                  <option value="tonelada">Por tonelada</option>
+                  <option value="efectivo">Efectivo</option>
+                </select>
+                <span class="mensaje-error">Seleccione cómo cobra la dadora.</span>
+              </div>
+
+              <div class="grupo-input" id="dadora-pct-grupo-acopio" hidden>
+                <label for="dadora-pct-acopio">Porcentaje (%)</label>
+                <input
+                  type="number"
+                  id="dadora-pct-acopio"
+                  name="dadora_valor"
+                  min="1"
+                  max="100"
+                  step="1"
+                  placeholder="Ej: 5"
+                  disabled>
+                <span class="mensaje-error">Debe ser un número entre 1 y 100.</span>
+              </div>
+
+              <div class="grupo-input" id="dadora-ton-grupo-acopio" hidden>
+                <label for="dadora-ton-acopio">Cant. de toneladas</label>
+                <input
+                  type="number"
+                  id="dadora-ton-acopio"
+                  name="dadora_valor"
+                  min="1"
+                  step="1"
+                  placeholder="Ej: 1"
+                  disabled>
+                <span class="mensaje-error">Ingrese una cantidad de toneladas mayor a 0.</span>
+              </div>
+
+              <div class="grupo-input" id="dadora-efe-grupo-acopio" hidden>
+                <label for="dadora-efe-acopio">Monto en efectivo</label>
+                <div class="input-con-icono">
+                  <span>$</span>
+                  <input
+                    type="text"
+                    id="dadora-efe-acopio"
+                    name="dadora_valor"
+                    class="input-miles"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    placeholder="0"
+                    pattern="[1-9][0-9]{0,2}(\.[0-9]{3})*"
+                    disabled>
+                </div>
+                <span class="mensaje-error">Ingrese un monto válido mayor a 0.</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Seccion 6: Estado de pago (ultimo del formulario) -->
+        {% if user.is_staff %}
+        <section class="seccion-bloque">
+          <div class="pago-fila">
+            <div class="pago-fila__texto">
+              <span class="pago-fila__titulo">Viaje pagado</span>
+              <span class="pago-fila__sub">Activalo cuando el cobro ya entró. El cobro es total, no hay pagos parciales.</span>
+            </div>
+            <label class="pago-switch">
+              <input type="checkbox" id="pagado-acopio" name="pagado">
+              <span class="pago-switch__slider"></span>
+            </label>
+          </div>
+        </section>
+        {% endif %}
       </main>
 
       <!-- 3. Pie del panel -->
@@ -276,9 +419,16 @@
 {% endblock %}
 
 {% block codigo-javascript %}
-<script src="{% static 'js/autocompletado_ciudades.js' %}"></script>
-<script src="{% static 'js/autocompletado_clientes.js' %}"></script>
-<script src="{% static 'js/viajes_cereales.js' %}"></script>
+<script src="{% static_v 'js/autocompletado_ciudades.js' %}"></script>
+<script src="{% static_v 'js/autocompletado_clientes.js' %}"></script>
+<script src="{% static_v 'js/filtro_fechas.js' %}"></script>
+<script src="{% static_v 'js/filtro_pago.js' %}"></script>
+<script src="{% static_v 'js/selector_entidad.js' %}"></script>
+<script src="{% static_v 'js/filtros_entidad.js' %}"></script>
+<script src="{% static_v 'js/filtro_factura.js' %}"></script>
+<script src="{% static_v 'js/viajes_cereales.js' %}"></script>
+<script src="{% static_v 'js/pago_viaje.js' %}"></script>
+<script src="{% static_v 'js/dadora_carga.js' %}"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     // Autocompletar la fecha del viaje con la fecha actual al cargar la pagina
@@ -327,6 +477,22 @@
         }
       });
     }
+
+    // Dadora de carga: el switch revela los campos y, segun la forma de cobro,
+    // deja habilitado solo el input que corresponde. Los dos inputs de valor
+    // comparten el name "dadora_valor": deshabilitar el que no se usa evita que
+    // viaje en el POST y que su validacion required bloquee el envio.
+    inicializarDadoraCarga({
+      toggle: 'dadora-toggle-acopio',
+      campos: 'dadora-campos-acopio',
+      nombre: 'dadora-nombre-acopio',
+      tipo: 'dadora-tipo-acopio',
+      valores: {
+        porcentaje: { grupo: 'dadora-pct-grupo-acopio', input: 'dadora-pct-acopio' },
+        tonelada: { grupo: 'dadora-ton-grupo-acopio', input: 'dadora-ton-acopio' },
+        efectivo: { grupo: 'dadora-efe-grupo-acopio', input: 'dadora-efe-acopio' },
+      },
+    });
   });
 </script>
 {% endblock %}

@@ -19,29 +19,7 @@
   gap: 1.25rem;
 }
 
-/* --- Volver (estilo del sistema) --- */
-.boton-volver {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  align-self: flex-start;
-  color: var(--text-muted);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-bold);
-  text-transform: uppercase;
-  text-decoration: none;
-  letter-spacing: var(--tracking-wide);
-  margin-bottom: 0;
-  transition: color var(--dur-normal) var(--ease-standard);
-}
-
-.boton-volver:hover {
-  color: var(--brand-active);
-}
-
-.boton-volver .material-symbols-outlined {
-  font-size: 1.05rem;
-}
+/* Boton volver: estilos unificados en base.css (.boton-volver) */
 
 /* --- Cabecera --- */
 .op-head {
@@ -60,6 +38,13 @@
   display: flex;
   align-items: flex-start;
   gap: 0.95rem;
+  min-width: 0;
+}
+
+/* El bloque de texto (título, meta y observación) debe poder encogerse para
+   que la observación aplique su elipsis y no empuje los botones de acción */
+.op-head__left > div {
+  min-width: 0;
 }
 
 .op-head__tile {
@@ -114,6 +99,35 @@
   color: var(--sand-400);
 }
 
+/* Observación de la operación (la misma nota que se imprime en el remito).
+   Una sola línea con elipsis: una nota larga (incluso sin espacios) no debe
+   ensanchar la cabecera ni empujar los botones de acción fuera de la vista.
+   El texto completo queda en el title del elemento. */
+.op-head__obs {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.5rem 0 0;
+  max-width: 60ch;
+  min-width: 0;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.op-head__obstext {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.op-head__obs .material-symbols-outlined {
+  font-size: 1.05rem;
+  color: var(--sand-400);
+  flex: none;
+}
+
 .op-viaje {
   display: inline-flex;
   align-items: center;
@@ -131,6 +145,14 @@
 
 .op-viaje .material-symbols-outlined {
   font-size: 0.95rem;
+}
+
+/* Chip de viaje eliminado: informativo pero no clickeable */
+.op-viaje--eliminado {
+  background-color: var(--neutral-100, #f3f4f6);
+  border-color: var(--neutral-200, #e5e7eb);
+  color: var(--neutral-500, #6b7280);
+  cursor: default;
 }
 
 .op-head__actions {
@@ -280,12 +302,21 @@
   transition: width 0.3s var(--ease-standard);
 }
 
+.op-total__barfill--compra {
+  background-color: var(--danger-500);
+}
+
 /* --- Grilla de dos columnas --- */
 .op-grid {
   display: grid;
   grid-template-columns: 1.35fr 1fr;
   gap: 1.25rem;
   align-items: start;
+}
+
+/* Grilla sin la tarjeta de pagos (usuario no-staff): productos a todo el ancho */
+.op-grid--solo {
+  grid-template-columns: 1fr;
 }
 
 .op-card {
@@ -363,6 +394,13 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Tabla sin las columnas de importes (usuario no-staff): la cantidad queda
+   acotada a la derecha y el nombre del producto se lleva el ancho sobrante */
+.op-table--reducida th.c,
+.op-table--reducida td.c {
+  width: 12rem;
+}
+
 .op-prod__name {
   font-weight: var(--weight-semibold);
   color: var(--text-strong);
@@ -397,12 +435,7 @@
   color: var(--danger-700);
 }
 
-.op-table td.op-empty {
-  text-align: center;
-  color: var(--text-subtle);
-  padding: 2rem 1rem;
-  font-size: var(--text-sm);
-}
+/* Celda vacia (.celda-vacia): estilos unificados en base.css */
 
 /* --- Responsive --- */
 @media (max-width: 960px) {
@@ -521,4 +554,17 @@
 
 .campo-info label {
   color: var(--text-body);
+}
+
+/* fallback-oklch-autogenerado */
+/* Safari < 15.4 no soporta oklch(): redefinimos las variables en sRGB. */
+@supports not (color: oklch(0% 0 0)) {
+  :root {
+    --info-50: #ebf5ff;
+    --info-200: #badbfe;
+    --info-700: #005fad;
+    --danger-200: #ffc9c9;
+    --danger-700: #a81f20;
+    --success-700: #207041;
+  }
 }

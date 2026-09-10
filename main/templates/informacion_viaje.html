@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="{% static 'operaciones_compartido.css' %}">
 <link rel="stylesheet" href="{% static 'informacion_operacion.css' %}">
 <link rel="stylesheet" href="{% static 'informacion_viaje.css' %}">
+<link rel="stylesheet" href="{% static 'selector_entidad.css' %}">
 {% endblock %}
 
 {% block top-header %}
@@ -21,10 +22,17 @@
 {% block area-trabajo %}
 <section id="area-trabajo" class="vd-screen">
 
+  {% if volver_url %}
+  <a href="{{ volver_url }}" class="boton-volver">
+    <span class="material-symbols-outlined">arrow_back</span>
+    Volver a la estación
+  </a>
+  {% else %}
   <a href="{% url 'viajes' %}" class="boton-volver">
     <span class="material-symbols-outlined">arrow_back</span>
     Volver a Viajes
   </a>
+  {% endif %}
 
   <!-- CABECERA -->
   <div class="op-head">
@@ -44,7 +52,7 @@
             <span class="material-symbols-outlined">arrow_forward</span>
             {% if viaje.fecha_vuelta %}{{ viaje.fecha_vuelta|date:"d/m/Y" }}{% else %}No definido{% endif %}
           </span>
-          <span class="op-head__metaitem"><span class="material-symbols-outlined">person</span>{% if viaje.chofer %}{{ viaje.chofer.nombre }} {{ viaje.chofer.apellido }}{% else %}Sin chofer{% endif %}</span>
+          <span class="op-head__metaitem"><span class="material-symbols-outlined">person</span>{% if viaje.empleado %}{{ viaje.empleado.nombre }} {{ viaje.empleado.apellido }}{% else %}Sin empleado{% endif %}</span>
           <span class="op-head__metaitem"><span class="material-symbols-outlined">local_shipping</span>{% if viaje.vehiculo %}{{ viaje.vehiculo.nombre }}{% else %}Sin vehículo{% endif %}</span>
         </div>
       </div>
@@ -62,7 +70,7 @@
   </div>
 
   <!-- DATOS GENERALES + RESUMEN DE CAJA -->
-  <div class="op-grid">
+  <div class="op-grid{% if not user.is_staff %} op-grid--solo{% endif %}">
 
     <!-- Datos generales -->
     <div class="op-card">
@@ -95,10 +103,10 @@
           </div>
         </div>
         <div class="vd-data__row">
-          <span class="vd-avatar">{% if viaje.chofer %}{{ viaje.chofer.nombre|first|upper }}{{ viaje.chofer.apellido|first|upper }}{% else %}?{% endif %}</span>
+          <span class="avatar-iniciales avatar-iniciales--empleado">{% if viaje.empleado %}{{ viaje.empleado.nombre|first|upper }}{{ viaje.empleado.apellido|first|upper }}{% else %}?{% endif %}</span>
           <div class="vd-data__meta">
-            <div class="vd-data__label">Chofer</div>
-            <div class="vd-data__value">{% if viaje.chofer %}{{ viaje.chofer.nombre }} {{ viaje.chofer.apellido }}{% else %}Chofer no especificado{% endif %}</div>
+            <div class="vd-data__label">Empleado</div>
+            <div class="vd-data__value">{% if viaje.empleado %}{{ viaje.empleado.nombre }} {{ viaje.empleado.apellido }}{% else %}Empleado no especificado{% endif %}</div>
           </div>
         </div>
       </div>
@@ -125,15 +133,22 @@
       </div>
     </div>
 
-    <!-- Resumen de caja -->
+    <!-- Resumen de caja (solo staff) -->
+    {% if user.is_staff %}
     <div class="op-card">
       <div class="op-card__head">
         <span class="material-symbols-outlined">payments</span>
         <h4>Resumen de caja</h4>
-        <button class="op-btn op-btn--secondary op-btn--sm vd-headbtn" onclick="abrirModalGasto()">
-          <span class="material-symbols-outlined">add</span>
-          Añadir gasto
-        </button>
+        <div class="vd-headbtns">
+          <button class="op-btn op-btn--secondary op-btn--sm" onclick="abrirModalIngreso()">
+            <span class="material-symbols-outlined">add</span>
+            Añadir dinero
+          </button>
+          <button class="op-btn op-btn--secondary op-btn--sm" onclick="abrirModalGasto()">
+            <span class="material-symbols-outlined">add</span>
+            Añadir gasto
+          </button>
+        </div>
       </div>
       <div class="vd-caja">
         <div class="vd-caja__row vd-caja__row--head">
@@ -141,22 +156,83 @@
           <span class="vd-caja__v">${{ viaje.inicio_caja|default:0|intcomma }}</span>
         </div>
         <div class="vd-gastos">
-          {% for gasto in viaje.detalle_gastos.all %}
-          <div class="vd-gasto">
-            <span class="vd-gasto__ico"><span class="material-symbols-outlined">{% if gasto.gasto == 'Comida' %}restaurant{% elif gasto.gasto == 'Combustible' %}local_gas_station{% elif gasto.gasto == 'Playa' %}local_parking{% elif gasto.gasto == 'Peaje' %}toll{% elif gasto.gasto == 'Hotel' %}hotel{% elif gasto.gasto == 'Viaticos personales' %}wallet{% else %}more_horiz{% endif %}</span></span>
-            <span class="vd-gasto__name">{{ gasto.gasto }}<span class="vd-gasto__date">{{ gasto.fecha|date:"d/m/Y" }}</span></span>
-            <span class="vd-gasto__amt">-${{ gasto.monto|intcomma }}</span>
-          </div>
-          {% empty %}
-          <div class="vd-gastos__empty">Sin gastos registrados.</div>
-          {% endfor %}
+          {% include "gastos_viaje.html" with gastos=viaje.detalle_gastos.all vacio="Sin gastos registrados." %}
         </div>
-        <div class="vd-caja__row vd-caja__row--total">
+        {% for operacion in operaciones %}
+        {% if operacion.activa %}
+        <button type="button" class="vd-caja__row vd-caja__row--op vd-caja__row--link"
+                data-ir-operacion="{{ operacion.id }}"
+                aria-label="Ver la {% if operacion.tipo_operacion == 'venta' %}venta{% else %}compra{% endif %} del {{ operacion.fecha|date:'d/m/Y' }} en la tabla de operaciones">
+          <span class="vd-caja__k">
+            <span class="vd-caja__ico"><span class="material-symbols-outlined">{% if operacion.tipo_operacion == 'venta' %}trending_up{% else %}trending_down{% endif %}</span></span>
+            {% if operacion.tipo_operacion == 'venta' %}Venta{% else %}Compra{% endif %}
+            <span class="vd-caja__date">{{ operacion.fecha|date:"d/m/Y" }}</span>
+          </span>
+          <span class="vd-caja__v vd-caja__v--{% if operacion.tipo_operacion == 'venta' %}pos{% else %}neg{% endif %}">{% if operacion.tipo_operacion == 'venta' %}+{% else %}-{% endif %}${{ operacion.monto_total|floatformat:"-2g" }}</span>
+        </button>
+        {% endif %}
+        {% endfor %}
+        {% for ingreso in viaje.ingresos_caja.all %}
+        <button type="button" class="vd-gasto vd-gasto--editable vd-gasto--ingreso" id="ingreso-{{ ingreso.id }}"
+                data-ingreso="{{ ingreso.id }}"
+                data-monto="{{ ingreso.monto }}"
+                aria-label="Editar la transferencia al chofer del {{ ingreso.fecha|date:'d/m/Y' }} por ${{ ingreso.monto|intcomma }}">
+          <span class="vd-gasto__ico"><span class="material-symbols-outlined">swap_horiz</span></span>
+          <span class="vd-gasto__name">Transferencia al chofer<span class="vd-gasto__date">{{ ingreso.fecha|date:"d/m/Y" }}</span></span>
+          <span class="vd-gasto__amt vd-gasto__amt--pos">+${{ ingreso.monto|intcomma }}</span>
+        </button>
+        {% endfor %}
+        <div class="vd-caja__row vd-caja__row--total{% if viaje.final_caja < 0 %} vd-caja__row--total-neg{% endif %}">
           <span class="vd-caja__k"><span class="material-symbols-outlined">savings</span>Total restante</span>
           <span class="vd-caja__v">${{ viaje.final_caja|intcomma }}</span>
         </div>
+
+        {% comment %}
+          Devolución del sobrante: qué hizo el chofer con la plata que le quedó en
+          la caja. Solo aparece si hay sobrante (final_caja > 0) o si ya se
+          registró una devolución, para no perder el dato si la caja se movió después.
+        {% endcomment %}
+        {% if viaje.final_caja > 0 or viaje.devolucion_registrada %}
+        <div class="vd-devol vd-devol--{{ viaje.devolucion_estado|default:'pendiente' }}">
+          {% if not viaje.devolucion_registrada %}
+          <div class="vd-devol__ico"><span class="material-symbols-outlined">wallet</span></div>
+          <div class="vd-devol__texto">
+            <div class="vd-devol__titulo">El chofer tiene ${{ viaje.final_caja|intcomma }} de sobrante</div>
+            <div class="vd-devol__sub">Registrá si devolvió la plata al volver.</div>
+          </div>
+          <button type="button" class="op-btn op-btn--dark op-btn--sm" onclick="abrirModalDevolucion()">
+            <span class="material-symbols-outlined">undo</span>
+            Registrar devolución
+          </button>
+
+          {% elif viaje.devolucion_estado == 'total' %}
+          <div class="vd-devol__ico vd-devol__ico--ok"><span class="material-symbols-outlined">check_circle</span></div>
+          <div class="vd-devol__texto">
+            <div class="vd-devol__titulo">Devolvió todo el sobrante</div>
+            <div class="vd-devol__sub">${{ viaje.sobrante_devolucion|intcomma }} devueltos. No quedó nada en su poder.</div>
+          </div>
+          <button type="button" class="vd-devol__edit" onclick="abrirModalDevolucion()" aria-label="Editar la devolución">
+            <span class="material-symbols-outlined">edit</span>
+          </button>
+
+          {% else %}
+          <div class="vd-devol__ico vd-devol__ico--parcial"><span class="material-symbols-outlined">call_split</span></div>
+          <div class="vd-devol__texto">
+            <div class="vd-devol__titulo">Devolvió ${{ viaje.monto_devuelto|intcomma }} de ${{ viaje.sobrante_devolucion|intcomma }}</div>
+            <div class="vd-devol__sub">
+              Se quedó con <strong>${{ viaje.devolucion_retenido|intcomma }}</strong>, que figura como
+              <a href="{% url 'informacion_empleado' viaje.empleado.id %}" class="vd-devol__link">pago de {{ viaje.empleado.nombre }}</a>.
+            </div>
+          </div>
+          <button type="button" class="vd-devol__edit" onclick="abrirModalDevolucion()" aria-label="Editar la devolución">
+            <span class="material-symbols-outlined">edit</span>
+          </button>
+          {% endif %}
+        </div>
+        {% endif %}
       </div>
     </div>
+    {% endif %}
 
   </div>
 
@@ -186,20 +262,22 @@
 
     <div class="op-card contenedor-listado-operaciones">
       {% if operaciones %}
-      <table class="op-table vd-opstable">
+      <table class="op-table vd-opstable{% if not user.is_staff %} vd-opstable--reducida{% endif %}">
         <thead>
           <tr>
             <th>Fecha</th>
             <th>Cliente</th>
             <th>Detalle</th>
+            {% if user.is_staff %}
             <th class="c">Tipo</th>
             <th class="c">Estado</th>
             <th class="r">Monto total</th>
+            {% endif %}
           </tr>
         </thead>
         <tbody>
           {% for operacion in operaciones %}
-          <tr data-url="{% url 'informacion_operacion' operacion.id %}?origen=viaje" data-tipo="{{ operacion.tipo_operacion }}" onclick="window.location.href=this.dataset.url" class="fila-operacion">
+          <tr id="fila-op-{{ operacion.id }}" data-operacion="{{ operacion.id }}" data-url="{% url 'informacion_operacion' operacion.id %}?origen=viaje" data-tipo="{{ operacion.tipo_operacion }}" onclick="window.location.href=this.dataset.url" class="fila-operacion">
             <td class="vd-op-fecha">{{ operacion.fecha|date:"d/m/Y" }}</td>
             <td><span class="vd-op-cli">{{ operacion.cliente.nombre }} {{ operacion.cliente.apellido|default:"" }}</span></td>
             <td>
@@ -214,6 +292,7 @@
                 {% endif %}
               </div>
             </td>
+            {% if user.is_staff %}
             <td class="c">
               {% if operacion.tipo_operacion == 'compra' %}
                 <span class="badge-tipo-operacion compra">Compra</span>
@@ -233,6 +312,7 @@
               {% endif %}
             </td>
             <td class="r vd-op-monto">${{ operacion.monto_total|floatformat:"-2g" }}</td>
+            {% endif %}
           </tr>
           {% endfor %}
         </tbody>
@@ -253,52 +333,26 @@
 
 </section>
 
-<!-- Modal de Seleccion de Cliente (paso previo al carrito) -->
-<div id="contenedor-modal-cliente">
-  <div id="contenedor-modal-fondo-cliente" onclick="cerrarModalSeleccionCliente()"></div>
+<!-- Modal de Seleccion de Cliente (paso previo al carrito). Usa el componente
+     compartido selector_entidad; informacion_viaje.js escucha 'selector-entidad:elegir'
+     y navega a la nueva operacion del cliente elegido. -->
+{% include "selector_entidad.html" with selector_id="selector-cliente-viaje" icono="person_search" titulo="Seleccionar cliente" descripcion="Elegí el cliente para la nueva operación de este viaje." placeholder="Buscar por nombre o apellido" items=clientes_items sin_items="No hay clientes registrados." %}
 
-  <div id="panel-cliente" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-cliente" aria-describedby="descripcion-modal-cliente">
-    <button type="button" class="boton-cerrar" onclick="cerrarModalSeleccionCliente()" aria-label="Cerrar selección de cliente">
-      <span class="material-symbols-outlined" aria-hidden="true">close</span>
-    </button>
-
-    <div id="icono-cliente" aria-hidden="true">
-      <span class="material-symbols-outlined">person_search</span>
-    </div>
-
-    <h3 id="titulo-modal-cliente">Seleccionar cliente</h3>
-    <p id="descripcion-modal-cliente">Elegí el cliente para la nueva operación de este viaje.</p>
-
-    <div class="buscador-cliente">
-      <span class="material-symbols-outlined" aria-hidden="true">search</span>
-      <input type="text" id="input-buscar-cliente" placeholder="Buscar por nombre o apellido" autocomplete="off"
-             role="combobox" aria-expanded="true" aria-controls="lista-clientes-modal"
-             aria-label="Buscar cliente por nombre o apellido" aria-activedescendant="">
-    </div>
-
-    <ul id="lista-clientes-modal" role="listbox" aria-label="Lista de clientes">
-      {% for cliente in clientes %}
-      <li class="item-cliente-modal" id="cliente-modal-{{ cliente.id }}" role="option" tabindex="-1" aria-selected="false" data-id="{{ cliente.id }}" data-nombre="{{ cliente.nombre|lower }} {{ cliente.apellido|lower }}">
-        <span class="material-symbols-outlined" aria-hidden="true">person</span>
-        <span class="nombre-cliente-modal">{{ cliente.nombre }} {{ cliente.apellido|default:"" }}</span>
-      </li>
-      {% empty %}
-      <li class="sin-clientes-modal">No hay clientes registrados.</li>
-      {% endfor %}
-    </ul>
-    <p id="sin-resultados-cliente" class="sin-clientes-modal" role="status" aria-live="polite" hidden>No se encontraron clientes.</p>
-  </div>
-</div>
-
-<!-- Panel de Nuevo Gasto -->
-<form id="formulario-gasto" method="POST">
+<!-- Panel de gasto: sirve para registrar uno nuevo y para corregir uno cargado.
+     Las acciones del POST viajan en data-* porque cada vista de viaje usa las
+     suyas; el resto del modal es identico en los tres. -->
+<form id="formulario-gasto" method="POST"
+      data-accion-nuevo="nuevo_gasto"
+      data-accion-editar="editar_gasto"
+      data-accion-eliminar="eliminar_gasto">
   {% csrf_token %}
   <div id="contenedor-modal-gasto">
     <div id="contenedor-modal-fondo-gasto" onclick="cerrarModalGasto()"> </div>
 
     <!-- Panel -->
     <div id="panel-gasto">
-      <input type="hidden" name="accion" value="nuevo_gasto"> 
+      <input type="hidden" name="accion" id="gasto-accion" value="nuevo_gasto">
+      <input type="hidden" name="id_gasto" id="gasto-id">
 
       <button type="button" class="boton-cerrar" onclick="cerrarModalGasto()">
         <span class="material-symbols-outlined">close</span>
@@ -308,9 +362,10 @@
         <span class="material-symbols-outlined">payments</span>
       </div>
 
-      <h3>Registrar gasto</h3>
-      <p>Seleccioná el tipo de gasto e ingresá el monto correspondiente.</p>
+      <h3 id="gasto-titulo">Registrar gasto</h3>
+      <p id="gasto-bajada">Seleccioná el tipo de gasto e ingresá el monto correspondiente.</p>
 
+      <div id="gasto-campos">
       <div class="grupo-input">
         <label for="tipo-gasto">Tipo de gasto</label>
         <select id="tipo-gasto" name="tipo_gasto" required class="vd-select">
@@ -330,24 +385,193 @@
         <div class="input-con-icono">
           <span>$</span>
           <input
-            type="number"
+            type="text"
             id="monto-gasto"
             name="monto_gasto"
+            class="input-miles"
+            inputmode="numeric"
+            autocomplete="off"
             placeholder="0"
-            step="1"
-            min="1"
+            pattern="[1-9][0-9]{0,2}(\.[0-9]{3})*"
             required>
         </div>
-        <span class="vd-hint">Número entero, sin puntos ni comas.</span>
+        <span class="vd-hint">Número entero. Los puntos se agregan solos.</span>
       </div>
 
-      <div class="acciones-modal">
-        <button type="submit" class="boton-primario">Guardar</button>
+      {% include 'campos_gasto_combustible.html' %}
+      </div>
+
+      <div class="acciones-modal" id="gasto-acciones">
+        <button type="submit" class="boton-primario" id="gasto-guardar">Guardar</button>
         <button type="button" class="boton-secundario" onclick="cerrarModalGasto()">Cancelar</button>
+      </div>
+
+      {% comment %}
+        Eliminar vive adentro del mismo modal de edicion, sin un segundo modal
+        de confirmacion: hay que mantener apretado el boton tres segundos, como
+        el resto de los borrados del sistema. La leyenda cambia mientras se
+        mantiene apretado.
+      {% endcomment %}
+      <div class="gasto-borrar" id="gasto-zona-borrar" hidden>
+        <button type="button" class="op-btn op-btn--danger gasto-borrar__btn" id="gasto-borrar">
+          <span class="gasto-borrar__label">
+            <span class="material-symbols-outlined">delete</span>
+            <span id="gasto-borrar-texto">Eliminar gasto</span>
+          </span>
+        </button>
       </div>
     </div>
   </div>
 </form>
+
+<!-- Panel de ingreso a caja: mismo estilo que el de gasto, pero solo pide el
+     monto. El concepto es fijo (transferencia al chofer), asi que va como texto
+     del modal y no como campo. Sirve para cargar uno nuevo y para corregir uno,
+     y el borrado usa el mismo gesto de mantener apretado que el gasto. -->
+<form id="formulario-ingreso" method="POST">
+  {% csrf_token %}
+  <div id="contenedor-modal-ingreso">
+    <div id="contenedor-modal-fondo-ingreso" onclick="cerrarModalIngreso()"> </div>
+
+    <!-- Panel -->
+    <div id="panel-ingreso">
+      <input type="hidden" name="accion" id="ingreso-accion" value="nuevo_ingreso">
+      <input type="hidden" name="id_ingreso" id="ingreso-id">
+
+      <button type="button" class="boton-cerrar" onclick="cerrarModalIngreso()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+
+      <div id="icono-ingreso">
+        <span class="material-symbols-outlined">swap_horiz</span>
+      </div>
+
+      <h3 id="ingreso-titulo">Añadir dinero a caja</h3>
+      <p id="ingreso-bajada">Ingresá el monto transferido al chofer. Suma al total de la caja.</p>
+
+      <div class="grupo-input">
+        <label for="monto-ingreso">Monto en concepto de transferencia al chofer</label>
+        <div class="input-con-icono">
+          <span>$</span>
+          <input
+            type="text"
+            id="monto-ingreso"
+            name="monto_ingreso"
+            class="input-miles"
+            inputmode="numeric"
+            autocomplete="off"
+            placeholder="0"
+            pattern="[1-9][0-9]{0,2}(\.[0-9]{3})*"
+            required>
+        </div>
+        <span class="vd-hint">Número entero. Los puntos se agregan solos.</span>
+      </div>
+
+      <div class="acciones-modal">
+        <button type="submit" class="boton-primario" id="ingreso-guardar">Guardar</button>
+        <button type="button" class="boton-secundario" onclick="cerrarModalIngreso()">Cancelar</button>
+      </div>
+
+      {% comment %}
+        Igual que el gasto: eliminar vive dentro del mismo modal de edicion y hay
+        que mantener apretado el boton tres segundos, sin un segundo modal.
+      {% endcomment %}
+      <div class="gasto-borrar" id="ingreso-zona-borrar" hidden>
+        <button type="button" class="op-btn op-btn--danger gasto-borrar__btn" id="ingreso-borrar">
+          <span class="gasto-borrar__label">
+            <span class="material-symbols-outlined">delete</span>
+            <span id="ingreso-borrar-texto">Eliminar ingreso</span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
+
+{% if user.is_staff %}
+<!-- Panel de devolucion del sobrante de la caja. Deja elegir entre "devolvió
+     todo" y "devolvió una parte"; en el segundo caso pide cuánto devolvió y
+     muestra en vivo el pago que se le cargará al empleado por lo que retuvo.
+     El botón de quitar usa el mismo gesto de mantener apretado que gasto/ingreso. -->
+<form id="formulario-devolucion" method="POST"
+      data-sobrante="{{ viaje.final_caja }}"
+      data-estado="{{ viaje.devolucion_estado }}"
+      data-devuelto="{{ viaje.monto_devuelto }}"
+      data-empleado="{{ viaje.empleado.nombre|default:'el chofer' }}">
+  {% csrf_token %}
+  <input type="hidden" name="accion" value="registrar_devolucion">
+  <input type="hidden" name="estado_devolucion" id="devol-estado" value="">
+  <div id="contenedor-modal-devolucion">
+    <div id="contenedor-modal-fondo-devolucion" onclick="cerrarModalDevolucion()"> </div>
+
+    <div id="panel-devolucion">
+      <button type="button" class="boton-cerrar" onclick="cerrarModalDevolucion()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+
+      <div id="icono-devolucion">
+        <span class="material-symbols-outlined">wallet</span>
+      </div>
+
+      <h3 id="devolucion-titulo">Devolución del sobrante</h3>
+      <p id="devolucion-bajada">Sobran <strong>${{ viaje.final_caja|intcomma }}</strong> en la caja. ¿Qué hizo el chofer con esa plata?</p>
+
+      <div class="devol-opciones" role="radiogroup" aria-label="Qué hizo el chofer con el sobrante">
+        <button type="button" class="devol-opcion" data-opcion="total" role="radio" aria-checked="false">
+          <span class="devol-opcion__ico"><span class="material-symbols-outlined">check_circle</span></span>
+          <span class="devol-opcion__txt">
+            <span class="devol-opcion__titulo">Devolvió todo</span>
+            <span class="devol-opcion__sub">Entregó el sobrante completo</span>
+          </span>
+        </button>
+        <button type="button" class="devol-opcion" data-opcion="parcial" role="radio" aria-checked="false">
+          <span class="devol-opcion__ico"><span class="material-symbols-outlined">call_split</span></span>
+          <span class="devol-opcion__txt">
+            <span class="devol-opcion__titulo">Devolvió una parte</span>
+            <span class="devol-opcion__sub">Se quedó con el resto</span>
+          </span>
+        </button>
+      </div>
+
+      <div class="grupo-input devol-monto" id="devol-monto-campo" hidden>
+        <label for="monto-devuelto">¿Cuánto devolvió?</label>
+        <div class="input-con-icono">
+          <span>$</span>
+          <input
+            type="text"
+            id="monto-devuelto"
+            name="monto_devuelto"
+            class="input-miles"
+            inputmode="numeric"
+            autocomplete="off"
+            placeholder="0"
+            pattern="0|[1-9][0-9]{0,2}(\.[0-9]{3})*">
+        </div>
+        <span class="vd-hint devol-hint" id="devol-hint">El resto queda como pago del empleado.</span>
+      </div>
+
+      <div class="acciones-modal">
+        <button type="submit" class="boton-primario" id="devolucion-guardar" disabled>Guardar</button>
+        <button type="button" class="boton-secundario" onclick="cerrarModalDevolucion()">Cancelar</button>
+      </div>
+
+      {% comment %}
+        Quitar la devolución vuelve el viaje a "sin registrar" y borra el pago que
+        hubiera generado. Mismo gesto de mantener apretado que gasto/ingreso, sin
+        segundo modal. Solo aparece cuando ya hay una devolución cargada.
+      {% endcomment %}
+      <div class="gasto-borrar" id="devolucion-zona-borrar" hidden>
+        <button type="button" class="op-btn op-btn--danger gasto-borrar__btn" id="devolucion-borrar">
+          <span class="gasto-borrar__label">
+            <span class="material-symbols-outlined">delete</span>
+            <span id="devolucion-borrar-texto">Quitar devolución</span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
+{% endif %}
 
 <!-- Panel de eliminacion y Fondo -->
 <form id="formulario-eliminar" method="POST">
@@ -412,14 +636,14 @@
             </div>
 
             <div class="grupo-input">
-              <label for="chofer-viaje">Chofer</label>
-              <select id="chofer-viaje" name="id_chofer" class="select-estandar" required>
-                <option value="" disabled>Seleccione un chofer</option>
-                {% for chofer in choferes %}
-                <option value="{{ chofer.id }}" {% if viaje.chofer.id == chofer.id %}selected{% endif %}>{{ chofer.nombre }} {{ chofer.apellido }}</option>
+              <label for="empleado-viaje">Empleado</label>
+              <select id="empleado-viaje" name="id_empleado" class="select-estandar" required>
+                <option value="" disabled>Seleccione un empleado</option>
+                {% for empleado in empleados %}
+                <option value="{{ empleado.id }}" {% if viaje.empleado.id == empleado.id %}selected{% endif %}>{{ empleado.nombre }} {{ empleado.apellido }}</option>
                 {% endfor %}
               </select>
-              <span class="mensaje-error">Por favor, seleccione un chofer de la lista.</span>
+              <span class="mensaje-error">Por favor, seleccione un empleado de la lista.</span>
             </div>
 
             <div class="grupo-input">
@@ -491,15 +715,20 @@
               <label for="inicio-caja">Inicio de Caja</label>
               <div class="input-con-icono">
                 <span>$</span>
+                {% comment %}
+                  Este acepta 0, por eso el pattern no es el mismo que el de los
+                  montos que tienen que ser mayores a cero.
+                {% endcomment %}
                 <input
-                  type="number"
+                  type="text"
                   id="inicio-caja"
                   name="inicio_caja"
+                  class="input-miles"
+                  inputmode="numeric"
+                  autocomplete="off"
                   placeholder="0"
-                  step="1"
-                  min="0"
+                  pattern="0|[1-9][0-9]{0,2}(\.[0-9]{3})*"
                   required
-                  pattern="[0-9+]"
                   value="{{ viaje.inicio_caja|stringformat:'s' }}">
               </div>
               <span class="mensaje-error">Por favor, ingrese un monto válido.</span>
@@ -543,6 +772,10 @@
 
 {% block codigo-javascript %}
   <script src="{% static 'js/autocompletado_ciudades.js' %}"></script>
+  <script src="{% static 'js/selector_entidad.js' %}"></script>
+  <script src="{% static 'js/gastos_viaje.js' %}"></script>
+  <script src="{% static 'js/ingreso_caja.js' %}"></script>
+  <script src="{% static 'js/devolucion_caja.js' %}"></script>
   <script src="{% static 'js/informacion_viaje.js' %}"></script>
   <script>
     // Filtro de operaciones por tipo (Todas / Compras / Ventas)
@@ -551,7 +784,6 @@
       const filas = document.querySelectorAll('.vd-opstable tbody .fila-operacion');
       const vacioFiltro = document.querySelector('.vd-ops-empty-filtro');
       const tabla = document.querySelector('.vd-opstable');
-      if (!tabs.length) return;
 
       const aplicarFiltro = (filtro) => {
         let visibles = 0;
@@ -567,11 +799,47 @@
         }
       };
 
+      const activarTab = (filtro) => {
+        tabs.forEach((t) => t.classList.toggle('is-active', t.dataset.filtro === filtro));
+        aplicarFiltro(filtro);
+      };
+
       tabs.forEach((tab) => {
-        tab.addEventListener('click', () => {
-          tabs.forEach((t) => t.classList.remove('is-active'));
-          tab.classList.add('is-active');
-          aplicarFiltro(tab.dataset.filtro);
+        tab.addEventListener('click', () => activarTab(tab.dataset.filtro));
+      });
+
+      // Salto desde una fila de la caja (venta/compra) a su fila en la tabla de
+      // operaciones: reseteo el filtro para garantizar que la fila este visible,
+      // hago scroll suave y la destaco con un pulso que se desvanece solo.
+      const enlacesCaja = document.querySelectorAll('[data-ir-operacion]');
+      const prefiereMenosMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      enlacesCaja.forEach((enlace) => {
+        enlace.addEventListener('click', () => {
+          const id = enlace.dataset.irOperacion;
+          const destino = document.getElementById('fila-op-' + id);
+          if (!destino) return;
+
+          // Si un filtro dejaba oculta la fila, vuelvo a "Todas" antes de saltar.
+          if (destino.hidden && tabs.length) activarTab('todas');
+
+          destino.scrollIntoView({
+            behavior: prefiereMenosMovimiento ? 'auto' : 'smooth',
+            block: 'center',
+          });
+
+          destino.classList.remove('fila-operacion--destacada');
+          // Reinicio el reflow para que la animacion se dispare aunque se
+          // haga clic dos veces seguidas sobre la misma fila.
+          void destino.offsetWidth;
+          destino.classList.add('fila-operacion--destacada');
+
+          // Limpio la clase pasado el pulso (con menos movimiento, dejo el
+          // resaltado estatico un instante mas para que igual se note).
+          clearTimeout(destino._timeoutDestacado);
+          destino._timeoutDestacado = setTimeout(() => {
+            destino.classList.remove('fila-operacion--destacada');
+          }, prefiereMenosMovimiento ? 2200 : 1800);
         });
       });
     });

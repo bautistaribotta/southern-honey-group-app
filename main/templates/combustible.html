@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block nombre-pestaña %}
+  <title> Combustible </title>
+{% endblock %}
+
+{% block links %}
+  <link rel="stylesheet" href="{% static 'combustible.css' %}">
+{% endblock %}
+
+{% block cabecera %}
+  <div class="cabecera-seccion">
+    <span class="cabecera-seccion__tile">
+      <span class="material-symbols-outlined">local_gas_station</span>
+    </span>
+    <div class="cabecera-seccion__texto">
+      <h2>Combustible</h2>
+      <p>Gestiona las estaciones de servicio donde cargas combustible</p>
+    </div>
+  </div>
+{% endblock %}
+
+{% block area-trabajo %}
+<section id="area-trabajo">
+  {% comment %}
+    Tarjeta de gasto del mes: a la izquierda el mes, navegable con flechas, y a
+    la derecha lo gastado y los litros cargados en ese mes (suma de las cargas
+    del periodo, pagas e impagas). Ocupa todo el ancho, arriba de la barra de
+    herramientas. Las flechas son enlaces de verdad (?mes=YYYY-MM): cambiar de
+    mes anda sin JavaScript y se puede abrir en otra pestaña.
+  {% endcomment %}
+  <section class="comb-mes">
+    <div class="comb-mes__periodo">
+      <p class="comb-mes__eyebrow">Combustible de</p>
+      <div class="comb-nav">
+        <a class="comb-nav__paso"
+           href="?mes={{ periodo_anterior|date:'Y-m' }}{% if q %}&amp;q={{ q }}{% endif %}"
+           title="{{ periodo_anterior|date:'F \d\e Y' }}" aria-label="Mes anterior">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </a>
+        <p class="comb-mes__fecha">
+          <span class="comb-mes__nombre">{{ periodo|date:"F" }}</span>
+          <span class="comb-mes__anio">{{ periodo|date:"Y" }}</span>
+        </p>
+        <a class="comb-nav__paso"
+           href="?mes={{ periodo_siguiente|date:'Y-m' }}{% if q %}&amp;q={{ q }}{% endif %}"
+           title="{{ periodo_siguiente|date:'F \d\e Y' }}" aria-label="Mes siguiente">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </a>
+      </div>
+
+      {% comment %}
+        Mirando otro mes, el camino de vuelta tiene que estar a la vista. Se
+        renderiza siempre para que la tarjeta mantenga su alto: en el mes actual
+        se oculta con visibility, sigue ocupando lugar pero no es visible ni
+        accesible.
+      {% endcomment %}
+      <a class="comb-mes__volver{% if es_mes_actual %} es-oculto{% endif %}"
+         href="{% url 'combustible' %}{% if q %}?q={{ q }}{% endif %}"
+         {% if es_mes_actual %}aria-hidden="true" tabindex="-1"{% endif %}>
+        <span class="material-symbols-outlined">undo</span>
+        <span class="comb-mes__volver-texto">Volver a {{ mes_actual|date:"F" }}</span>
+      </a>
+    </div>
+
+    <div class="comb-mes__cifras">
+      <p class="comb-cifra comb-cifra--gasto">
+        <span class="comb-cifra__valor">${{ gasto_mes|floatformat:"0"|intcomma }}</span>
+        <span class="comb-cifra__rotulo">gastado</span>
+      </p>
+      {% comment %}
+        Los litros son el dato propio del combustible (alquileres no lo tiene) y
+        van como cifra par del gasto: mismo tamaño y diseño, en blanco en vez de
+        miel para que la plata siga siendo el acento. Cuando ninguna carga del
+        mes registro litros el total es 0: se muestra "0 L", apagado.
+      {% endcomment %}
+      <p class="comb-cifra{% if not litros_mes %} es-cero{% endif %}">
+        <span class="comb-cifra__valor">{{ litros_mes|floatformat:"0"|intcomma }} L</span>
+        <span class="comb-cifra__rotulo">litros cargados</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- Controles superiores: buscador y alta -->
+  <div class="barra-herramientas">
+    <div class="grupo-busqueda">
+      <div class="contenedor-input-busqueda">
+        <span class="material-symbols-outlined icono-busqueda">search</span>
+        <input type="text" id="buscar-estacion" class="input-busqueda"
+               placeholder="Buscar estacion por nombre o id" value="{{ q|default:'' }}">
+      </div>
+    </div>
+
+    <button class="boton-nuevo" onclick="prepararPanelNuevaEstacion()">
+      <span class="material-symbols-outlined">add</span>
+      <span class="texto-boton">Nueva estacion</span>
+    </button>
+  </div>
+
+  <!-- Tabla de estaciones -->
+  <div class="contenedor-tabla" id="tabla-estaciones-container">
+    {% include 'tabla_estaciones.html' %}
+  </div>
+</section>
+
+<!-- PANEL LATERAL NUEVA/EDITAR ESTACION (SLIDE-OVER) -->
+<div id="contenedor-slide-over">
+  <div id="slide-over-fondo" onclick="cerrarSlideOver()"> </div>
+
+  <div id="slide-over-panel">
+    <header class="panel-cabecera">
+      <div class="panel-titulo-fila">
+        <div class="icono-contenedor">
+          <span class="material-symbols-outlined">local_gas_station</span>
+        </div>
+        <div class="texto-cabecera">
+          <h3>Nueva estacion</h3>
+          <p>Registra una estacion de servicio</p>
+        </div>
+      </div>
+      <button class="boton-cerrar-panel" onclick="cerrarSlideOver()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </header>
+
+    <div class="panel-cuerpo">
+      <form class="formulario-estacion" id="form-estacion" method="POST" autocomplete="off">
+        {% csrf_token %}
+        <input type="hidden" id="id_estacion" name="id_estacion">
+        <div class="campo-formulario">
+          <label for="nombre">Nombre de la estacion</label>
+          <input
+            type="text"
+            id="nombre"
+            name="nombre"
+            class="input-estandar"
+            placeholder="Ej: YPF Ruta 8"
+            maxlength="30"
+            required
+            pattern="[a-zA-ZÁÉÍÓÚáéíóúñÑ\s\d]{3,}">
+          <span class="mensaje-error">Minimo 3 caracteres. No se permiten simbolos.</span>
+        </div>
+      </form>
+    </div>
+
+    <div class="panel-pie">
+      <button type="submit" form="form-estacion" class="boton-primario">Guardar estacion</button>
+      <button type="button" class="boton-secundario" onclick="cerrarSlideOver()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Panel de eliminacion -->
+<form id="formulario-eliminar" method="POST">
+  {% csrf_token %}
+  <div id="contenedor-panel-eliminar">
+    <div id="contenedor-panel-fondo" onclick="cerrarPanelEliminar()"> </div>
+
+    <div id="panel-eliminar">
+      <input type="hidden" id="id_eliminar" name="id_eliminar" value="">
+
+      <button type="button" class="boton-cerrar-panel" id="icono-cerrar-panel-eliminar" onclick="cerrarPanelEliminar()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+
+      <div id="icono-advertencia">
+        <span class="material-symbols-outlined">warning</span>
+      </div>
+
+      <h3>Confirmar eliminacion</h3>
+      <p id="texto-confirmacion-eliminar">¿Esta seguro que quiere eliminar esta estacion?</p>
+
+      <div class="acciones-modal">
+        <button type="button" class="boton-secundario" onclick="cerrarPanelEliminar()">No, mantener</button>
+        <button type="button" class="boton-primario-eliminar" id="boton-confirmar-eliminar"><span>Si, eliminar</span></button>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% block codigo-javascript %}
+<script src="{% static 'js/paneles.js' %}"></script>
+<script src="{% static 'js/combustible.js' %}"></script>
+{% endblock %}
